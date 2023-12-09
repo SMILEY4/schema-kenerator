@@ -30,7 +30,7 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
-class Test : StringSpec({
+class TestDataTypes : StringSpec({
 
     "Int" {
         val analyzer = ClassAnalyzer()

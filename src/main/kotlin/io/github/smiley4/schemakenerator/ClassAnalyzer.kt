@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator
 
+import io.github.smiley4.schemakenerator.data.ParentTypeInfo
 import io.github.smiley4.schemakenerator.data.PropertyInformation
 import io.github.smiley4.schemakenerator.data.TypeInformation
 import mu.KotlinLogging
@@ -15,12 +16,15 @@ class ClassAnalyzer {
 
     private val logger = KotlinLogging.logger {}
 
-    inline fun <reified T> analyze() = analyze(getKType<T>())
+    inline fun <reified T> analyze() = analyze(getKType<T>(), false, ParentTypeInfo.UNKNOWN)
 
-    fun analyze(type: KType, nullable: Boolean = false): TypeInformation {
+    fun analyze(type: KType, nullable: Boolean, parent: ParentTypeInfo): TypeInformation {
         return when (val classifier = type.classifier) {
             is KClass<*> -> {
-                analyzeClass(type, classifier, nullable)
+                analyzeClass(type, classifier, nullable, parent)
+            }
+            is KTypeParameter -> {
+                parent.generics[classifier.name] ?: TypeInformation.UNKNOWN
             }
             else -> {
                 logger.warn { "Unhandled classifier type: $classifier" }
@@ -29,28 +33,32 @@ class ClassAnalyzer {
         }
     }
 
-    private fun analyzeClass(type: KType, classifier: KClass<*>, nullable: Boolean = false): TypeInformation {
+    private fun analyzeClass(type: KType, classifier: KClass<*>, nullable: Boolean, parent: ParentTypeInfo): TypeInformation {
+        val parentTypeInfo = ParentTypeInfo(
+            qualifiedName = classifier.qualifiedName ?: ParentTypeInfo.UNKNOWN.qualifiedName,
+            generics = classifier.typeParameters.associateIndexed { i, t -> analyzeGeneric(type.arguments[i], t, parent) },
+        )
         return TypeInformation(
             type = type,
-            generics = classifier.typeParameters.associateIndexed { i, t -> analyzeGeneric(type.arguments[i], t) },
+            generics = parentTypeInfo.generics,
             simpleName = classifier.simpleName ?: TypeInformation.UNKNOWN.simpleName,
             qualifiedName = classifier.qualifiedName ?: TypeInformation.UNKNOWN.qualifiedName,
-            properties = if (includeMembers(classifier)) classifier.members.mapNotNull { analyzeMember(it) } else emptyList(),
+            properties = if (includeMembers(classifier)) classifier.members.mapNotNull { analyzeMember(it, parentTypeInfo) } else emptyList(),
             nullable = nullable
         )
     }
 
-    private fun analyzeGeneric(type: KTypeProjection, paramType: KTypeParameter): Pair<String, TypeInformation> {
-        return paramType.name to analyze(type.type!!, type.type!!.isMarkedNullable)
+    private fun analyzeGeneric(type: KTypeProjection, paramType: KTypeParameter, parent: ParentTypeInfo): Pair<String, TypeInformation> {
+        return paramType.name to analyze(type.type!!, type.type!!.isMarkedNullable, parent)
     }
 
-    private fun analyzeMember(callable: KCallable<*>): PropertyInformation? {
+    private fun analyzeMember(callable: KCallable<*>, parent: ParentTypeInfo): PropertyInformation? {
         return when (callable) {
             is KProperty -> {
                 PropertyInformation(
                     name = callable.name,
                     type = callable.returnType,
-                    typeInformation = analyze(callable.returnType, callable.returnType.isMarkedNullable)
+                    typeInformation = analyze(callable.returnType, callable.returnType.isMarkedNullable, parent)
                 )
             }
             is KFunction -> {
