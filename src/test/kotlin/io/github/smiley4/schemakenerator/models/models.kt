@@ -62,5 +62,17 @@ data class TestClassDeepGeneric<T>(
 
 
 
+open class TestOpenClass(
+    val baseField: String
+)
+
+class TestSubClass(
+    baseField: String,
+    val additionalField: Int
+) : TestOpenClass(baseField)
+
+
+
+
 
 

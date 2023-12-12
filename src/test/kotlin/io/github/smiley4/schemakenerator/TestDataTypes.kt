@@ -29,6 +29,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import java.awt.SystemColor.info
 
 class TestDataTypes : StringSpec({
 
@@ -39,6 +40,7 @@ class TestDataTypes : StringSpec({
             info.simpleName shouldBe "Int"
             info.qualifiedName shouldBe "kotlin.Int"
             info.properties shouldHaveSize 0
+            info.baseType shouldBe true
         }
     }
 
@@ -49,6 +51,7 @@ class TestDataTypes : StringSpec({
             info.simpleName shouldBe "String"
             info.qualifiedName shouldBe "kotlin.String"
             info.properties shouldHaveSize 0
+            info.baseType shouldBe true
         }
     }
 
@@ -58,6 +61,7 @@ class TestDataTypes : StringSpec({
             info.simpleName shouldBe "Any"
             info.qualifiedName shouldBe "kotlin.Any"
             info.properties shouldHaveSize 0
+            info.baseType shouldBe true
         }
     }
 
@@ -67,6 +71,7 @@ class TestDataTypes : StringSpec({
             info.simpleName shouldBe "Unit"
             info.qualifiedName shouldBe "kotlin.Unit"
             info.properties shouldHaveSize 0
+            info.baseType shouldBe true
         }
     }
 
@@ -78,6 +83,7 @@ class TestDataTypes : StringSpec({
             type.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassSimple"
             type.generics shouldHaveSize 0
             type.properties shouldHaveSize 1
+            type.baseType shouldBe false
 
             type.shouldHaveProperty("someField") { prop ->
                 prop.name shouldBe "someField"
@@ -95,6 +101,7 @@ class TestDataTypes : StringSpec({
             info.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassSimpleDataTypes"
             info.generics shouldHaveSize 0
             info.properties shouldHaveSize 30
+            info.baseType shouldBe false
 
             info.shouldHaveProperty("fieldByte") { prop ->
                 prop.typeInformation.nullable shouldBe false
@@ -203,6 +210,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "TestClassSimple"
                     propType.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassSimple"
                     propType.properties shouldHaveSize 1
+                    propType.baseType shouldBe false
                 }
             }
 
@@ -223,6 +231,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "TestClassSimple"
                     propType.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassSimple"
                     propType.properties shouldHaveSize 1
+                    propType.baseType shouldBe false
                 }
             }
             
@@ -244,6 +253,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "List"
                     propType.qualifiedName shouldBe "kotlin.collections.List"
                     propType.properties shouldHaveSize 0
+                    propType.baseType shouldBe false
                 }
             }
             
@@ -259,6 +269,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "List"
                     propType.qualifiedName shouldBe "kotlin.collections.List"
                     propType.properties shouldHaveSize 0
+                    propType.baseType shouldBe false
                 }
             }
             
@@ -275,6 +286,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "List"
                     propType.qualifiedName shouldBe "kotlin.collections.List"
                     propType.properties shouldHaveSize 0
+                    propType.baseType shouldBe false
                 }
             }
             
@@ -291,6 +303,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "Map"
                     propType.qualifiedName shouldBe "kotlin.collections.Map"
                     propType.properties shouldHaveSize 0
+                    propType.baseType shouldBe false
                 }
             }
             
@@ -309,6 +322,7 @@ class TestDataTypes : StringSpec({
                     propType.simpleName shouldBe "Map"
                     propType.qualifiedName shouldBe "kotlin.collections.Map"
                     propType.properties shouldHaveSize 0
+                    propType.baseType shouldBe false
                 }
             }
             

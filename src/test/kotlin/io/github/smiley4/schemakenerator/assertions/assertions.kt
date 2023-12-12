@@ -18,6 +18,7 @@ fun TypeInformation.shouldBeAny() {
     this.simpleName shouldBe "Any"
     this.qualifiedName shouldBe "kotlin.Any"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeByte() {
@@ -25,6 +26,7 @@ fun TypeInformation.shouldBeByte() {
     this.simpleName shouldBe "Byte"
     this.qualifiedName shouldBe "kotlin.Byte"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeShort() {
@@ -32,6 +34,7 @@ fun TypeInformation.shouldBeShort() {
     this.simpleName shouldBe "Short"
     this.qualifiedName shouldBe "kotlin.Short"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeInt() {
@@ -39,6 +42,7 @@ fun TypeInformation.shouldBeInt() {
     this.simpleName shouldBe "Int"
     this.qualifiedName shouldBe "kotlin.Int"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeLong() {
@@ -46,6 +50,7 @@ fun TypeInformation.shouldBeLong() {
     this.simpleName shouldBe "Long"
     this.qualifiedName shouldBe "kotlin.Long"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeFloat() {
@@ -53,6 +58,7 @@ fun TypeInformation.shouldBeFloat() {
     this.simpleName shouldBe "Float"
     this.qualifiedName shouldBe "kotlin.Float"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeDouble() {
@@ -60,6 +66,7 @@ fun TypeInformation.shouldBeDouble() {
     this.simpleName shouldBe "Double"
     this.qualifiedName shouldBe "kotlin.Double"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 
@@ -68,6 +75,7 @@ fun TypeInformation.shouldBeUByte() {
     this.simpleName shouldBe "UByte"
     this.qualifiedName shouldBe "kotlin.UByte"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeUShort() {
@@ -75,6 +83,7 @@ fun TypeInformation.shouldBeUShort() {
     this.simpleName shouldBe "UShort"
     this.qualifiedName shouldBe "kotlin.UShort"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeUInt() {
@@ -82,6 +91,7 @@ fun TypeInformation.shouldBeUInt() {
     this.simpleName shouldBe "UInt"
     this.qualifiedName shouldBe "kotlin.UInt"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeULong() {
@@ -89,6 +99,7 @@ fun TypeInformation.shouldBeULong() {
     this.simpleName shouldBe "ULong"
     this.qualifiedName shouldBe "kotlin.ULong"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 
@@ -97,6 +108,7 @@ fun TypeInformation.shouldBeUByteArray() {
     this.simpleName shouldBe "UByteArray"
     this.qualifiedName shouldBe "kotlin.UByteArray"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 
 fun TypeInformation.shouldBeByteArray() {
@@ -104,6 +116,7 @@ fun TypeInformation.shouldBeByteArray() {
     this.simpleName shouldBe "ByteArray"
     this.qualifiedName shouldBe "kotlin.ByteArray"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 
 
@@ -112,6 +125,7 @@ fun TypeInformation.shouldBeULongArray() {
     this.simpleName shouldBe "ULongArray"
     this.qualifiedName shouldBe "kotlin.ULongArray"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 
 fun TypeInformation.shouldBeLongArray() {
@@ -119,6 +133,7 @@ fun TypeInformation.shouldBeLongArray() {
     this.simpleName shouldBe "LongArray"
     this.qualifiedName shouldBe "kotlin.LongArray"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 
 fun TypeInformation.shouldBeBoolean() {
@@ -126,6 +141,7 @@ fun TypeInformation.shouldBeBoolean() {
     this.simpleName shouldBe "Boolean"
     this.qualifiedName shouldBe "kotlin.Boolean"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeBooleanArray() {
@@ -133,6 +149,7 @@ fun TypeInformation.shouldBeBooleanArray() {
     this.simpleName shouldBe "BooleanArray"
     this.qualifiedName shouldBe "kotlin.BooleanArray"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 
 fun TypeInformation.shouldBeChar() {
@@ -140,6 +157,7 @@ fun TypeInformation.shouldBeChar() {
     this.simpleName shouldBe "Char"
     this.qualifiedName shouldBe "kotlin.Char"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 fun TypeInformation.shouldBeCharArray() {
@@ -147,6 +165,7 @@ fun TypeInformation.shouldBeCharArray() {
     this.simpleName shouldBe "CharArray"
     this.qualifiedName shouldBe "kotlin.CharArray"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 
 
@@ -155,6 +174,7 @@ fun TypeInformation.shouldBeString() {
     this.simpleName shouldBe "String"
     this.qualifiedName shouldBe "kotlin.String"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe true
 }
 
 
@@ -168,5 +188,6 @@ fun TypeInformation.shouldBeStringArray() {
     this.simpleName shouldBe "Array"
     this.qualifiedName shouldBe "kotlin.Array"
     this.properties shouldHaveSize 0
+    this.baseType shouldBe false
 }
 

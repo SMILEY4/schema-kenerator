@@ -9,7 +9,9 @@ data class TypeInformation(
     val simpleName: String,
     val qualifiedName: String,
     val properties: List<PropertyInformation>,
-    val nullable: Boolean
+    val superTypes: List<TypeInformation>,
+    val nullable: Boolean,
+    val baseType: Boolean,
 ) {
 
     companion object {
@@ -20,8 +22,14 @@ data class TypeInformation(
             simpleName = "?",
             qualifiedName = "?",
             properties = emptyList(),
-            nullable = false
+            superTypes = emptyList(),
+            nullable = false,
+            baseType = false
         )
+
+        fun TypeInformation.collectProperties(): List<PropertyInformation> {
+            return this.properties + superTypes.flatMap { it.collectProperties() }
+        }
 
     }
 

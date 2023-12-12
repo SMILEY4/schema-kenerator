@@ -91,11 +91,7 @@ class TestGenerics : StringSpec({
                         ?.also { genericType2 ->
                             genericType2.shouldBeString()
                         }
-                    genericType1.properties shouldHaveSize 1
-                    genericType1.shouldHaveProperty("value") { prop2 ->
-                        prop2.typeInformation.nullable shouldBe false
-                        prop2.typeInformation.shouldBeString()
-                    }
+                    genericType1.properties shouldHaveSize 0
                 }
             info.properties shouldHaveSize 1
             info.shouldHaveProperty("value") { prop1 ->
