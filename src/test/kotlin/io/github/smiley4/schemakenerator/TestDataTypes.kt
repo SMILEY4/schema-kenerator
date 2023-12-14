@@ -29,12 +29,11 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import java.awt.SystemColor.info
 
 class TestDataTypes : StringSpec({
 
     "Int" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<Int>().also { info ->
             info.generics shouldHaveSize 0
             info.simpleName shouldBe "Int"
@@ -45,7 +44,7 @@ class TestDataTypes : StringSpec({
     }
 
     "String" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<String>().also { info ->
             info.generics shouldHaveSize 0
             info.simpleName shouldBe "String"
@@ -56,7 +55,7 @@ class TestDataTypes : StringSpec({
     }
 
     "Any" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<Any>().also { info ->
             info.simpleName shouldBe "Any"
             info.qualifiedName shouldBe "kotlin.Any"
@@ -66,7 +65,7 @@ class TestDataTypes : StringSpec({
     }
 
     "Unit" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<Unit>().also { info ->
             info.simpleName shouldBe "Unit"
             info.qualifiedName shouldBe "kotlin.Unit"
@@ -76,7 +75,7 @@ class TestDataTypes : StringSpec({
     }
 
     "TestClassSimple" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestClassSimple>().also { type ->
 
             type.simpleName shouldBe "TestClassSimple"
@@ -94,7 +93,7 @@ class TestDataTypes : StringSpec({
     }
 
     "TestClassSimpleDataTypes" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestClassSimpleDataTypes>().also { info ->
 
             info.simpleName shouldBe "TestClassSimpleDataTypes"

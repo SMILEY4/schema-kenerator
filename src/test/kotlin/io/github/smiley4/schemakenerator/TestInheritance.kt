@@ -3,19 +3,16 @@ package io.github.smiley4.schemakenerator
 import io.github.smiley4.schemakenerator.assertions.shouldBeInt
 import io.github.smiley4.schemakenerator.assertions.shouldBeString
 import io.github.smiley4.schemakenerator.assertions.shouldHaveProperty
-import io.github.smiley4.schemakenerator.models.TestClassDeepGeneric
-import io.github.smiley4.schemakenerator.models.TestClassGeneric
 import io.github.smiley4.schemakenerator.models.TestSubClass
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
 class TestInheritance : StringSpec({
 
     "test basic" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestSubClass>().also { info ->
             info.simpleName shouldBe "TestSubClass"
             info.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestSubClass"

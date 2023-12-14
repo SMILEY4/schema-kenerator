@@ -13,7 +13,7 @@ import io.kotest.matchers.shouldBe
 class TestGenerics : StringSpec({
 
     "test basic single generic" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestClassGeneric<String>>().also { info ->
             info.simpleName shouldBe "TestClassGeneric"
             info.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassGeneric"
@@ -32,7 +32,7 @@ class TestGenerics : StringSpec({
     }
 
     "test nested same single generic" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestClassGeneric<TestClassGeneric<String>>>().also { info ->
             info.simpleName shouldBe "TestClassGeneric"
             info.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassGeneric"
@@ -75,7 +75,7 @@ class TestGenerics : StringSpec({
     }
 
     "test nested list" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestClassGeneric<List<String>>>().also { info ->
             info.simpleName shouldBe "TestClassGeneric"
             info.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassGeneric"
@@ -109,7 +109,7 @@ class TestGenerics : StringSpec({
     }
 
     "test deep generic" {
-        val analyzer = ClassAnalyzer()
+        val analyzer = Analyzer()
         analyzer.analyze<TestClassDeepGeneric<String>>().also { info ->
             info.simpleName shouldBe "TestClassDeepGeneric"
             info.qualifiedName shouldBe "io.github.smiley4.schemakenerator.models.TestClassDeepGeneric"

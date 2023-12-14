@@ -56,8 +56,8 @@ data class TestClassGeneric<T>(
     val value: T
 )
 
-data class TestClassDeepGeneric<T>(
-    val values: List<T>
+data class TestClassDeepGeneric<E>(
+    val myValues: List<E>
 )
 
 

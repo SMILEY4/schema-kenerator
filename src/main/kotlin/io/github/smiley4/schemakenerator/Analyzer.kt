@@ -13,7 +13,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 
-class ClassAnalyzer {
+class Analyzer {
 
     companion object {
 
