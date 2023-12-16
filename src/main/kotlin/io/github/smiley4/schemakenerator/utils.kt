@@ -8,6 +8,6 @@ inline fun <reified T> getKType(): KType {
 }
 
 
- inline fun <T, K, V> Iterable<T>.associateIndexed(transform: (index: Int, T) -> Pair<K, V>): Map<K, V> {
+inline fun <T, K, V> Iterable<T>.associateIndexed(transform: (index: Int, T) -> Pair<K, V>): Map<K, V> {
     return this.mapIndexed(transform).associate { it }
 }

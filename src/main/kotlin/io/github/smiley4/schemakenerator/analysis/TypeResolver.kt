@@ -14,32 +14,33 @@ data class TestClassGeneric<T>(
 
 data class TestClassDeepGeneric<X>(
     val myValues: Map<String, X>,
-    val other: TestClassGeneric<Int>
+    val other: TestClassGeneric<Int>,
+    val other2: TestClassGeneric<Int>
 )
-
 
 fun main() {
     val type = getKType<TestClassDeepGeneric<List<Boolean>>>()
-    val resolved = TypeResolver().resolveClass(type, type.classifier as KClass<*>, mapOf())
-    println("" + type + resolved)
+    val context = TypeContext()
+    val resolved = TypeResolver(context).resolveClass(type, type.classifier as KClass<*>, mapOf())
+    println("" + type + resolved + context)
 }
 
 
 data class TypeData(
     val name: String,
-    val typeParameters: Map<String, TypeData>,
+    val typeParameters: Map<String, TypeRef>,
     val members: List<MemberData>,
 )
 
 data class MemberData(
     val name: String,
-    val type: TypeData
+    val type: TypeRef
 )
 
 
-class TypeResolver {
+class TypeResolver(private val context: TypeContext) {
 
-    fun resolveClass(type: KType, clazz: KClass<*>, resolvedTypeParameters: Map<String, TypeData>): TypeData {
+    fun resolveClass(type: KType, clazz: KClass<*>, resolvedTypeParameters: Map<String, TypeRef>): TypeRef {
 
         val typeParameters = buildMap {
             for (index in type.arguments.indices) {
@@ -47,6 +48,11 @@ class TypeResolver {
                 val argType = type.arguments[index]
                 this[name] = resolveTypeProjection(argType, resolvedTypeParameters)
             }
+        }
+
+        val ref = TypeRef.forType(type, typeParameters)
+        if(context.has(ref)) {
+            return ref
         }
 
         val members = clazz.members
@@ -62,10 +68,12 @@ class TypeResolver {
             name = clazz.simpleName!!,
             typeParameters = typeParameters,
             members = members,
-        )
+        ).let {
+            context.add(type, it)
+        }
     }
 
-    private fun resolveTypeProjection(typeProjection: KTypeProjection, resolvedTypeParameters: Map<String, TypeData>): TypeData {
+    private fun resolveTypeProjection(typeProjection: KTypeProjection, resolvedTypeParameters: Map<String, TypeRef>): TypeRef {
         return when (val classifier = typeProjection.type?.classifier) {
             is KClass<*> -> {
                 resolveClass(typeProjection.type!!, classifier, resolvedTypeParameters)
@@ -79,7 +87,7 @@ class TypeResolver {
         }
     }
 
-    private fun resolveMemberType(type: KType, resolvedTypeParameters: Map<String, TypeData>): TypeData {
+    private fun resolveMemberType(type: KType, resolvedTypeParameters: Map<String, TypeRef>): TypeRef {
         return when (val classifier = type.classifier) {
             is KClass<*> -> {
                 resolveClass(type, classifier, resolvedTypeParameters)
@@ -92,6 +100,5 @@ class TypeResolver {
             }
         }
     }
-
 
 }
