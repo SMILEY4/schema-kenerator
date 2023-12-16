@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.analysis
 
 import io.github.smiley4.schemakenerator.getKType
-import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
@@ -19,93 +19,76 @@ data class TestClassDeepGeneric<X>(
 
 
 fun main() {
-
-    val type = getKType<TestClassDeepGeneric<String>>()
-
-    TypeResolver().resolve(type.classifier as KClass<*>, type.arguments)
-
+    val type = getKType<TestClassDeepGeneric<List<Boolean>>>()
+    val resolved = TypeResolver().resolveClass(type, type.classifier as KClass<*>, mapOf())
+    println("" + type + resolved)
 }
 
-data class ClassData(
-    val generics: List<GenericData>,
-    val members: List<MemberData>
-)
 
-data class GenericData(
+data class TypeData(
     val name: String,
-    val type: KType
+    val typeParameters: Map<String, TypeData>,
+    val members: List<MemberData>,
 )
 
 data class MemberData(
     val name: String,
-    val gType: GenericData?,
-    val cType: KClass<*>?,
+    val type: TypeData
 )
+
 
 class TypeResolver {
 
-    fun resolve(clazz: KClass<*>, typeParams: List<KTypeProjection>): ClassData {
+    fun resolveClass(type: KType, clazz: KClass<*>, resolvedTypeParameters: Map<String, TypeData>): TypeData {
 
-        val genericData = typeParams.mapIndexed { index, typeParam -> GenericData(clazz.typeParameters[index].name, typeParam.type!!) }
-        val genericDataMap = genericData.associateBy { it.name }
-
-        val members = clazz.members.map { member ->
-            resolveMember(member, genericDataMap)
-
-//            val memberName = member.name
-//            val memberTypeClassifier = member.returnType.classifier!!
-//            if(memberTypeClassifier is KTypeParameter) {
-//                val genericType = genericDataMap[memberTypeClassifier.name]
-//                MemberData(memberName, genericType, null)
-//            } else {
-//                val memberTypeParams = member.returnType.arguments
-//                // ...resolve member.returnType.classifier + resolved memberTypeParams
-//                MemberData(memberName, null, memberTypeClassifier as KClass<*>)
-//            }
+        val typeParameters = buildMap {
+            for (index in type.arguments.indices) {
+                val name = clazz.typeParameters[index].name
+                val argType = type.arguments[index]
+                this[name] = resolveTypeProjection(argType, resolvedTypeParameters)
+            }
         }
 
-        return ClassData(
-            generics = genericData,
-            members = members
+        val members = clazz.members
+            .filterIsInstance<KProperty<*>>()
+            .map { member ->
+                MemberData(
+                    name = member.name,
+                    type = resolveMemberType(member.returnType, typeParameters)
+                )
+            }
+
+        return TypeData(
+            name = clazz.simpleName!!,
+            typeParameters = typeParameters,
+            members = members,
         )
     }
 
-
-    fun resolveTypeParameter(type: KType) {
-
+    private fun resolveTypeProjection(typeProjection: KTypeProjection, resolvedTypeParameters: Map<String, TypeData>): TypeData {
+        return when (val classifier = typeProjection.type?.classifier) {
+            is KClass<*> -> {
+                resolveClass(typeProjection.type!!, classifier, resolvedTypeParameters)
+            }
+            is KTypeParameter -> {
+                resolvedTypeParameters[classifier.name]!!
+            }
+            else -> {
+                throw Exception("Unhandled classifier type")
+            }
+        }
     }
 
-
-
-    private fun resolveMember(member: KCallable<*>, generics: Map<String, GenericData>): MemberData {
-        val type = member.returnType
-        val classifier = member.returnType.classifier!!
-
-        return when (classifier) {
-//            // member is directly of generic type specified by class
-//            is KTypeParameter -> {
-//                MemberData(
-//                    member.name,
-//                    gType = generics[classifier.name],
-//                    cType = null,
-//                    0
-//                )
-//            }
-//            // member is another type, possibly with nested generic type specified by class
-//            is KClass<*> -> {
-//                MemberData(
-//                    member.name,
-//                    gType = null,
-//                    cType = classifier
-//                )
-//            }
-            // anything else
+    private fun resolveMemberType(type: KType, resolvedTypeParameters: Map<String, TypeData>): TypeData {
+        return when (val classifier = type.classifier) {
+            is KClass<*> -> {
+                resolveClass(type, classifier, resolvedTypeParameters)
+            }
+            is KTypeParameter -> {
+                resolvedTypeParameters[classifier.name]!!
+            }
             else -> {
-                MemberData(
-                    member.name,
-                    gType = null,
-                    cType = null,
-                )
+                throw Exception("Unhandled classifier type")
             }
         }
     }
