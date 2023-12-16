@@ -1,5 +1,8 @@
 package io.github.smiley4.schemakenerator.analysis
 
+import io.github.smiley4.schemakenerator.analysis.data.TypeData
+import io.github.smiley4.schemakenerator.analysis.data.TypeParameterData
+import io.github.smiley4.schemakenerator.analysis.data.TypeRef
 import kotlin.reflect.KType
 
 
@@ -13,7 +16,7 @@ class TypeContext {
         return ref
     }
 
-    fun getData(kType: KType, typeParameters: Map<String, TypeRef>): TypeData? {
+    fun getData(kType: KType, typeParameters: Map<String, TypeParameterData>): TypeData? {
         return getData(TypeRef.forType(kType, typeParameters))
     }
 
@@ -21,12 +24,16 @@ class TypeContext {
         return types[ref.id]
     }
 
-    fun has(kType: KType, typeParameters: Map<String, TypeRef>): Boolean {
+    fun has(kType: KType, typeParameters: Map<String, TypeParameterData>): Boolean {
         return has(TypeRef.forType(kType, typeParameters))
     }
 
     fun has(ref: TypeRef): Boolean {
         return types.containsKey(ref.id)
+    }
+
+    fun getIds(): List<String> {
+        return types.keys.toList()
     }
 
 }
