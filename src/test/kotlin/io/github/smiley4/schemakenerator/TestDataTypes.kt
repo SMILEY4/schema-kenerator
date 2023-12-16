@@ -7,6 +7,8 @@ import io.github.smiley4.schemakenerator.assertions.ExpectedTypeData
 import io.github.smiley4.schemakenerator.assertions.shouldHave
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
 import io.github.smiley4.schemakenerator.models.TestClassSimple
+import io.github.smiley4.schemakenerator.models.TestClassWithEnumField
+import io.github.smiley4.schemakenerator.models.TestClassWithFunctionField
 import io.kotest.core.spec.style.StringSpec
 
 class TestDataTypes : StringSpec({
@@ -83,9 +85,65 @@ class TestDataTypes : StringSpec({
         context shouldHave listOf("kotlin.Unit")
     }
 
-    "TestClassSimple" {
+    "simple class" {
         val context = TypeContext()
         TypeResolver(context).resolve<TestClassSimple>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                type.shouldMatch(
+                    ExpectedTypeData(
+                        simpleName = "TestClassSimple",
+                        qualifiedName = "io.github.smiley4.schemakenerator.models.TestClassSimple",
+                        typeParameters = emptyMap(),
+                        supertypeIds = listOf("kotlin.Any"),
+                        members = listOf(
+                            ExpectedMemberData(
+                                name = "someField",
+                                typeId = "kotlin.String",
+                                nullable = false
+                            )
+                        )
+                    )
+                )
+            }
+        context shouldHave listOf(
+            "io.github.smiley4.schemakenerator.models.TestClassSimple",
+            "kotlin.String",
+            "kotlin.Any"
+        )
+    }
+
+    "enum" {
+        val context = TypeContext()
+        TypeResolver(context).resolve<TestClassWithEnumField>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                type.shouldMatch(
+                    ExpectedTypeData(
+                        simpleName = "TestClassSimple",
+                        qualifiedName = "io.github.smiley4.schemakenerator.models.TestClassSimple",
+                        typeParameters = emptyMap(),
+                        supertypeIds = listOf("kotlin.Any"),
+                        members = listOf(
+                            ExpectedMemberData(
+                                name = "someField",
+                                typeId = "kotlin.String",
+                                nullable = false
+                            )
+                        )
+                    )
+                )
+            }
+        context shouldHave listOf(
+            "io.github.smiley4.schemakenerator.models.TestClassSimple",
+            "kotlin.String",
+            "kotlin.Any"
+        )
+    }
+
+    "lambda" {
+        val context = TypeContext()
+        TypeResolver(context).resolve<TestClassWithFunctionField>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(

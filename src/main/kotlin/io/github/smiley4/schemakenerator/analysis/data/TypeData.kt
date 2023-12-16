@@ -6,4 +6,26 @@ data class TypeData(
     val typeParameters: Map<String, TypeParameterData>,
     val supertypes: List<TypeRef>,
     val members: List<MemberData>,
-)
+) {
+
+    companion object {
+
+        fun wildcard() = TypeData(
+            simpleName = "*",
+            qualifiedName = "*",
+            typeParameters = emptyMap(),
+            supertypes = emptyList(),
+            members = emptyList()
+        )
+
+        fun placeholder(ref: TypeRef) = TypeData(
+            simpleName = ref.id,
+            qualifiedName = ref.id,
+            typeParameters = emptyMap(),
+            supertypes = emptyList(),
+            members = emptyList()
+        )
+
+    }
+
+}

@@ -2,12 +2,14 @@ package io.github.smiley4.schemakenerator
 
 import io.github.smiley4.schemakenerator.analysis.TypeContext
 import io.github.smiley4.schemakenerator.analysis.TypeResolver
+import io.github.smiley4.schemakenerator.assertions.ExpectedMemberData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeParameterData
 import io.github.smiley4.schemakenerator.assertions.shouldHave
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
 import io.github.smiley4.schemakenerator.models.TestClassDeepGeneric
 import io.github.smiley4.schemakenerator.models.TestClassGeneric
+import io.github.smiley4.schemakenerator.models.TestClassRecursiveGeneric
 import io.kotest.core.spec.style.StringSpec
 
 class TestGenerics : StringSpec({
@@ -27,6 +29,12 @@ class TestGenerics : StringSpec({
                                 nullable = false
                             )
                         ),
+                        members = listOf(
+                            ExpectedMemberData(
+                                name = "value",
+                                typeId = "kotlin.String"
+                            )
+                        )
                     )
                 )
             }
@@ -52,6 +60,12 @@ class TestGenerics : StringSpec({
                                 nullable = false
                             )
                         ),
+                        members = listOf(
+                            ExpectedMemberData(
+                                name = "value",
+                                typeId = "io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>"
+                            )
+                        )
                     )
                 )
             }
@@ -79,6 +93,12 @@ class TestGenerics : StringSpec({
                                 nullable = false
                             )
                         ),
+                        members = listOf(
+                            ExpectedMemberData(
+                                name = "myValues",
+                                typeId = "kotlin.collections.List<kotlin.String>"
+                            )
+                        )
                     )
                 )
             }
@@ -92,4 +112,36 @@ class TestGenerics : StringSpec({
             "kotlin.String",
         )
     }
+
+    "test wildcard" {
+        val context = TypeContext()
+        TypeResolver(context).resolve<TestClassGeneric<*>>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                type.shouldMatch(
+                    ExpectedTypeData(
+                        simpleName = "TestClassGeneric",
+                        typeParameters = mapOf(
+                            "T" to ExpectedTypeParameterData(
+                                name = "T",
+                                typeId = "*",
+                                nullable = false
+                            )
+                        ),
+                        members = listOf(
+                            ExpectedMemberData(
+                                name = "value",
+                                typeId = "*"
+                            )
+                        )
+                    )
+                )
+            }
+        context shouldHave listOf(
+            "io.github.smiley4.schemakenerator.models.TestClassGeneric<*>",
+            "kotlin.Any",
+            "*"
+        )
+    }
+
 })

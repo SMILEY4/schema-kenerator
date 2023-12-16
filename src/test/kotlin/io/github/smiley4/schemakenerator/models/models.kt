@@ -5,6 +5,20 @@ class TestClassSimple(
     val someField: String
 )
 
+enum class TestEnum {
+    RED, GREEN, BLUE
+}
+
+class TestClassWithEnumField(
+    val value: TestEnum
+)
+
+class TestClassWithFunctionField(
+    val value: (x: Int) -> String
+)
+
+
+
 data class TestClassGeneric<T>(
     val value: T
 )
@@ -24,7 +38,9 @@ class TestSubClass(
 ) : TestOpenClass(baseField)
 
 
+data class TestClassRecursiveGeneric<T>(
+    val value: T
+) : TestInterfaceRecursiveGeneric<TestClassRecursiveGeneric<*>>
 
 
-
-
+interface TestInterfaceRecursiveGeneric<T>

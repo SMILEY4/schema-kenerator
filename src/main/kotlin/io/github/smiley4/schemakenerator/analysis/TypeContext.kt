@@ -16,6 +16,11 @@ class TypeContext {
         return ref
     }
 
+    fun add(ref: TypeRef, type: TypeData): TypeRef {
+        types[ref.id] = type
+        return ref
+    }
+
     fun getData(kType: KType, typeParameters: Map<String, TypeParameterData>): TypeData? {
         return getData(TypeRef.forType(kType, typeParameters))
     }

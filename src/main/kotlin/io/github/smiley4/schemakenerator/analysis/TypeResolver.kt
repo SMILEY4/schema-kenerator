@@ -12,12 +12,6 @@ import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 
 
-
-
-
-
-
-
 class TypeResolver(private val context: TypeContext) {
 
     companion object {
@@ -85,6 +79,9 @@ class TypeResolver(private val context: TypeContext) {
             return ref
         }
 
+        // add placeholder to break out of infinite recursions
+        context.add(ref, TypeData.placeholder(ref))
+
         // get all supertypes
         val supertypes =
             if (BASE_TYPES.contains(clazz)) emptyList() else clazz.supertypes.map { resolveSupertype(it, resolvedTypeParameters) }
@@ -113,11 +110,14 @@ class TypeResolver(private val context: TypeContext) {
             supertypes = supertypes,
             members = members,
         ).let {
-            context.add(type, it)
+            context.add(ref, it)
         }
     }
 
     private fun resolveTypeProjection(typeProjection: KTypeProjection, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
+        if (typeProjection.type == null) {
+            return if (context.has(TypeRef.wildcard())) TypeRef.wildcard() else context.add(TypeRef.wildcard(), TypeData.wildcard())
+        }
         return when (val classifier = typeProjection.type?.classifier) {
             is KClass<*> -> {
                 resolveClass(typeProjection.type!!, classifier, providedTypeParameters)

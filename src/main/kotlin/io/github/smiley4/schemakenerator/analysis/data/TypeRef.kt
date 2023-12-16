@@ -9,6 +9,8 @@ data class TypeRef(
 
     companion object {
 
+        fun wildcard() = TypeRef("*")
+
         fun forType(kType: KType, resolvedTypeParameters: Map<String, TypeParameterData>): TypeRef {
             return TypeRef(buildId(kType, resolvedTypeParameters))
         }
