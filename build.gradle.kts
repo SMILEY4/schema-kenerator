@@ -13,6 +13,7 @@ plugins {
     kotlin("jvm") version "1.8.21"
     id("org.owasp.dependencycheck") version "8.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.23.0"
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 
@@ -23,6 +24,7 @@ repositories {
 dependencies {
 
     implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
     val kotlinLoggingVersion = "3.0.5"
     implementation("io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion")

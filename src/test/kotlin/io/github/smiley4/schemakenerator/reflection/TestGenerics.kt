@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator
+package io.github.smiley4.schemakenerator.reflection
 
 import io.github.smiley4.schemakenerator.parser.core.TypeParsingContext
 import io.github.smiley4.schemakenerator.parser.reflection.TypeReflectionParser
@@ -7,8 +7,6 @@ import io.github.smiley4.schemakenerator.assertions.ExpectedTypeData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeParameterData
 import io.github.smiley4.schemakenerator.assertions.shouldHave
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
-import io.github.smiley4.schemakenerator.models.TestClassDeepGeneric
-import io.github.smiley4.schemakenerator.models.TestClassGeneric
 import io.github.smiley4.schemakenerator.parser.core.TypeParsingConfig
 import io.kotest.core.spec.style.StringSpec
 
@@ -39,7 +37,7 @@ class TestGenerics : StringSpec({
                 )
             }
         context shouldHave listOf(
-            "io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>",
+            "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>",
             "kotlin.String",
             "kotlin.Any"
         )
@@ -56,22 +54,22 @@ class TestGenerics : StringSpec({
                         typeParameters = mapOf(
                             "T" to ExpectedTypeParameterData(
                                 name = "T",
-                                typeId = "io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>",
+                                typeId = "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>",
                                 nullable = false
                             )
                         ),
                         members = listOf(
                             ExpectedMemberData(
                                 name = "value",
-                                typeId = "io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>"
+                                typeId = "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>"
                             )
                         )
                     )
                 )
             }
         context shouldHave listOf(
-            "io.github.smiley4.schemakenerator.models.TestClassGeneric<io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>>",
-            "io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>",
+            "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>>",
+            "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>",
             "kotlin.String",
             "kotlin.Any"
         )
@@ -103,7 +101,7 @@ class TestGenerics : StringSpec({
                 )
             }
         context shouldHave listOf(
-            "io.github.smiley4.schemakenerator.models.TestClassDeepGeneric<kotlin.String>",
+            "io.github.smiley4.schemakenerator.reflection.TestClassDeepGeneric<kotlin.String>",
             "kotlin.collections.List<kotlin.String>",
             "kotlin.collections.Collection<kotlin.String>",
             "kotlin.collections.Iterable<kotlin.String>",
@@ -138,7 +136,7 @@ class TestGenerics : StringSpec({
                 )
             }
         context shouldHave listOf(
-            "io.github.smiley4.schemakenerator.models.TestClassGeneric<*>",
+            "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<*>",
             "kotlin.Any",
             "*"
         )

@@ -1,8 +1,14 @@
-package io.github.smiley4.schemakenerator.models
+package io.github.smiley4.schemakenerator.reflection
 
 
 class TestClassSimple(
     val someField: String
+)
+
+class TestClassMixedTypes(
+    val myList: List<TestClassSimple>,
+    val myMap: Map<String, TestClassSimple>,
+    val myArray: Array<TestClassSimple>
 )
 
 enum class TestEnum {
