@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.assertions
 
 import io.github.smiley4.schemakenerator.parser.data.MemberData
-import io.github.smiley4.schemakenerator.parser.TypeParsingContext
+import io.github.smiley4.schemakenerator.parser.core.TypeParsingContext
 import io.github.smiley4.schemakenerator.parser.data.TypeData
 import io.github.smiley4.schemakenerator.parser.data.TypeParameterData
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder

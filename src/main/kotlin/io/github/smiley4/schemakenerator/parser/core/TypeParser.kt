@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.parser
+package io.github.smiley4.schemakenerator.parser.core
 
 import io.github.smiley4.schemakenerator.getKType
 import io.github.smiley4.schemakenerator.parser.data.TypeRef

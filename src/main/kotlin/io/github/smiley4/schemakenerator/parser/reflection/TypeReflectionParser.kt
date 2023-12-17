@@ -1,171 +1,39 @@
 package io.github.smiley4.schemakenerator.parser.reflection
 
-import io.github.smiley4.schemakenerator.parser.data.MemberData
-import io.github.smiley4.schemakenerator.parser.data.TypeData
-import io.github.smiley4.schemakenerator.parser.data.TypeParameterData
-import io.github.smiley4.schemakenerator.parser.data.TypeRef
 import io.github.smiley4.schemakenerator.getKType
-import io.github.smiley4.schemakenerator.getMembersSafe
-import io.github.smiley4.schemakenerator.parser.BASE_TYPES
-import io.github.smiley4.schemakenerator.parser.TypeParsingContext
-import io.github.smiley4.schemakenerator.parser.TypeParser
-import io.github.smiley4.schemakenerator.parser.TypeParsingConfig
+import io.github.smiley4.schemakenerator.parser.core.TypeParser
+import io.github.smiley4.schemakenerator.parser.core.TypeParsingConfig
+import io.github.smiley4.schemakenerator.parser.core.TypeParsingContext
+import io.github.smiley4.schemakenerator.parser.data.TypeRef
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 import kotlin.reflect.KType
-import kotlin.reflect.KTypeParameter
-import kotlin.reflect.KTypeProjection
 
 
 class TypeReflectionParser(private val config: TypeParsingConfig, private val context: TypeParsingContext) : TypeParser {
 
     override fun getContext(): TypeParsingContext = context
 
+    fun getConfig(): TypeParsingConfig = config
+
+    fun getClassParser(): ClassParser = ClassParser(this)
+    fun getTypeParameterParser(): TypeParameterParser = TypeParameterParser(this)
+    fun getMemberParser(): MemberParser = MemberParser(this)
+    fun getSupertypeParser(): SupertypeParser = SupertypeParser(this)
+    fun getEnumValueParser(): EnumValueParser = EnumValueParser(this)
+
     // TODO: resolve annotations
     //  - all as raw additinal information ?
     //  - as programmable processing-step ? -> only include wanted annotations ? -> modify data?
     // TODO: make everything mutable + post-processing step
 
+    inline fun <reified T> parse(): TypeRef = this.parse(getKType<T>())
+
     override fun parse(type: KType): TypeRef {
         if (type.classifier is KClass<*>) {
-            return resolveClass(type, type.classifier as KClass<*>, mapOf())
+            return getClassParser().parse(type, type.classifier as KClass<*>, mapOf())
         } else {
             throw Exception("Type is not a class.")
         }
-    }
-
-    private fun resolveClass(type: KType, clazz: KClass<*>, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
-
-        // resolve all type parameters
-        val resolvedTypeParameters = getTypeParameters(type, clazz, providedTypeParameters)
-
-        // check if the same type with the same type parameters has already been resolved -> reuse existing
-        val ref = TypeRef.forType(type, resolvedTypeParameters)
-        if (context.has(ref)) {
-            return ref
-        }
-
-        // add placeholder to break out of infinite recursions
-        context.reserve(ref)
-
-        // get all supertypes
-        val supertypes = getSupertypes(clazz, resolvedTypeParameters)
-
-        // get all members
-        val members = getMembers(clazz, resolvedTypeParameters, supertypes)
-
-        // get enum values
-        val enumValues = getEnumValues(clazz)
-
-        // add type to context and return its ref
-        return TypeData(
-            simpleName = clazz.simpleName!!,
-            qualifiedName = clazz.qualifiedName!!,
-            typeParameters = resolvedTypeParameters,
-            supertypes = supertypes,
-            members = members,
-            enumValues = enumValues
-        ).let {
-            context.add(ref, it)
-        }
-    }
-
-    private fun getTypeParameters(type: KType, clazz: KClass<*>, providedTypeParameters: Map<String, TypeParameterData>): Map<String, TypeParameterData> {
-        return buildMap {
-            for (index in type.arguments.indices) {
-                val name = clazz.typeParameters[index].name
-                val argType = type.arguments[index]
-                val resolvedType = resolveTypeProjection(argType, providedTypeParameters)
-                this[name] = TypeParameterData(
-                    name = name,
-                    type = resolvedType,
-                    nullable = argType.type?.isMarkedNullable ?: false
-                )
-            }
-        }
-    }
-
-    private fun resolveTypeProjection(typeProjection: KTypeProjection, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
-        if (typeProjection.type == null) {
-            return if (context.has(TypeRef.wildcard())) TypeRef.wildcard() else context.add(TypeRef.wildcard(), TypeData.wildcard())
-        }
-        return when (val classifier = typeProjection.type?.classifier) {
-            is KClass<*> -> {
-                resolveClass(typeProjection.type!!, classifier, providedTypeParameters)
-            }
-            is KTypeParameter -> {
-                providedTypeParameters[classifier.name]!!.type
-            }
-            else -> {
-                throw Exception("Unhandled classifier type")
-            }
-        }
-    }
-
-    private fun getSupertypes(clazz: KClass<*>, resolvedTypeParameters: Map<String, TypeParameterData>): List<TypeRef> {
-        return if (BASE_TYPES.contains(clazz)) {
-            emptyList()
-        } else {
-            clazz.supertypes
-                .filter { config.supertypeFilter.filter(it) }
-                .map { resolveSupertype(it, resolvedTypeParameters) }
-                .filter { config.supertypeFilter.filter(it, context) }
-        }
-    }
-
-    private fun resolveSupertype(type: KType, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
-        return when (val classifier = type.classifier) {
-            is KClass<*> -> {
-                resolveClass(type, classifier, providedTypeParameters)
-            }
-            else -> {
-                throw Exception("Unhandled classifier type")
-            }
-        }
-    }
-
-    private fun getMembers(clazz: KClass<*>, resolvedTypeParameters: Map<String, TypeParameterData>, supertypes: List<TypeRef>): List<MemberData> {
-        return if (BASE_TYPES.contains(clazz)) {
-            emptyList()
-        } else {
-            clazz.getMembersSafe()
-                .onEach { println(it) }
-                .filterIsInstance<KProperty<*>>()
-                .filter { config.memberFilter.filterProperty(it) }
-                .map { member ->
-                    MemberData(
-                        name = member.name,
-                        type = resolveMemberType(member.returnType, resolvedTypeParameters),
-                        nullable = member.returnType.isMarkedNullable
-                    )
-                }
-                .filter { !checkIsSupertypeMember(it, supertypes) }
-                .filter { config.memberFilter.filterProperty(it, context) }
-        }
-    }
-
-    private fun resolveMemberType(type: KType, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
-        return when (val classifier = type.classifier) {
-            is KClass<*> -> {
-                resolveClass(type, classifier, providedTypeParameters)
-            }
-            is KTypeParameter -> {
-                providedTypeParameters[classifier.name]!!.type
-            }
-            else -> {
-                throw Exception("Unhandled classifier type")
-            }
-        }
-    }
-
-    private fun checkIsSupertypeMember(member: MemberData, supertypes: List<TypeRef>): Boolean {
-        val resolvedSupertypes = supertypes.mapNotNull { context.getData(it) }
-        val supertypeMembers = resolvedSupertypes.flatMap { it.members }
-        return supertypeMembers.any { it.name == member.name && it.type.id == member.type.id && it.nullable == member.nullable }
-    }
-
-    private fun getEnumValues(clazz: KClass<*>): List<String> {
-        return clazz.java.enumConstants?.map { it.toString() } ?: emptyList()
     }
 
 }
