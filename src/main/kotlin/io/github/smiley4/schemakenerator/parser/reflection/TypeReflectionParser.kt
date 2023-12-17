@@ -1,11 +1,15 @@
-package io.github.smiley4.schemakenerator.analysis
+package io.github.smiley4.schemakenerator.parser.reflection
 
-import io.github.smiley4.schemakenerator.analysis.data.MemberData
-import io.github.smiley4.schemakenerator.analysis.data.TypeData
-import io.github.smiley4.schemakenerator.analysis.data.TypeParameterData
-import io.github.smiley4.schemakenerator.analysis.data.TypeRef
+import io.github.smiley4.schemakenerator.parser.data.MemberData
+import io.github.smiley4.schemakenerator.parser.data.TypeData
+import io.github.smiley4.schemakenerator.parser.data.TypeParameterData
+import io.github.smiley4.schemakenerator.parser.data.TypeRef
 import io.github.smiley4.schemakenerator.getKType
 import io.github.smiley4.schemakenerator.getMembersSafe
+import io.github.smiley4.schemakenerator.parser.BASE_TYPES
+import io.github.smiley4.schemakenerator.parser.TypeParsingContext
+import io.github.smiley4.schemakenerator.parser.TypeParser
+import io.github.smiley4.schemakenerator.parser.TypeParsingConfig
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
@@ -13,51 +17,16 @@ import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 
 
-class TypeResolver(private val context: TypeContext) {
+class TypeReflectionParser(private val config: TypeParsingConfig, private val context: TypeParsingContext) : TypeParser {
 
-    companion object {
-
-        // Types that will be analyzed with less detail (no members, supertypes, ...)
-        val BASE_TYPES = setOf(
-            Number::class,
-
-            Byte::class,
-            Short::class,
-            Int::class,
-            Long::class,
-
-            UByte::class,
-            UShort::class,
-            UInt::class,
-            ULong::class,
-
-            Float::class,
-            Double::class,
-
-            Boolean::class,
-
-            Char::class,
-            String::class,
-
-            Any::class,
-            Unit::class,
-
-            Enum::class
-        )
-
-    }
+    override fun getContext(): TypeParsingContext = context
 
     // TODO: resolve annotations
     //  - all as raw additinal information ?
     //  - as programmable processing-step ? -> only include wanted annotations ? -> modify data?
     // TODO: make everything mutable + post-processing step
 
-    inline fun <reified T> resolve(): TypeRef {
-        return resolve(getKType<T>())
-    }
-
-
-    fun resolve(type: KType): TypeRef {
+    override fun parse(type: KType): TypeRef {
         if (type.classifier is KClass<*>) {
             return resolveClass(type, type.classifier as KClass<*>, mapOf())
         } else {
@@ -137,9 +106,10 @@ class TypeResolver(private val context: TypeContext) {
         return if (BASE_TYPES.contains(clazz)) {
             emptyList()
         } else {
-            clazz.supertypes.map {
-                resolveSupertype(it, resolvedTypeParameters)
-            }
+            clazz.supertypes
+                .filter { config.supertypeFilter.filter(it) }
+                .map { resolveSupertype(it, resolvedTypeParameters) }
+                .filter { config.supertypeFilter.filter(it, context) }
         }
     }
 
@@ -161,6 +131,7 @@ class TypeResolver(private val context: TypeContext) {
             clazz.getMembersSafe()
                 .onEach { println(it) }
                 .filterIsInstance<KProperty<*>>()
+                .filter { config.memberFilter.filterProperty(it) }
                 .map { member ->
                     MemberData(
                         name = member.name,
@@ -169,6 +140,7 @@ class TypeResolver(private val context: TypeContext) {
                     )
                 }
                 .filter { !checkIsSupertypeMember(it, supertypes) }
+                .filter { config.memberFilter.filterProperty(it, context) }
         }
     }
 

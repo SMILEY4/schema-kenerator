@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.analysis.data
+package io.github.smiley4.schemakenerator.parser.data
 
 data class TypeData(
     val simpleName: String,

@@ -1,24 +1,22 @@
 package io.github.smiley4.schemakenerator
 
-import io.github.smiley4.schemakenerator.analysis.TypeContext
-import io.github.smiley4.schemakenerator.analysis.TypeResolver
-import io.github.smiley4.schemakenerator.analysis.data.TypeRef
+import io.github.smiley4.schemakenerator.parser.TypeParsingContext
+import io.github.smiley4.schemakenerator.parser.reflection.TypeReflectionParser
+import io.github.smiley4.schemakenerator.parser.data.TypeRef
 import io.github.smiley4.schemakenerator.assertions.ExpectedMemberData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeData
 import io.github.smiley4.schemakenerator.assertions.shouldHave
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
 import io.github.smiley4.schemakenerator.models.TestClassSimple
-import io.github.smiley4.schemakenerator.models.TestClassWithAbstractField
 import io.github.smiley4.schemakenerator.models.TestClassWithEnumField
 import io.github.smiley4.schemakenerator.models.TestClassWithFunctionField
-import io.github.smiley4.schemakenerator.models.TestEnum
 import io.kotest.core.spec.style.StringSpec
 
 class TestDataTypes : StringSpec({
 
     "Int" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<Int>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<Int>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -35,8 +33,8 @@ class TestDataTypes : StringSpec({
     }
 
     "String" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<String>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<String>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -53,8 +51,8 @@ class TestDataTypes : StringSpec({
     }
 
     "Any" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<Any>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<Any>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -71,8 +69,8 @@ class TestDataTypes : StringSpec({
     }
 
     "Unit" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<Unit>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<Unit>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -89,8 +87,8 @@ class TestDataTypes : StringSpec({
     }
 
     "simple class" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<TestClassSimple>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<TestClassSimple>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -117,8 +115,8 @@ class TestDataTypes : StringSpec({
     }
 
     "enum" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<TestClassWithEnumField>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<TestClassWithEnumField>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -165,8 +163,8 @@ class TestDataTypes : StringSpec({
     }
 
     "function type" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<TestClassWithFunctionField>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<TestClassWithFunctionField>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(

@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.analysis.data
+package io.github.smiley4.schemakenerator.parser.data
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KType

@@ -1,12 +1,12 @@
-package io.github.smiley4.schemakenerator.analysis
+package io.github.smiley4.schemakenerator.parser
 
-import io.github.smiley4.schemakenerator.analysis.data.TypeData
-import io.github.smiley4.schemakenerator.analysis.data.TypeParameterData
-import io.github.smiley4.schemakenerator.analysis.data.TypeRef
+import io.github.smiley4.schemakenerator.parser.data.TypeData
+import io.github.smiley4.schemakenerator.parser.data.TypeParameterData
+import io.github.smiley4.schemakenerator.parser.data.TypeRef
 import kotlin.reflect.KType
 
 
-class TypeContext {
+class TypeParsingContext {
 
     private val types = mutableMapOf<String, TypeData>()
 

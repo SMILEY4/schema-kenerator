@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.assertions
 
-import io.github.smiley4.schemakenerator.analysis.data.MemberData
-import io.github.smiley4.schemakenerator.analysis.TypeContext
-import io.github.smiley4.schemakenerator.analysis.data.TypeData
-import io.github.smiley4.schemakenerator.analysis.data.TypeParameterData
+import io.github.smiley4.schemakenerator.parser.data.MemberData
+import io.github.smiley4.schemakenerator.parser.TypeParsingContext
+import io.github.smiley4.schemakenerator.parser.data.TypeData
+import io.github.smiley4.schemakenerator.parser.data.TypeParameterData
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -64,6 +64,6 @@ infix fun MemberData.shouldMatch(expected: ExpectedMemberData) {
     expected.nullable?.also { this.nullable shouldBe it }
 }
 
-infix fun TypeContext.shouldHave(expectedTypeIds: Collection<String>) {
+infix fun TypeParsingContext.shouldHave(expectedTypeIds: Collection<String>) {
     this.getIds() shouldContainExactlyInAnyOrder expectedTypeIds
 }

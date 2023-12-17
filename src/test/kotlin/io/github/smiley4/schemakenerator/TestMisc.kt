@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator
 
-import io.github.smiley4.schemakenerator.analysis.TypeContext
-import io.github.smiley4.schemakenerator.analysis.TypeResolver
+import io.github.smiley4.schemakenerator.parser.TypeParsingContext
+import io.github.smiley4.schemakenerator.parser.reflection.TypeReflectionParser
 import io.github.smiley4.schemakenerator.assertions.ExpectedMemberData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeParameterData
@@ -13,8 +13,8 @@ import io.kotest.core.spec.style.StringSpec
 class TestMisc : StringSpec({
 
     "test recursive" {
-        val context = TypeContext()
-        TypeResolver(context).resolve<TestClassRecursiveGeneric<String>>()
+        val context = TypeParsingContext()
+        TypeReflectionParser(context).resolve<TestClassRecursiveGeneric<String>>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
