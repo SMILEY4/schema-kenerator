@@ -15,6 +15,7 @@ data class ExpectedTypeData(
     val typeParameters: Map<String, ExpectedTypeParameterData>? = null,
     val supertypeIds: List<String>? = null,
     val members: List<ExpectedMemberData>? = null,
+    val enumValues: List<String>? = null
 )
 
 data class ExpectedTypeParameterData(
@@ -48,6 +49,7 @@ infix fun TypeData.shouldMatch(expected: ExpectedTypeData) {
             this.members.find { am -> am.name == em.name }!! shouldMatch em
         }
     }
+    expected.enumValues?.also { this.enumValues shouldContainExactlyInAnyOrder it }
 }
 
 infix fun TypeParameterData.shouldMatch(expected: ExpectedTypeParameterData) {

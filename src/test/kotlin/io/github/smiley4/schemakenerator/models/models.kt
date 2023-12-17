@@ -17,6 +17,12 @@ class TestClassWithFunctionField(
     val value: (x: Int) -> String
 )
 
+abstract class TestAbstractClass(val myField: String)
+
+
+class TestClassWithAbstractField(
+    val field: TestAbstractClass
+)
 
 
 data class TestClassGeneric<T>(

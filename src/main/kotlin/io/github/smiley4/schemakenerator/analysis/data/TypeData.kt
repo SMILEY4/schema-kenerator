@@ -6,6 +6,7 @@ data class TypeData(
     val typeParameters: Map<String, TypeParameterData>,
     val supertypes: List<TypeRef>,
     val members: List<MemberData>,
+    val enumValues: List<String>
 ) {
 
     companion object {
@@ -15,7 +16,8 @@ data class TypeData(
             qualifiedName = "*",
             typeParameters = emptyMap(),
             supertypes = emptyList(),
-            members = emptyList()
+            members = emptyList(),
+            enumValues = emptyList()
         )
 
         fun placeholder(ref: TypeRef) = TypeData(
@@ -23,7 +25,8 @@ data class TypeData(
             qualifiedName = ref.id,
             typeParameters = emptyMap(),
             supertypes = emptyList(),
-            members = emptyList()
+            members = emptyList(),
+            enumValues = emptyList()
         )
 
     }

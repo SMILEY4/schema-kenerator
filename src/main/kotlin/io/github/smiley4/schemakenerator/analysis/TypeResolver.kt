@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.analysis.data.TypeData
 import io.github.smiley4.schemakenerator.analysis.data.TypeParameterData
 import io.github.smiley4.schemakenerator.analysis.data.TypeRef
 import io.github.smiley4.schemakenerator.getKType
+import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
@@ -39,10 +40,17 @@ class TypeResolver(private val context: TypeContext) {
             String::class,
 
             Any::class,
-            Unit::class
+            Unit::class,
+
+            Enum::class
         )
 
     }
+
+    // TODO: resolve annotations
+    //  - all as raw additinal information ?
+    //  - as programmable processing-step ? -> only include wanted annotations ? -> modify data?
+    // TODO: make everything mutable + post-processing step
 
     inline fun <reified T> resolve(): TypeRef {
         return resolve(getKType<T>())
@@ -83,14 +91,20 @@ class TypeResolver(private val context: TypeContext) {
         context.add(ref, TypeData.placeholder(ref))
 
         // get all supertypes
-        val supertypes =
-            if (BASE_TYPES.contains(clazz)) emptyList() else clazz.supertypes.map { resolveSupertype(it, resolvedTypeParameters) }
+        val supertypes = if (BASE_TYPES.contains(clazz)) {
+            emptyList()
+        } else {
+            clazz.supertypes.map {
+                resolveSupertype(it, resolvedTypeParameters)
+            }
+        }
 
         // get all members
         val members = if (BASE_TYPES.contains(clazz)) {
             emptyList()
         } else {
-            clazz.members
+            clazz.getMembersSafe()
+                .onEach { println(it) }
                 .filterIsInstance<KProperty<*>>()
                 .map { member ->
                     MemberData(
@@ -102,6 +116,9 @@ class TypeResolver(private val context: TypeContext) {
                 .filter { !checkIsSupertypeMember(it, supertypes) }
         }
 
+        // get enum values
+        val enumValues = clazz.java.enumConstants?.map { it.toString() } ?: emptyList()
+
         // add type to context and return its ref
         return TypeData(
             simpleName = clazz.simpleName!!,
@@ -109,8 +126,27 @@ class TypeResolver(private val context: TypeContext) {
             typeParameters = resolvedTypeParameters,
             supertypes = supertypes,
             members = members,
+            enumValues = enumValues
         ).let {
             context.add(ref, it)
+        }
+    }
+
+    private fun KClass<*>.getMembersSafe(): Collection<KCallable<*>> {
+        /*
+        Throws error for function-types (for unknown reasons). Catch and ignore this error
+
+        Example:
+        class MyClass(
+            val myField: (v: Int) -> String
+        )
+        "Unknown origin of public abstract operator fun invoke(p1: P1):
+        R defined in kotlin.Function1[FunctionInvokeDescriptor@162989f2] (class kotlin.reflect.jvm.internal.impl.builtins.functions.FunctionInvokeDescriptor)"
+        */
+        return try {
+            this.members
+        } catch (e: Throwable) {
+            emptyList()
         }
     }
 
