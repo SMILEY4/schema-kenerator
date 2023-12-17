@@ -21,6 +21,10 @@ class TypeContext {
         return ref
     }
 
+    fun reserve(ref: TypeRef) {
+        add(ref, TypeData.placeholder(ref))
+    }
+
     fun getData(kType: KType, typeParameters: Map<String, TypeParameterData>): TypeData? {
         return getData(TypeRef.forType(kType, typeParameters))
     }
