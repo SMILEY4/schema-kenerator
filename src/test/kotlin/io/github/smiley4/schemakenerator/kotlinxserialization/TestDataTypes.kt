@@ -1,21 +1,23 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.kotlinxserialization
 
 import io.github.smiley4.schemakenerator.assertions.ExpectedEnumTypeData
 import io.github.smiley4.schemakenerator.assertions.ExpectedObjectTypeData
 import io.github.smiley4.schemakenerator.assertions.ExpectedPrimitiveTypeData
-import io.github.smiley4.schemakenerator.parser.core.TypeParserContext
-import io.github.smiley4.schemakenerator.parser.reflection.ReflectionTypeParser
 import io.github.smiley4.schemakenerator.assertions.ExpectedPropertyData
 import io.github.smiley4.schemakenerator.assertions.shouldHaveExactly
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
+import io.github.smiley4.schemakenerator.assertions.shouldMatchWildcard
 import io.github.smiley4.schemakenerator.parser.core.TypeId
+import io.github.smiley4.schemakenerator.parser.core.TypeParserContext
+import io.github.smiley4.schemakenerator.parser.serialization.KotlinxSerializationTypeParser
+import io.github.smiley4.schemakenerator.parser.serialization.KotlinxSerializationTypeParserConfig
 import io.kotest.core.spec.style.StringSpec
 
 class TestDataTypes : StringSpec({
 
     "Int" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<Int>()
+        KotlinxSerializationTypeParser(context = context).parse<Int>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -31,7 +33,7 @@ class TestDataTypes : StringSpec({
 
     "String" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<String>()
+        KotlinxSerializationTypeParser(context = context).parse<String>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -47,23 +49,17 @@ class TestDataTypes : StringSpec({
 
     "Any" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<Any>()
+        KotlinxSerializationTypeParser(context = context).parse<Any>()
             .let { context.getData(it)!! }
             .also { type ->
-                type.shouldMatch(
-                    ExpectedPrimitiveTypeData(
-                        simpleName = "Any",
-                        qualifiedName = "kotlin.Any",
-                        typeParameters = emptyMap(),
-                    )
-                )
+                type.shouldMatchWildcard()
             }
-        context shouldHaveExactly listOf("kotlin.Any")
+        context shouldHaveExactly listOf("*")
     }
 
     "Unit" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<Unit>()
+        KotlinxSerializationTypeParser(context = context).parse<Unit>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
@@ -79,15 +75,14 @@ class TestDataTypes : StringSpec({
 
     "simple class" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<TestClassSimple>()
+        KotlinxSerializationTypeParser(context = context).parse<TestClassSimple>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
                     ExpectedObjectTypeData(
                         simpleName = "TestClassSimple",
-                        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassSimple",
+                        qualifiedName = "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple",
                         typeParameters = emptyMap(),
-                        supertypeIds = listOf("kotlin.Any"),
                         members = listOf(
                             ExpectedPropertyData(
                                 name = "someField",
@@ -99,35 +94,34 @@ class TestDataTypes : StringSpec({
                 )
             }
         context shouldHaveExactly listOf(
-            "io.github.smiley4.schemakenerator.reflection.TestClassSimple",
+            "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple",
             "kotlin.String",
-            "kotlin.Any"
         )
     }
 
     "mixed types" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<TestClassMixedTypes>()
+        KotlinxSerializationTypeParser(context = context).parse<TestClassMixedTypes>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
                     ExpectedObjectTypeData(
                         simpleName = "TestClassMixedTypes",
-                        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassMixedTypes",
+                        qualifiedName = "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes",
                         members = listOf(
                             ExpectedPropertyData(
                                 name = "myList",
-                                typeId = "kotlin.collections.List<io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-                                nullable = false
+                                typeId = "kotlin.collections.ArrayList<io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple>",
+                                        nullable = false
                             ),
                             ExpectedPropertyData(
                                 name = "myMap",
-                                typeId = "kotlin.collections.Map<kotlin.String,io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
+                                typeId = "kotlin.collections.LinkedHashMap<io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple,kotlin.String>",
                                 nullable = false
                             ),
                             ExpectedPropertyData(
                                 name = "myArray",
-                                typeId = "kotlin.Array<io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
+                                typeId = "kotlin.Array<io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple>",
                                 nullable = false
                             )
                         )
@@ -135,43 +129,30 @@ class TestDataTypes : StringSpec({
                 )
             }
         context shouldHaveExactly listOf(
-            "io.github.smiley4.schemakenerator.reflection.TestClassMixedTypes",
-            "io.github.smiley4.schemakenerator.reflection.TestClassSimple",
-            "kotlin.Array<io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-            "kotlin.collections.Collection<io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-            "kotlin.collections.Collection<kotlin.collections.Map.Entry<kotlin.String,io.github.smiley4.schemakenerator.reflection.TestClassSimple>>",
-            "kotlin.collections.Collection<kotlin.String>",
-            "kotlin.collections.Iterable<io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-            "kotlin.collections.Iterable<kotlin.collections.Map.Entry<kotlin.String,io.github.smiley4.schemakenerator.reflection.TestClassSimple>>",
-            "kotlin.collections.Iterable<kotlin.String>",
-            "kotlin.collections.List<io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-            "kotlin.collections.Map.Entry<kotlin.String,io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-            "kotlin.collections.Map<kotlin.String,io.github.smiley4.schemakenerator.reflection.TestClassSimple>",
-            "kotlin.collections.Set<kotlin.collections.Map.Entry<kotlin.String,io.github.smiley4.schemakenerator.reflection.TestClassSimple>>",
-            "kotlin.collections.Set<kotlin.String>",
-            "kotlin.Int",
+            "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple",
+            "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes",
+            "kotlin.collections.ArrayList<io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple>",
+            "kotlin.collections.LinkedHashMap<io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple,kotlin.String>",
+            "kotlin.Array<io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple>",
             "kotlin.String",
-            "kotlin.Any",
-            "kotlin.Cloneable",
-            "java.io.Serializable",
         )
     }
 
     "enum" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<TestClassWithEnumField>()
+        KotlinxSerializationTypeParser(context = context).parse<TestClassWithEnumField>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
                     ExpectedObjectTypeData(
                         simpleName = "TestClassWithEnumField",
-                        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassWithEnumField",
+                        qualifiedName = "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField",
                         typeParameters = emptyMap(),
-                        supertypeIds = listOf("kotlin.Any"),
+                        supertypeIds = listOf(),
                         members = listOf(
                             ExpectedPropertyData(
                                 name = "value",
-                                typeId = "io.github.smiley4.schemakenerator.reflection.TestEnum",
+                                typeId = "io.github.smiley4.schemakenerator.kotlinxserialization.TestEnum",
                                 nullable = false
                             )
                         ),
@@ -179,19 +160,11 @@ class TestDataTypes : StringSpec({
                 )
             }
         context shouldHaveExactly listOf(
-            "io.github.smiley4.schemakenerator.reflection.TestClassWithEnumField",
-            "io.github.smiley4.schemakenerator.reflection.TestEnum",
-            "kotlin.Enum<io.github.smiley4.schemakenerator.reflection.TestEnum>",
-            "kotlin.enums.EnumEntries<io.github.smiley4.schemakenerator.reflection.TestEnum>",
-            "kotlin.collections.List<io.github.smiley4.schemakenerator.reflection.TestEnum>",
-            "kotlin.collections.Collection<io.github.smiley4.schemakenerator.reflection.TestEnum>",
-            "kotlin.collections.Iterable<io.github.smiley4.schemakenerator.reflection.TestEnum>",
-            "kotlin.String",
-            "kotlin.Int",
-            "kotlin.Any",
+            "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField",
+            "io.github.smiley4.schemakenerator.kotlinxserialization.TestEnum",
         )
 
-        context.getData(TypeId("io.github.smiley4.schemakenerator.reflection.TestEnum"))!!.also { type ->
+        context.getData(TypeId("io.github.smiley4.schemakenerator.kotlinxserialization.TestEnum"))!!.also { type ->
             type.shouldMatch(
                 ExpectedEnumTypeData(
                     simpleName = "TestEnum",
@@ -203,19 +176,19 @@ class TestDataTypes : StringSpec({
 
     "function type" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<TestClassWithFunctionField>()
+        KotlinxSerializationTypeParser(context = context).parse<TestClassWithFunctionField>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
                     ExpectedObjectTypeData(
                         simpleName = "TestClassWithFunctionField",
-                        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassWithFunctionField",
+                        qualifiedName = "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithFunctionField",
                         typeParameters = emptyMap(),
-                        supertypeIds = listOf("kotlin.Any"),
+                        supertypeIds = listOf(),
                         members = listOf(
                             ExpectedPropertyData(
                                 name = "value",
-                                typeId = "kotlin.Function1<kotlin.Int,kotlin.String>",
+                                typeId = "kotlinx.serialization.Polymorphic<Function1>", // todo: seems like data is lost here
                                 nullable = false
                             )
                         )
@@ -223,12 +196,8 @@ class TestDataTypes : StringSpec({
                 )
             }
         context shouldHaveExactly listOf(
-            "io.github.smiley4.schemakenerator.reflection.TestClassWithFunctionField",
-            "kotlin.Function1<kotlin.Int,kotlin.String>",
-            "kotlin.Function<kotlin.String>",
-            "kotlin.Int",
-            "kotlin.String",
-            "kotlin.Any"
+            "kotlinx.serialization.Polymorphic<Function1>",
+            "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithFunctionField",
         )
     }
 

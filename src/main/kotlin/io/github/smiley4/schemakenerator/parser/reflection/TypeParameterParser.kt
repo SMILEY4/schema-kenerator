@@ -1,14 +1,14 @@
 package io.github.smiley4.schemakenerator.parser.reflection
 
-import io.github.smiley4.schemakenerator.parser.data.TypeData
-import io.github.smiley4.schemakenerator.parser.data.TypeParameterData
-import io.github.smiley4.schemakenerator.parser.data.TypeRef
+import io.github.smiley4.schemakenerator.parser.core.TypeId
+import io.github.smiley4.schemakenerator.parser.core.TypeParameterData
+import io.github.smiley4.schemakenerator.parser.core.WildcardTypeData
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 
-class TypeParameterParser(private val typeParser: TypeReflectionParser) {
+class TypeParameterParser(private val typeParser: ReflectionTypeParser) {
 
     fun parse(type: KType, clazz: KClass<*>, providedTypeParameters: Map<String, TypeParameterData>): Map<String, TypeParameterData> {
         return buildMap {
@@ -25,9 +25,13 @@ class TypeParameterParser(private val typeParser: TypeReflectionParser) {
         }
     }
 
-    private fun resolveTypeProjection(typeProjection: KTypeProjection, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
+    private fun resolveTypeProjection(typeProjection: KTypeProjection, providedTypeParameters: Map<String, TypeParameterData>): TypeId {
         if (typeProjection.type == null) {
-            return if (typeParser.getContext().has(TypeRef.wildcard())) TypeRef.wildcard() else typeParser.getContext().add(TypeRef.wildcard(), TypeData.wildcard())
+            return if (typeParser.context.has(TypeId.wildcard())) {
+                TypeId.wildcard()
+            } else {
+                typeParser.context.add(WildcardTypeData())
+            }
         }
         return when (val classifier = typeProjection.type?.classifier) {
             is KClass<*> -> {

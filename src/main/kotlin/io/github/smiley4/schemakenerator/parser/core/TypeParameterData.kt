@@ -1,7 +1,7 @@
-package io.github.smiley4.schemakenerator.parser.data
+package io.github.smiley4.schemakenerator.parser.core
 
 data class TypeParameterData(
     val name: String,
-    val type: TypeRef,
+    val type: TypeId,
     val nullable: Boolean
 )

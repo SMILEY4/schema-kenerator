@@ -1,24 +1,24 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.parser.core.TypeParsingContext
-import io.github.smiley4.schemakenerator.parser.reflection.TypeReflectionParser
-import io.github.smiley4.schemakenerator.assertions.ExpectedMemberData
-import io.github.smiley4.schemakenerator.assertions.ExpectedTypeData
+import io.github.smiley4.schemakenerator.assertions.ExpectedObjectTypeData
+import io.github.smiley4.schemakenerator.parser.core.TypeParserContext
+import io.github.smiley4.schemakenerator.parser.reflection.ReflectionTypeParser
+import io.github.smiley4.schemakenerator.assertions.ExpectedPropertyData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeParameterData
-import io.github.smiley4.schemakenerator.assertions.shouldHave
+import io.github.smiley4.schemakenerator.assertions.shouldHaveExactly
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
-import io.github.smiley4.schemakenerator.parser.core.TypeParsingConfig
+import io.github.smiley4.schemakenerator.parser.reflection.ReflectionTypeParserConfig
 import io.kotest.core.spec.style.StringSpec
 
 class TestGenerics : StringSpec({
 
     "test basic single generic" {
-        val context = TypeParsingContext()
-        TypeReflectionParser(TypeParsingConfig(), context).parse<TestClassGeneric<String>>()
+        val context = TypeParserContext()
+        ReflectionTypeParser(context = context).parse<TestClassGeneric<String>>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
-                    ExpectedTypeData(
+                    ExpectedObjectTypeData(
                         simpleName = "TestClassGeneric",
                         typeParameters = mapOf(
                             "T" to ExpectedTypeParameterData(
@@ -28,7 +28,7 @@ class TestGenerics : StringSpec({
                             )
                         ),
                         members = listOf(
-                            ExpectedMemberData(
+                            ExpectedPropertyData(
                                 name = "value",
                                 typeId = "kotlin.String"
                             )
@@ -36,7 +36,7 @@ class TestGenerics : StringSpec({
                     )
                 )
             }
-        context shouldHave listOf(
+        context shouldHaveExactly listOf(
             "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>",
             "kotlin.String",
             "kotlin.Any"
@@ -44,12 +44,12 @@ class TestGenerics : StringSpec({
     }
 
     "test nested same single generic" {
-        val context = TypeParsingContext()
-        TypeReflectionParser(TypeParsingConfig(), context).parse<TestClassGeneric<TestClassGeneric<String>>>()
+        val context = TypeParserContext()
+        ReflectionTypeParser(context = context).parse<TestClassGeneric<TestClassGeneric<String>>>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
-                    ExpectedTypeData(
+                    ExpectedObjectTypeData(
                         simpleName = "TestClassGeneric",
                         typeParameters = mapOf(
                             "T" to ExpectedTypeParameterData(
@@ -59,7 +59,7 @@ class TestGenerics : StringSpec({
                             )
                         ),
                         members = listOf(
-                            ExpectedMemberData(
+                            ExpectedPropertyData(
                                 name = "value",
                                 typeId = "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>"
                             )
@@ -67,8 +67,8 @@ class TestGenerics : StringSpec({
                     )
                 )
             }
-        context shouldHave listOf(
-            "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<io.github.smiley4.schemakenerator.models.TestClassGeneric<kotlin.String>>",
+        context shouldHaveExactly listOf(
+            "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>>",
             "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<kotlin.String>",
             "kotlin.String",
             "kotlin.Any"
@@ -77,12 +77,12 @@ class TestGenerics : StringSpec({
 
 
     "test deep generic" {
-        val context = TypeParsingContext()
-        TypeReflectionParser(TypeParsingConfig(), context).parse<TestClassDeepGeneric<String>>()
+        val context = TypeParserContext()
+        ReflectionTypeParser(context = context).parse<TestClassDeepGeneric<String>>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
-                    ExpectedTypeData(
+                    ExpectedObjectTypeData(
                         simpleName = "TestClassDeepGeneric",
                         typeParameters = mapOf(
                             "E" to ExpectedTypeParameterData(
@@ -92,7 +92,7 @@ class TestGenerics : StringSpec({
                             )
                         ),
                         members = listOf(
-                            ExpectedMemberData(
+                            ExpectedPropertyData(
                                 name = "myValues",
                                 typeId = "kotlin.collections.List<kotlin.String>"
                             )
@@ -100,7 +100,7 @@ class TestGenerics : StringSpec({
                     )
                 )
             }
-        context shouldHave listOf(
+        context shouldHaveExactly listOf(
             "io.github.smiley4.schemakenerator.reflection.TestClassDeepGeneric<kotlin.String>",
             "kotlin.collections.List<kotlin.String>",
             "kotlin.collections.Collection<kotlin.String>",
@@ -112,12 +112,12 @@ class TestGenerics : StringSpec({
     }
 
     "test wildcard" {
-        val context = TypeParsingContext()
-        TypeReflectionParser(TypeParsingConfig(), context).parse<TestClassGeneric<*>>()
+        val context = TypeParserContext()
+        ReflectionTypeParser(context = context).parse<TestClassGeneric<*>>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
-                    ExpectedTypeData(
+                    ExpectedObjectTypeData(
                         simpleName = "TestClassGeneric",
                         typeParameters = mapOf(
                             "T" to ExpectedTypeParameterData(
@@ -127,7 +127,7 @@ class TestGenerics : StringSpec({
                             )
                         ),
                         members = listOf(
-                            ExpectedMemberData(
+                            ExpectedPropertyData(
                                 name = "value",
                                 typeId = "*"
                             )
@@ -135,7 +135,7 @@ class TestGenerics : StringSpec({
                     )
                 )
             }
-        context shouldHave listOf(
+        context shouldHaveExactly listOf(
             "io.github.smiley4.schemakenerator.reflection.TestClassGeneric<*>",
             "kotlin.Any",
             "*"
