@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.reflection
 
+import java.time.LocalDateTime
+
 
 class TestClassSimple(
     val someField: String
@@ -10,6 +12,20 @@ class TestClassMixedTypes(
     val myMap: Map<String, TestClassSimple>,
     val myArray: Array<TestClassSimple>
 )
+
+class TestClassLocalDateTime (
+    val timestamp: LocalDateTime
+)
+
+class TestClassWithMethods(
+    val someText: String,
+    val myFlag: Boolean,
+    val isEnabled: Boolean,
+) {
+    fun calculateValue(): Int = 4
+    fun myFlag() = myFlag.toString()
+    fun isDisabled() = !isEnabled
+}
 
 enum class TestEnum {
     RED, GREEN, BLUE

@@ -50,4 +50,43 @@ class TestMisc : StringSpec({
         )
     }
 
+    "test functions" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(context = context).parse<TestClassWithMethods>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                type.shouldMatch(
+                    ExpectedObjectTypeData(
+                        simpleName = "TestClassWithMethods",
+                        members = listOf(
+                            ExpectedPropertyData(
+                                name = "someText",
+                                typeId = "kotlin.String"
+                            ),
+                            ExpectedPropertyData(
+                                name = "myFlag",
+                                typeId = "kotlin.Boolean"
+                            ),
+                            ExpectedPropertyData(
+                                name = "isEnabled",
+                                typeId = "kotlin.Boolean"
+                            ),
+                            ExpectedPropertyData(
+                                name = "calculateValue",
+                                typeId = "kotlin.Int"
+                            ),
+                            ExpectedPropertyData(
+                                name = "myFlag",
+                                typeId = "kotlin.String"
+                            ),
+                            ExpectedPropertyData(
+                                name = "isDisabled",
+                                typeId = "kotlin.Boolean"
+                            ),
+                        )
+                    )
+                )
+            }
+    }
+
 })

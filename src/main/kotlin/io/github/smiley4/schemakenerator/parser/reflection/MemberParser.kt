@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.parser.core.PropertyData
 import io.github.smiley4.schemakenerator.parser.core.TypeId
 import io.github.smiley4.schemakenerator.parser.core.TypeParameterData
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
@@ -22,15 +23,23 @@ class MemberParser(private val typeParser: ReflectionTypeParser) {
         } else {
             clazz.getMembersSafe()
                 .asSequence()
-                .filterIsInstance<KProperty<*>>()
-                .map { member ->
-                    PropertyData(
-                        name = member.name,
-                        type = resolveMemberType(member.returnType, resolvedTypeParameters),
-                        nullable = member.returnType.isMarkedNullable
-                    )
+                .mapNotNull { member ->
+                    when (member) {
+                        is KProperty<*> -> PropertyData(
+                            name = member.name,
+                            type = resolveMemberType(member.returnType, resolvedTypeParameters),
+                            nullable = member.returnType.isMarkedNullable
+                        )
+                        is KFunction<*> -> PropertyData(
+                            name = member.name,
+                            type = resolveMemberType(member.returnType, resolvedTypeParameters),
+                            nullable = member.returnType.isMarkedNullable
+                        )
+                        else -> null
+                    }
                 }
                 .filter { !checkIsSupertypeMember(it, supertypes) }
+                .distinctBy { it.name + "" + it.type.id }
                 .toList()
         }
     }

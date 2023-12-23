@@ -6,10 +6,15 @@ import io.github.smiley4.schemakenerator.assertions.ExpectedPrimitiveTypeData
 import io.github.smiley4.schemakenerator.parser.core.TypeParserContext
 import io.github.smiley4.schemakenerator.parser.reflection.ReflectionTypeParser
 import io.github.smiley4.schemakenerator.assertions.ExpectedPropertyData
+import io.github.smiley4.schemakenerator.assertions.shouldHave
 import io.github.smiley4.schemakenerator.assertions.shouldHaveExactly
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
+import io.github.smiley4.schemakenerator.parser.core.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.parser.core.TypeId
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldNotBe
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class TestDataTypes : StringSpec({
 
@@ -230,6 +235,85 @@ class TestDataTypes : StringSpec({
             "kotlin.String",
             "kotlin.Any"
         )
+    }
+
+    "java localdatetime" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(context = context).parse<TestClassLocalDateTime>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                type.shouldMatch(
+                    ExpectedObjectTypeData(
+                        simpleName = "TestClassLocalDateTime",
+                        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime",
+                        typeParameters = emptyMap(),
+                        supertypeIds = listOf("kotlin.Any"),
+                        members = listOf(
+                            ExpectedPropertyData(
+                                name = "timestamp",
+                                typeId = "java.time.LocalDateTime",
+                                nullable = false
+                            )
+                        )
+                    )
+                )
+            }
+        context shouldHave listOf(
+            "io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime",
+            "java.time.LocalDateTime",
+            "java.time.temporal.Temporal",
+            "java.time.LocalDate",
+            "java.time.LocalTime",
+            "java.time.chrono.ChronoLocalDate",
+        )
+    }
+
+    "localdatetime customized" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(
+            context = context,
+            config = {
+                registerParser(LocalDateTime::class) { id, _ ->
+                    PrimitiveTypeData(
+                        id = id,
+                        simpleName = LocalDateTime::class.simpleName!!,
+                        qualifiedName = LocalDateTime::class.qualifiedName!!,
+                        typeParameters = emptyMap()
+                    )
+                }
+            }
+        ).parse<TestClassLocalDateTime>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                type.shouldMatch(
+                    ExpectedObjectTypeData(
+                        simpleName = "TestClassLocalDateTime",
+                        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime",
+                        typeParameters = emptyMap(),
+                        supertypeIds = listOf("kotlin.Any"),
+                        members = listOf(
+                            ExpectedPropertyData(
+                                name = "timestamp",
+                                typeId = "java.time.LocalDateTime",
+                                nullable = false
+                            )
+                        )
+                    )
+                )
+            }
+        context shouldHaveExactly  listOf(
+            "io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime",
+            "java.time.LocalDateTime",
+            "kotlin.Any"
+        )
+        context.getData(TypeId("java.time.LocalDateTime"))!!.also { type ->
+            type.shouldMatch(
+                ExpectedPrimitiveTypeData(
+                    simpleName = "LocalDateTime",
+                    qualifiedName = "java.time.LocalDateTime"
+                )
+            )
+        }
     }
 
 })

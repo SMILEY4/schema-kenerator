@@ -7,8 +7,18 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 
+class TestClassSimple(
+    val someField: String
+)
+
+class TestClassNested(
+    val myClass: TestClassSimple
+)
+
 @Suppress("DuplicatedCode")
 fun main() {
+
+    println("${TestClassNested::class.simpleName} > ${TestClassNested::myClass.name} > ${TestClassSimple::someField.name}")
 
     ReflectionTypeParser(
         config = {

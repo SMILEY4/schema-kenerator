@@ -8,6 +8,7 @@ import io.github.smiley4.schemakenerator.parser.core.PropertyData
 import io.github.smiley4.schemakenerator.parser.core.TypeParameterData
 import io.github.smiley4.schemakenerator.parser.core.TypeParserContext
 import io.github.smiley4.schemakenerator.parser.core.WildcardTypeData
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -123,4 +124,9 @@ infix fun PropertyData.shouldMatch(expected: ExpectedPropertyData) {
 
 infix fun TypeParserContext.shouldHaveExactly(expectedTypeIds: Collection<String>) {
     this.getIds() shouldContainExactlyInAnyOrder expectedTypeIds
+}
+
+
+infix fun TypeParserContext.shouldHave(expectedTypeIds: Collection<String>) {
+    this.getIds() shouldContainAll expectedTypeIds
 }
