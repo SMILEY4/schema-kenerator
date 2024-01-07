@@ -27,23 +27,32 @@ class ReflectionTypeParserConfigBuilder {
         propertyFilters.add(filter)
     }
 
+
+    /**
+     * include method starting with "is" or "get" and only return a value while taking no parameters
+     */
     var includeGetters = false
 
+    /**
+     * include methods that only return a value while taking no parameters
+     */
     var includeWeakGetters = false
 
-    var includeAllFunctions = false
 
+    /**
+     * include hidden fields and methods
+     */
     var includeHidden = false
 
 
     fun build(): ReflectionTypeParserConfig {
         return ReflectionTypeParserConfig(
             customParsers = parsers,
-            propertyFilters = buildList { //todo: filters weird / dont work
-//              add(VisibilityReflectionPropertyFilter(includeHidden))
-                add(FunctionReflectionPropertyFilter(includeAllFunctions))
+            propertyFilters = buildList {
+                add(FunctionReflectionPropertyFilter())
+                add(GetterReflectionPropertyFilter(includeGetters))
                 add(WeakGetterReflectionPropertyFilter(includeWeakGetters))
-                add(TrueGetterReflectionPropertyFilter(includeGetters))
+                add(VisibilityGetterReflectionPropertyFilter(includeHidden))
             } + propertyFilters,
         )
     }

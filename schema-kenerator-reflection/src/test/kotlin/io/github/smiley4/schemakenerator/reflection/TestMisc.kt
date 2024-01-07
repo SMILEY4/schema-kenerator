@@ -1,12 +1,14 @@
 package io.github.smiley4.schemakenerator.reflection
 
 import io.github.smiley4.schemakenerator.assertions.ExpectedObjectTypeData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.github.smiley4.schemakenerator.assertions.ExpectedPropertyData
 import io.github.smiley4.schemakenerator.assertions.ExpectedTypeParameterData
 import io.github.smiley4.schemakenerator.assertions.shouldHaveExactly
 import io.github.smiley4.schemakenerator.assertions.shouldMatch
+import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 
 class TestMisc : StringSpec({
 
@@ -48,41 +50,137 @@ class TestMisc : StringSpec({
         )
     }
 
-    "test functions" {
+    "test filters - default config" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<TestClassWithMethods>()
+        ReflectionTypeParser(
+            context = context,
+            config = {}
+        ).parse<TestClassWithMethods>()
             .let { context.getData(it)!! }
             .also { type ->
-                type.shouldMatch(
-                    ExpectedObjectTypeData(
-                        simpleName = "TestClassWithMethods",
-                        members = listOf(
-                            ExpectedPropertyData(
-                                name = "someText",
-                                typeId = "kotlin.String"
-                            ),
-                            ExpectedPropertyData(
-                                name = "myFlag",
-                                typeId = "kotlin.Boolean"
-                            ),
-                            ExpectedPropertyData(
-                                name = "isEnabled",
-                                typeId = "kotlin.Boolean"
-                            ),
-                            ExpectedPropertyData(
-                                name = "calculateValue",
-                                typeId = "kotlin.Int"
-                            ),
-                            ExpectedPropertyData(
-                                name = "myFlag",
-                                typeId = "kotlin.String"
-                            ),
-                            ExpectedPropertyData(
-                                name = "isDisabled",
-                                typeId = "kotlin.Boolean"
-                            ),
-                        )
-                    )
+                val members = (type as ObjectTypeData).members.map { it.name }
+                members shouldContainExactlyInAnyOrder listOf(
+                    "someText",
+                    "myFlag",
+                    "isEnabled",
+                    // "hiddenField",
+                    // "calculateValue",
+                    // "compare",
+                    // "isDisabled",
+                    // "hiddenFunction",
+                    // "equals",
+                    // "hashCode",
+                    // "toString",
+                )
+            }
+    }
+
+    "test filters - include getters" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(
+            context = context,
+            config = {
+                includeGetters = true
+            }
+        ).parse<TestClassWithMethods>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                val members = (type as ObjectTypeData).members.map { it.name }
+                members shouldContainExactlyInAnyOrder listOf(
+                    "someText",
+                    "myFlag",
+                    "isEnabled",
+                    // "hiddenField",
+                    // "calculateValue",
+                    // "compare",
+                    "isDisabled",
+                    // "hiddenFunction",
+                    // "equals",
+                    // "hashCode",
+                    // "toString",
+                )
+            }
+    }
+
+    "test filters - include weak getters" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(
+            context = context,
+            config = {
+                includeWeakGetters = true
+            }
+        ).parse<TestClassWithMethods>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                val members = (type as ObjectTypeData).members.map { it.name }
+                members shouldContainExactlyInAnyOrder listOf(
+                    "someText",
+                    "myFlag",
+                    "isEnabled",
+                    // "hiddenField",
+                    "calculateValue",
+                    // "compare",
+                    // "isDisabled",
+                    // "hiddenFunction",
+                    // "equals",
+                    "hashCode",
+                    "toString",
+                )
+            }
+    }
+
+    "test filters - include all getters" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(
+            context = context,
+            config = {
+                includeGetters = true
+                includeWeakGetters = true
+            }
+        ).parse<TestClassWithMethods>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                val members = (type as ObjectTypeData).members.map { it.name }
+                members shouldContainExactlyInAnyOrder listOf(
+                    "someText",
+                    "myFlag",
+                    "isEnabled",
+                    // "hiddenField",
+                    "calculateValue",
+                    // "compare",
+                    "isDisabled",
+                    // "hiddenFunction",
+                    // "equals",
+                    "hashCode",
+                    "toString",
+                )
+            }
+    }
+
+
+    "test filters - include hidden" {
+        val context = TypeParserContext()
+        ReflectionTypeParser(
+            context = context,
+            config = {
+                includeHidden = true
+            }
+        ).parse<TestClassWithMethods>()
+            .let { context.getData(it)!! }
+            .also { type ->
+                val members = (type as ObjectTypeData).members.map { it.name }
+                members shouldContainExactlyInAnyOrder listOf(
+                    "someText",
+                    "myFlag",
+                    "isEnabled",
+                    "hiddenField",
+                    // "calculateValue",
+                    // "compare",
+                    // "isDisabled",
+                    // "hiddenFunction",
+                    // "equals",
+                    // "hashCode",
+                    // "toString",
                 )
             }
     }

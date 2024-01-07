@@ -1,72 +1,88 @@
 package io.github.smiley4.schemakenerator.reflection
+
 import io.github.smiley4.schemakenerator.core.parser.PropertyFilter
 import io.github.smiley4.schemakenerator.core.parser.PropertyFilterResult
 import kotlin.reflect.KCallable
 import kotlin.reflect.KFunction
 import kotlin.reflect.KVisibility
+import kotlin.reflect.full.valueParameters
 
 open class ReflectionPropertyFilter : PropertyFilter<KCallable<*>>()
 
-class VisibilityReflectionPropertyFilter(private val includeHidden: Boolean) : ReflectionPropertyFilter() {
-    override fun filterProperty(property: KCallable<*>): PropertyFilterResult {
-        return if (property.visibility == KVisibility.PUBLIC) {
-            PropertyFilterResult.KEEP
-        } else {
-            if(includeHidden) PropertyFilterResult.KEEP else PropertyFilterResult.REMOVE
-        }
-    }
-}
 
+class FunctionReflectionPropertyFilter : ReflectionPropertyFilter() {
 
-class FunctionReflectionPropertyFilter(private val includeFunctions: Boolean) : ReflectionPropertyFilter() {
     override fun filterProperty(property: KCallable<*>): PropertyFilterResult {
-        return if(property is KFunction<*>) {
-            if(includeFunctions) PropertyFilterResult.KEEP else PropertyFilterResult.REMOVE
+        return if (isOtherFunction(property)) {
+            PropertyFilterResult.REMOVE
         } else {
             PropertyFilterResult.DO_NOT_CARE
         }
     }
+
+    private fun isOtherFunction(property: KCallable<*>): Boolean {
+        return property is KFunction<*> && (property.returnType == Unit::class || property.valueParameters.isNotEmpty())
+    }
+
 }
 
 
-class WeakGetterReflectionPropertyFilter(private val include: Boolean) : ReflectionPropertyFilter() {
+class GetterReflectionPropertyFilter(private val include: Boolean) : ReflectionPropertyFilter() {
 
     override fun filterProperty(property: KCallable<*>): PropertyFilterResult {
-        if(property is KFunction<*>) {
-            if(isGetter(property) && include) {
-                return PropertyFilterResult.KEEP
+        if (isGetter(property)) {
+            return if (include) {
+                PropertyFilterResult.KEEP
             } else {
-                return PropertyFilterResult.REMOVE
+                PropertyFilterResult.REMOVE
             }
-        } else {
-            return PropertyFilterResult.DO_NOT_CARE
         }
-    }
-
-    private fun isGetter(property: KFunction<*>): Boolean {
-        return property.returnType !== Unit::class
-                && property.parameters.none { it.name != null }
-    }
-}
-
-
-class TrueGetterReflectionPropertyFilter(private val include: Boolean) : ReflectionPropertyFilter() {
-
-    override fun filterProperty(property: KCallable<*>): PropertyFilterResult {
-        if(property is KFunction<*>) {
-            if(isGetter(property) && include) {
-                return PropertyFilterResult.KEEP
-            } else {
-                return PropertyFilterResult.REMOVE
-            }
-        } else {
-            return PropertyFilterResult.DO_NOT_CARE
-        }
+        return PropertyFilterResult.DO_NOT_CARE
     }
 
     private fun isGetter(property: KCallable<*>): Boolean {
         return property is KFunction<*>
                 && property.returnType !== Unit::class
+                && property.valueParameters.isEmpty()
                 && property.name.let { it.startsWith("get") || it.startsWith("is") }
     }
+
+}
+
+class WeakGetterReflectionPropertyFilter(private val include: Boolean) : ReflectionPropertyFilter() {
+
+    override fun filterProperty(property: KCallable<*>): PropertyFilterResult {
+        if (isWeakGetter(property)) {
+            return if (include) {
+                PropertyFilterResult.KEEP
+            } else {
+                PropertyFilterResult.REMOVE
+            }
+        }
+        return PropertyFilterResult.DO_NOT_CARE
+    }
+
+    private fun isWeakGetter(property: KCallable<*>): Boolean {
+        return property is KFunction<*>
+                && property.returnType !== Unit::class
+                && property.valueParameters.isEmpty()
+                && !property.name.let { it.startsWith("get") || it.startsWith("is") }
+    }
+
+}
+
+class VisibilityGetterReflectionPropertyFilter(private val includeHidden: Boolean) : ReflectionPropertyFilter() {
+
+    override fun filterProperty(property: KCallable<*>): PropertyFilterResult {
+        return if (property.visibility == KVisibility.PUBLIC) {
+            PropertyFilterResult.KEEP
+        } else {
+            if (includeHidden) {
+                PropertyFilterResult.KEEP
+            } else {
+                PropertyFilterResult.REMOVE
+            }
+        }
+    }
+
 }

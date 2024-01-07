@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.reflection
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
+import io.github.smiley4.schemakenerator.core.parser.PropertyFilter
 import io.github.smiley4.schemakenerator.core.parser.PropertyFilterResult
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
@@ -20,12 +21,7 @@ class PropertyParser(private val typeParser: ReflectionTypeParser) {
         } else {
             clazz.getMembersSafe()
                 .asSequence()
-                .filter { member ->
-                    typeParser.config.propertyFilters
-                        .map { it.filterProperty(member) }
-                        .filter { it !== PropertyFilterResult.DO_NOT_CARE }
-                        .any { it == PropertyFilterResult.REMOVE }
-                }
+                .filter { PropertyFilter.applyFilters(it, typeParser.config.propertyFilters)}
                 .mapNotNull { member ->
                     when (member) {
                         is KProperty<*> -> parseProperty(member, resolvedTypeParameters)
@@ -34,12 +30,7 @@ class PropertyParser(private val typeParser: ReflectionTypeParser) {
                     }
                 }
                 .filter { !checkIsSupertypeMember(it, supertypes) }
-                .filter { member ->
-                    typeParser.config.propertyFilters
-                        .map { it.filterProperty(member) }
-                        .filter { it !== PropertyFilterResult.DO_NOT_CARE }
-                        .any { it == PropertyFilterResult.REMOVE }
-                }
+                .filter { PropertyFilter.applyFilters(it, typeParser.config.propertyFilters)}
                 .distinctBy { it.name }
                 .toList()
         }
