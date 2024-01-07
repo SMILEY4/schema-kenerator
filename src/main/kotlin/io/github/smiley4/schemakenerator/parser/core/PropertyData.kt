@@ -4,5 +4,6 @@ data class PropertyData(
     val name: String,
     val type: TypeId,
     val nullable: Boolean,
-    // todo: visibility
+    val visibility: Visibility,
+    val kind: PropertyType
 )

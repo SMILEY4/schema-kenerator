@@ -9,6 +9,7 @@ import kotlin.reflect.KClass
  */
 class ReflectionTypeParserConfig(
     val customParsers: Map<KClass<*>, CustomTypeParser<KClass<*>>>,
+    val propertyFilters: List<ReflectionPropertyFilter>,
 ) : TypeParserConfig()
 
 
@@ -20,9 +21,29 @@ class ReflectionTypeParserConfigBuilder {
         parsers[type] = parser
     }
 
+    private val propertyFilters = mutableListOf<ReflectionPropertyFilter>()
+
+    fun registerPropertyFilter(filter: ReflectionPropertyFilter) {
+        propertyFilters.add(filter)
+    }
+
+    var includeGetters = false
+
+    var includeWeakGetters = false
+
+    var includeAllFunctions = false
+
+    var includeHidden = false
+
     fun build(): ReflectionTypeParserConfig {
         return ReflectionTypeParserConfig(
-            customParsers = parsers
+            customParsers = parsers,
+            propertyFilters = buildList {
+//                add(VisibilityReflectionPropertyFilter(includeHidden))
+                add(FunctionReflectionPropertyFilter(includeAllFunctions))
+                add(WeakGetterReflectionPropertyFilter(includeWeakGetters))
+                add(TrueGetterReflectionPropertyFilter(includeGetters))
+            } + propertyFilters,
         )
     }
 

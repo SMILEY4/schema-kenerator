@@ -15,7 +15,7 @@ class ReflectionTypeParser(
 
     fun getClassParser(): ClassParser = ClassParser(this)
     fun getTypeParameterParser(): TypeParameterParser = TypeParameterParser(this)
-    fun getPropertyParser(): MemberParser = MemberParser(this)
+    fun getPropertyParser(): PropertyParser = PropertyParser(this)
     fun getSupertypeParser(): SupertypeParser = SupertypeParser(this)
     fun getEnumValueParser(): EnumValueParser = EnumValueParser(this)
 
