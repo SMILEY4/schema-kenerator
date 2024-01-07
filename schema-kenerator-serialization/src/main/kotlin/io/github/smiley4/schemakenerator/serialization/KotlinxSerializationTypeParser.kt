@@ -6,9 +6,11 @@ import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
+import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParser
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
@@ -22,6 +24,7 @@ import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.serializerOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+
 
 @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
 class KotlinxSerializationTypeParser(
@@ -99,7 +102,9 @@ class KotlinxSerializationTypeParser(
             itemType = PropertyData(
                 name = "item",
                 type = itemType,
-                nullable = itemDescriptor.isNullable
+                nullable = itemDescriptor.isNullable,
+                kind = PropertyType.PROPERTY,
+                visibility = Visibility.PUBLIC, // TODO,
             ),
         ).let { context.add(it) }
     }
@@ -123,12 +128,17 @@ class KotlinxSerializationTypeParser(
             keyType = PropertyData(
                 name = "key",
                 type = keyType,
-                nullable = keyDescriptor.isNullable
+                nullable = keyDescriptor.isNullable,
+                kind = PropertyType.PROPERTY,
+                visibility = Visibility.PUBLIC, // TODO,
+
             ),
             valueType = PropertyData(
                 name = "value",
                 type = valueType,
-                nullable = valueDescriptor.isNullable
+                nullable = valueDescriptor.isNullable,
+                kind = PropertyType.PROPERTY,
+                visibility = Visibility.PUBLIC, // TODO,
             ),
         ).let { context.add(it) }
     }
@@ -150,7 +160,9 @@ class KotlinxSerializationTypeParser(
                     PropertyData(
                         name = fieldName,
                         type = fieldType,
-                        nullable = fieldDescriptor.isNullable
+                        nullable = fieldDescriptor.isNullable,
+                        kind = PropertyType.PROPERTY,
+                        visibility = Visibility.PUBLIC, // TODO,
                     )
                 )
             }

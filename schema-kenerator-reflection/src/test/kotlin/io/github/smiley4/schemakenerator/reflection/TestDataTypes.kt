@@ -12,12 +12,20 @@ import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.kotest.core.spec.style.StringSpec
 import java.time.LocalDateTime
+import kotlin.reflect.KClass
 
 class TestDataTypes : StringSpec({
 
     "Int" {
         val context = TypeParserContext()
-        ReflectionTypeParser(context = context).parse<Int>()
+        ReflectionTypeParser(
+            context = context,
+            config = {
+                this.registerParser(Int::class) { typeId: TypeId, type: KClass<*> ->
+                    TODO()
+                }
+            }
+        ).parse<Int>()
             .let { context.getData(it)!! }
             .also { type ->
                 type.shouldMatch(
