@@ -1,12 +1,11 @@
+rootProject.name = "schema-kenerator"
+include("schema-kenerator-core")
+include("schema-kenerator-reflection")
+include("schema-kenerator-serialization")
+
 pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
     }
 }
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
-}
-
-rootProject.name = "schema-kenerator"
