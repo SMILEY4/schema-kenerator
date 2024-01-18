@@ -4,15 +4,15 @@ class TypeParserContext {
 
     private val types = mutableMapOf<String, BaseTypeData>()
 
-    fun add(type: BaseTypeData): TypeId {
+    fun add(type: BaseTypeData): TypeRef {
         types[type.id.id] = type
-        return type.id
+        return ContextTypeRef(type.id)
     }
 
-    fun reserve(id: TypeId): TypeId {
-        types[id.id] = BaseTypeData.placeholder(id)
-        return id
-    }
+//    fun reserve(id: TypeId): TypeId {
+//        types[id.id] = BaseTypeData.placeholder(id)
+//        return id
+//    }
 
     fun getData(id: TypeId): BaseTypeData? {
         return types[id.id]

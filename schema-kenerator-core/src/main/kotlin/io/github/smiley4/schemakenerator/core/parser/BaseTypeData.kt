@@ -12,10 +12,10 @@ open class BaseTypeData(
 
     companion object {
 
-        fun placeholder(ref: TypeId) = BaseTypeData(
-            id = ref,
-            simpleName = ref.id,
-            qualifiedName = ref.id,
+        fun placeholder(id: TypeId) = BaseTypeData(
+            id = id,
+            simpleName = id.id,
+            qualifiedName = id.id,
             typeParameters = emptyMap(),
         )
 
@@ -54,8 +54,8 @@ open class ObjectTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    val subtypes: List<TypeId> = emptyList(),
-    val supertypes: List<TypeId> = emptyList(),
+    val subtypes: List<TypeRef> = emptyList(),
+    val supertypes: List<TypeRef> = emptyList(),
     val members: List<PropertyData> = emptyList(),
 ) : BaseTypeData(id, simpleName, qualifiedName, typeParameters)
 
@@ -68,8 +68,8 @@ class EnumTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    subtypes: List<TypeId> = emptyList(),
-    supertypes: List<TypeId> = emptyList(),
+    subtypes: List<TypeRef> = emptyList(),
+    supertypes: List<TypeRef> = emptyList(),
     members: List<PropertyData> = emptyList(),
     val enumConstants: List<String>
 ) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members)
@@ -83,8 +83,8 @@ class MapTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    subtypes: List<TypeId> = emptyList(),
-    supertypes: List<TypeId> = emptyList(),
+    subtypes: List<TypeRef> = emptyList(),
+    supertypes: List<TypeRef> = emptyList(),
     members: List<PropertyData> = emptyList(),
     val keyType: PropertyData,
     val valueType: PropertyData
@@ -99,8 +99,8 @@ class CollectionTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    subtypes: List<TypeId> = emptyList(),
-    supertypes: List<TypeId> = emptyList(),
+    subtypes: List<TypeRef> = emptyList(),
+    supertypes: List<TypeRef> = emptyList(),
     members: List<PropertyData> = emptyList(),
     val itemType: PropertyData,
 ) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members)

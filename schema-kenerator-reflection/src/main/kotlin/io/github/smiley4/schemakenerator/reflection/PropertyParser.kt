@@ -2,7 +2,6 @@ package io.github.smiley4.schemakenerator.reflection
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyFilter
-import io.github.smiley4.schemakenerator.core.parser.PropertyFilterResult
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData

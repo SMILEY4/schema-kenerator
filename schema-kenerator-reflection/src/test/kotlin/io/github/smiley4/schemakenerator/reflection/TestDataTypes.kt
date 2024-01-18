@@ -1,18 +1,17 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.assertions.ExpectedEnumTypeData
-import io.github.smiley4.schemakenerator.assertions.ExpectedObjectTypeData
-import io.github.smiley4.schemakenerator.assertions.ExpectedPrimitiveTypeData
-import io.github.smiley4.schemakenerator.assertions.ExpectedPropertyData
-import io.github.smiley4.schemakenerator.assertions.shouldHave
-import io.github.smiley4.schemakenerator.assertions.shouldHaveExactly
-import io.github.smiley4.schemakenerator.assertions.shouldMatch
+import io.github.smiley4.schemakenerator.testutils.ExpectedEnumTypeData
+import io.github.smiley4.schemakenerator.testutils.ExpectedObjectTypeData
+import io.github.smiley4.schemakenerator.testutils.ExpectedPrimitiveTypeData
+import io.github.smiley4.schemakenerator.testutils.ExpectedPropertyData
+import io.github.smiley4.schemakenerator.testutils.shouldHave
+import io.github.smiley4.schemakenerator.testutils.shouldHaveExactly
+import io.github.smiley4.schemakenerator.testutils.shouldMatch
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.kotest.core.spec.style.StringSpec
 import java.time.LocalDateTime
-import kotlin.reflect.KClass
 
 class TestDataTypes : StringSpec({
 
@@ -21,8 +20,16 @@ class TestDataTypes : StringSpec({
         ReflectionTypeParser(
             context = context,
             config = {
-                this.registerParser(Int::class) { typeId: TypeId, type: KClass<*> ->
-                    TODO()
+                customParser = CustomReflectionTypeParser { typeId, type ->
+                    if (type.simpleName == "LocalDate") {
+                        PrimitiveTypeData(
+                            id = typeId,
+                            simpleName = "localdate",
+                            qualifiedName = "localdate"
+                        )
+                    } else {
+                        null
+                    }
                 }
             }
         ).parse<Int>()

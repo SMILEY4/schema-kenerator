@@ -6,5 +6,5 @@ abstract class TypeParser<T : TypeParserConfig>(
     val config: T,
     val context: TypeParserContext,
 ) {
-    abstract fun parse(type: KType): TypeId
+    abstract fun parse(type: KType): TypeRef
 }

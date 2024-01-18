@@ -1,5 +1,6 @@
-package io.github.smiley4.schemakenerator.assertions
+package io.github.smiley4.schemakenerator.testutils
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
@@ -8,6 +9,15 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.parser.id
+import io.kotest.assertions.json.ArrayOrder
+import io.kotest.assertions.json.FieldComparison
+import io.kotest.assertions.json.NumberFormat
+import io.kotest.assertions.json.PropertyOrder
+import io.kotest.assertions.json.TypeCoercion
+import io.kotest.assertions.json.compareJsonOptions
+import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
@@ -80,8 +90,8 @@ infix fun BaseTypeData.shouldMatch(expected: ExpectedObjectTypeData) {
                 a.shouldMatch(b)
             }
         }
-        expected.subtypeIds?.also { this.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder it }
-        expected.supertypeIds?.also { this.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder it }
+        expected.subtypeIds?.also { this.subtypes.map { t -> t.id() } shouldContainExactlyInAnyOrder it }
+        expected.supertypeIds?.also { this.supertypes.map { t -> t.id() } shouldContainExactlyInAnyOrder it }
         expected.members?.also {
             this.members shouldHaveSize it.size
             this.members.map { m -> m.name } shouldContainExactlyInAnyOrder it.map { m -> m.name }
@@ -91,6 +101,22 @@ infix fun BaseTypeData.shouldMatch(expected: ExpectedObjectTypeData) {
         }
     } else {
         throw Exception("this type is not a ${ObjectTypeData::simpleName}")
+    }
+}
+
+infix fun BaseTypeData.shouldMatch(expected: BaseTypeData) {
+    this.shouldMatchJson(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(expected))
+}
+
+infix fun BaseTypeData.shouldMatchJson(expected: String) {
+    val actual = jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this)
+    actual.shouldEqualJson {
+        propertyOrder = PropertyOrder.Lenient
+        arrayOrder = ArrayOrder.Lenient
+        fieldComparison = FieldComparison.Strict
+        numberFormat = NumberFormat.Lenient
+        typeCoercion = TypeCoercion.Disabled
+        expected
     }
 }
 
@@ -112,13 +138,13 @@ fun BaseTypeData.shouldMatchWildcard() {
 
 infix fun TypeParameterData.shouldMatch(expected: ExpectedTypeParameterData) {
     expected.name?.also { this.name shouldBe it }
-    expected.typeId?.also { this.type.id shouldBe it }
+    expected.typeId?.also { this.type.id() shouldBe it }
     expected.nullable?.also { this.nullable shouldBe it }
 }
 
 infix fun PropertyData.shouldMatch(expected: ExpectedPropertyData) {
     expected.name?.also { this.name shouldBe it }
-    expected.typeId?.also { this.type.id shouldBe it }
+    expected.typeId?.also { this.type.id() shouldBe it }
     expected.nullable?.also { this.nullable shouldBe it }
 }
 
@@ -126,6 +152,9 @@ infix fun TypeParserContext.shouldHaveExactly(expectedTypeIds: Collection<String
     this.getIds() shouldContainExactlyInAnyOrder expectedTypeIds
 }
 
+fun TypeParserContext.shouldBeEmpty() {
+    this.getIds().shouldBeEmpty()
+}
 
 infix fun TypeParserContext.shouldHave(expectedTypeIds: Collection<String>) {
     this.getIds() shouldContainAll expectedTypeIds

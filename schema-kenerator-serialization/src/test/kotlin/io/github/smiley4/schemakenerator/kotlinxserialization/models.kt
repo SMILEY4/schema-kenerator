@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class TestClassSimple(
-    val someField: String
+    val someField: String?
 )
 
 
@@ -46,13 +46,14 @@ class TestClassWithAbstractField(
 
 @Serializable
 data class TestClassGeneric<T>(
-    val value: T
+    val genericValue: T
 )
 
 
 @Serializable
-data class TestClassDeepGeneric<E>(
-    val myValues: List<E>
+data class TestClassDeepGeneric(
+    val myInt: TestClassGeneric<Int>,
+    val myString: TestClassGeneric<String>
 )
 
 

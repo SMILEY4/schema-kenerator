@@ -8,16 +8,19 @@ import kotlin.reflect.KClass
  * Configuration for parsing kotlin types
  */
 class ReflectionTypeParserConfig(
-    val customParsers: Map<KClass<*>, CustomTypeParser<KClass<*>>>,
+    val customParser: CustomReflectionTypeParser?,
+    val customParsers: Map<KClass<*>, CustomReflectionTypeParser>,
     val propertyFilters: List<ReflectionPropertyFilter>,
 ) : TypeParserConfig()
 
 
 class ReflectionTypeParserConfigBuilder {
 
-    private val parsers = mutableMapOf<KClass<*>, CustomTypeParser<KClass<*>>>()
+    var customParser: CustomReflectionTypeParser? = null
 
-    fun registerParser(type: KClass<*>, parser: CustomTypeParser<KClass<*>>) {
+    private val parsers = mutableMapOf<KClass<*>, CustomReflectionTypeParser>()
+
+    fun registerParser(type: KClass<*>, parser: CustomReflectionTypeParser) {
         parsers[type] = parser
     }
 
@@ -47,6 +50,7 @@ class ReflectionTypeParserConfigBuilder {
 
     fun build(): ReflectionTypeParserConfig {
         return ReflectionTypeParserConfig(
+            customParser = customParser,
             customParsers = parsers,
             propertyFilters = buildList {
                 add(FunctionReflectionPropertyFilter())

@@ -14,7 +14,6 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
         // resolve all type parameters
         val resolvedTypeParameters = typeParser.getTypeParameterParser().parse(type, clazz, providedTypeParameters)
 
-
         // check if the same type with the same type parameters has already been resolved -> reuse existing
         val id = TypeId.build(clazz.qualifiedName ?: "?", resolvedTypeParameters.values.map { it.type })
         if (typeParser.context.has(id)) {
@@ -22,10 +21,11 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
         }
 
         // check custom parsers
-        val customParser = typeParser.config.customParsers[clazz]
-        if(customParser != null) {
-            return customParser.parse(id, clazz).let {
-                typeParser.context.add(it)
+        val customParser = typeParser.config.customParsers[clazz] ?: typeParser.config.customParser
+        if (customParser != null) {
+            val customParserResult = customParser.parse(id, clazz)
+            if (customParserResult != null) {
+                return customParserResult.let { typeParser.context.add(it) }
             }
         }
 

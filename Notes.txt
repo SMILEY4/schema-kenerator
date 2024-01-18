@@ -1,0 +1,9 @@
+- new name for library
+    - schema-kenerator
+    - kschema
+    - type-inspector
+    - type-craft
+    - type-morph
+    - type-meta-kit
+    - k-type-kit
+    - ... ?

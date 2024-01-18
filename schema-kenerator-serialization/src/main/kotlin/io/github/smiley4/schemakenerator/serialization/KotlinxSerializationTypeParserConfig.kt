@@ -1,33 +1,39 @@
 package io.github.smiley4.schemakenerator.serialization
 
-import io.github.smiley4.schemakenerator.core.parser.CustomTypeParser
 import io.github.smiley4.schemakenerator.core.parser.TypeParserConfig
-import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlin.reflect.KClass
 
 /**
  * Configuration for parsing kotlin types
  */
 class KotlinxSerializationTypeParserConfig(
-    val customParsers: Map<String, CustomTypeParser<SerialDescriptor>>,
+    val customParser: CustomKotlinxSerializationTypeParser?,
+    val customParsers: Map<String, CustomKotlinxSerializationTypeParser>,
+    val inline: Boolean,
 ) : TypeParserConfig()
 
 
 class KotlinxSerializationTypeParserConfigBuilder {
 
-    private val parsers = mutableMapOf<String, CustomTypeParser<SerialDescriptor>>()
+    var inline: Boolean = true
 
-    fun registerParser(type: KClass<*>, parser: CustomTypeParser<SerialDescriptor>) {
+    var customParser: CustomKotlinxSerializationTypeParser? = null
+
+    private val parsers = mutableMapOf<String, CustomKotlinxSerializationTypeParser>()
+
+    fun registerParser(type: KClass<*>, parser: CustomKotlinxSerializationTypeParser) {
         type.qualifiedName?.also { registerParser(it, parser) }
     }
 
-    fun registerParser(type: String, parser: CustomTypeParser<SerialDescriptor>) {
+    fun registerParser(type: String, parser: CustomKotlinxSerializationTypeParser) {
         parsers[type] = parser
     }
 
     fun build(): KotlinxSerializationTypeParserConfig {
         return KotlinxSerializationTypeParserConfig(
-            customParsers = parsers
+            customParser = customParser,
+            customParsers = parsers,
+            inline = inline
         )
     }
 

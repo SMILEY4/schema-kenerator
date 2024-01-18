@@ -1,10 +1,10 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.assertions.ExpectedObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
-import io.github.smiley4.schemakenerator.assertions.ExpectedPropertyData
-import io.github.smiley4.schemakenerator.assertions.shouldHaveExactly
-import io.github.smiley4.schemakenerator.assertions.shouldMatch
+import io.github.smiley4.schemakenerator.testutils.ExpectedObjectTypeData
+import io.github.smiley4.schemakenerator.testutils.ExpectedPropertyData
+import io.github.smiley4.schemakenerator.testutils.shouldHaveExactly
+import io.github.smiley4.schemakenerator.testutils.shouldMatch
 import io.kotest.core.spec.style.StringSpec
 
 class TestInheritance : StringSpec({

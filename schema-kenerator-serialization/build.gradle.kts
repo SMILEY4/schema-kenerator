@@ -10,4 +10,6 @@ dependencies {
     implementation(project(":schema-kenerator-core"))
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    testImplementation(project(":schema-kenerator-test-utils"))
 }
