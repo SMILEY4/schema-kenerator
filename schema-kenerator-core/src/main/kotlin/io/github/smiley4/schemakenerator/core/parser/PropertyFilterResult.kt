@@ -22,10 +22,7 @@ open class PropertyFilter<T> {
     companion object {
 
         fun <T> applyFilters(property: T, filters: Collection<PropertyFilter<T>>): Boolean {
-            println()
-            println(property)
             val results = filters.map { it.filterProperty(property) }.toSet()
-            println()
             return decideFilterResult(results)
         }
 

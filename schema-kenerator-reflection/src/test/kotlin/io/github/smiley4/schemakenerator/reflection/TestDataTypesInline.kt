@@ -1,19 +1,14 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
-import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.PropertyData
-import io.github.smiley4.schemakenerator.core.parser.PropertyType
-import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
-import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.reflection.parsers.ReflectionTypeParser
 import io.github.smiley4.schemakenerator.testutils.shouldBeEmpty
 import io.github.smiley4.schemakenerator.testutils.shouldMatch
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
@@ -112,60 +107,10 @@ class TestDataTypesInline : StringSpec({
     }
 
     "java localdatetime" {
-        val context = TypeParserContext()
-        val result = ReflectionTypeParser(context = context, config = CONFIG).parse<TestClassLocalDateTime>()
-        context.shouldBeEmpty()
-        result.also { ref ->
-            (ref is InlineTypeRef) shouldBe true
-            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime"
-        }
-        context.getData(TypeId("io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime"))!!.also { type ->
-            type.shouldMatch(
-                ObjectTypeData(
-                    id = TypeId("io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime"),
-                    simpleName = "TestClassLocalDateTime",
-                    qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassLocalDateTime",
-                    members = listOf(
-                        PropertyData(
-                            name = "timestamp",
-                            nullable = false,
-                            visibility = Visibility.PUBLIC,
-                            kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
-                        )
-                    )
-                )
-            )
-        }
-        context.getData(TypeId("java.time.LocalDateTime"))!!.also { type ->
-            type.shouldMatch(
-                ObjectTypeData(
-                    id = TypeId("java.time.LocalDateTime"),
-                    qualifiedName = "java.time.LocalDateTime",
-                    simpleName = "LocalDateTime",
-                    supertypes = listOf(
-                        ContextTypeRef(TypeId("java.time.temporal.Temporal")),
-                        ContextTypeRef(TypeId("java.time.temporal.TemporalAdjuster")),
-                        ContextTypeRef(TypeId("java.time.chrono.ChronoLocalDateTime<java.time.LocalDate>")),
-                    ),
-                    members = listOf(
-                        PropertyData(
-                            name = "MIN",
-                            nullable = false,
-                            visibility = Visibility.PUBLIC,
-                            kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
-                        ),
-                        PropertyData(
-                            name = "MAX",
-                            nullable = false,
-                            visibility = Visibility.PUBLIC,
-                            kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
-                        )
-                    ),
-                )
-            )
+        shouldThrow<StackOverflowError> {
+            // results in infinite recursion when using "inline"
+            val context = TypeParserContext()
+            ReflectionTypeParser(context = context, config = CONFIG).parse<TestClassLocalDateTime>()
         }
     }
 

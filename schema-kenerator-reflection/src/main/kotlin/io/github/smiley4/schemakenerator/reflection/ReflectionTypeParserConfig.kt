@@ -8,11 +8,11 @@ import kotlin.reflect.KClass
  * Configuration for parsing kotlin types
  */
 class ReflectionTypeParserConfig(
+    val inline: Boolean,
     val typeDecider: TypeDecider,
     val customParser: CustomReflectionTypeParser?,
     val customParsers: Map<KClass<*>, CustomReflectionTypeParser>,
     val propertyFilters: List<ReflectionPropertyFilter>,
-    val inline: Boolean,
     val primitiveTypes: Set<KClass<*>>,
     val ignoreSupertypes: Set<KClass<*>>
 ) : TypeParserConfig()
@@ -83,16 +83,11 @@ class ReflectionTypeParserConfigBuilder {
         Unit::class,
     )
 
-    var skipCollectionDetails: Boolean = true
-
     var ignoreSupertypes: Set<KClass<*>> = mutableSetOf(
         Any::class,
         Enum::class,
         Cloneable::class,
         Serializable::class,
-        Map::class,
-        List::class,
-        Array::class
     )
 
     fun build(): ReflectionTypeParserConfig {
