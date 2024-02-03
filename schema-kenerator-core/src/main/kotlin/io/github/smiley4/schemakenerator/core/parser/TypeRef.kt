@@ -2,10 +2,12 @@ package io.github.smiley4.schemakenerator.core.parser
 
 sealed interface TypeRef
 
-fun TypeRef.id(): String = when (this) {
-    is ContextTypeRef -> this.id.id
-    is InlineTypeRef -> this.type.id.id
+fun TypeRef.id(): TypeId = when (this) {
+    is ContextTypeRef -> this.id
+    is InlineTypeRef -> this.type.id
 }
+
+fun TypeRef.idStr(): String = this.id().id
 
 fun TypeRef.resolve(context: TypeParserContext): BaseTypeData? {
     return when (this) {

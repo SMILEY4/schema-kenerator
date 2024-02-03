@@ -9,10 +9,10 @@ class TypeParserContext {
         return ContextTypeRef(type.id)
     }
 
-//    fun reserve(id: TypeId): TypeId {
-//        types[id.id] = BaseTypeData.placeholder(id)
-//        return id
-//    }
+    fun reserve(id: TypeId): TypeId {
+        types[id.id] = BaseTypeData.placeholder(id)
+        return id
+    }
 
     fun getData(id: TypeId): BaseTypeData? {
         return types[id.id]

@@ -9,13 +9,12 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.core.parser.id
+import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
 import io.kotest.assertions.json.PropertyOrder
 import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.compareJsonOptions
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
@@ -90,8 +89,8 @@ infix fun BaseTypeData.shouldMatch(expected: ExpectedObjectTypeData) {
                 a.shouldMatch(b)
             }
         }
-        expected.subtypeIds?.also { this.subtypes.map { t -> t.id() } shouldContainExactlyInAnyOrder it }
-        expected.supertypeIds?.also { this.supertypes.map { t -> t.id() } shouldContainExactlyInAnyOrder it }
+        expected.subtypeIds?.also { this.subtypes.map { t -> t.idStr() } shouldContainExactlyInAnyOrder it }
+        expected.supertypeIds?.also { this.supertypes.map { t -> t.idStr() } shouldContainExactlyInAnyOrder it }
         expected.members?.also {
             this.members shouldHaveSize it.size
             this.members.map { m -> m.name } shouldContainExactlyInAnyOrder it.map { m -> m.name }
@@ -105,6 +104,7 @@ infix fun BaseTypeData.shouldMatch(expected: ExpectedObjectTypeData) {
 }
 
 infix fun BaseTypeData.shouldMatch(expected: BaseTypeData) {
+    this::class shouldBe expected::class
     this.shouldMatchJson(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(expected))
 }
 
@@ -138,13 +138,13 @@ fun BaseTypeData.shouldMatchWildcard() {
 
 infix fun TypeParameterData.shouldMatch(expected: ExpectedTypeParameterData) {
     expected.name?.also { this.name shouldBe it }
-    expected.typeId?.also { this.type.id() shouldBe it }
+    expected.typeId?.also { this.type.idStr() shouldBe it }
     expected.nullable?.also { this.nullable shouldBe it }
 }
 
 infix fun PropertyData.shouldMatch(expected: ExpectedPropertyData) {
     expected.name?.also { this.name shouldBe it }
-    expected.typeId?.also { this.type.id() shouldBe it }
+    expected.typeId?.also { this.type.idStr() shouldBe it }
     expected.nullable?.also { this.nullable shouldBe it }
 }
 

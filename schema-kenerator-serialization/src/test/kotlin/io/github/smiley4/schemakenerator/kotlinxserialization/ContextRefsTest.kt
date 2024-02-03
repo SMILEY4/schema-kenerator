@@ -1,9 +1,10 @@
 package io.github.smiley4.schemakenerator.kotlinxserialization
 
 import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
+import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
-import io.github.smiley4.schemakenerator.core.parser.id
+import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParser
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParserConfigBuilder
@@ -21,7 +22,7 @@ class ContextRefsTest : StringSpec({
         context shouldHaveExactly listOf("kotlin.Int")
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "kotlin.Int"
+            ref.idStr() shouldBe "kotlin.Int"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataContext.int())
@@ -34,7 +35,7 @@ class ContextRefsTest : StringSpec({
         context shouldHaveExactly listOf("kotlin.String")
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "kotlin.String"
+            ref.idStr() shouldBe "kotlin.String"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataContext.string())
@@ -47,7 +48,7 @@ class ContextRefsTest : StringSpec({
         context shouldHaveExactly listOf("*")
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "*"
+            ref.idStr() shouldBe "*"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatchWildcard()
@@ -60,7 +61,7 @@ class ContextRefsTest : StringSpec({
         context shouldHaveExactly listOf("kotlin.Unit")
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "kotlin.Unit"
+            ref.idStr() shouldBe "kotlin.Unit"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataContext.unit())
@@ -76,7 +77,7 @@ class ContextRefsTest : StringSpec({
         )
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple"
         }
         context.getData(TypeId("io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple"))!!.also { type ->
             type.shouldMatch(TypeDataContext.testClassSimple())
@@ -99,7 +100,7 @@ class ContextRefsTest : StringSpec({
         )
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes"
         }
         context.getData(TypeId("io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes"))!!.also { type ->
             type.shouldMatch(TypeDataContext.testClassMixedTypes())
@@ -132,7 +133,7 @@ class ContextRefsTest : StringSpec({
         )
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField"
         }
         context.getData(TypeId("io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField"))!!.also { type ->
             type.shouldMatch(TypeDataContext.testClassWithEnumField())
@@ -151,7 +152,7 @@ class ContextRefsTest : StringSpec({
         )
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithFunctionField"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithFunctionField"
         }
         context.getData(TypeId("kotlinx.serialization.Polymorphic<Function1>"))!!.also { type ->
             type.shouldMatch(TypeDataContext.polymorphicFunction())
@@ -172,7 +173,7 @@ class ContextRefsTest : StringSpec({
         )
         result.also { ref ->
             (ref is ContextTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassDeepGeneric"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassDeepGeneric"
         }
         context.getData(TypeId("io.github.smiley4.schemakenerator.kotlinxserialization.TestClassDeepGeneric"))!!.also { type ->
             type.shouldMatch(TypeDataContext.testClassDeepGeneric())

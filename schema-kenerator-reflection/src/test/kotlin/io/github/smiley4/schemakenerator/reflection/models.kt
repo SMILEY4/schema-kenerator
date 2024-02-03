@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 
 class TestClassSimple(
-    val someField: String
+    val someField: String?
 )
 
 class TestClassMixedTypes(

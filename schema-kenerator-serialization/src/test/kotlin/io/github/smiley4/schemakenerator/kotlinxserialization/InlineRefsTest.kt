@@ -3,7 +3,7 @@ package io.github.smiley4.schemakenerator.kotlinxserialization
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.core.parser.id
+import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParser
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParserConfigBuilder
@@ -20,7 +20,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "kotlin.Int"
+            ref.idStr() shouldBe "kotlin.Int"
         }
         result.resolve(context)!!.also { type ->
             type shouldMatch TypeDataInline.int()
@@ -33,7 +33,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "kotlin.String"
+            ref.idStr() shouldBe "kotlin.String"
         }
         result.resolve(context)!!.also { type ->
             type shouldMatch TypeDataInline.string()
@@ -46,7 +46,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "*"
+            ref.idStr() shouldBe "*"
         }
         result.resolve(context)!!.also { type ->
             type shouldMatch WildcardTypeData()
@@ -59,7 +59,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "kotlin.Unit"
+            ref.idStr() shouldBe "kotlin.Unit"
         }
         result.resolve(context)!!.also { type ->
             type shouldMatch TypeDataInline.unit()
@@ -72,7 +72,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassSimple"
         }
         result.resolve(context)!!.also { type ->
             type shouldMatch TypeDataInline.testClassSimple()
@@ -85,7 +85,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassMixedTypes"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataInline.testClassMixedTypes())
@@ -98,7 +98,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithEnumField"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataInline.testClassWithEnumField())
@@ -111,7 +111,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithFunctionField"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassWithFunctionField"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataInline.testClassWithFunctionField())
@@ -124,7 +124,7 @@ class InlineRefsTest : StringSpec({
         context.shouldBeEmpty()
         result.also { ref ->
             (ref is InlineTypeRef) shouldBe true
-            ref.id() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassDeepGeneric"
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.kotlinxserialization.TestClassDeepGeneric"
         }
         result.resolve(context)!!.also { type ->
             type.shouldMatch(TypeDataInline.testClassDeepGeneric())

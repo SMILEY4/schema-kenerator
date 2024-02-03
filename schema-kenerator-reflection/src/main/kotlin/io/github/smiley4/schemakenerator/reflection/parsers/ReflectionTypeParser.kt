@@ -1,8 +1,14 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.reflection.parsers
 
+import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
+import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParser
 import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeRef
+import io.github.smiley4.schemakenerator.reflection.ReflectionTypeParserConfig
+import io.github.smiley4.schemakenerator.reflection.ReflectionTypeParserConfigBuilder
+import io.github.smiley4.schemakenerator.reflection.getKType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -18,7 +24,9 @@ class ReflectionTypeParser(
     fun getSupertypeParser(): SupertypeParser = SupertypeParser(this)
     fun getEnumValueParser(): EnumValueParser = EnumValueParser(this)
 
-    override fun parse(type: KType): TypeId {
+    inline fun <reified T> parse() = parse(getKType<T>())
+
+    override fun parse(type: KType): TypeRef {
         if (type.classifier is KClass<*>) {
             return getClassParser().parse(type, type.classifier as KClass<*>, mapOf())
         } else {
@@ -26,6 +34,20 @@ class ReflectionTypeParser(
         }
     }
 
-    inline fun <reified T> parse() = parse(getKType<T>())
+    internal fun parseCustom(id: TypeId, clazz: KClass<*>): BaseTypeData? {
+        val customParser = config.customParsers[clazz] ?: config.customParser
+        if (customParser != null) {
+            return customParser.parse(id, clazz)
+        }
+        return null
+    }
+
+    internal fun asRef(data: BaseTypeData): TypeRef {
+        return if (config.inline) {
+            InlineTypeRef(data)
+        } else {
+            context.add(data)
+        }
+    }
 
 }

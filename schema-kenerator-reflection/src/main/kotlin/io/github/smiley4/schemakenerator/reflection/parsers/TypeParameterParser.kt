@@ -1,7 +1,10 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.reflection.parsers
 
+import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
+import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
+import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -25,13 +28,9 @@ class TypeParameterParser(private val typeParser: ReflectionTypeParser) {
         }
     }
 
-    private fun resolveTypeProjection(typeProjection: KTypeProjection, providedTypeParameters: Map<String, TypeParameterData>): TypeId {
+    private fun resolveTypeProjection(typeProjection: KTypeProjection, providedTypeParameters: Map<String, TypeParameterData>): TypeRef {
         if (typeProjection.type == null) {
-            return if (typeParser.context.has(TypeId.wildcard())) {
-                TypeId.wildcard()
-            } else {
-                typeParser.context.add(WildcardTypeData())
-            }
+            return resolveWildcard()
         }
         return when (val classifier = typeProjection.type?.classifier) {
             is KClass<*> -> {
@@ -42,6 +41,18 @@ class TypeParameterParser(private val typeParser: ReflectionTypeParser) {
             }
             else -> {
                 throw Exception("Unhandled classifier type")
+            }
+        }
+    }
+
+    private fun resolveWildcard(): TypeRef {
+        return if (typeParser.config.inline) {
+            InlineTypeRef(WildcardTypeData())
+        } else {
+            if (typeParser.context.has(TypeId.wildcard())) {
+                ContextTypeRef(TypeId.wildcard())
+            } else {
+                typeParser.context.add(WildcardTypeData())
             }
         }
     }

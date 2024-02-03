@@ -26,8 +26,3 @@ fun KClass<*>.getMembersSafe(): Collection<KCallable<*>> {
         emptyList()
     }
 }
-
-
-inline fun <T, K, V> Iterable<T>.associateIndexed(transform: (index: Int, T) -> Pair<K, V>): Map<K, V> {
-    return this.mapIndexed(transform).associate { it }
-}

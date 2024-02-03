@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.reflection.parsers
 
 import kotlin.reflect.KClass
 
