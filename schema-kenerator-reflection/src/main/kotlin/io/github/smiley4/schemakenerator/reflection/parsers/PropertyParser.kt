@@ -48,6 +48,7 @@ class PropertyParser(private val typeParser: ReflectionTypeParser) {
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters),
             nullable = member.returnType.isMarkedNullable,
+            annotations = typeParser.getAnnotationParser().parse(member),
             kind = PropertyType.PROPERTY,
             visibility = if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
         )
@@ -61,6 +62,7 @@ class PropertyParser(private val typeParser: ReflectionTypeParser) {
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters),
             nullable = member.returnType.isMarkedNullable,
+            annotations = typeParser.getAnnotationParser().parse(member),
             kind = PropertyType.FUNCTION,
             visibility = if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
         )

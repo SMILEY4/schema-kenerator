@@ -179,7 +179,8 @@ class TestDataTypesContext : StringSpec({
                             nullable = false,
                             visibility = Visibility.PUBLIC,
                             kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
+                            type = ContextTypeRef(TypeId("java.time.LocalDateTime")),
+                            annotations = emptyList()
                         )
                     )
                 )
@@ -202,14 +203,16 @@ class TestDataTypesContext : StringSpec({
                             nullable = false,
                             visibility = Visibility.PUBLIC,
                             kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
+                            type = ContextTypeRef(TypeId("java.time.LocalDateTime")),
+                            annotations = emptyList()
                         ),
                         PropertyData(
                             name = "MAX",
                             nullable = false,
                             visibility = Visibility.PUBLIC,
                             kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
+                            type = ContextTypeRef(TypeId("java.time.LocalDateTime")),
+                            annotations = emptyList()
                         )
                     ),
                 )
@@ -240,7 +243,8 @@ class TestDataTypesContext : StringSpec({
                             nullable = false,
                             visibility = Visibility.PUBLIC,
                             kind = PropertyType.PROPERTY,
-                            type = ContextTypeRef(TypeId("java.time.LocalDateTime"))
+                            type = ContextTypeRef(TypeId("java.time.LocalDateTime")),
+                            annotations = emptyList()
                         )
                     )
                 )

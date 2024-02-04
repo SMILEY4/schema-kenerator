@@ -5,5 +5,6 @@ data class PropertyData(
     val type: TypeRef,
     val nullable: Boolean,
     val visibility: Visibility,
-    val kind: PropertyType
+    val kind: PropertyType,
+    val annotations: List<AnnotationData> = emptyList()
 )

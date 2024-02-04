@@ -1,7 +1,9 @@
 package io.github.smiley4.schemakenerator.kotlinxserialization
 
+import io.github.smiley4.schemakenerator.core.parser.AnnotationData
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.CollectionTypeData
+import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
 import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData

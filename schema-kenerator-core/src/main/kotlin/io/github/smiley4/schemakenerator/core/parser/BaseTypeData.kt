@@ -8,6 +8,7 @@ open class BaseTypeData(
     val simpleName: String,
     val qualifiedName: String,
     val typeParameters: Map<String, TypeParameterData>,
+    val annotations: List<AnnotationData>
 ) {
 
     companion object {
@@ -17,6 +18,7 @@ open class BaseTypeData(
             simpleName = id.id,
             qualifiedName = id.id,
             typeParameters = emptyMap(),
+            annotations = emptyList()
         )
 
     }
@@ -31,7 +33,8 @@ class WildcardTypeData : BaseTypeData(
     id = TypeId("*"),
     simpleName = "*",
     qualifiedName = "*",
-    typeParameters = emptyMap()
+    typeParameters = emptyMap(),
+    annotations = emptyList()
 )
 
 
@@ -42,8 +45,9 @@ class PrimitiveTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
-    typeParameters: Map<String, TypeParameterData> = emptyMap()
-) : BaseTypeData(id, simpleName, qualifiedName, typeParameters)
+    typeParameters: Map<String, TypeParameterData> = emptyMap(),
+    annotations: List<AnnotationData> = emptyList()
+) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
 /**
@@ -57,7 +61,8 @@ open class ObjectTypeData(
     val subtypes: List<TypeRef> = emptyList(),
     val supertypes: List<TypeRef> = emptyList(),
     val members: List<PropertyData> = emptyList(),
-) : BaseTypeData(id, simpleName, qualifiedName, typeParameters)
+    annotations: List<AnnotationData> = emptyList()
+) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
 /**
@@ -71,8 +76,9 @@ class EnumTypeData(
     subtypes: List<TypeRef> = emptyList(),
     supertypes: List<TypeRef> = emptyList(),
     members: List<PropertyData> = emptyList(),
-    val enumConstants: List<String>
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members)
+    annotations: List<AnnotationData> = emptyList(),
+    val enumConstants: List<String>,
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
 
 
 /**
@@ -86,9 +92,10 @@ class MapTypeData(
     subtypes: List<TypeRef> = emptyList(),
     supertypes: List<TypeRef> = emptyList(),
     members: List<PropertyData> = emptyList(),
+    annotations: List<AnnotationData> = emptyList(),
     val keyType: PropertyData,
-    val valueType: PropertyData
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members)
+    val valueType: PropertyData,
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
 
 
 /**
@@ -102,6 +109,7 @@ class CollectionTypeData(
     subtypes: List<TypeRef> = emptyList(),
     supertypes: List<TypeRef> = emptyList(),
     members: List<PropertyData> = emptyList(),
+    annotations: List<AnnotationData> = emptyList(),
     val itemType: PropertyData,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
 

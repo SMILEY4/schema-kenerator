@@ -23,6 +23,7 @@ class ReflectionTypeParser(
     fun getPropertyParser(): PropertyParser = PropertyParser(this)
     fun getSupertypeParser(): SupertypeParser = SupertypeParser(this)
     fun getEnumValueParser(): EnumValueParser = EnumValueParser(this)
+    fun getAnnotationParser(): AnnotationParser = AnnotationParser(this)
 
     inline fun <reified T> parse() = parse(getKType<T>())
 

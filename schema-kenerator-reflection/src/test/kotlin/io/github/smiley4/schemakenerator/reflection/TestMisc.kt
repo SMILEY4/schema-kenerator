@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
 import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.reflection.parsers.ReflectionTypeParser
+import io.github.smiley4.schemakenerator.testutils.shouldMatchJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
@@ -20,7 +21,7 @@ class TestMisc : StringSpec({
 
     "test basic" {
         val context = TypeParserContext()
-        val result = ReflectionTypeParser(context = context, config =  TestGenerics.CONFIG).parse<TestSubClass>()
+        val result = ReflectionTypeParser(context = context, config =  CONFIG).parse<TestSubClass>()
         context shouldHaveExactly listOf(
             "io.github.smiley4.schemakenerator.reflection.TestSubClass",
             "io.github.smiley4.schemakenerator.reflection.TestOpenClass",
@@ -38,7 +39,7 @@ class TestMisc : StringSpec({
 
     "test recursive" {
         val context = TypeParserContext()
-        val result = ReflectionTypeParser(context = context).parse<TestClassRecursiveGeneric<String>>()
+        val result = ReflectionTypeParser(context = context, config = CONFIG).parse<TestClassRecursiveGeneric<String>>()
         context shouldHaveExactly listOf(
             "*",
             "kotlin.String",
@@ -196,4 +197,29 @@ class TestMisc : StringSpec({
             }
     }
 
-})
+    "test annotations" {
+        val context = TypeParserContext()
+        val result = ReflectionTypeParser(context = context, config =  CONFIG).parse<TestClassWithAnnotations>()
+        context shouldHaveExactly listOf(
+            "io.github.smiley4.schemakenerator.reflection.TestClassWithAnnotations",
+            "kotlin.String"
+        )
+        result.also { ref ->
+            (ref is ContextTypeRef) shouldBe true
+            ref.idStr() shouldBe "io.github.smiley4.schemakenerator.reflection.TestClassWithAnnotations"
+        }
+        result.resolve(context)!!.also { type ->
+            type.shouldMatch(TypeDataContext.testClassWithAnnotations())
+        }
+    }
+
+}) {
+
+    companion object {
+
+        val CONFIG: (ReflectionTypeParserConfigBuilder.() -> Unit) = {
+            inline = false
+        }
+
+    }
+}

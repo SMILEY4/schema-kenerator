@@ -13,7 +13,7 @@ class TestClassMixedTypes(
     val myArray: Array<TestClassSimple>
 )
 
-class TestClassLocalDateTime (
+class TestClassLocalDateTime(
     val timestamp: LocalDateTime
 )
 
@@ -75,3 +75,14 @@ data class TestClassRecursiveGeneric<T>(
 
 
 interface TestInterfaceRecursiveGeneric<T>
+
+
+@TestAnnotation("Hello Class 1")
+@TestAnnotation("Hello Class 2")
+class TestClassWithAnnotations {
+    @TestAnnotation("Hello Field")
+    val value: String = ""
+}
+
+@Repeatable
+annotation class TestAnnotation(val value: String)

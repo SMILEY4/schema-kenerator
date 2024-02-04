@@ -68,6 +68,9 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
             emptyList()
         }
 
+        // collect annotation information
+        val annotations = typeParser.getAnnotationParser().parse(clazz)
+
         // add type to context and return its id
         return when (classType) {
             ClassType.PRIMITIVE -> PrimitiveTypeData(
@@ -75,6 +78,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
                 typeParameters = resolvedTypeParameters,
+                annotations = annotations
             ).let { typeParser.asRef(it) }
             ClassType.OBJECT -> ObjectTypeData(
                 id = id,
@@ -84,6 +88,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 subtypes = emptyList(),
                 supertypes = supertypes,
                 members = members,
+                annotations = annotations
             ).let { typeParser.asRef(it) }
             ClassType.ENUM -> EnumTypeData(
                 id = id,
@@ -93,7 +98,8 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 subtypes = emptyList(),
                 supertypes = supertypes,
                 members = members,
-                enumConstants = enumValues
+                enumConstants = enumValues,
+                annotations = annotations
             ).let { typeParser.asRef(it) }
             ClassType.COLLECTION -> CollectionTypeData(
                 id = id,
@@ -103,13 +109,15 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 subtypes = emptyList(),
                 supertypes = supertypes,
                 members = members,
+                annotations = annotations,
                 itemType = resolvedTypeParameters["E"]?.let {
                     PropertyData(
                         name = "item",
                         type = it.type,
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
-                        kind = PropertyType.PROPERTY
+                        kind = PropertyType.PROPERTY,
+                        annotations = emptyList()
                     )
                 } ?: resolvedTypeParameters["T"]?.let {
                     PropertyData(
@@ -117,7 +125,8 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                         type = it.type,
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
-                        kind = PropertyType.PROPERTY
+                        kind = PropertyType.PROPERTY,
+                        annotations = emptyList()
                     )
                 }
                 ?: unknownPropertyData("item")
@@ -130,13 +139,15 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 subtypes = emptyList(),
                 supertypes = supertypes,
                 members = members,
+                annotations = annotations,
                 keyType = resolvedTypeParameters["K"]?.let {
                     PropertyData(
                         name = "key",
                         type = it.type,
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
-                        kind = PropertyType.PROPERTY
+                        kind = PropertyType.PROPERTY,
+                        annotations = emptyList()
                     )
                 } ?: unknownPropertyData("item"),
                 valueType = resolvedTypeParameters["V"]?.let {
@@ -145,7 +156,8 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                         type = it.type,
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
-                        kind = PropertyType.PROPERTY
+                        kind = PropertyType.PROPERTY,
+                        annotations = emptyList()
                     )
                 } ?: unknownPropertyData("item")
             ).let { typeParser.asRef(it) }
@@ -157,7 +169,8 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
         type = ContextTypeRef(TypeId.wildcard()),
         nullable = false,
         visibility = Visibility.PUBLIC,
-        kind = PropertyType.PROPERTY
+        kind = PropertyType.PROPERTY,
+        annotations = emptyList()
     )
 
 }

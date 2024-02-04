@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.reflection
 
+import io.github.smiley4.schemakenerator.core.parser.AnnotationData
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
@@ -12,6 +13,7 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.Visibility
+import io.mockk.mockk
 
 object TypeDataContext {
 
@@ -67,7 +69,8 @@ object TypeDataContext {
             nullable = false,
             visibility = Visibility.PUBLIC,
             kind = PropertyType.PROPERTY,
-            type = ContextTypeRef(item.id)
+            type = ContextTypeRef(item.id),
+            annotations = emptyList()
         ),
     )
 
@@ -314,5 +317,38 @@ object TypeDataContext {
         ),
         members = emptyList()
     )
+
+    fun testClassWithAnnotations() = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestClassWithAnnotations"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassWithAnnotations",
+        simpleName = "TestClassWithAnnotations",
+        annotations = listOf(
+            AnnotationData(
+                name = "io.github.smiley4.schemakenerator.reflection.TestAnnotation",
+                annotation = NoOpAnnotation()
+            ),
+            AnnotationData(
+                name = "io.github.smiley4.schemakenerator.reflection.TestAnnotation",
+                annotation = NoOpAnnotation()
+            )
+        ),
+        members = listOf(
+            PropertyData(
+                name = "value",
+                nullable = false,
+                visibility = Visibility.PUBLIC,
+                kind = PropertyType.PROPERTY,
+                type = ContextTypeRef(string().id),
+                annotations = listOf(
+                    AnnotationData(
+                        name = "io.github.smiley4.schemakenerator.reflection.TestAnnotation",
+                        annotation = NoOpAnnotation()
+                    ),
+                ),
+            ),
+        )
+    )
+
+    class NoOpAnnotation : Annotation
 
 }
