@@ -15,6 +15,13 @@ import io.github.smiley4.schemakenerator.core.parser.Visibility
 
 object TypeDataContext {
 
+    fun wildcard() = PrimitiveTypeData(
+        id = TypeId("*"),
+        qualifiedName = "*",
+        simpleName = "*",
+        typeParameters = emptyMap()
+    )
+
     fun any() = PrimitiveTypeData(
         id = TypeId("kotlin.Any"),
         qualifiedName = "kotlin.Any",
@@ -188,6 +195,124 @@ object TypeDataContext {
                 type = ContextTypeRef(testEnum().id)
             ),
         )
+    )
+
+    fun testClassGeneric(genericType: BaseTypeData) = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestClassGeneric<${genericType.id.id}>"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassGeneric",
+        simpleName = "TestClassGeneric",
+        typeParameters = mapOf(
+            "T" to TypeParameterData(
+                name = "T",
+                type = ContextTypeRef(genericType.id),
+                nullable = false
+            ),
+        ),
+        members = listOf(
+            PropertyData(
+                name = "value",
+                nullable = false,
+                visibility = Visibility.PUBLIC,
+                kind = PropertyType.PROPERTY,
+                type = ContextTypeRef(genericType.id)
+            ),
+        )
+    )
+
+    fun testClassDeepGeneric(genericType: BaseTypeData) = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestClassDeepGeneric<${genericType.id.id}>"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassDeepGeneric",
+        simpleName = "TestClassDeepGeneric",
+        typeParameters = mapOf(
+            "E" to TypeParameterData(
+                name = "E",
+                type = ContextTypeRef(genericType.id),
+                nullable = false
+            ),
+        ),
+        members = listOf(
+            PropertyData(
+                name = "myValues",
+                nullable = false,
+                visibility = Visibility.PUBLIC,
+                kind = PropertyType.PROPERTY,
+                type = ContextTypeRef(list(genericType).id)
+            ),
+        )
+    )
+
+    fun testSubClass() = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestSubClass"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestSubClass",
+        simpleName = "TestSubClass",
+        typeParameters = emptyMap(),
+        supertypes = listOf(
+            ContextTypeRef(testOpenClass().id)
+        ),
+        members = listOf(
+            PropertyData(
+                name = "additionalField",
+                nullable = false,
+                visibility = Visibility.PUBLIC,
+                kind = PropertyType.PROPERTY,
+                type = ContextTypeRef(int().id)
+            ),
+        )
+    )
+
+    fun testOpenClass() = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestOpenClass"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestOpenClass",
+        simpleName = "TestOpenClass",
+        typeParameters = emptyMap(),
+        members = listOf(
+            PropertyData(
+                name = "baseField",
+                nullable = false,
+                visibility = Visibility.PUBLIC,
+                kind = PropertyType.PROPERTY,
+                type = ContextTypeRef(string().id)
+            ),
+        )
+    )
+
+    fun testClassRecursiveGeneric(genericType: BaseTypeData) = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestClassRecursiveGeneric<${genericType.id.id}>"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestClassRecursiveGeneric",
+        simpleName = "TestClassRecursiveGeneric",
+        typeParameters = mapOf(
+            "T" to TypeParameterData(
+                name = "T",
+                type = ContextTypeRef(genericType.id),
+                nullable = false
+            ),
+        ),
+        supertypes = listOf(
+            ContextTypeRef(TypeId("io.github.smiley4.schemakenerator.reflection.TestInterfaceRecursiveGeneric<io.github.smiley4.schemakenerator.reflection.TestClassRecursiveGeneric<*>>"))
+        ),
+        members = listOf(
+            PropertyData(
+                name = "value",
+                nullable = false,
+                visibility = Visibility.PUBLIC,
+                kind = PropertyType.PROPERTY,
+                type = ContextTypeRef(genericType.id)
+            ),
+        )
+    )
+
+    fun testInterfaceRecursiveGeneric(genericType: BaseTypeData) = ObjectTypeData(
+        id = TypeId("io.github.smiley4.schemakenerator.reflection.TestInterfaceRecursiveGeneric<${genericType.id.id}>"),
+        qualifiedName = "io.github.smiley4.schemakenerator.reflection.TestInterfaceRecursiveGeneric",
+        simpleName = "TestInterfaceRecursiveGeneric",
+        typeParameters = mapOf(
+            "T" to TypeParameterData(
+                name = "T",
+                type = ContextTypeRef(genericType.id),
+                nullable = false
+            ),
+        ),
+        members = emptyList()
     )
 
 }
