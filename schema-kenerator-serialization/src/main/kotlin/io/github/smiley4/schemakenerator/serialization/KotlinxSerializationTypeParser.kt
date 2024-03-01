@@ -39,16 +39,19 @@ class KotlinxSerializationTypeParser(
 
 
     override fun parse(type: KType): TypeRef {
+        if(config.clearContext) {
+            context.clear()
+        }
         if (type.classifier is KClass<*>) {
             return (type.classifier as KClass<*>).serializerOrNull()
-                ?.let { parse(it.descriptor) }
-                ?: parseAsWildcard()
+                ?.let { parseInternal(it.descriptor) }
+                ?: parseInternalAsWildcard()
         } else {
             throw Exception("Type is not a class.")
         }
     }
 
-    private fun parse(descriptor: SerialDescriptor): TypeRef {
+    private fun parseInternal(descriptor: SerialDescriptor): TypeRef {
         val type = parseAsBaseTypeData(descriptor)
         return if (config.inline) {
             InlineTypeRef(type)
@@ -57,7 +60,7 @@ class KotlinxSerializationTypeParser(
         }
     }
 
-    private fun parseAsWildcard(): TypeRef {
+    private fun parseInternalAsWildcard(): TypeRef {
         val type = WildcardTypeData()
         return if (config.inline) {
             InlineTypeRef(type)
@@ -110,7 +113,7 @@ class KotlinxSerializationTypeParser(
 
     private fun parseList(descriptor: SerialDescriptor): BaseTypeData {
         val itemDescriptor = descriptor.getElementDescriptor(0)
-        val itemType = parse(itemDescriptor)
+        val itemType = parseInternal(itemDescriptor)
 
         val id = TypeId.build(descriptor.serialName, listOf(itemType))
 
@@ -136,8 +139,8 @@ class KotlinxSerializationTypeParser(
     private fun parseMap(descriptor: SerialDescriptor): BaseTypeData {
         val keyDescriptor = descriptor.getElementDescriptor(0)
         val valueDescriptor = descriptor.getElementDescriptor(1)
-        val keyType = parse(keyDescriptor)
-        val valueType = parse(valueDescriptor)
+        val keyType = parseInternal(keyDescriptor)
+        val valueType = parseInternal(valueDescriptor)
 
         val id = TypeId.build(descriptor.serialName, listOf(keyType, valueType))
         parseCustom(id, descriptor)?.also {
@@ -178,7 +181,7 @@ class KotlinxSerializationTypeParser(
             for (i in 0..<descriptor.elementsCount) {
                 val fieldDescriptor = descriptor.getElementDescriptor(i)
                 val fieldName = descriptor.getElementName(i)
-                val fieldType = parse(fieldDescriptor)
+                val fieldType = parseInternal(fieldDescriptor)
                 add(
                     PropertyData(
                         name = fieldName,
@@ -206,7 +209,7 @@ class KotlinxSerializationTypeParser(
             return@parseSealed it
         }
 
-        val subTypes = descriptor.elementDescriptors.toList()[1].elementDescriptors.map { parse(it) }
+        val subTypes = descriptor.elementDescriptors.toList()[1].elementDescriptors.map { parseInternal(it) }
         return ObjectTypeData(
             id = id,
             simpleName = descriptor.simpleName(),

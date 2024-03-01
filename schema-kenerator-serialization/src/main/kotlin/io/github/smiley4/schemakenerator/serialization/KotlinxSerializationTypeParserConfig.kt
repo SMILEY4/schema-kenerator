@@ -8,6 +8,10 @@ import kotlin.reflect.KClass
  */
 class KotlinxSerializationTypeParserConfig(
     /**
+     * Automatically clear the context before parsing.
+     */
+    val clearContext: Boolean,
+    /**
      * Whether to inline additional types or keep them separate in the context and reference them.
      */
     val inline: Boolean,
@@ -26,6 +30,12 @@ class KotlinxSerializationTypeParserConfig(
  * Builder for the [KotlinxSerializationTypeParserConfig]
  */
 class KotlinxSerializationTypeParserConfigBuilder {
+
+    /**
+     * Automatically clear the context before parsing.
+     */
+    var clearContext = true
+
 
     /**
      * Whether to inline additional types or keep them separate in the context and reference them.
@@ -47,7 +57,7 @@ class KotlinxSerializationTypeParserConfigBuilder {
 
     /**
      * Register a custom parser for the given type.
-     * @param type the type to overwrite the default parsing behaviour for
+     * @param type the type to overwrite the default parsing behavior for
      * @param parser the custom parser for the given type
      */
     fun registerParser(type: KClass<*>, parser: CustomKotlinxSerializationTypeParser) {
@@ -57,7 +67,7 @@ class KotlinxSerializationTypeParserConfigBuilder {
 
     /**
      * Register a custom parser for the given type.
-     * @param type the qualified name of the type to overwrite the default parsing behaviour for
+     * @param type the qualified name of the type to overwrite the default parsing behavior for
      * @param parser the custom parser for the given type
      */
     fun registerParser(type: String, parser: CustomKotlinxSerializationTypeParser) {
@@ -70,6 +80,7 @@ class KotlinxSerializationTypeParserConfigBuilder {
      */
     fun build(): KotlinxSerializationTypeParserConfig {
         return KotlinxSerializationTypeParserConfig(
+            clearContext = clearContext,
             customParser = customParser,
             customParsers = parsers,
             inline = inline

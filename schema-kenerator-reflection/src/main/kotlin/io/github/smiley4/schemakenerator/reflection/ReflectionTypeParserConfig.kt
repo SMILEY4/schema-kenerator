@@ -9,6 +9,10 @@ import kotlin.reflect.KClass
  */
 class ReflectionTypeParserConfig(
     /**
+     * Automatically clear the context before parsing.
+     */
+    val clearContext: Boolean,
+    /**
      * Whether to inline additional types or keep them separate in the context and reference them.
      */
     val inline: Boolean,
@@ -45,7 +49,14 @@ class ReflectionTypeParserConfig(
 class ReflectionTypeParserConfigBuilder {
 
     /**
-     * Whether to inline additional types or keep them separate in the context and reference them.
+     * Automatically clear the context before parsing.
+     */
+    var clearContext = true
+
+
+    /**
+     * whether to inline types into one single data-object or keep them separated in the context for later reference.
+     * Note: `true` may cause infinite loops for some types.
      */
     var inline = false
 
@@ -64,7 +75,7 @@ class ReflectionTypeParserConfigBuilder {
 
     /**
      * Register a custom parser for the given type.
-     * @param type the type to overwrite the default parsing behaviour for
+     * @param type the type to overwrite the default parsing behavior for
      * @param parser the custom parser for the given type
      */
     fun registerParser(type: KClass<*>, parser: CustomReflectionTypeParser) {
@@ -149,6 +160,7 @@ class ReflectionTypeParserConfigBuilder {
      */
     fun build(): ReflectionTypeParserConfig {
         return ReflectionTypeParserConfig(
+            clearContext = clearContext,
             typeDecider = typeDecider,
             customParser = customParser,
             customParsers = parsers,

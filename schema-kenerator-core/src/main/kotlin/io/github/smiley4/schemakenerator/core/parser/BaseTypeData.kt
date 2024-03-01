@@ -3,7 +3,7 @@ package io.github.smiley4.schemakenerator.core.parser
 /**
  * Base data for a type
  */
-open class BaseTypeData(
+sealed class BaseTypeData(
     val id: TypeId,
     val simpleName: String,
     val qualifiedName: String,
@@ -13,17 +13,25 @@ open class BaseTypeData(
 
     companion object {
 
-        fun placeholder(id: TypeId) = BaseTypeData(
-            id = id,
-            simpleName = id.id,
-            qualifiedName = id.id,
-            typeParameters = emptyMap(),
-            annotations = emptyList()
-        )
+        fun placeholder(id: TypeId) = PlaceholderTypeData(id)
 
     }
 
 }
+
+
+/**
+ * Data for a wildcard-type
+ */
+class PlaceholderTypeData(
+    id: TypeId
+) : BaseTypeData(
+    id = id,
+    simpleName = id.id,
+    qualifiedName = id.id,
+    typeParameters = emptyMap(),
+    annotations = emptyList()
+)
 
 
 /**

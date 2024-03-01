@@ -26,4 +26,8 @@ class TypeParserContext {
         return types.keys.toList()
     }
 
+    fun clear() {
+        types.clear()
+    }
+
 }

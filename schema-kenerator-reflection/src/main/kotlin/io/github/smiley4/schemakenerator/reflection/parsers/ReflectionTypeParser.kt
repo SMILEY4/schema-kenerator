@@ -28,6 +28,9 @@ class ReflectionTypeParser(
     inline fun <reified T> parse() = parse(getKType<T>())
 
     override fun parse(type: KType): TypeRef {
+        if(config.clearContext) {
+            context.clear()
+        }
         if (type.classifier is KClass<*>) {
             return getClassParser().parse(type, type.classifier as KClass<*>, mapOf())
         } else {
