@@ -1,9 +1,27 @@
-- new name for library
-    - schema-kenerator
-    - kschema
-    - type-inspector
-    - type-craft
-    - type-morph
-    - type-meta-kit
-    - k-type-kit
-    - ... ?
+Parser: Reflection
+- parser config ✅
+- type specific parser config ❌
+- base data ✅
+- properties ✅
+- supertypes ✅
+- type parameters (generics) ✅
+- enums ✅
+- annotations ✅
+- custom parsers ✅
+
+Parser: Serialization
+- parser config ✅
+- type specific parser config ❌
+- base data ✅
+- properties ✅
+- supertypes ✅
+- type parameters (generics) ✅
+- enums ✅
+- annotations ⭕
+- custom parsers ✅
+
+Generator: Swagger-Schema
+
+
+Generator: Json-Schema
+❌

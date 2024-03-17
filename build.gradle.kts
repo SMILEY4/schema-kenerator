@@ -35,6 +35,7 @@ subprojects {
         val versionKotest = "5.8.0"
         testImplementation("io.kotest:kotest-runner-junit5:$versionKotest")
         testImplementation("io.kotest:kotest-assertions-core:$versionKotest")
+        testImplementation("io.kotest:kotest-framework-datatest:$versionKotest")
 
         val versionKotlinTest = "1.8.21"
         testImplementation("org.jetbrains.kotlin:kotlin-test:$versionKotlinTest")

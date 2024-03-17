@@ -100,7 +100,7 @@ class ReflectionTypeParserConfigBuilder {
     /**
      * include method starting with "is" or "get" and only return a value while taking no parameters.
      */
-    var includeGetters = true
+    var includeGetters = false
 
 
     /**
