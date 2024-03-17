@@ -16,6 +16,7 @@ import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.reflection.ClassType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.reflect.full.starProjectedType
 
 class ClassParser(private val typeParser: ReflectionTypeParser) {
 
@@ -54,6 +55,15 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
             emptyList()
         }
 
+        // collect subclasses (causes infinite loop when inlining types)
+        val subtypes = if (!typeParser.config.inline) {
+            clazz.sealedSubclasses.map { subclass ->
+                typeParser.getClassParser().parse(subclass.starProjectedType, subclass, providedTypeParameters)
+            }
+        } else {
+            emptyList()
+        }
+
         // collect information about enum constants
         val enumValues = if (classType == ClassType.ENUM) {
             typeParser.getEnumValueParser().parse(clazz)
@@ -85,7 +95,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
                 typeParameters = resolvedTypeParameters,
-                subtypes = emptyList(),
+                subtypes = subtypes,
                 supertypes = supertypes,
                 members = members,
                 annotations = annotations
@@ -95,7 +105,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
                 typeParameters = resolvedTypeParameters,
-                subtypes = emptyList(),
+                subtypes = subtypes,
                 supertypes = supertypes,
                 members = members,
                 enumConstants = enumValues,
@@ -106,7 +116,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
                 typeParameters = resolvedTypeParameters,
-                subtypes = emptyList(),
+                subtypes = subtypes,
                 supertypes = supertypes,
                 members = members,
                 annotations = annotations,
@@ -136,7 +146,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
                 typeParameters = resolvedTypeParameters,
-                subtypes = emptyList(),
+                subtypes = subtypes,
                 supertypes = supertypes,
                 members = members,
                 annotations = annotations,
