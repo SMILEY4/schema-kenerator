@@ -34,7 +34,7 @@ class JsonObjectDsl {
             JsonArray(
                 value
                     .map { it ?: JsonNullValue() }
-                    .toList()
+                    .toMutableList()
             )
         } ?: JsonNullValue()
     }
@@ -45,7 +45,7 @@ class JsonObjectDsl {
             JsonArray(
                 value
                     .map { it?.let { JsonTextValue(it) } ?: JsonNullValue() }
-                    .toList()
+                    .toMutableList()
             )
         } ?: JsonNullValue()
     }
@@ -56,7 +56,7 @@ class JsonObjectDsl {
             JsonArray(
                 value
                     .map { it?.let { JsonNumericValue(it) } ?: JsonNullValue() }
-                    .toList()
+                    .toMutableList()
             )
         } ?: JsonNullValue()
     }
@@ -67,7 +67,7 @@ class JsonObjectDsl {
             JsonArray(
                 value
                     .map { it?.let { JsonBooleanValue(it) } ?: JsonNullValue() }
-                    .toList()
+                    .toMutableList()
             )
         } ?: JsonNullValue()
     }

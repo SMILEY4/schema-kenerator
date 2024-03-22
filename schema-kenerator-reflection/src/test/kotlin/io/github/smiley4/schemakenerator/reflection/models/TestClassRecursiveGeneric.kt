@@ -20,17 +20,17 @@ object TestClassRecursiveGenericMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassRecursiveGeneric<${genericType.id.id}>"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassRecursiveGeneric",
         simpleName = "TestClassRecursiveGeneric",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "T" to TypeParameterData(
                 name = "T",
                 type = ContextTypeRef(genericType.id),
                 nullable = false
             ),
         ),
-        supertypes = listOf(
+        supertypes = mutableListOf(
             ContextTypeRef(TypeId("io.github.smiley4.schemakenerator.reflection.models.TestInterfaceRecursiveGeneric<io.github.smiley4.schemakenerator.reflection.models.TestClassRecursiveGeneric<*>>"))
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "value",
                 nullable = false,

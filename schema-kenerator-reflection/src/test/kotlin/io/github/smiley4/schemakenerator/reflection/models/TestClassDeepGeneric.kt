@@ -20,14 +20,14 @@ object TestClassDeepGenericMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassDeepGeneric<${genericType.id.id}>"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassDeepGeneric",
         simpleName = "TestClassDeepGeneric",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "E" to TypeParameterData(
                 name = "E",
                 type = ContextTypeRef(genericType.id),
                 nullable = false
             ),
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "myValues",
                 nullable = false,
@@ -42,14 +42,14 @@ object TestClassDeepGenericMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassDeepGeneric<${genericType.id.id}>"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassDeepGeneric",
         simpleName = "TestClassDeepGeneric",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "E" to TypeParameterData(
                 name = "E",
                 type = InlineTypeRef(genericType),
                 nullable = false
             ),
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "myValues",
                 nullable = false,

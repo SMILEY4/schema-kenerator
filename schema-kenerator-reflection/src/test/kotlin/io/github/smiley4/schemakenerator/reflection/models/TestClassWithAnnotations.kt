@@ -23,7 +23,7 @@ object TestClassWithAnnotationsMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassWithAnnotations"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassWithAnnotations",
         simpleName = "TestClassWithAnnotations",
-        annotations = listOf(
+        annotations = mutableListOf(
             AnnotationData(
                 name = "io.github.smiley4.schemakenerator.reflection.models.TestAnnotation",
                 annotation = NoOpAnnotation()
@@ -33,7 +33,7 @@ object TestClassWithAnnotationsMeta {
                 annotation = NoOpAnnotation()
             )
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "value",
                 nullable = false,
@@ -54,7 +54,7 @@ object TestClassWithAnnotationsMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassWithAnnotations"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassWithAnnotations",
         simpleName = "TestClassWithAnnotations",
-        annotations = listOf(
+        annotations = mutableListOf(
             AnnotationData(
                 name = "io.github.smiley4.schemakenerator.reflection.models.TestAnnotation",
                 annotation = NoOpAnnotation()
@@ -64,7 +64,7 @@ object TestClassWithAnnotationsMeta {
                 annotation = NoOpAnnotation()
             )
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "value",
                 nullable = false,

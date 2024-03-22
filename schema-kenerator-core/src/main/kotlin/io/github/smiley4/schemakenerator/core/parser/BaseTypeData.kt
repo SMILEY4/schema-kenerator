@@ -5,10 +5,10 @@ package io.github.smiley4.schemakenerator.core.parser
  */
 sealed class BaseTypeData(
     val id: TypeId,
-    val simpleName: String,
-    val qualifiedName: String,
-    val typeParameters: Map<String, TypeParameterData>,
-    val annotations: List<AnnotationData>
+    var simpleName: String,
+    var qualifiedName: String,
+    var typeParameters: MutableMap<String, TypeParameterData>,
+    var annotations: MutableList<AnnotationData>
 ) {
 
     companion object {
@@ -29,8 +29,8 @@ class PlaceholderTypeData(
     id = id,
     simpleName = id.id,
     qualifiedName = id.id,
-    typeParameters = emptyMap(),
-    annotations = emptyList()
+    typeParameters = mutableMapOf(),
+    annotations = mutableListOf()
 )
 
 
@@ -41,8 +41,8 @@ class WildcardTypeData : BaseTypeData(
     id = TypeId("*"),
     simpleName = "*",
     qualifiedName = "*",
-    typeParameters = emptyMap(),
-    annotations = emptyList()
+    typeParameters = mutableMapOf(),
+    annotations = mutableListOf()
 )
 
 
@@ -53,8 +53,8 @@ class PrimitiveTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
-    typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    annotations: List<AnnotationData> = emptyList()
+    typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
+    annotations: MutableList<AnnotationData> = mutableListOf()
 ) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
@@ -65,11 +65,11 @@ open class ObjectTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
-    typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    val subtypes: List<TypeRef> = emptyList(),
-    val supertypes: List<TypeRef> = emptyList(),
-    val members: List<PropertyData> = emptyList(),
-    annotations: List<AnnotationData> = emptyList()
+    typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
+    var subtypes: MutableList<TypeRef> = mutableListOf(),
+    var supertypes: MutableList<TypeRef> = mutableListOf(),
+    var members: MutableList<PropertyData> = mutableListOf(),
+    annotations: MutableList<AnnotationData> = mutableListOf()
 ) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
@@ -80,12 +80,12 @@ class EnumTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
-    typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    subtypes: List<TypeRef> = emptyList(),
-    supertypes: List<TypeRef> = emptyList(),
-    members: List<PropertyData> = emptyList(),
-    annotations: List<AnnotationData> = emptyList(),
-    val enumConstants: List<String>,
+    typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
+    subtypes: MutableList<TypeRef> = mutableListOf(),
+    supertypes: MutableList<TypeRef> = mutableListOf(),
+    members: MutableList<PropertyData> = mutableListOf(),
+    annotations: MutableList<AnnotationData> = mutableListOf(),
+    var enumConstants: MutableList<String>,
 ) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
 
 
@@ -96,13 +96,13 @@ class MapTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
-    typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    subtypes: List<TypeRef> = emptyList(),
-    supertypes: List<TypeRef> = emptyList(),
-    members: List<PropertyData> = emptyList(),
-    annotations: List<AnnotationData> = emptyList(),
-    val keyType: PropertyData,
-    val valueType: PropertyData,
+    typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
+    subtypes: MutableList<TypeRef> = mutableListOf(),
+    supertypes: MutableList<TypeRef> = mutableListOf(),
+    members: MutableList<PropertyData> = mutableListOf(),
+    annotations: MutableList<AnnotationData> = mutableListOf(),
+    var keyType: PropertyData,
+    var valueType: PropertyData,
 ) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
 
 
@@ -113,11 +113,11 @@ class CollectionTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
-    typeParameters: Map<String, TypeParameterData> = emptyMap(),
-    subtypes: List<TypeRef> = emptyList(),
-    supertypes: List<TypeRef> = emptyList(),
-    members: List<PropertyData> = emptyList(),
-    annotations: List<AnnotationData> = emptyList(),
+    typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
+    subtypes: MutableList<TypeRef> = mutableListOf(),
+    supertypes: MutableList<TypeRef> = mutableListOf(),
+    members: MutableList<PropertyData> = mutableListOf(),
+    annotations: MutableList<AnnotationData> = mutableListOf(),
     val itemType: PropertyData,
 ) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
 

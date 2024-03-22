@@ -15,14 +15,14 @@ object TestInterfaceRecursiveGenericMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestInterfaceRecursiveGeneric<${genericType.id.id}>"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestInterfaceRecursiveGeneric",
         simpleName = "TestInterfaceRecursiveGeneric",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "T" to TypeParameterData(
                 name = "T",
                 type = ContextTypeRef(genericType.id),
                 nullable = false
             ),
         ),
-        members = emptyList()
+        members = mutableListOf()
     )
 
 }

@@ -20,11 +20,11 @@ object TestSubClassMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestSubClass"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestSubClass",
         simpleName = "TestSubClass",
-        typeParameters = emptyMap(),
-        supertypes = listOf(
+        typeParameters = mutableMapOf(),
+        supertypes = mutableListOf(
             InlineTypeRef(TestOpenClassMeta.INLINE)
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "additionalField",
                 nullable = false,
@@ -39,11 +39,11 @@ object TestSubClassMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestSubClass"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestSubClass",
         simpleName = "TestSubClass",
-        typeParameters = emptyMap(),
-        supertypes = listOf(
+        typeParameters = mutableMapOf(),
+        supertypes = mutableListOf(
             ContextTypeRef(TestOpenClassMeta.CONTEXT.id)
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "additionalField",
                 nullable = false,

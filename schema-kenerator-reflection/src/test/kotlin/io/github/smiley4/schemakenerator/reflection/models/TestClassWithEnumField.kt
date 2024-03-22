@@ -18,8 +18,8 @@ object TestClassWithEnumFieldMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassWithEnumField"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassWithEnumField",
         simpleName = "TestClassWithEnumField",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "value",
                 nullable = false,
@@ -34,8 +34,8 @@ object TestClassWithEnumFieldMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassWithEnumField"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassWithEnumField",
         simpleName = "TestClassWithEnumField",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "value",
                 nullable = false,

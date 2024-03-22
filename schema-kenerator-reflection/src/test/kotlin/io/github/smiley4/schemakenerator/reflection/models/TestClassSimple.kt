@@ -21,8 +21,8 @@ object TestClassSimpleMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassSimple"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassSimple",
         simpleName = "TestClassSimple",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "someField",
                 nullable = true,
@@ -37,8 +37,8 @@ object TestClassSimpleMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassSimple"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassSimple",
         simpleName = "TestClassSimple",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "someField",
                 nullable = true,
@@ -49,7 +49,7 @@ object TestClassSimpleMeta {
                         id = TypeId("kotlin.String"),
                         simpleName = "String",
                         qualifiedName = "kotlin.String",
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 )
             )

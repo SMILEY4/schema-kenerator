@@ -23,6 +23,10 @@ class AnnotationParser(private val typeParser: ReflectionTypeParser) {
         return AnnotationData(
             name = annotation.annotationClass.qualifiedName ?: "",
             annotation = annotation,
+            values = annotation.annotationClass.members
+                .filterIsInstance<KProperty<*>>()
+                .associate { it.name to it.getter.call(annotation) }
+                .toMutableMap()
         )
     }
 

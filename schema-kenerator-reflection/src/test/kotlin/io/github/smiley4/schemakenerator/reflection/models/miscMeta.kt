@@ -24,42 +24,42 @@ object MiscMeta {
         id = TypeId("kotlin.Any"),
         qualifiedName = "kotlin.Any",
         simpleName = "Any",
-        typeParameters = emptyMap()
+        typeParameters = mutableMapOf()
     )
 
     val UNIT = PrimitiveTypeData(
         id = TypeId("kotlin.Unit"),
         qualifiedName = "kotlin.Unit",
         simpleName = "Unit",
-        typeParameters = emptyMap()
+        typeParameters = mutableMapOf()
     )
 
     val STRING = PrimitiveTypeData(
         id = TypeId("kotlin.String"),
         qualifiedName = "kotlin.String",
         simpleName = "String",
-        typeParameters = emptyMap()
+        typeParameters = mutableMapOf()
     )
 
     val INT = PrimitiveTypeData(
         id = TypeId("kotlin.Int"),
         qualifiedName = "kotlin.Int",
         simpleName = "Int",
-        typeParameters = emptyMap()
+        typeParameters = mutableMapOf()
     )
 
     fun listContext(item: BaseTypeData) = CollectionTypeData(
         id = TypeId("kotlin.collections.List<${item.id.id}>"),
         qualifiedName = "kotlin.collections.List",
         simpleName = "List",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "E" to TypeParameterData(
                 name = "E",
                 type = ContextTypeRef(item.id),
                 nullable = false
             )
         ),
-        supertypes = emptyList(),
+        supertypes = mutableListOf(),
         itemType = PropertyData(
             name = "item",
             nullable = false,
@@ -74,7 +74,7 @@ object MiscMeta {
         id = TypeId("kotlin.collections.List<${item.id.id}>"),
         qualifiedName = "kotlin.collections.List",
         simpleName = "List",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "E" to TypeParameterData(
                 name = "E",
                 nullable = false,
@@ -94,7 +94,7 @@ object MiscMeta {
         id = TypeId("kotlin.Array<${item.id.id}>"),
         qualifiedName = "kotlin.Array",
         simpleName = "Array",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "T" to TypeParameterData(
                 name = "T",
                 type = ContextTypeRef(item.id),
@@ -114,7 +114,7 @@ object MiscMeta {
         id = TypeId("kotlin.Array<${item.id.id}>"),
         qualifiedName = "kotlin.Array",
         simpleName = "Array",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "T" to TypeParameterData(
                 name = "T",
                 nullable = false,
@@ -135,7 +135,7 @@ object MiscMeta {
         id = TypeId("kotlin.collections.Map<${key.id.id},${value.id.id}>"),
         qualifiedName = "kotlin.collections.Map",
         simpleName = "Map",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "K" to TypeParameterData(
                 name = "K",
                 type = ContextTypeRef(key.id),
@@ -167,7 +167,7 @@ object MiscMeta {
         id = TypeId("kotlin.collections.Map<${key.id.id},${value.id.id}>"),
         qualifiedName = "kotlin.collections.Map",
         simpleName = "Map",
-        typeParameters = mapOf(
+        typeParameters = mutableMapOf(
             "K" to TypeParameterData(
                 name = "K",
                 nullable = false,
@@ -199,12 +199,12 @@ object MiscMeta {
         id = TypeId("java.time.LocalDateTime"),
         qualifiedName = "java.time.LocalDateTime",
         simpleName = "LocalDateTime",
-        supertypes = listOf(
+        supertypes = mutableListOf(
             ContextTypeRef(TypeId("java.time.temporal.Temporal")),
             ContextTypeRef(TypeId("java.time.temporal.TemporalAdjuster")),
             ContextTypeRef(TypeId("java.time.chrono.ChronoLocalDateTime<java.time.LocalDate>")),
         ),
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "MIN",
                 nullable = false,
@@ -222,7 +222,7 @@ object MiscMeta {
                 annotations = emptyList()
             )
         ),
-        annotations = listOf(
+        annotations = mutableListOf(
             AnnotationData("jdk.internal.ValueBased", NoOpAnnotation())
         )
     )
@@ -231,7 +231,7 @@ object MiscMeta {
         id = TypeId("java.time.LocalDateTime"),
         simpleName = LocalDateTime::class.simpleName!!,
         qualifiedName = LocalDateTime::class.qualifiedName!!,
-        typeParameters = emptyMap()
+        typeParameters = mutableMapOf()
     )
 
 }

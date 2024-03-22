@@ -197,7 +197,7 @@ class KotlinxSerializationTypeParser(
             id = id,
             simpleName = descriptor.simpleName(),
             qualifiedName = descriptor.qualifiedName(),
-            members = members,
+            members = members.toMutableList(),
         )
     }
 
@@ -214,7 +214,7 @@ class KotlinxSerializationTypeParser(
             id = id,
             simpleName = descriptor.simpleName(),
             qualifiedName = descriptor.qualifiedName(),
-            subtypes = subTypes,
+            subtypes = subTypes.toMutableList(),
         )
     }
 
@@ -245,7 +245,7 @@ class KotlinxSerializationTypeParser(
             id = id,
             simpleName = descriptor.simpleName(),
             qualifiedName = descriptor.qualifiedName(),
-            enumConstants = descriptor.elementNames.toList(),
+            enumConstants = descriptor.elementNames.toMutableList(),
         )
     }
 

@@ -87,39 +87,39 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 id = id,
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
-                typeParameters = resolvedTypeParameters,
-                annotations = annotations
+                typeParameters = resolvedTypeParameters.toMutableMap(),
+                annotations = annotations.toMutableList()
             ).let { typeParser.asRef(it) }
             ClassType.OBJECT -> ObjectTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
-                typeParameters = resolvedTypeParameters,
-                subtypes = subtypes,
-                supertypes = supertypes,
-                members = members,
-                annotations = annotations
+                typeParameters = resolvedTypeParameters.toMutableMap(),
+                subtypes = subtypes.toMutableList(),
+                supertypes = supertypes.toMutableList(),
+                members = members.toMutableList(),
+                annotations = annotations.toMutableList()
             ).let { typeParser.asRef(it) }
             ClassType.ENUM -> EnumTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
-                typeParameters = resolvedTypeParameters,
-                subtypes = subtypes,
-                supertypes = supertypes,
-                members = members,
-                enumConstants = enumValues,
-                annotations = annotations
+                typeParameters = resolvedTypeParameters.toMutableMap(),
+                subtypes = subtypes.toMutableList(),
+                supertypes = supertypes.toMutableList(),
+                members = members.toMutableList(),
+                enumConstants = enumValues.toMutableList(),
+                annotations = annotations.toMutableList()
             ).let { typeParser.asRef(it) }
             ClassType.COLLECTION -> CollectionTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
-                typeParameters = resolvedTypeParameters,
-                subtypes = subtypes,
-                supertypes = supertypes,
-                members = members,
-                annotations = annotations,
+                typeParameters = resolvedTypeParameters.toMutableMap(),
+                subtypes = subtypes.toMutableList(),
+                supertypes = supertypes.toMutableList(),
+                members = members.toMutableList(),
+                annotations = annotations.toMutableList(),
                 itemType = resolvedTypeParameters["E"]?.let {
                     PropertyData(
                         name = "item",
@@ -145,11 +145,11 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 id = id,
                 simpleName = clazz.simpleName!!,
                 qualifiedName = clazz.qualifiedName!!,
-                typeParameters = resolvedTypeParameters,
-                subtypes = subtypes,
-                supertypes = supertypes,
-                members = members,
-                annotations = annotations,
+                typeParameters = resolvedTypeParameters.toMutableMap(),
+                subtypes = subtypes.toMutableList(),
+                supertypes = supertypes.toMutableList(),
+                members = members.toMutableList(),
+                annotations = annotations.toMutableList(),
                 keyType = resolvedTypeParameters["K"]?.let {
                     PropertyData(
                         name = "key",

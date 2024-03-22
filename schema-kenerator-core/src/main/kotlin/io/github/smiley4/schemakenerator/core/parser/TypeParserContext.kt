@@ -26,6 +26,10 @@ class TypeParserContext {
         return types.keys.toList()
     }
 
+    fun getTypes(): List<BaseTypeData> {
+        return types.values.toList()
+    }
+
     fun clear() {
         types.clear()
     }

@@ -18,8 +18,8 @@ object TestOpenClassMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestOpenClass"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestOpenClass",
         simpleName = "TestOpenClass",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "baseField",
                 nullable = false,
@@ -34,8 +34,8 @@ object TestOpenClassMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestOpenClass"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestOpenClass",
         simpleName = "TestOpenClass",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "baseField",
                 nullable = false,

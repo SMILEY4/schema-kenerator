@@ -20,8 +20,8 @@ object TestClassLocalDateTimeMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassLocalDateTime"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassLocalDateTime",
         simpleName = "TestClassLocalDateTime",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "timestamp",
                 nullable = false,
@@ -32,7 +32,7 @@ object TestClassLocalDateTimeMeta {
                         id = TypeId("java.time.LocalDateTime"),
                         simpleName = LocalDateTime::class.simpleName!!,
                         qualifiedName = LocalDateTime::class.qualifiedName!!,
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 )
             ),
@@ -43,7 +43,7 @@ object TestClassLocalDateTimeMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassLocalDateTime"),
         simpleName = "TestClassLocalDateTime",
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassLocalDateTime",
-        members = listOf(
+        members = mutableListOf(
             PropertyData(
                 name = "timestamp",
                 nullable = false,

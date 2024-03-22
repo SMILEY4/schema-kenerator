@@ -42,7 +42,7 @@ import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
 import kotlin.reflect.KType
 
-class ReflectionParserTests : FunSpec({
+class ReflectionParserTest : FunSpec({
 
     context("reflection parser: basic (inline)") {
         withData(SIMPLE_DATA.filter { it.dataInline != null }) { data ->
@@ -154,7 +154,7 @@ class ReflectionParserTests : FunSpec({
                     id = id,
                     simpleName = LocalDateTime::class.simpleName!!,
                     qualifiedName = LocalDateTime::class.qualifiedName!!,
-                    typeParameters = emptyMap()
+                    typeParameters = mutableMapOf()
                 )
             }
         }
@@ -166,7 +166,7 @@ class ReflectionParserTests : FunSpec({
                     id = id,
                     simpleName = LocalDateTime::class.simpleName!!,
                     qualifiedName = LocalDateTime::class.qualifiedName!!,
-                    typeParameters = emptyMap()
+                    typeParameters = mutableMapOf()
                 )
             }
         }

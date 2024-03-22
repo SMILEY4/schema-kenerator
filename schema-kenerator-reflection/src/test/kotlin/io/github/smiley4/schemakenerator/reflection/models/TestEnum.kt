@@ -14,16 +14,16 @@ object TestEnumMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestEnum"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestEnum",
         simpleName = "TestEnum",
-        typeParameters = emptyMap(),
-        enumConstants = listOf("RED", "GREEN", "BLUE")
+        typeParameters = mutableMapOf(),
+        enumConstants = mutableListOf("RED", "GREEN", "BLUE")
     )
 
     val INLINE = EnumTypeData(
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestEnum"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestEnum",
         simpleName = "TestEnum",
-        typeParameters = emptyMap(),
-        enumConstants = listOf("RED", "GREEN", "BLUE")
+        typeParameters = mutableMapOf(),
+        enumConstants = mutableListOf("RED", "GREEN", "BLUE")
     )
 
 }

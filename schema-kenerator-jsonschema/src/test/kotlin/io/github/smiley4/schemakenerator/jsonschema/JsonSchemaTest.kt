@@ -23,12 +23,11 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 
-class JsonSchemaTests : FunSpec({
+class JsonSchemaTest : FunSpec({
 
     context("json schema generator: basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = JsonSchemaGenerator().generate(data.typeData, TypeParserContext())
-            println("${data.testName}: ${schema.prettyPrint()}")
             schema.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient
@@ -59,7 +58,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.UByte"),
                         qualifiedName = "kotlin.UByte",
                         simpleName = "UByte",
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 ),
                 expectedSchema = """
@@ -77,7 +76,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.Int"),
                         qualifiedName = "kotlin.Int",
                         simpleName = "Int",
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 ),
                 expectedSchema = """
@@ -95,7 +94,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.Float"),
                         qualifiedName = "kotlin.Float",
                         simpleName = "Float",
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 ),
                 expectedSchema = """
@@ -113,7 +112,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.Boolean"),
                         qualifiedName = "kotlin.Boolean",
                         simpleName = "Boolean",
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 ),
                 expectedSchema = """
@@ -129,7 +128,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.String"),
                         qualifiedName = "kotlin.String",
                         simpleName = "String",
-                        typeParameters = emptyMap()
+                        typeParameters = mutableMapOf()
                     )
                 ),
                 expectedSchema = """
@@ -145,7 +144,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.collections.List<kotlin.String>"),
                         qualifiedName = "kotlin.collections.List",
                         simpleName = "List",
-                        typeParameters = mapOf(
+                        typeParameters =mutableMapOf(
                             "E" to TypeParameterData(
                                 name = "E",
                                 type = InlineTypeRef(
@@ -153,7 +152,7 @@ class JsonSchemaTests : FunSpec({
                                         id = TypeId("kotlin.String"),
                                         qualifiedName = "kotlin.String",
                                         simpleName = "String",
-                                        typeParameters = emptyMap()
+                                        typeParameters = mutableMapOf()
                                     )
                                 ),
                                 nullable = false
@@ -169,7 +168,7 @@ class JsonSchemaTests : FunSpec({
                                     id = TypeId("kotlin.String"),
                                     qualifiedName = "kotlin.String",
                                     simpleName = "String",
-                                    typeParameters = emptyMap()
+                                    typeParameters = mutableMapOf()
                                 )
                             ),
                             annotations = emptyList()
@@ -192,7 +191,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.Array<kotlin.String>"),
                         qualifiedName = "kotlin.Array",
                         simpleName = "Array",
-                        typeParameters = mapOf(
+                        typeParameters = mutableMapOf(
                             "T" to TypeParameterData(
                                 name = "T",
                                 type = InlineTypeRef(
@@ -200,7 +199,7 @@ class JsonSchemaTests : FunSpec({
                                         id = TypeId("kotlin.String"),
                                         qualifiedName = "kotlin.String",
                                         simpleName = "String",
-                                        typeParameters = emptyMap()
+                                        typeParameters = mutableMapOf()
                                     )
                                 ),
                                 nullable = false
@@ -216,7 +215,7 @@ class JsonSchemaTests : FunSpec({
                                     id = TypeId("kotlin.String"),
                                     qualifiedName = "kotlin.String",
                                     simpleName = "String",
-                                    typeParameters = emptyMap()
+                                    typeParameters = mutableMapOf()
                                 )
                             ),
                             annotations = emptyList()
@@ -239,7 +238,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("kotlin.collections.Map<kotlin.String,kotlin.Int>"),
                         qualifiedName = "kotlin.collections.Map",
                         simpleName = "Map",
-                        typeParameters = mapOf(
+                        typeParameters = mutableMapOf(
                             "K" to TypeParameterData(
                                 name = "K",
                                 nullable = false,
@@ -248,7 +247,7 @@ class JsonSchemaTests : FunSpec({
                                         id = TypeId("kotlin.String"),
                                         qualifiedName = "kotlin.String",
                                         simpleName = "String",
-                                        typeParameters = emptyMap()
+                                        typeParameters = mutableMapOf()
                                     )
                                 )
                             ),
@@ -260,7 +259,7 @@ class JsonSchemaTests : FunSpec({
                                         id = TypeId("kotlin.Int"),
                                         qualifiedName = "kotlin.Int",
                                         simpleName = "Int",
-                                        typeParameters = emptyMap()
+                                        typeParameters = mutableMapOf()
                                     )
                                 )
                             )
@@ -275,7 +274,7 @@ class JsonSchemaTests : FunSpec({
                                     id = TypeId("kotlin.String"),
                                     qualifiedName = "kotlin.String",
                                     simpleName = "String",
-                                    typeParameters = emptyMap()
+                                    typeParameters = mutableMapOf()
                                 )
                             )
                         ),
@@ -289,7 +288,7 @@ class JsonSchemaTests : FunSpec({
                                     id = TypeId("kotlin.Int"),
                                     qualifiedName = "kotlin.Int",
                                     simpleName = "Int",
-                                    typeParameters = emptyMap()
+                                    typeParameters = mutableMapOf()
                                 )
                             )
                         ),
@@ -313,8 +312,8 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("MyClass"),
                         qualifiedName = "MyClass",
                         simpleName = "MyClass",
-                        typeParameters = emptyMap(),
-                        members = listOf(
+                        typeParameters = mutableMapOf(),
+                        members = mutableListOf(
                             PropertyData(
                                 name = "requiredField",
                                 nullable = false,
@@ -325,7 +324,7 @@ class JsonSchemaTests : FunSpec({
                                         id = TypeId("kotlin.String"),
                                         simpleName = "String",
                                         qualifiedName = "kotlin.String",
-                                        typeParameters = emptyMap()
+                                        typeParameters = mutableMapOf()
                                     )
                                 )
                             ),
@@ -339,7 +338,7 @@ class JsonSchemaTests : FunSpec({
                                         id = TypeId("kotlin.Boolean"),
                                         simpleName = "Boolean",
                                         qualifiedName = "kotlin.Boolean",
-                                        typeParameters = emptyMap()
+                                        typeParameters = mutableMapOf()
                                     )
                                 )
                             )
@@ -368,7 +367,7 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("MyClass"),
                         qualifiedName = "MyClass",
                         simpleName = "MyClass",
-                        typeParameters = mapOf(
+                        typeParameters = mutableMapOf(
                             "T" to TypeParameterData(
                                 name = "T",
                                 nullable = false,
@@ -377,7 +376,7 @@ class JsonSchemaTests : FunSpec({
                                 )
                             ),
                         ),
-                        members = listOf(
+                        members = mutableListOf(
                             PropertyData(
                                 name = "value",
                                 nullable = false,
@@ -409,8 +408,8 @@ class JsonSchemaTests : FunSpec({
                         id = TypeId("TestEnum"),
                         qualifiedName = "TestEnum",
                         simpleName = "TestEnum",
-                        typeParameters = emptyMap(),
-                        enumConstants = listOf("RED", "GREEN", "BLUE")
+                        typeParameters = mutableMapOf(),
+                        enumConstants = mutableListOf("RED", "GREEN", "BLUE")
                     )
                 ),
                 expectedSchema = """

@@ -11,7 +11,7 @@ sealed interface JsonNode {
     fun indent(level: Int): String = " ".repeat(level * indentSize)
 }
 
-data class JsonObject(val properties: Map<String, JsonNode>) : JsonNode {
+data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
 
     override fun prettyPrint(level: Int): String {
         if(properties.isEmpty()) {
@@ -29,7 +29,7 @@ data class JsonObject(val properties: Map<String, JsonNode>) : JsonNode {
 
 }
 
-data class JsonArray(val items: List<JsonNode>) : JsonNode {
+data class JsonArray(val items: MutableList<JsonNode>) : JsonNode {
 
     override fun prettyPrint(level: Int): String {
         if(items.isEmpty()) {

@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema.schema
 
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
+import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.array
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
 
@@ -14,7 +15,7 @@ class JsonSchema {
      * @param min the min length of the string (inclusive)
      * @param max the max length of the string (inclusive)
      */
-    fun stringSchema(min: Int?, max: Int?): JsonNode {
+    fun stringSchema(min: Int?, max: Int?): JsonObject {
         return obj {
             "type" to "string"
             min?.also { "minLength" to it }
@@ -29,7 +30,7 @@ class JsonSchema {
      * @param min the min value of the number (inclusive)
      * @param max the max value of the number (inclusive)
      */
-    fun numericSchema(integer: Boolean, min: Number?, max: Number?): JsonNode {
+    fun numericSchema(integer: Boolean, min: Number?, max: Number?): JsonObject {
         return obj {
             "type" to if (integer) "integer" else "number"
             min?.also { "minimum" to it }
@@ -44,7 +45,7 @@ class JsonSchema {
     /**
      * Schema of a boolean
      */
-    fun booleanSchema(): JsonNode {
+    fun booleanSchema(): JsonObject {
         return obj {
             "type" to "boolean"
         }
@@ -54,7 +55,7 @@ class JsonSchema {
     /**
      * Schema for 'null'
      */
-    fun nullSchema(): JsonNode {
+    fun nullSchema(): JsonObject {
         return obj {
             "type" to "null"
         }
@@ -63,7 +64,7 @@ class JsonSchema {
     //=====  ARRAYS =================================
     // https://cswr.github.io/JsonSchema/spec/arrays/
 
-    fun arraySchema(items: JsonNode): JsonNode {
+    fun arraySchema(items: JsonNode): JsonObject {
         return obj {
             "type" to "array"
             "items" to items
@@ -82,7 +83,7 @@ class JsonSchema {
      * @param properties the allowed properties of the object. Key is the name of the property.
      * @param required the names of the required (non-nullable) properties
      */
-    fun objectSchema(properties: Map<String, JsonNode>, required: Collection<String>): JsonNode {
+    fun objectSchema(properties: Map<String, JsonNode>, required: Collection<String>): JsonObject {
         return obj {
             "type" to "object"
             "required" to required
@@ -99,7 +100,7 @@ class JsonSchema {
      * Schema for a key-value-map object with the given schema for the values
      * @param valueSchema the schema for the values
      */
-    fun mapObjectSchema(valueSchema: JsonNode): JsonNode {
+    fun mapObjectSchema(valueSchema: JsonNode): JsonObject {
         return obj {
             "type" to "object"
             "additionalProperties" to valueSchema
@@ -109,7 +110,7 @@ class JsonSchema {
     /**
      * Schema for any json object
      */
-    fun anyObjectSchema(): JsonNode {
+    fun anyObjectSchema(): JsonObject {
         return obj {
             "type" to "object"
         }
@@ -117,7 +118,7 @@ class JsonSchema {
 
     //=====  OBJECTS ================================
 
-    fun subtypesSchema(subtypes: List<JsonNode>): JsonNode {
+    fun subtypesSchema(subtypes: List<JsonNode>): JsonObject {
         return obj {
             "anyOf" to array {
                 subtypes.forEach { subtype ->
@@ -130,7 +131,7 @@ class JsonSchema {
 
     //=====  ENUM ===================================
 
-    fun enumSchema(values: Collection<String>): JsonNode {
+    fun enumSchema(values: Collection<String>): JsonObject {
         return obj {
             "enum" to array {
                 values.toSet().forEach { value ->

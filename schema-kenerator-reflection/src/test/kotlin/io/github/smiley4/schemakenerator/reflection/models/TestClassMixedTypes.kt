@@ -20,8 +20,8 @@ object TestClassMixedTypesMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassMixedTypes"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassMixedTypes",
         simpleName = "TestClassMixedTypes",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "myList",
                 nullable = false,
@@ -50,8 +50,8 @@ object TestClassMixedTypesMeta {
         id = TypeId("io.github.smiley4.schemakenerator.reflection.models.TestClassMixedTypes"),
         qualifiedName = "io.github.smiley4.schemakenerator.reflection.models.TestClassMixedTypes",
         simpleName = "TestClassMixedTypes",
-        typeParameters = emptyMap(),
-        members = listOf(
+        typeParameters = mutableMapOf(),
+        members = mutableListOf(
             PropertyData(
                 name = "myArray",
                 nullable = false,
