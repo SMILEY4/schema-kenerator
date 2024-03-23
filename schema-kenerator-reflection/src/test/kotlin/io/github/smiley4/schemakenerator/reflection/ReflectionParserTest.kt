@@ -5,7 +5,7 @@ import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.reflection.models.MiscMeta
 import io.github.smiley4.schemakenerator.reflection.models.TestClassDeepGeneric
@@ -46,7 +46,7 @@ class ReflectionParserTest : FunSpec({
 
     context("reflection parser: basic (inline)") {
         withData(SIMPLE_DATA.filter { it.dataInline != null }) { data ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             val result = ReflectionTypeParser(context = context, config = data.configInline).parse(data.type)
             result.also { ref -> (ref is InlineTypeRef) shouldBe true }
             result.resolve(context)!!.also { type ->
@@ -57,7 +57,7 @@ class ReflectionParserTest : FunSpec({
 
     context("reflection parser: basic (context)") {
         withData(SIMPLE_DATA.filter { it.dataParentContext != null }) { data ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             val result = ReflectionTypeParser(context = context, config = data.configContext).parse(data.type)
             result.also { ref -> (ref is ContextTypeRef) shouldBe true }
             result.resolve(context)!!.also { type ->
@@ -73,7 +73,7 @@ class ReflectionParserTest : FunSpec({
 
     context("reflection parser: filters (context)") {
         withData(FILTER_DATA) { data ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             ReflectionTypeParser(
                 context = context,
                 config = data.configContext
@@ -88,7 +88,7 @@ class ReflectionParserTest : FunSpec({
 
     context("reflection parser: filters (inline)") {
         withData(FILTER_DATA) { data ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             ReflectionTypeParser(
                 context = context,
                 config = data.configInline
@@ -107,7 +107,7 @@ class ReflectionParserTest : FunSpec({
             getKType<TestClassRecursiveGeneric<String>>()
         )) { type ->
             shouldThrow<StackOverflowError> {
-                val context = TypeParserContext()
+                val context = TypeDataContext()
                 ReflectionTypeParser(context = context, config = CONFIG_INLINE).parse(type)
             }
         }
@@ -117,7 +117,7 @@ class ReflectionParserTest : FunSpec({
         withData(listOf(
             getKType<TestSubClass>()
         )) { type ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             val result = ReflectionTypeParser(context = context, config = CONFIG_INLINE).parse(type)
             println("$context $result")
         }

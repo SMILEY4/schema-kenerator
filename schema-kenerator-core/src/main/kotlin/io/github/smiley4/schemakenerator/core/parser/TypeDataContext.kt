@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.core.parser
 
-class TypeParserContext {
+class TypeDataContext {
 
     private val types = mutableMapOf<String, BaseTypeData>()
 

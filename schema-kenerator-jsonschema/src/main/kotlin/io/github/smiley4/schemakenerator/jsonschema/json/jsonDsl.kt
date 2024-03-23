@@ -12,6 +12,8 @@ class JsonObjectDsl {
         return JsonObject(properties)
     }
 
+    fun hasProperty(key: String) = properties.containsKey(key)
+
     infix fun String.to(json: JsonNode?) {
         properties[this] = json ?: JsonNullValue()
     }

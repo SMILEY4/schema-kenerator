@@ -24,6 +24,7 @@ class JsonSchema {
         }
     }
 
+
     /**
      * Schema of a number
      * @param integer whether the number is an integer or a floating-point value
@@ -107,6 +108,7 @@ class JsonSchema {
         }
     }
 
+
     /**
      * Schema for any json object
      */
@@ -128,7 +130,6 @@ class JsonSchema {
         }
     }
 
-
     //=====  ENUM ===================================
 
     fun enumSchema(values: Collection<String>): JsonObject {
@@ -138,6 +139,14 @@ class JsonSchema {
                     item(value)
                 }
             }
+        }
+    }
+
+    //=====  REFERENCE ==============================
+
+    fun referenceSchema(id: String): JsonObject {
+        return obj {
+            "\$ref" to "#/definitions/$id"
         }
     }
 

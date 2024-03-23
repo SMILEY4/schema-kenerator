@@ -9,7 +9,7 @@ fun TypeRef.id(): TypeId = when (this) {
 
 fun TypeRef.idStr(): String = this.id().id
 
-fun TypeRef.resolve(context: TypeParserContext): BaseTypeData? {
+fun TypeRef.resolve(context: TypeDataContext): BaseTypeData? {
     return when (this) {
         is ContextTypeRef -> context.getData(this.id)
         is InlineTypeRef -> this.type

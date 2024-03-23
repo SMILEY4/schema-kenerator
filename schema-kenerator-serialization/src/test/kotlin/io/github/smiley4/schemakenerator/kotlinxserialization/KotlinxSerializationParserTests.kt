@@ -3,7 +3,7 @@ package io.github.smiley4.schemakenerator.kotlinxserialization
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.kotlinxserialization.models.MiscMeta
 import io.github.smiley4.schemakenerator.kotlinxserialization.models.TestAbstractClass
@@ -38,7 +38,7 @@ class KotlinxSerializationParserTests : FunSpec({
 
     context("kotlinx.serialization parser: basic (inline)") {
         withData(SIMPLE_DATA.filter { it.dataInline != null }) { data ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             val result = KotlinxSerializationTypeParser(context = context, config = data.configInline).parse(data.type)
             result.also { ref -> (ref is InlineTypeRef) shouldBe true }
             result.resolve(context)!!.also { type ->
@@ -49,7 +49,7 @@ class KotlinxSerializationParserTests : FunSpec({
 
     context("kotlinx.serialization parser: basic (context)") {
         withData(SIMPLE_DATA.filter { it.dataParentContext != null }) { data ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             val result = KotlinxSerializationTypeParser(context = context, config = data.configContext).parse(data.type)
             result.also { ref -> (ref is ContextTypeRef) shouldBe true }
             result.resolve(context)!!.also { type ->
@@ -67,12 +67,12 @@ class KotlinxSerializationParserTests : FunSpec({
         withData(listOf(
             getKType<TestClassGeneric<String>>()
         )) { type ->
-            val contextInline = TypeParserContext()
+            val contextInline = TypeDataContext()
             val resultInline = KotlinxSerializationTypeParser(context = contextInline, config = CONFIG_INLINE).parse(type)
             resultInline.also { ref -> (ref is InlineTypeRef) shouldBe true }
             resultInline.resolve(contextInline)!!.also { it.shouldMatch(MiscMeta.WILDCARD) }
 
-            val contextContext = TypeParserContext()
+            val contextContext = TypeDataContext()
             val resultContext = KotlinxSerializationTypeParser(context = contextContext, config = CONFIG_CONTEXT).parse(type)
             resultContext.also { ref -> (ref is ContextTypeRef) shouldBe true }
             resultContext.resolve(contextContext)!!.also { it.shouldMatch(MiscMeta.WILDCARD) }
@@ -84,7 +84,7 @@ class KotlinxSerializationParserTests : FunSpec({
         withData(listOf(
             getKType<TestClassDeepGeneric>()
         )) { type ->
-            val context = TypeParserContext()
+            val context = TypeDataContext()
             val result = KotlinxSerializationTypeParser(context = context, config = CONFIG_CONTEXT).parse(type)
             println("$context $result")
         }

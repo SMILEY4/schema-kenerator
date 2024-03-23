@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
 import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchema
@@ -16,7 +16,7 @@ class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
 
     private val schema = SwaggerSchema()
 
-    override fun build(generator: SwaggerSchemaGenerator, context: TypeParserContext, typeData: BaseTypeData): Schema<*> {
+    override fun build(generator: SwaggerSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData): Schema<*> {
         return when (typeData) {
             is PrimitiveTypeData -> buildPrimitiveSchema(typeData)
             is EnumTypeData -> buildEnumSchema(typeData)
@@ -28,11 +28,11 @@ class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
         }
     }
 
-    override fun enhance(generator: SwaggerSchemaGenerator, context: TypeParserContext, typeData: BaseTypeData, node: Schema<*>) {
+    override fun enhance(generator: SwaggerSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, node: Schema<*>) {
         // nothing to do
     }
 
-    private fun buildWithSubtypes(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeParserContext): Schema<*> {
+    private fun buildWithSubtypes(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): Schema<*> {
         return schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context) })
     }
 
@@ -42,7 +42,7 @@ class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
     }
 
 
-    private fun buildObjectSchema(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeParserContext): Schema<*> {
+    private fun buildObjectSchema(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): Schema<*> {
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, Schema<*>>()
 
@@ -61,7 +61,7 @@ class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
     private fun buildCollectionSchema(
         generator: SwaggerSchemaGenerator,
         typeData: CollectionTypeData,
-        context: TypeParserContext
+        context: TypeDataContext
     ): Schema<*> {
         val itemSchema = generator.generate(typeData.itemType.type, context)
         return schema.arraySchema(
@@ -70,7 +70,7 @@ class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
     }
 
 
-    private fun buildMapSchema(generator: SwaggerSchemaGenerator, typeData: MapTypeData, context: TypeParserContext): Schema<*> {
+    private fun buildMapSchema(generator: SwaggerSchemaGenerator, typeData: MapTypeData, context: TypeDataContext): Schema<*> {
         val valueSchema = generator.generate(typeData.valueType.type, context)
         return schema.mapObjectSchema(valueSchema)
     }

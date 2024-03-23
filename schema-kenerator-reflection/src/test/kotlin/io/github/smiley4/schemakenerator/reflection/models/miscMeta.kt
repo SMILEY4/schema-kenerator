@@ -223,7 +223,7 @@ object MiscMeta {
             )
         ),
         annotations = mutableListOf(
-            AnnotationData("jdk.internal.ValueBased", NoOpAnnotation())
+            AnnotationData("jdk.internal.ValueBased", mutableMapOf(), NoOpAnnotation())
         )
     )
 

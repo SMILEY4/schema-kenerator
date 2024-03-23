@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.core.annotations.SchemaExample
 import io.github.smiley4.schemakenerator.core.annotations.SchemaTitle
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonBooleanValue
@@ -33,9 +33,9 @@ class AnnotationJsonSchemaGeneratorModule(private val autoTitle: AutoTitle = Aut
         }
     }
 
-    override fun build(generator: JsonSchemaGenerator, context: TypeParserContext, typeData: BaseTypeData): JsonObject? = null
+    override fun build(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData): JsonObject? = null
 
-    override fun enhance(generator: JsonSchemaGenerator, context: TypeParserContext, typeData: BaseTypeData, node: JsonObject) {
+    override fun enhance(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, node: JsonObject) {
         appendDescription(typeData, node)
         appendExample(typeData, node)
         appendDefault(typeData, node)

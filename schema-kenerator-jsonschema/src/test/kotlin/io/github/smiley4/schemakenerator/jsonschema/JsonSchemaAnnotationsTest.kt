@@ -9,11 +9,12 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.module.AnnotationJsonSchemaGeneratorModule
 import io.github.smiley4.schemakenerator.jsonschema.module.AnnotationJsonSchemaGeneratorModule.Companion.AutoTitle
+import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -29,8 +30,9 @@ class JsonSchemaAnnotationsTest : FunSpec({
     context("json schema generator: basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = JsonSchemaGenerator()
+                .withModule(StandardJsonSchemaGeneratorModule())
                 .withModule(AnnotationJsonSchemaGeneratorModule(AutoTitle.SIMPLE_NAME))
-                .generate(data.typeData, TypeParserContext())
+                .generate(data.typeData, TypeDataContext())
             schema.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient

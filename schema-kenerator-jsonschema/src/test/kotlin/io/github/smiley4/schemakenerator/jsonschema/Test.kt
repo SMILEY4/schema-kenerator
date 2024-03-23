@@ -5,7 +5,7 @@ import io.github.smiley4.schemakenerator.core.annotations.SchemaDeprecated
 import io.github.smiley4.schemakenerator.core.annotations.SchemaDescription
 import io.github.smiley4.schemakenerator.core.annotations.SchemaExample
 import io.github.smiley4.schemakenerator.core.annotations.SchemaTitle
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.jsonschema.module.AnnotationJsonSchemaGeneratorModule
 import io.github.smiley4.schemakenerator.reflection.parsers.ReflectionTypeParser
 
@@ -25,7 +25,7 @@ class MyClassA(
 
 
 fun main() {
-    val context = TypeParserContext()
+    val context = TypeDataContext()
     val parser = ReflectionTypeParser(context = context, config = { inline = false })
     val generator = JsonSchemaGenerator()
         .withModule(AnnotationJsonSchemaGeneratorModule())

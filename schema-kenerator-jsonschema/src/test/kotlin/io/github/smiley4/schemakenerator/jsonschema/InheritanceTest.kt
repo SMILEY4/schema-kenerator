@@ -7,15 +7,16 @@ import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
+import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
 import io.kotest.core.spec.style.StringSpec
 
 class InheritanceTest : StringSpec({
 
     "test deep inheritance structure" {
 
-        val context = TypeParserContext()
+        val context = TypeDataContext()
 
         context.add(
             objectTypeData("BaseClass")
@@ -47,7 +48,9 @@ class InheritanceTest : StringSpec({
                 .withSuperType("BaseClass")
         )
 
-        val schema = JsonSchemaGenerator().generate(ContextTypeRef(TypeId("BaseClass")), context)
+        val schema = JsonSchemaGenerator()
+            .withModule(StandardJsonSchemaGeneratorModule())
+            .generate(ContextTypeRef(TypeId("BaseClass")), context)
         println(schema.prettyPrint())
     }
 

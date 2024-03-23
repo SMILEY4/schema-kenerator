@@ -4,7 +4,7 @@ import kotlin.reflect.KType
 
 abstract class TypeParser<T : TypeParserConfig>(
     val config: T,
-    val context: TypeParserContext,
+    val context: TypeDataContext,
 ) {
     abstract fun parse(type: KType): TypeRef
 }

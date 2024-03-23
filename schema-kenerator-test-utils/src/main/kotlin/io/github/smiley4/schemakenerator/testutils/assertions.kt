@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.kotest.assertions.json.ArrayOrder
@@ -148,14 +148,14 @@ infix fun PropertyData.shouldMatch(expected: ExpectedPropertyData) {
     expected.nullable?.also { this.nullable shouldBe it }
 }
 
-infix fun TypeParserContext.shouldHaveExactly(expectedTypeIds: Collection<String>) {
+infix fun TypeDataContext.shouldHaveExactly(expectedTypeIds: Collection<String>) {
     this.getIds() shouldContainExactlyInAnyOrder expectedTypeIds
 }
 
-fun TypeParserContext.shouldBeEmpty() {
+fun TypeDataContext.shouldBeEmpty() {
     this.getIds().shouldBeEmpty()
 }
 
-infix fun TypeParserContext.shouldHave(expectedTypeIds: Collection<String>) {
+infix fun TypeDataContext.shouldHave(expectedTypeIds: Collection<String>) {
     this.getIds() shouldContainAll expectedTypeIds
 }

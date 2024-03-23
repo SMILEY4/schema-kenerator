@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.core.enhancer.ContextEnhancer
+import io.github.smiley4.schemakenerator.core.enhancer.SubTypeEnhancer
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeId
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.id
 import io.github.smiley4.schemakenerator.reflection.parsers.ReflectionTypeParser
 import io.kotest.core.spec.style.StringSpec
@@ -12,16 +12,16 @@ import io.kotest.matchers.shouldNotBe
 
 class ReflectionEnhancerTest : StringSpec({
 
-    "test context enhancing, inline=false" {
+    "test core-subtype-enhancer, inline=false" {
 
-        val context = TypeParserContext()
+        val context = TypeDataContext()
         val parser = ReflectionTypeParser(context = context, config = { clearContext = false; inline = false; });
 
         parser.parse<TestClassA1>()
         parser.parse<TestClassA2>()
         parser.parse<TestClassB>()
 
-        ContextEnhancer(false).enrichSubTypes(context)
+        SubTypeEnhancer(false).enhance(context)
 
         context.getIds() shouldContainExactlyInAnyOrder listOf(
             "io.github.smiley4.schemakenerator.reflection.ReflectionEnhancerTest.Companion.TestClassA",

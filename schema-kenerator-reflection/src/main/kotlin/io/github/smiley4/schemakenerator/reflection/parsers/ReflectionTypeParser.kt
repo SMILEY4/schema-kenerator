@@ -4,7 +4,7 @@ import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParser
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeParserConfig
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeParserConfigBuilder
@@ -15,7 +15,7 @@ import kotlin.reflect.KType
 
 class ReflectionTypeParser(
     config: ReflectionTypeParserConfigBuilder.() -> Unit = {},
-    context: TypeParserContext = TypeParserContext()
+    context: TypeDataContext = TypeDataContext()
 ) : TypeParser<ReflectionTypeParserConfig>(ReflectionTypeParserConfigBuilder().apply(config).build(), context) {
 
     fun getClassParser(): ClassParser = ClassParser(this)

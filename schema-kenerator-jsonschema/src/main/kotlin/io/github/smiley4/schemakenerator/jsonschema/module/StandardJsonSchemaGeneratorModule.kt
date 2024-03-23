@@ -6,19 +6,18 @@ import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonNullValue
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchema
 
-class BaseJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
+class StandardJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
 
     private val schema = JsonSchema()
 
-    override fun build(generator: JsonSchemaGenerator, context: TypeParserContext, typeData: BaseTypeData): JsonObject {
+    override fun build(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData): JsonObject {
         if (typeData is ObjectTypeData && typeData.subtypes.isNotEmpty()) {
             return buildWithSubtypes(generator, typeData, context)
         }
@@ -34,12 +33,10 @@ class BaseJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
     }
 
 
-    override fun enhance(generator: JsonSchemaGenerator, context: TypeParserContext, typeData: BaseTypeData, node: JsonObject) {
-        // nothing to do
-    }
+    override fun enhance(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, node: JsonObject) = Unit
 
 
-    private fun buildWithSubtypes(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeParserContext): JsonObject {
+    private fun buildWithSubtypes(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): JsonObject {
         return schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context) })
     }
 
@@ -49,7 +46,7 @@ class BaseJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
     }
 
 
-    private fun buildObjectSchema(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeParserContext): JsonObject {
+    private fun buildObjectSchema(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): JsonObject {
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
@@ -65,7 +62,7 @@ class BaseJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
     }
 
 
-    private fun buildCollectionSchema(generator: JsonSchemaGenerator, typeData: CollectionTypeData, context: TypeParserContext): JsonObject {
+    private fun buildCollectionSchema(generator: JsonSchemaGenerator, typeData: CollectionTypeData, context: TypeDataContext): JsonObject {
         val itemSchema = generator.generate(typeData.itemType.type, context)
         return schema.arraySchema(
             items = itemSchema,
@@ -73,7 +70,7 @@ class BaseJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
     }
 
 
-    private fun buildMapSchema(generator: JsonSchemaGenerator, typeData: MapTypeData, context: TypeParserContext): JsonObject {
+    private fun buildMapSchema(generator: JsonSchemaGenerator, typeData: MapTypeData, context: TypeDataContext): JsonObject {
         val valueSchema = generator.generate(typeData.valueType.type, context)
         return schema.mapObjectSchema(valueSchema)
     }

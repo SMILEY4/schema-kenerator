@@ -10,9 +10,10 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -27,7 +28,9 @@ class JsonSchemaTest : FunSpec({
 
     context("json schema generator: basic inline types") {
         withData(TEST_DATA) { data ->
-            val schema = JsonSchemaGenerator().generate(data.typeData, TypeParserContext())
+            val schema = JsonSchemaGenerator()
+                .withModule(StandardJsonSchemaGeneratorModule())
+                .generate(data.typeData, TypeDataContext())
             schema.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient
@@ -415,6 +418,153 @@ class JsonSchemaTest : FunSpec({
                 expectedSchema = """
                     {
                         "enum": ["RED", "GREEN", "BLUE"]
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                testName = "deep nested class",
+                typeData = InlineTypeRef(
+                    ObjectTypeData(
+                        id = TypeId("MyClass"),
+                        qualifiedName = "MyClass",
+                        simpleName = "MyClass",
+                        typeParameters = mutableMapOf(),
+                        members = mutableListOf(
+                            PropertyData(
+                                name = "textField",
+                                nullable = false,
+                                visibility = Visibility.PUBLIC,
+                                kind = PropertyType.PROPERTY,
+                                type = InlineTypeRef(
+                                    PrimitiveTypeData(
+                                        id = TypeId("kotlin.String"),
+                                        simpleName = "String",
+                                        qualifiedName = "kotlin.String",
+                                        typeParameters = mutableMapOf()
+                                    )
+                                )
+                            ),
+                            PropertyData(
+                                name = "values",
+                                nullable = false,
+                                visibility = Visibility.PUBLIC,
+                                kind = PropertyType.PROPERTY,
+                                type = InlineTypeRef(
+                                    CollectionTypeData(
+                                        id = TypeId("kotlin.collections.List<kotlin.String>"),
+                                        qualifiedName = "kotlin.collections.List",
+                                        simpleName = "List",
+                                        typeParameters = mutableMapOf(
+                                            "E" to TypeParameterData(
+                                                name = "E",
+                                                type = InlineTypeRef(
+                                                    PrimitiveTypeData(
+                                                        id = TypeId("kotlin.String"),
+                                                        qualifiedName = "kotlin.String",
+                                                        simpleName = "String",
+                                                        typeParameters = mutableMapOf()
+                                                    )
+                                                ),
+                                                nullable = false
+                                            )
+                                        ),
+                                        itemType = PropertyData(
+                                            name = "item",
+                                            nullable = false,
+                                            visibility = Visibility.PUBLIC,
+                                            kind = PropertyType.PROPERTY,
+                                            type = InlineTypeRef(
+                                                PrimitiveTypeData(
+                                                    id = TypeId("kotlin.String"),
+                                                    qualifiedName = "kotlin.String",
+                                                    simpleName = "String",
+                                                    typeParameters = mutableMapOf()
+                                                )
+                                            ),
+                                            annotations = emptyList()
+                                        ),
+                                    )
+                                )
+                            ),
+                            PropertyData(
+                                name = "nested",
+                                nullable = false,
+                                visibility = Visibility.PUBLIC,
+                                kind = PropertyType.PROPERTY,
+                                type = InlineTypeRef(
+                                    ObjectTypeData(
+                                        id = TypeId("MyClass"),
+                                        qualifiedName = "MyClass",
+                                        simpleName = "MyClass",
+                                        typeParameters = mutableMapOf(),
+                                        members = mutableListOf(
+                                            PropertyData(
+                                                name = "nestedValue",
+                                                nullable = false,
+                                                visibility = Visibility.PUBLIC,
+                                                kind = PropertyType.PROPERTY,
+                                                type = InlineTypeRef(
+                                                    ObjectTypeData(
+                                                        id = TypeId("MyClass"),
+                                                        qualifiedName = "MyClass",
+                                                        simpleName = "MyClass",
+                                                        typeParameters = mutableMapOf(),
+                                                        members = mutableListOf(
+                                                            PropertyData(
+                                                                name = "deepNestedValue",
+                                                                nullable = false,
+                                                                visibility = Visibility.PUBLIC,
+                                                                kind = PropertyType.PROPERTY,
+                                                                type = InlineTypeRef(
+                                                                    PrimitiveTypeData(
+                                                                        id = TypeId("kotlin.String"),
+                                                                        simpleName = "String",
+                                                                        qualifiedName = "kotlin.String",
+                                                                        typeParameters = mutableMapOf()
+                                                                    )
+                                                                )
+                                                            ),
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                        )
+                                    )
+                                )
+                            ),
+                        )
+                    )
+                ),
+                expectedSchema = """
+                    {
+                        "type": "object",
+                        "required": ["textField", "values", "nested"],
+                        "properties": {
+                            "textField": {
+                                "type": "string"
+                            },
+                            "values": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "nested": {
+                                "type": "object",
+                                "required": ["nestedValue"],
+                                "properties": {
+                                    "nestedValue": {
+                                        "type": "object",
+                                        "required": ["deepNestedValue"],
+                                        "properties": {
+                                            "deepNestedValue": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 """.trimIndent(),
             ),

@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger
 
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
@@ -23,7 +23,7 @@ class SwaggerSchemaGenerator : SchemaGenerator<Schema<*>> {
         return this
     }
 
-    override fun generate(typeRef: TypeRef, context: TypeParserContext): Schema<*> {
+    override fun generate(typeRef: TypeRef, context: TypeDataContext): Schema<*> {
         val type = typeRef.resolve(context) ?: throw IllegalArgumentException("TypeRef could not be resolved: ${typeRef.idStr()}")
 
         var schema = schema.nullSchema()

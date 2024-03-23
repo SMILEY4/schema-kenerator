@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParser
-import io.github.smiley4.schemakenerator.core.parser.TypeParserContext
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
@@ -32,7 +32,7 @@ import kotlin.reflect.KType
 @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
 class KotlinxSerializationTypeParser(
     config: KotlinxSerializationTypeParserConfigBuilder.() -> Unit = {},
-    context: TypeParserContext = TypeParserContext()
+    context: TypeDataContext = TypeDataContext()
 ) : TypeParser<KotlinxSerializationTypeParserConfig>(KotlinxSerializationTypeParserConfigBuilder().apply(config).build(), context) {
 
     inline fun <reified T> parse(): TypeRef = this.parse(getKType<T>())
