@@ -51,7 +51,7 @@ class InheritanceTest : StringSpec({
         val schema = JsonSchemaGenerator()
             .withModule(StandardJsonSchemaGeneratorModule())
             .generate(ContextTypeRef(TypeId("BaseClass")), context)
-        println(schema.prettyPrint())
+        println(schema.asJson().prettyPrint())
     }
 
 }) {

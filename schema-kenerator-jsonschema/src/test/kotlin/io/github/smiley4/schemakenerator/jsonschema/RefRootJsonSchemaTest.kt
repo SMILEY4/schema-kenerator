@@ -13,7 +13,7 @@ import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.jsonschema.module.ReferencingJsonSchemaGeneratorModule
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -24,12 +24,12 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 
-class JsonSchemaTest : FunSpec({
+class RefRootJsonSchemaTest : FunSpec({
 
-    context("json schema generator: basic inline types") {
+    context("json schema generator with referencing (incl. root): basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = JsonSchemaGenerator()
-                .withModule(StandardJsonSchemaGeneratorModule())
+                .withModule(ReferencingJsonSchemaGeneratorModule(referenceRoot = true))
                 .generate(data.typeData, TypeDataContext())
             schema.asJson().prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
@@ -349,18 +349,25 @@ class JsonSchemaTest : FunSpec({
                     )
                 ),
                 expectedSchema = """
-                    {
-                        "type": "object",
-                        "required": ["requiredField"],
-                        "properties": {
-                            "requiredField": {
-                                "type": "string"
-                            },
-                            "optionalField": {
-                                "type": "boolean"
+                {
+                    "${'$'}ref": "#/definitions/MyClass",
+                    "definitions": {
+                        "MyClass": {
+                            "type": "object",
+                            "required": [
+                                "requiredField"
+                            ],
+                            "properties": {
+                                "requiredField": {
+                                    "type": "string"
+                                },
+                                "optionalField": {
+                                    "type": "boolean"
+                                }
                             }
                         }
                     }
+                }
                 """.trimIndent(),
             ),
             TestData(
@@ -393,15 +400,22 @@ class JsonSchemaTest : FunSpec({
                     )
                 ),
                 expectedSchema = """
-                    {
-                        "type": "object",
-                        "required": ["value"],
-                        "properties": {
-                            "value": {
-                                "type": "object"
+                {
+                    "${'$'}ref": "#/definitions/MyClass<*>",
+                    "definitions": {
+                        "MyClass<*>": {
+                            "type": "object",
+                            "required": [
+                                "value"
+                            ],
+                            "properties": {
+                                "value": {
+                                    "type": "object"
+                                }
                             }
                         }
                     }
+                }
                 """.trimIndent(),
             ),
             TestData(
@@ -417,7 +431,16 @@ class JsonSchemaTest : FunSpec({
                 ),
                 expectedSchema = """
                     {
-                        "enum": ["RED", "GREEN", "BLUE"]
+                        "${'$'}ref": "#/definitions/TestEnum",
+                        "definitions": {
+                            "TestEnum": {
+                                "enum": [
+                                    "RED",
+                                    "GREEN",
+                                    "BLUE"
+                                ]
+                            }
+                        }
                     }
                 """.trimIndent(),
             ),
@@ -474,11 +497,27 @@ class JsonSchemaTest : FunSpec({
                                             visibility = Visibility.PUBLIC,
                                             kind = PropertyType.PROPERTY,
                                             type = InlineTypeRef(
-                                                PrimitiveTypeData(
-                                                    id = TypeId("kotlin.String"),
-                                                    qualifiedName = "kotlin.String",
-                                                    simpleName = "String",
-                                                    typeParameters = mutableMapOf()
+                                                ObjectTypeData(
+                                                    id = TypeId("MyDeepNestedClass"),
+                                                    qualifiedName = "MyDeepNestedClass",
+                                                    simpleName = "MyDeepNestedClass",
+                                                    typeParameters = mutableMapOf(),
+                                                    members = mutableListOf(
+                                                        PropertyData(
+                                                            name = "deepNestedValue",
+                                                            nullable = false,
+                                                            visibility = Visibility.PUBLIC,
+                                                            kind = PropertyType.PROPERTY,
+                                                            type = InlineTypeRef(
+                                                                PrimitiveTypeData(
+                                                                    id = TypeId("kotlin.String"),
+                                                                    simpleName = "String",
+                                                                    qualifiedName = "kotlin.String",
+                                                                    typeParameters = mutableMapOf()
+                                                                )
+                                                            )
+                                                        ),
+                                                    )
                                                 )
                                             ),
                                             annotations = emptyList()
@@ -493,9 +532,9 @@ class JsonSchemaTest : FunSpec({
                                 kind = PropertyType.PROPERTY,
                                 type = InlineTypeRef(
                                     ObjectTypeData(
-                                        id = TypeId("MyClass"),
-                                        qualifiedName = "MyClass",
-                                        simpleName = "MyClass",
+                                        id = TypeId("MyNestedClass"),
+                                        qualifiedName = "MyNestedClass",
+                                        simpleName = "MyNestedClass",
                                         typeParameters = mutableMapOf(),
                                         members = mutableListOf(
                                             PropertyData(
@@ -505,9 +544,9 @@ class JsonSchemaTest : FunSpec({
                                                 kind = PropertyType.PROPERTY,
                                                 type = InlineTypeRef(
                                                     ObjectTypeData(
-                                                        id = TypeId("MyClass"),
-                                                        qualifiedName = "MyClass",
-                                                        simpleName = "MyClass",
+                                                        id = TypeId("MyDeepNestedClass"),
+                                                        qualifiedName = "MyDeepNestedClass",
+                                                        simpleName = "MyDeepNestedClass",
                                                         typeParameters = mutableMapOf(),
                                                         members = mutableListOf(
                                                             PropertyData(
@@ -537,30 +576,49 @@ class JsonSchemaTest : FunSpec({
                 ),
                 expectedSchema = """
                     {
-                        "type": "object",
-                        "required": ["textField", "values", "nested"],
-                        "properties": {
-                            "textField": {
-                                "type": "string"
-                            },
-                            "values": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
+                        "${'$'}ref": "#/definitions/MyClass",
+                        "definitions": {
+                            "MyDeepNestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "deepNestedValue"
+                                ],
+                                "properties": {
+                                    "deepNestedValue": {
+                                        "type": "string"
+                                    }
                                 }
                             },
-                            "nested": {
+                            "MyNestedClass": {
                                 "type": "object",
-                                "required": ["nestedValue"],
+                                "required": [
+                                    "nestedValue"
+                                ],
                                 "properties": {
                                     "nestedValue": {
-                                        "type": "object",
-                                        "required": ["deepNestedValue"],
-                                        "properties": {
-                                            "deepNestedValue": {
-                                                "type": "string"
-                                            }
+                                        "${'$'}ref": "#/definitions/MyDeepNestedClass"
+                                    }
+                                }
+                            },
+                            "MyClass": {
+                                "type": "object",
+                                "required": [
+                                    "textField",
+                                    "values",
+                                    "nested"
+                                ],
+                                "properties": {
+                                    "textField": {
+                                        "type": "string"
+                                    },
+                                    "values": {
+                                        "type": "array",
+                                        "items": {
+                                            "${'$'}ref": "#/definitions/MyDeepNestedClass"
                                         }
+                                    },
+                                    "nested": {
+                                        "${'$'}ref": "#/definitions/MyNestedClass"
                                     }
                                 }
                             }
@@ -569,6 +627,5 @@ class JsonSchemaTest : FunSpec({
                 """.trimIndent(),
             ),
         )
-
     }
 }

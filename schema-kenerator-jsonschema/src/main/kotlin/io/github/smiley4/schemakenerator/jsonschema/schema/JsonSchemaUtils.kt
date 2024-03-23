@@ -5,7 +5,7 @@ import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.array
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
 
-class JsonSchema {
+class JsonSchemaUtils {
 
     //=====  BASIC TYPES ============================
     // https://cswr.github.io/JsonSchema/spec/basic_types/

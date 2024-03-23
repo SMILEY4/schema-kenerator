@@ -8,79 +8,88 @@ import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
+import io.github.smiley4.schemakenerator.jsonschema.asJson
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
 
 class StandardJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
 
-    private val schema = JsonSchema()
+    private val schema = JsonSchemaUtils()
 
-    override fun build(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData): JsonObject {
+    override fun build(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, depth: Int): JsonSchema {
         if (typeData is ObjectTypeData && typeData.subtypes.isNotEmpty()) {
-            return buildWithSubtypes(generator, typeData, context)
+            return buildWithSubtypes(generator, typeData, context, depth)
         }
         return when (typeData) {
             is PrimitiveTypeData -> buildPrimitiveSchema(typeData)
             is EnumTypeData -> buildEnumSchema(typeData)
-            is CollectionTypeData -> buildCollectionSchema(generator, typeData, context)
-            is MapTypeData -> buildMapSchema(generator, typeData, context)
-            is ObjectTypeData -> buildObjectSchema(generator, typeData, context)
+            is CollectionTypeData -> buildCollectionSchema(generator, typeData, context, depth)
+            is MapTypeData -> buildMapSchema(generator, typeData, context, depth)
+            is ObjectTypeData -> buildObjectSchema(generator, typeData, context, depth)
             is WildcardTypeData -> buildAnySchema()
-            else -> schema.nullSchema()
+            else -> JsonSchema(schema.nullSchema())
         }
     }
 
 
-    override fun enhance(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, node: JsonObject) = Unit
+    override fun enhance(
+        generator: JsonSchemaGenerator,
+        context: TypeDataContext,
+        typeData: BaseTypeData,
+        schema: JsonSchema,
+        depth: Int
+    ) = Unit
 
 
-    private fun buildWithSubtypes(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): JsonObject {
-        return schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context) })
+    private fun buildWithSubtypes(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext, depth: Int): JsonSchema {
+        return JsonSchema(schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context, depth+1).asJson() }))
     }
 
 
-    private fun buildEnumSchema(typeData: EnumTypeData): JsonObject {
-        return schema.enumSchema(typeData.enumConstants)
+    private fun buildEnumSchema(typeData: EnumTypeData): JsonSchema {
+        return JsonSchema(schema.enumSchema(typeData.enumConstants))
     }
 
 
-    private fun buildObjectSchema(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): JsonObject {
+    private fun buildObjectSchema(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext, depth: Int): JsonSchema {
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
         typeData.members.forEach { member ->
-            val memberSchema = generator.generate(member.type, context)
+            val memberSchema = generator.generate(member.type, context, depth+1).asJson()
             propertySchemas[member.name] = memberSchema
             if (!member.nullable) {
                 requiredProperties.add(member.name)
             }
         }
 
-        return schema.objectSchema(propertySchemas, requiredProperties)
+        return JsonSchema(schema.objectSchema(propertySchemas, requiredProperties))
     }
 
 
-    private fun buildCollectionSchema(generator: JsonSchemaGenerator, typeData: CollectionTypeData, context: TypeDataContext): JsonObject {
-        val itemSchema = generator.generate(typeData.itemType.type, context)
-        return schema.arraySchema(
-            items = itemSchema,
+    private fun buildCollectionSchema(generator: JsonSchemaGenerator, typeData: CollectionTypeData, context: TypeDataContext, depth: Int): JsonSchema {
+        val itemSchema = generator.generate(typeData.itemType.type, context, depth+1).asJson()
+        return JsonSchema(
+            schema.arraySchema(
+                items = itemSchema,
+            )
         )
     }
 
 
-    private fun buildMapSchema(generator: JsonSchemaGenerator, typeData: MapTypeData, context: TypeDataContext): JsonObject {
-        val valueSchema = generator.generate(typeData.valueType.type, context)
-        return schema.mapObjectSchema(valueSchema)
+    private fun buildMapSchema(generator: JsonSchemaGenerator, typeData: MapTypeData, context: TypeDataContext, depth: Int): JsonSchema {
+        val valueSchema = generator.generate(typeData.valueType.type, context, depth+1).asJson()
+        return JsonSchema(schema.mapObjectSchema(valueSchema))
     }
 
 
-    private fun buildAnySchema(): JsonObject {
-        return schema.anyObjectSchema()
+    private fun buildAnySchema(): JsonSchema {
+        return JsonSchema(schema.anyObjectSchema())
     }
 
-    private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): JsonObject {
+    private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): JsonSchema {
         return when (typeData.qualifiedName) {
             Number::class.qualifiedName -> schema.numericSchema(
                 integer = false,
@@ -149,6 +158,8 @@ class StandardJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
             Any::class.qualifiedName -> schema.anyObjectSchema()
             Unit::class.qualifiedName -> schema.nullSchema()
             else -> schema.nullSchema()
+        }.let {
+            JsonSchema(it)
         }
     }
 

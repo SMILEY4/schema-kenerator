@@ -5,15 +5,11 @@ import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.core.schema.SchemaGenerator
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.jsonschema.json.obj
 import io.github.smiley4.schemakenerator.jsonschema.module.JsonSchemaGeneratorModule
-import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
 
-class JsonSchemaGenerator : SchemaGenerator<JsonNode> {
-
-    private val schema = JsonSchema()
+class JsonSchemaGenerator : SchemaGenerator<JsonSchema> {
 
     private val modules = mutableListOf<JsonSchemaGeneratorModule>()
 
@@ -22,12 +18,12 @@ class JsonSchemaGenerator : SchemaGenerator<JsonNode> {
         return this
     }
 
-    override fun generate(typeRef: TypeRef, context: TypeDataContext): JsonObject {
+    override fun generate(typeRef: TypeRef, context: TypeDataContext, depth: Int): JsonSchema {
         val type = typeRef.resolve(context) ?: throw IllegalArgumentException("TypeRef could not be resolved: ${typeRef.idStr()}")
 
-        var schema = schema.nullSchema()
+        var schema = JsonSchema(obj { }, mutableMapOf())
         for (module in modules.reversed()) {
-            val result = module.build(this, context, type)
+            val result = module.build(this, context, type, depth)
             if (result != null) {
                 schema = result
                 break
@@ -35,7 +31,7 @@ class JsonSchemaGenerator : SchemaGenerator<JsonNode> {
         }
 
         for (module in modules) {
-            module.enhance(this, context, type, schema)
+            module.enhance(this, context, type, schema, depth)
         }
 
         return schema
