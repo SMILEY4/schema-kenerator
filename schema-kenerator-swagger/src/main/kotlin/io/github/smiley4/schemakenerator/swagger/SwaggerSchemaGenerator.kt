@@ -5,30 +5,24 @@ import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.core.parser.idStr
 import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.core.schema.SchemaGenerator
-import io.github.smiley4.schemakenerator.swagger.module.BaseSwaggerSchemaGeneratorModule
 import io.github.smiley4.schemakenerator.swagger.module.SwaggerSchemaGeneratorModule
-import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 
-class SwaggerSchemaGenerator : SchemaGenerator<Schema<*>> {
+class SwaggerSchemaGenerator : SchemaGenerator<SwaggerSchema> {
 
-    private val schema = SwaggerSchema()
-
-    private val modules = mutableListOf<SwaggerSchemaGeneratorModule>().also {
-        it.add(BaseSwaggerSchemaGeneratorModule())
-    }
+    private val modules = mutableListOf<SwaggerSchemaGeneratorModule>()
 
     fun withModule(module: SwaggerSchemaGeneratorModule): SwaggerSchemaGenerator {
         this.modules.add(module)
         return this
     }
 
-    override fun generate(typeRef: TypeRef, context: TypeDataContext): Schema<*> {
+    override fun generate(typeRef: TypeRef, context: TypeDataContext, depth: Int): SwaggerSchema {
         val type = typeRef.resolve(context) ?: throw IllegalArgumentException("TypeRef could not be resolved: ${typeRef.idStr()}")
 
-        var schema = schema.nullSchema()
+        var schema = SwaggerSchema(Schema<Any>(), mutableMapOf())
         for (module in modules.reversed()) {
-            val result = module.build(this, context, type)
+            val result = module.build(this, context, type, depth)
             if (result != null) {
                 schema = result
                 break
@@ -36,7 +30,7 @@ class SwaggerSchemaGenerator : SchemaGenerator<Schema<*>> {
         }
 
         for (module in modules) {
-            module.enhance(this, context, type, schema)
+            module.enhance(this, context, type, schema, depth)
         }
 
         return schema

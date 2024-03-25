@@ -3,7 +3,7 @@ package io.github.smiley4.schemakenerator.swagger.swagger
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
-class SwaggerSchema {
+class SwaggerSchemaUtils {
 
     //=====  BASIC TYPES ============================
     // https://cswr.github.io/JsonSchema/spec/basic_types/
@@ -115,6 +115,14 @@ class SwaggerSchema {
     fun enumSchema(values: Collection<String>): Schema<*> {
         return Schema<String>().also { schema ->
             schema.enum = values.toMutableList()
+        }
+    }
+
+    //=====  REFERENCE ==============================
+
+    fun referenceSchema(id: String): Schema<*> {
+        return Schema<String>().also { schema ->
+            schema.`$ref` = "#/definitions/$id"
         }
     }
 

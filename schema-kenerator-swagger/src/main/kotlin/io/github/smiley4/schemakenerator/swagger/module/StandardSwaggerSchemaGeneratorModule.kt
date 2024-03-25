@@ -8,79 +8,87 @@ import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.swagger.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
-import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
 
-class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
+class StandardSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
 
-    private val schema = SwaggerSchema()
+    private val schema = SwaggerSchemaUtils()
 
-    override fun build(generator: SwaggerSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData): Schema<*> {
+    override fun build(generator: SwaggerSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, depth: Int): SwaggerSchema {
+        if (typeData is ObjectTypeData && typeData.subtypes.isNotEmpty()) {
+            return buildWithSubtypes(generator, typeData, context, depth)
+        }
         return when (typeData) {
             is PrimitiveTypeData -> buildPrimitiveSchema(typeData)
             is EnumTypeData -> buildEnumSchema(typeData)
-            is CollectionTypeData -> buildCollectionSchema(generator, typeData, context)
-            is MapTypeData -> buildMapSchema(generator, typeData, context)
-            is ObjectTypeData -> buildObjectSchema(generator, typeData, context)
+            is CollectionTypeData -> buildCollectionSchema(generator, typeData, context, depth)
+            is MapTypeData -> buildMapSchema(generator, typeData, context, depth)
+            is ObjectTypeData -> buildObjectSchema(generator, typeData, context, depth)
             is WildcardTypeData -> buildAnySchema()
-            else -> schema.nullSchema()
+            else -> SwaggerSchema(schema.nullSchema())
         }
     }
 
-    override fun enhance(generator: SwaggerSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, node: Schema<*>) {
-        // nothing to do
+
+    override fun enhance(
+        generator: SwaggerSchemaGenerator,
+        context: TypeDataContext,
+        typeData: BaseTypeData,
+        schema: SwaggerSchema,
+        depth: Int
+    ) = Unit
+
+
+    private fun buildWithSubtypes(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext, depth: Int): SwaggerSchema {
+        return SwaggerSchema(schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context, depth+1).schema }))
     }
 
-    private fun buildWithSubtypes(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): Schema<*> {
-        return schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context) })
+
+    private fun buildEnumSchema(typeData: EnumTypeData): SwaggerSchema {
+        return SwaggerSchema(schema.enumSchema(typeData.enumConstants))
     }
 
 
-    private fun buildEnumSchema(typeData: EnumTypeData): Schema<*> {
-        return schema.enumSchema(typeData.enumConstants)
-    }
-
-
-    private fun buildObjectSchema(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext): Schema<*> {
+    private fun buildObjectSchema(generator: SwaggerSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext, depth: Int): SwaggerSchema {
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, Schema<*>>()
 
         typeData.members.forEach { member ->
-            val memberSchema = generator.generate(member.type, context)
+            val memberSchema = generator.generate(member.type, context, depth+1).schema
             propertySchemas[member.name] = memberSchema
             if (!member.nullable) {
                 requiredProperties.add(member.name)
             }
         }
 
-        return schema.objectSchema(propertySchemas, requiredProperties)
+        return SwaggerSchema(schema.objectSchema(propertySchemas, requiredProperties))
     }
 
 
-    private fun buildCollectionSchema(
-        generator: SwaggerSchemaGenerator,
-        typeData: CollectionTypeData,
-        context: TypeDataContext
-    ): Schema<*> {
-        val itemSchema = generator.generate(typeData.itemType.type, context)
-        return schema.arraySchema(
-            items = itemSchema,
+    private fun buildCollectionSchema(generator: SwaggerSchemaGenerator, typeData: CollectionTypeData, context: TypeDataContext, depth: Int): SwaggerSchema {
+        val itemSchema = generator.generate(typeData.itemType.type, context, depth+1).schema
+        return SwaggerSchema(
+            schema.arraySchema(
+                items = itemSchema,
+            )
         )
     }
 
 
-    private fun buildMapSchema(generator: SwaggerSchemaGenerator, typeData: MapTypeData, context: TypeDataContext): Schema<*> {
-        val valueSchema = generator.generate(typeData.valueType.type, context)
-        return schema.mapObjectSchema(valueSchema)
+    private fun buildMapSchema(generator: SwaggerSchemaGenerator, typeData: MapTypeData, context: TypeDataContext, depth: Int): SwaggerSchema {
+        val valueSchema = generator.generate(typeData.valueType.type, context, depth+1).schema
+        return SwaggerSchema(schema.mapObjectSchema(valueSchema))
     }
 
 
-    private fun buildAnySchema(): Schema<*> {
-        return schema.anyObjectSchema()
+    private fun buildAnySchema(): SwaggerSchema {
+        return SwaggerSchema(schema.anyObjectSchema())
     }
 
-    private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): Schema<*> {
+    private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): SwaggerSchema {
         return when (typeData.qualifiedName) {
             Number::class.qualifiedName -> schema.numericSchema(
                 integer = false,
@@ -149,6 +157,8 @@ class BaseSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
             Any::class.qualifiedName -> schema.anyObjectSchema()
             Unit::class.qualifiedName -> schema.nullSchema()
             else -> schema.nullSchema()
+        }.let {
+            SwaggerSchema(it)
         }
     }
 

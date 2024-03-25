@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.jsonschema
+package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
 import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
@@ -9,7 +9,7 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
-import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.swagger.module.StandardSwaggerSchemaGeneratorModule
 import io.kotest.core.spec.style.StringSpec
 
 class InheritanceTest : StringSpec({
@@ -48,11 +48,11 @@ class InheritanceTest : StringSpec({
                 .withSuperType("BaseClass")
         )
 
-        val schema = JsonSchemaGenerator()
-            .withModule(StandardJsonSchemaGeneratorModule())
+        val schema = SwaggerSchemaGenerator()
+            .withModule(StandardSwaggerSchemaGeneratorModule())
             .generate(ContextTypeRef(TypeId("BaseClass")), context)
 
-        TODO("Assert")
+     TODO("Assert")
     }
 
 }) {
