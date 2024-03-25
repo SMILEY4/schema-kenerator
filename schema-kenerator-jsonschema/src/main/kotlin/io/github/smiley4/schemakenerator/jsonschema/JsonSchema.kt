@@ -22,3 +22,10 @@ fun JsonSchema.asJson(): JsonObject {
         }
     }
 }
+
+fun JsonSchema.getByRef(ref: String): JsonObject? {
+    val definitionName = ref.replace("#/definitions/", "")
+    return this.definitions[definitionName]
+}
+
+fun JsonSchema.getByRefOrThrow(ref: String) = this.getByRef(ref) ?: throw Exception("Could not find definition for ref $ref")
