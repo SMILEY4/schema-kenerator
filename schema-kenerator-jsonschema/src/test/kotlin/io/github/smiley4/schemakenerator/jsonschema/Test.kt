@@ -14,7 +14,6 @@ import io.github.smiley4.schemakenerator.reflection.parsers.ReflectionTypeParser
 @SchemaTitle("My Class - A")
 @SchemaDescription("A class for testing the schema generator")
 class MyAnnotatedClass(
-    @SchemaTitle("someValue")
     @SchemaDescription("value for testing")
     @SchemaExample("hello")
     @SchemaExample("world")

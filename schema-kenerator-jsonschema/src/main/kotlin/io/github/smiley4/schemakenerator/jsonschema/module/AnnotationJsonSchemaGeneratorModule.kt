@@ -152,48 +152,12 @@ class AnnotationJsonSchemaGeneratorModule(private val autoTitle: AutoTitle = Aut
     //========== TITLE ==========================================================================
 
     private fun appendTitle(context: TypeDataContext, typeData: BaseTypeData, node: JsonObject) {
-        appendObjectTitle(context, typeData, node)
-        if (typeData is ObjectTypeData) {
-            appendPropertyTitle(typeData, node)
-        }
-    }
-
-    private fun appendObjectTitle(context: TypeDataContext, typeData: BaseTypeData, node: JsonObject) {
         buildObjectTitle(context, typeData)?.also { title ->
             node.properties["title"] = JsonTextValue(title)
         }
         typeData.annotations
             .find { it.name === SchemaTitle::class.qualifiedName }
             ?.also { setObjectField(node, "title", JsonTextValue(it.values["title"].toString())) }
-    }
-
-    private fun appendPropertyTitle(typeData: ObjectTypeData, node: JsonObject) {
-        // properties
-        typeData.members.forEach { member ->
-            member.annotations.find { it.name === SchemaTitle::class.qualifiedName }?.also { descriptionAnnotation ->
-                setPropertyField(
-                    node,
-                    member.name,
-                    "title",
-                    JsonTextValue(descriptionAnnotation.values["title"].toString())
-                )
-            }
-        }
-        // required
-        if (node.properties.containsKey("required")) {
-            val jsonRequired = (node.properties["required"] as JsonArray).items
-            typeData.members.forEach { member ->
-                member.annotations.find { it.name === SchemaTitle::class.qualifiedName }?.also { titleAnnotation ->
-                    jsonRequired.replaceAll {
-                        if (it is JsonTextValue && it.value == member.name) {
-                            JsonTextValue(titleAnnotation.values["title"].toString())
-                        } else {
-                            it
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private fun buildObjectTitle(context: TypeDataContext, typeData: BaseTypeData): String? {
