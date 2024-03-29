@@ -13,6 +13,7 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
 import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
+import java.math.BigDecimal
 
 class ReferencingSwaggerSchemaGeneratorModule(val referenceRoot: Boolean = false) : SwaggerSchemaGeneratorModule {
 
@@ -169,61 +170,37 @@ class ReferencingSwaggerSchemaGeneratorModule(val referenceRoot: Boolean = false
 
     private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): SwaggerSchema {
         return when (typeData.qualifiedName) {
-            Number::class.qualifiedName -> schema.numericSchema(
-                integer = false,
-                min = null,
-                max = null,
-            )
+            Number::class.qualifiedName -> schema.numberSchema(false)
             Byte::class.qualifiedName -> schema.numericSchema(
                 integer = true,
-                min = Byte.MIN_VALUE,
-                max = Byte.MAX_VALUE,
+                min = BigDecimal.valueOf(Byte.MIN_VALUE.toLong()),
+                max = BigDecimal.valueOf(Byte.MAX_VALUE.toLong()),
             )
             Short::class.qualifiedName -> schema.numericSchema(
                 integer = true,
-                min = Short.MIN_VALUE,
-                max = Short.MAX_VALUE,
+                min = BigDecimal.valueOf(Short.MIN_VALUE.toLong()),
+                max = BigDecimal.valueOf(Short.MAX_VALUE.toLong()),
             )
-            Int::class.qualifiedName -> schema.numericSchema(
-                integer = true,
-                min = Int.MIN_VALUE,
-                max = Int.MAX_VALUE,
-            )
-            Long::class.qualifiedName -> schema.numericSchema(
-                integer = true,
-                min = Long.MIN_VALUE,
-                max = Long.MAX_VALUE,
-            )
+            Int::class.qualifiedName -> schema.int32Schema()
+            Long::class.qualifiedName -> schema.int64Schema()
             UByte::class.qualifiedName -> schema.numericSchema(
                 integer = true,
-                min = UByte.MIN_VALUE.toLong(),
-                max = UByte.MAX_VALUE.toLong(),
+                min = BigDecimal.valueOf(UByte.MIN_VALUE.toLong()),
+                max = BigDecimal.valueOf(UByte.MAX_VALUE.toLong()),
             )
             UShort::class.qualifiedName -> schema.numericSchema(
                 integer = true,
-                min = UShort.MIN_VALUE.toLong(),
-                max = UShort.MAX_VALUE.toLong(),
+                min = BigDecimal.valueOf(UShort.MIN_VALUE.toLong()),
+                max = BigDecimal.valueOf(UShort.MAX_VALUE.toLong()),
             )
             UInt::class.qualifiedName -> schema.numericSchema(
                 integer = true,
-                min = UInt.MIN_VALUE.toLong(),
-                max = UInt.MAX_VALUE.toLong(),
+                min = BigDecimal.valueOf(UInt.MIN_VALUE.toLong()),
+                max = BigDecimal.valueOf(UInt.MAX_VALUE.toLong()),
             )
-            ULong::class.qualifiedName -> schema.numericSchema(
-                integer = true,
-                min = null,
-                max = null,
-            )
-            Float::class.qualifiedName -> schema.numericSchema(
-                integer = false,
-                min = Float.MIN_VALUE,
-                max = Float.MAX_VALUE,
-            )
-            Double::class.qualifiedName -> schema.numericSchema(
-                integer = false,
-                min = Double.MIN_VALUE,
-                max = Double.MAX_VALUE,
-            )
+            ULong::class.qualifiedName -> schema.numberSchema(true)
+            Float::class.qualifiedName -> schema.floatSchema()
+            Double::class.qualifiedName -> schema.doubleSchema()
             Boolean::class.qualifiedName -> schema.booleanSchema()
             Char::class.qualifiedName -> schema.stringSchema(
                 min = 1,
@@ -240,6 +217,7 @@ class ReferencingSwaggerSchemaGeneratorModule(val referenceRoot: Boolean = false
             SwaggerSchema(it)
         }
     }
+
 
     private fun shouldReference(type: ObjectTypeData?, depth: Int): Boolean {
         if (depth == 0 && !referenceRoot) {

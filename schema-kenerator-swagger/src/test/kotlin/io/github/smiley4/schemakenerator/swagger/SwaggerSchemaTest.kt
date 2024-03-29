@@ -90,8 +90,7 @@ class SwaggerSchemaTest : FunSpec({
                 expectedSchema = """
                     {
                         "type": "integer",
-                        "minimum": -2147483648,
-                        "maximum": 2147483647,
+                        "format": "int32",
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
@@ -109,8 +108,7 @@ class SwaggerSchemaTest : FunSpec({
                 expectedSchema = """
                     {
                         "type": "number",
-                        "minimum": 1.40129846432481707092372958328991613128026194187651577175706828388979108268586060148663818836212158203125E-45,
-                        "maximum": 340282346638528859811704183484516925440,
+                        "format": "float",
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
@@ -316,8 +314,7 @@ class SwaggerSchemaTest : FunSpec({
                         "exampleSetFlag": false,
                         "additionalProperties": {
                             "type": "integer",
-                            "minimum": -2147483648,
-                            "maximum": 2147483647,
+                            "format": "int32",
                             "exampleSetFlag": false
                         }
                     }

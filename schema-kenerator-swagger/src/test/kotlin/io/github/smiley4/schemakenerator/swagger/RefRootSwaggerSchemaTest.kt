@@ -94,8 +94,7 @@ class RefRootSwaggerSchemaTest : FunSpec({
                     {
                         "schema": {
                             "type": "integer",
-                            "minimum": -2147483648,
-                            "maximum": 2147483647,
+                            "format": "int32",
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -116,8 +115,7 @@ class RefRootSwaggerSchemaTest : FunSpec({
                     {
                         "schema": {
                             "type": "number",
-                            "maximum": 340282346638528859811704183484516925440,
-                            "minimum": 1.40129846432481707092372958328991613128026194187651577175706828388979108268586060148663818836212158203125E-45,
+                            "format": "float",
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -337,8 +335,7 @@ class RefRootSwaggerSchemaTest : FunSpec({
                             "type": "object",
                             "additionalProperties": {
                                 "type": "integer",
-                                "minimum": -2147483648,
-                                "maximum": 2147483647,
+                                "format": "int32",
                                 "exampleSetFlag": false
                             },
                             "exampleSetFlag": false

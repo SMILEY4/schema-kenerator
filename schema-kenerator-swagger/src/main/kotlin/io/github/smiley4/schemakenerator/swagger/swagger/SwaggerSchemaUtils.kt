@@ -13,12 +13,10 @@ class SwaggerSchemaUtils {
      * @param min the min length of the string (inclusive)
      * @param max the max length of the string (inclusive)
      */
-    fun stringSchema(min: Int?, max: Int?): Schema<*> {
-        return Schema<Any>().also { schema ->
-            schema.type = "string"
-            min?.also { schema.minimum = BigDecimal(it) }
-            max?.also { schema.maximum = BigDecimal(it) }
-        }
+    fun stringSchema(min: Int?, max: Int?) = Schema<Any>().also { schema ->
+        schema.type = "string"
+        min?.also { schema.minimum = BigDecimal(it) }
+        max?.also { schema.maximum = BigDecimal(it) }
     }
 
     /**
@@ -27,14 +25,52 @@ class SwaggerSchemaUtils {
      * @param min the min value of the number (inclusive)
      * @param max the max value of the number (inclusive)
      */
-    fun numericSchema(integer: Boolean, min: Number?, max: Number?): Schema<*> {
-        return Schema<Any>().also { schema ->
-            schema.type = if(integer) "integer" else "number"
-            min?.also { schema.minimum = if(it is Float || it is Double) BigDecimal(it.toDouble()) else BigDecimal(it.toLong()) }
-            max?.also { schema.maximum = if(it is Float || it is Double) BigDecimal(it.toDouble()) else BigDecimal(it.toLong()) }
-        }
+    fun numericSchema(integer: Boolean, min: BigDecimal, max: BigDecimal) = Schema<Any>().also { schema ->
+        schema.type = if(integer) "integer" else "number"
+        schema.minimum = min
+        schema.maximum = max
     }
 
+    /**
+     * Schema of any number
+     * @param integer whether the number is an integer or a floating-point value
+     */
+    fun numberSchema(integer: Boolean) = Schema<Any>().also { schema ->
+        schema.type = if(integer) "integer" else "number"
+    }
+
+
+    /**
+     * Schema of a floating-point number
+     */
+    fun floatSchema() = Schema<Any>().also { schema ->
+        schema.type = "number"
+        schema.format = "float"
+    }
+
+    /**
+     * Schema of a floating-point number with double precision
+     */
+    fun doubleSchema() = Schema<Any>().also { schema ->
+        schema.type = "number"
+        schema.format = "double"
+    }
+
+    /**
+     * Schema of a signed 32-bit integer
+     */
+    fun int32Schema() = Schema<Any>().also { schema ->
+        schema.type = "integer"
+        schema.format = "int32"
+    }
+
+    /**
+     * Schema of a signed 64-bit integer
+     */
+    fun int64Schema() = Schema<Any>().also { schema ->
+        schema.type = "integer"
+        schema.format = "int64"
+    }
 
     /**
      * Schema of a boolean
@@ -92,6 +128,7 @@ class SwaggerSchemaUtils {
         }
     }
 
+
     /**
      * Schema for any json object
      */
@@ -108,7 +145,6 @@ class SwaggerSchemaUtils {
             schema.anyOf = subtypes
         }
     }
-
 
     //=====  ENUM ===================================
 
