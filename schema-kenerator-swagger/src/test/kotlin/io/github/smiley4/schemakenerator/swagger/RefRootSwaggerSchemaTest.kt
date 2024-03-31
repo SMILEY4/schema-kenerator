@@ -15,7 +15,7 @@ import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.swagger.module.ReferencingSwaggerSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.swagger.module.ReferencingGenerator
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -31,7 +31,7 @@ class RefRootSwaggerSchemaTest : FunSpec({
     context("json schema generator with referencing: basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = SwaggerSchemaGenerator()
-                .withModule(ReferencingSwaggerSchemaGeneratorModule(referenceRoot = true))
+                .withModule(ReferencingGenerator(referenceRoot = true))
                 .generate(data.typeData, TypeDataContext())
             json.writeValueAsString(schema).shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient

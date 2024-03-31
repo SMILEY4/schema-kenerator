@@ -9,7 +9,7 @@ import io.github.smiley4.schemakenerator.core.parser.PropertyType
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
-import io.github.smiley4.schemakenerator.swagger.module.StandardSwaggerSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.swagger.module.InliningGenerator
 import io.kotest.core.spec.style.StringSpec
 
 class InheritanceTest : StringSpec({
@@ -49,7 +49,7 @@ class InheritanceTest : StringSpec({
         )
 
         val schema = SwaggerSchemaGenerator()
-            .withModule(StandardSwaggerSchemaGeneratorModule())
+            .withModule(InliningGenerator())
             .generate(ContextTypeRef(TypeId("BaseClass")), context)
 
      TODO("Assert")

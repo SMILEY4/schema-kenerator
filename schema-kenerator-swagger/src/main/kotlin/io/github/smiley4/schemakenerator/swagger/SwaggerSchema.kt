@@ -14,3 +14,12 @@ fun SwaggerSchema.getByRef(ref: String): Schema<*>? {
 }
 
 fun SwaggerSchema.getByRefOrThrow(ref: String) = this.getByRef(ref) ?: throw Exception("Could not find definition for ref $ref")
+
+
+fun SwaggerSchema.getDefinition(): Schema<*> {
+    return if (this.schema.`$ref` !== null) {
+        this.getByRefOrThrow(this.schema.`$ref`)
+    } else {
+        this.schema
+    }
+}

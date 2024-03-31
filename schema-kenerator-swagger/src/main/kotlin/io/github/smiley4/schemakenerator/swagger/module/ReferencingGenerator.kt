@@ -15,7 +15,11 @@ import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
-class ReferencingSwaggerSchemaGeneratorModule(val referenceRoot: Boolean = false) : SwaggerSchemaGeneratorModule {
+/**
+ * Generates the base swagger-schema while referencing all definitions
+ * @param referenceRoot whether to also reference the root definition
+ */
+class ReferencingGenerator(val referenceRoot: Boolean = false) : SwaggerSchemaGeneratorModule {
 
     private val schema = SwaggerSchemaUtils()
 

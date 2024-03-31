@@ -15,7 +15,7 @@ import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.swagger.module.StandardSwaggerSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.swagger.module.InliningGenerator
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -31,7 +31,7 @@ class SwaggerSchemaTest : FunSpec({
     context("swagger schema generator: basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = SwaggerSchemaGenerator()
-                .withModule(StandardSwaggerSchemaGeneratorModule())
+                .withModule(InliningGenerator())
                 .generate(data.typeData, TypeDataContext())
             json.writeValueAsString(schema.schema).shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient

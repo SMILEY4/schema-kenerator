@@ -14,7 +14,10 @@ import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
-class StandardSwaggerSchemaGeneratorModule : SwaggerSchemaGeneratorModule {
+/**
+ * Generates the base swagger-schema while inlining all definitions
+ */
+class InliningGenerator : SwaggerSchemaGeneratorModule {
 
     private val schema = SwaggerSchemaUtils()
 

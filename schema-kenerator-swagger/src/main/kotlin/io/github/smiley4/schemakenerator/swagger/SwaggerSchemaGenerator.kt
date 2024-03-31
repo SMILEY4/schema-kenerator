@@ -17,6 +17,16 @@ class SwaggerSchemaGenerator : SchemaGenerator<SwaggerSchema> {
         return this
     }
 
+    fun withModules(vararg modules: SwaggerSchemaGeneratorModule): SwaggerSchemaGenerator {
+        this.modules.addAll(modules)
+        return this
+    }
+
+    fun withModules(modules: List<SwaggerSchemaGeneratorModule>): SwaggerSchemaGenerator {
+        this.modules.addAll(modules)
+        return this
+    }
+
     override fun generate(typeRef: TypeRef, context: TypeDataContext, depth: Int): SwaggerSchema {
         val type = typeRef.resolve(context) ?: throw IllegalArgumentException("TypeRef could not be resolved: ${typeRef.idStr()}")
 

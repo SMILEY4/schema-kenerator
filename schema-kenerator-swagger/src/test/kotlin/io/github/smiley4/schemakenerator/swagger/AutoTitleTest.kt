@@ -9,14 +9,14 @@ import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
-import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.swagger.module.AnnotationSwaggerSchemaGeneratorModule
-import io.github.smiley4.schemakenerator.swagger.module.AnnotationSwaggerSchemaGeneratorModule.Companion.AutoTitle
-import io.github.smiley4.schemakenerator.swagger.module.StandardSwaggerSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.swagger.module.AutoTitleModule
+import io.github.smiley4.schemakenerator.swagger.module.AutoTitleModule.Companion.AutoTitleType
+import io.github.smiley4.schemakenerator.swagger.module.InliningGenerator
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -27,13 +27,15 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 
-class SwaggerSchemaAnnotationsTest : FunSpec({
+class AutoTitleTest : FunSpec({
 
     context("swagger schema generator: basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = SwaggerSchemaGenerator()
-                .withModule(StandardSwaggerSchemaGeneratorModule())
-                .withModule(AnnotationSwaggerSchemaGeneratorModule(AutoTitle.SIMPLE_NAME))
+                .withModule(InliningGenerator())
+                .withModules(
+                    AutoTitleModule(type = AutoTitleType.SIMPLE_NAME)
+                )
                 .generate(data.typeData, TypeDataContext())
             json.writeValueAsString(schema).shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
