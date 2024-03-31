@@ -13,7 +13,7 @@ import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
-import io.github.smiley4.schemakenerator.jsonschema.module.StandardJsonSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.jsonschema.module.InliningGenerator
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -29,7 +29,7 @@ class JsonSchemaTest : FunSpec({
     context("json schema generator: basic inline types") {
         withData(TEST_DATA) { data ->
             val schema = JsonSchemaGenerator()
-                .withModule(StandardJsonSchemaGeneratorModule())
+                .withModule(InliningGenerator())
                 .generate(data.typeData, TypeDataContext())
             schema.asJson().prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient

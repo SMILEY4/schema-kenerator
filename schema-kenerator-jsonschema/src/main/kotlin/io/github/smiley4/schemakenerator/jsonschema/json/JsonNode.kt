@@ -29,7 +29,7 @@ data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
 
 }
 
-data class JsonArray(val items: MutableList<JsonNode>) : JsonNode {
+data class JsonArray(val items: MutableList<JsonNode> = mutableListOf()) : JsonNode {
 
     override fun prettyPrint(level: Int): String {
         if(items.isEmpty()) {
@@ -62,6 +62,7 @@ class JsonTextValue(value: String) : JsonValue<String>(value) {
 }
 
 class JsonBooleanValue(value: Boolean) : JsonValue<Boolean>(value) {
+
     override fun prettyPrint(level: Int): String {
         return "$value"
     }

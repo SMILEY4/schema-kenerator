@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.json.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
 
 data class JsonSchema(
@@ -29,3 +30,12 @@ fun JsonSchema.getByRef(ref: String): JsonObject? {
 }
 
 fun JsonSchema.getByRefOrThrow(ref: String) = this.getByRef(ref) ?: throw Exception("Could not find definition for ref $ref")
+
+fun JsonSchema.getDefinition(): JsonObject {
+    return if (this.schema.properties.containsKey("\$ref")) {
+        val ref = (this.schema.properties["\$ref"] as JsonTextValue).value
+        this.getByRefOrThrow(ref)
+    } else {
+        this.schema
+    }
+}

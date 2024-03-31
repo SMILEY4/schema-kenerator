@@ -1,16 +1,17 @@
-package io.github.smiley4.schemakenerator.swagger.module
+package io.github.smiley4.schemakenerator.jsonschema.module
 
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.resolve
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
-import io.github.smiley4.schemakenerator.swagger.getDefinition
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
+import io.github.smiley4.schemakenerator.jsonschema.getDefinition
+import io.github.smiley4.schemakenerator.jsonschema.json.JsonTextValue
 
 /**
  * Automatically detects and appends a title to the generated schema
  */
-class AutoTitleModule(private val type: AutoTitleType = AutoTitleType.SIMPLE_NAME) : SwaggerSchemaGeneratorModule {
+class AutoTitleModule(private val type: AutoTitleType = AutoTitleType.SIMPLE_NAME) : JsonSchemaGeneratorModule {
 
     companion object {
         enum class AutoTitleType {
@@ -20,19 +21,19 @@ class AutoTitleModule(private val type: AutoTitleType = AutoTitleType.SIMPLE_NAM
         }
     }
 
-    override fun build(generator: SwaggerSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, depth: Int): SwaggerSchema? =
+    override fun build(generator: JsonSchemaGenerator, context: TypeDataContext, typeData: BaseTypeData, depth: Int): JsonSchema? =
         null
 
     override fun enhance(
-        generator: SwaggerSchemaGenerator,
+        generator: JsonSchemaGenerator,
         context: TypeDataContext,
         typeData: BaseTypeData,
-        schema: SwaggerSchema,
+        schema: JsonSchema,
         depth: Int
     ) {
         val definition = schema.getDefinition()
         buildObjectTitle(context, typeData)?.also { title ->
-            definition.title = title
+            definition.properties["title"] = JsonTextValue(title)
         }
     }
 

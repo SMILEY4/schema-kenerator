@@ -8,13 +8,13 @@ data class SwaggerSchema(
     val definitions: Map<String, Schema<*>> = mutableMapOf()
 )
 
+
 fun SwaggerSchema.getByRef(ref: String): Schema<*>? {
     val definitionName = ref.replace("#/definitions/", "")
     return this.definitions[definitionName]
 }
 
 fun SwaggerSchema.getByRefOrThrow(ref: String) = this.getByRef(ref) ?: throw Exception("Could not find definition for ref $ref")
-
 
 fun SwaggerSchema.getDefinition(): Schema<*> {
     return if (this.schema.`$ref` !== null) {

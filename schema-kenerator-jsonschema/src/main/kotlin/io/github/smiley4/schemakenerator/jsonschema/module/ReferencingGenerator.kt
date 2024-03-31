@@ -15,7 +15,11 @@ import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
 
-class ReferencingJsonSchemaGeneratorModule(val referenceRoot: Boolean = false) : JsonSchemaGeneratorModule {
+/**
+ * Generates the base json-schema while referencing all definitions
+ * @param referenceRoot whether to also reference the root definition
+ */
+class ReferencingGenerator(val referenceRoot: Boolean = false) : JsonSchemaGeneratorModule {
 
     private val schema = JsonSchemaUtils()
 

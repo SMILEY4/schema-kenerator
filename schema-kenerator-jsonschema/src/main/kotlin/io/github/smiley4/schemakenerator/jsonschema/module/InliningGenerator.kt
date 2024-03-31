@@ -14,7 +14,10 @@ import io.github.smiley4.schemakenerator.jsonschema.asJson
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
 
-class StandardJsonSchemaGeneratorModule : JsonSchemaGeneratorModule {
+/**
+ * Generates the base json-schema while inlining all definitions
+ */
+class InliningGenerator : JsonSchemaGeneratorModule {
 
     private val schema = JsonSchemaUtils()
 
