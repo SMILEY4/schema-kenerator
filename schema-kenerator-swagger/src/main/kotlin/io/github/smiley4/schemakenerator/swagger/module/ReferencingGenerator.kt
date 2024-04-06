@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.parser.resolve
@@ -19,7 +20,7 @@ import java.math.BigDecimal
  * Generates the base swagger-schema while referencing all definitions
  * @param referenceRoot whether to also reference the root definition
  */
-class ReferencingGenerator(val referenceRoot: Boolean = false) : SwaggerSchemaGeneratorModule {
+class ReferencingGenerator(val referenceRoot: Boolean = true) : SwaggerSchemaGeneratorModule {
 
     private val schema = SwaggerSchemaUtils()
 
@@ -58,7 +59,7 @@ class ReferencingGenerator(val referenceRoot: Boolean = false) : SwaggerSchemaGe
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, Schema<*>>()
 
-        typeData.members.forEach { member ->
+        collectMembers(typeData, context).forEach { member ->
             val memberSchema = generator.generate(member.type, context, depth + 1)
             definitions.putAll(memberSchema.definitions)
             propertySchemas[member.name] = memberSchema.schema
@@ -78,6 +79,19 @@ class ReferencingGenerator(val referenceRoot: Boolean = false) : SwaggerSchemaGe
             schema = schema,
             definitions = definitions
         )
+    }
+
+
+    private fun collectMembers(typeData: ObjectTypeData, context: TypeDataContext): List<PropertyData> {
+        return buildList {
+            addAll(typeData.members)
+            typeData.supertypes.forEach { supertypeRef ->
+                val supertype = supertypeRef.resolve(context)
+                if (supertype is ObjectTypeData) {
+                    addAll(collectMembers(supertype, context))
+                }
+            }
+        }
     }
 
 

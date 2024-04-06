@@ -26,7 +26,7 @@ import io.github.smiley4.schemakenerator.kotlinxserialization.models.TestSubClas
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParser
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParserConfigBuilder
 import io.github.smiley4.schemakenerator.serialization.getKType
-import io.github.smiley4.schemakenerator.testutils.shouldMatch
+import io.github.smiley4.schemakenerator.test.shouldMatch
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData

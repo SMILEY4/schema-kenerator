@@ -6,8 +6,10 @@ import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
 import io.github.smiley4.schemakenerator.jsonschema.asJson
@@ -46,8 +48,15 @@ class InliningGenerator : JsonSchemaGeneratorModule {
     ) = Unit
 
 
-    private fun buildWithSubtypes(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext, depth: Int): JsonSchema {
-        return JsonSchema(schema.subtypesSchema(typeData.subtypes.map { subtype -> generator.generate(subtype, context, depth+1).asJson() }))
+    private fun buildWithSubtypes(
+        generator: JsonSchemaGenerator,
+        typeData: ObjectTypeData,
+        context: TypeDataContext,
+        depth: Int
+    ): JsonSchema {
+        return JsonSchema(schema.subtypesSchema(typeData.subtypes.map { subtype ->
+            generator.generate(subtype, context, depth + 1).asJson()
+        }))
     }
 
 
@@ -56,12 +65,17 @@ class InliningGenerator : JsonSchemaGeneratorModule {
     }
 
 
-    private fun buildObjectSchema(generator: JsonSchemaGenerator, typeData: ObjectTypeData, context: TypeDataContext, depth: Int): JsonSchema {
+    private fun buildObjectSchema(
+        generator: JsonSchemaGenerator,
+        typeData: ObjectTypeData,
+        context: TypeDataContext,
+        depth: Int
+    ): JsonSchema {
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
-        typeData.members.forEach { member ->
-            val memberSchema = generator.generate(member.type, context, depth+1).asJson()
+        collectMembers(typeData, context).forEach { member ->
+            val memberSchema = generator.generate(member.type, context, depth + 1).asJson()
             propertySchemas[member.name] = memberSchema
             if (!member.nullable) {
                 requiredProperties.add(member.name)
@@ -72,8 +86,26 @@ class InliningGenerator : JsonSchemaGeneratorModule {
     }
 
 
-    private fun buildCollectionSchema(generator: JsonSchemaGenerator, typeData: CollectionTypeData, context: TypeDataContext, depth: Int): JsonSchema {
-        val itemSchema = generator.generate(typeData.itemType.type, context, depth+1).asJson()
+    private fun collectMembers(typeData: ObjectTypeData, context: TypeDataContext): List<PropertyData> {
+        return buildList {
+            addAll(typeData.members)
+            typeData.supertypes.forEach { supertypeRef ->
+                val supertype = supertypeRef.resolve(context)
+                if (supertype is ObjectTypeData) {
+                    addAll(collectMembers(supertype, context))
+                }
+            }
+        }
+    }
+
+
+    private fun buildCollectionSchema(
+        generator: JsonSchemaGenerator,
+        typeData: CollectionTypeData,
+        context: TypeDataContext,
+        depth: Int
+    ): JsonSchema {
+        val itemSchema = generator.generate(typeData.itemType.type, context, depth + 1).asJson()
         return JsonSchema(
             schema.arraySchema(
                 items = itemSchema,
@@ -83,7 +115,7 @@ class InliningGenerator : JsonSchemaGeneratorModule {
 
 
     private fun buildMapSchema(generator: JsonSchemaGenerator, typeData: MapTypeData, context: TypeDataContext, depth: Int): JsonSchema {
-        val valueSchema = generator.generate(typeData.valueType.type, context, depth+1).asJson()
+        val valueSchema = generator.generate(typeData.valueType.type, context, depth + 1).asJson()
         return JsonSchema(schema.mapObjectSchema(valueSchema))
     }
 

@@ -31,7 +31,7 @@ import io.github.smiley4.schemakenerator.reflection.models.TestOpenClassMeta
 import io.github.smiley4.schemakenerator.reflection.models.TestSubClass
 import io.github.smiley4.schemakenerator.reflection.models.TestSubClassMeta
 import io.github.smiley4.schemakenerator.reflection.parsers.ReflectionTypeParser
-import io.github.smiley4.schemakenerator.testutils.shouldMatch
+import io.github.smiley4.schemakenerator.test.shouldMatch
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName

@@ -9,9 +9,9 @@ import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.PropertyType
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParser
-import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.core.parser.Visibility
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
@@ -39,7 +39,7 @@ class KotlinxSerializationTypeParser(
 
 
     override fun parse(type: KType): TypeRef {
-        if(config.clearContext) {
+        if (config.clearContext) {
             context.clear()
         }
         if (type.classifier is KClass<*>) {
@@ -71,30 +71,33 @@ class KotlinxSerializationTypeParser(
 
 
     private fun parseAsBaseTypeData(descriptor: SerialDescriptor): BaseTypeData {
-        if (descriptor.serialName == "kotlin.Unit") {
-            return parsePrimitive(descriptor)
-        }
-        return when (descriptor.kind) {
-            StructureKind.LIST -> parseList(descriptor)
-            StructureKind.MAP -> parseMap(descriptor)
-            StructureKind.CLASS -> parseClass(descriptor)
-            StructureKind.OBJECT -> parseObject(descriptor)
-            PolymorphicKind.OPEN -> parseSealed(descriptor)
-            PolymorphicKind.SEALED -> parseSealed(descriptor)
-            PrimitiveKind.BOOLEAN -> parsePrimitive(descriptor)
-            PrimitiveKind.BYTE -> parsePrimitive(descriptor)
-            PrimitiveKind.CHAR -> parsePrimitive(descriptor)
-            PrimitiveKind.DOUBLE -> parsePrimitive(descriptor)
-            PrimitiveKind.FLOAT -> parsePrimitive(descriptor)
-            PrimitiveKind.INT -> parsePrimitive(descriptor)
-            PrimitiveKind.LONG -> parsePrimitive(descriptor)
-            PrimitiveKind.SHORT -> parsePrimitive(descriptor)
-            PrimitiveKind.STRING -> parsePrimitive(descriptor)
-            SerialKind.ENUM -> parseEnum(descriptor)
-            SerialKind.CONTEXTUAL -> parseClass(descriptor)
+        return when (descriptor.serialName) {
+            Unit::class.qualifiedName -> parsePrimitive(descriptor)
+            UByte::class.qualifiedName -> parsePrimitive(descriptor)
+            UShort::class.qualifiedName -> parsePrimitive(descriptor)
+            UInt::class.qualifiedName -> parsePrimitive(descriptor)
+            ULong::class.qualifiedName -> parsePrimitive(descriptor)
+            else -> when (descriptor.kind) {
+                StructureKind.LIST -> parseList(descriptor)
+                StructureKind.MAP -> parseMap(descriptor)
+                StructureKind.CLASS -> parseClass(descriptor)
+                StructureKind.OBJECT -> parseObject(descriptor)
+                PolymorphicKind.OPEN -> parseSealed(descriptor)
+                PolymorphicKind.SEALED -> parseSealed(descriptor)
+                PrimitiveKind.BOOLEAN -> parsePrimitive(descriptor)
+                PrimitiveKind.BYTE -> parsePrimitive(descriptor)
+                PrimitiveKind.CHAR -> parsePrimitive(descriptor)
+                PrimitiveKind.DOUBLE -> parsePrimitive(descriptor)
+                PrimitiveKind.FLOAT -> parsePrimitive(descriptor)
+                PrimitiveKind.INT -> parsePrimitive(descriptor)
+                PrimitiveKind.LONG -> parsePrimitive(descriptor)
+                PrimitiveKind.SHORT -> parsePrimitive(descriptor)
+                PrimitiveKind.STRING -> parsePrimitive(descriptor)
+                SerialKind.ENUM -> parseEnum(descriptor)
+                SerialKind.CONTEXTUAL -> parseClass(descriptor)
+            }
         }
     }
-
 
     private fun parsePrimitive(descriptor: SerialDescriptor): BaseTypeData {
         val id = TypeId.build(descriptor.serialName)

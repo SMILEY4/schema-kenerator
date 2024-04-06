@@ -18,6 +18,16 @@ class JsonSchemaGenerator : SchemaGenerator<JsonSchema> {
         return this
     }
 
+    fun withModules(vararg modules: JsonSchemaGeneratorModule): JsonSchemaGenerator {
+        this.modules.addAll(modules)
+        return this
+    }
+
+    fun withModules(modules: List<JsonSchemaGeneratorModule>): JsonSchemaGenerator {
+        this.modules.addAll(modules)
+        return this
+    }
+
     override fun generate(typeRef: TypeRef, context: TypeDataContext, depth: Int): JsonSchema {
         val type = typeRef.resolve(context) ?: throw IllegalArgumentException("TypeRef could not be resolved: ${typeRef.idStr()}")
 

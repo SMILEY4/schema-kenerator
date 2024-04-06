@@ -48,20 +48,16 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
         // determine type (object, primitive, map, collection, ...)
         val classType = typeParser.config.typeDecider.determineType(typeParser.config, clazz, id)
 
-        // collect information about supertypes
-        val supertypes = if (classType == ClassType.OBJECT) {
+        // collect information about supertypes (would cause infinite loop with inline enabled)
+        val supertypes = if (!typeParser.config.inline && classType == ClassType.OBJECT) {
             typeParser.getSupertypeParser().parse(clazz, resolvedTypeParameters)
         } else {
             emptyList()
         }
 
-        // collect subclasses (causes infinite loop when inlining types)
-        val subtypes = if (!typeParser.config.inline) {
-            clazz.sealedSubclasses.map { subclass ->
-                typeParser.getClassParser().parse(subclass.starProjectedType, subclass, providedTypeParameters)
-            }
-        } else {
-            emptyList()
+        // collect subclasses
+        val subtypes = clazz.sealedSubclasses.map { subclass ->
+            typeParser.getClassParser().parse(subclass.starProjectedType, subclass, providedTypeParameters)
         }
 
         // collect information about enum constants

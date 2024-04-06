@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.testutils
+package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData

@@ -6,8 +6,10 @@ import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.parser.resolve
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
 import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchemaUtils
@@ -60,7 +62,7 @@ class InliningGenerator : SwaggerSchemaGeneratorModule {
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, Schema<*>>()
 
-        typeData.members.forEach { member ->
+        collectMembers(typeData, context).forEach { member ->
             val memberSchema = generator.generate(member.type, context, depth+1).schema
             propertySchemas[member.name] = memberSchema
             if (!member.nullable) {
@@ -69,6 +71,19 @@ class InliningGenerator : SwaggerSchemaGeneratorModule {
         }
 
         return SwaggerSchema(schema.objectSchema(propertySchemas, requiredProperties))
+    }
+
+
+    private fun collectMembers(typeData: ObjectTypeData, context: TypeDataContext): List<PropertyData> {
+        return buildList {
+            addAll(typeData.members)
+            typeData.supertypes.forEach { supertypeRef ->
+                val supertype = supertypeRef.resolve(context)
+                if (supertype is ObjectTypeData) {
+                    addAll(collectMembers(supertype, context))
+                }
+            }
+        }
     }
 
 

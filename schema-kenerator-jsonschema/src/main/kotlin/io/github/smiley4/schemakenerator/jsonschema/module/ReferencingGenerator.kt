@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
 import io.github.smiley4.schemakenerator.core.parser.MapTypeData
 import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.parser.PropertyData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.parser.resolve
@@ -19,7 +20,7 @@ import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
  * Generates the base json-schema while referencing all definitions
  * @param referenceRoot whether to also reference the root definition
  */
-class ReferencingGenerator(val referenceRoot: Boolean = false) : JsonSchemaGeneratorModule {
+class ReferencingGenerator(val referenceRoot: Boolean = true) : JsonSchemaGeneratorModule {
 
     private val schema = JsonSchemaUtils()
 
@@ -48,6 +49,41 @@ class ReferencingGenerator(val referenceRoot: Boolean = false) : JsonSchemaGener
     ) = Unit
 
 
+    private fun buildWithSubtypes(
+        generator: JsonSchemaGenerator,
+        typeData: ObjectTypeData,
+        context: TypeDataContext,
+        depth: Int
+    ): JsonSchema {
+        val schemas = typeData.subtypes.map { subtype -> generator.generate(subtype, context, depth + 1) }
+        val definitions = mergeDefinitions(schemas.map { it.definitions })
+        val schema = if (shouldReference(typeData, depth)) {
+            definitions[schemaReference(typeData, context)] = schema.subtypesSchema(schemas.map { it.schema })
+            schema.referenceSchema(schemaReference(typeData, context))
+        } else {
+            schema.subtypesSchema(schemas.map { it.schema })
+        }
+        return JsonSchema(
+            schema = schema,
+            definitions = definitions
+        )
+    }
+
+
+    private fun buildEnumSchema(typeData: EnumTypeData, context: TypeDataContext, depth: Int): JsonSchema {
+        return if (shouldReference(typeData, depth)) {
+            JsonSchema(
+                schema = schema.referenceSchema(schemaReference(typeData, context)),
+                definitions = mutableMapOf(
+                    schemaReference(typeData, context) to schema.enumSchema(typeData.enumConstants)
+                )
+            )
+        } else {
+            JsonSchema(schema.enumSchema(typeData.enumConstants))
+        }
+    }
+
+
     private fun buildObjectSchema(
         generator: JsonSchemaGenerator,
         typeData: ObjectTypeData,
@@ -58,7 +94,7 @@ class ReferencingGenerator(val referenceRoot: Boolean = false) : JsonSchemaGener
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
-        typeData.members.forEach { member ->
+        collectMembers(typeData, context).forEach { member ->
             val memberSchema = generator.generate(member.type, context, depth + 1)
             definitions.putAll(memberSchema.definitions)
             propertySchemas[member.name] = memberSchema.schema
@@ -78,6 +114,19 @@ class ReferencingGenerator(val referenceRoot: Boolean = false) : JsonSchemaGener
             schema = schema,
             definitions = definitions
         )
+    }
+
+
+    private fun collectMembers(typeData: ObjectTypeData, context: TypeDataContext): List<PropertyData> {
+        return buildList {
+            addAll(typeData.members)
+            typeData.supertypes.forEach { supertypeRef ->
+                val supertype = supertypeRef.resolve(context)
+                if (supertype is ObjectTypeData) {
+                    addAll(collectMembers(supertype, context))
+                }
+            }
+        }
     }
 
 
@@ -126,41 +175,6 @@ class ReferencingGenerator(val referenceRoot: Boolean = false) : JsonSchemaGener
             schema.mapObjectSchema(valueSchema.schema)
         }
 
-        return JsonSchema(
-            schema = schema,
-            definitions = definitions
-        )
-    }
-
-
-    private fun buildEnumSchema(typeData: EnumTypeData, context: TypeDataContext, depth: Int): JsonSchema {
-        return if (shouldReference(typeData, depth)) {
-            JsonSchema(
-                schema = schema.referenceSchema(schemaReference(typeData, context)),
-                definitions = mutableMapOf(
-                    schemaReference(typeData, context) to schema.enumSchema(typeData.enumConstants)
-                )
-            )
-        } else {
-            JsonSchema(schema.enumSchema(typeData.enumConstants))
-        }
-    }
-
-
-    private fun buildWithSubtypes(
-        generator: JsonSchemaGenerator,
-        typeData: ObjectTypeData,
-        context: TypeDataContext,
-        depth: Int
-    ): JsonSchema {
-        val schemas = typeData.subtypes.map { subtype -> generator.generate(subtype, context, depth + 1) }
-        val definitions = mergeDefinitions(schemas.map { it.definitions })
-        val schema = if (shouldReference(typeData, depth)) {
-            definitions[schemaReference(typeData, context)] = schema.subtypesSchema(schemas.map { it.schema })
-            schema.referenceSchema(schemaReference(typeData, context))
-        } else {
-            schema.subtypesSchema(schemas.map { it.schema })
-        }
         return JsonSchema(
             schema = schema,
             definitions = definitions
