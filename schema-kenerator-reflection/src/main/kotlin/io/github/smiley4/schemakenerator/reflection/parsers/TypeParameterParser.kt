@@ -1,7 +1,6 @@
 package io.github.smiley4.schemakenerator.reflection.parsers
 
 import io.github.smiley4.schemakenerator.core.parser.ContextTypeRef
-import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
 import io.github.smiley4.schemakenerator.core.parser.TypeRef
@@ -46,14 +45,10 @@ class TypeParameterParser(private val typeParser: ReflectionTypeParser) {
     }
 
     private fun resolveWildcard(): TypeRef {
-        return if (typeParser.config.inline) {
-            InlineTypeRef(WildcardTypeData())
+        return if (typeParser.context.has(TypeId.wildcard())) {
+            ContextTypeRef(TypeId.wildcard())
         } else {
-            if (typeParser.context.has(TypeId.wildcard())) {
-                ContextTypeRef(TypeId.wildcard())
-            } else {
-                typeParser.context.add(WildcardTypeData())
-            }
+            typeParser.context.add(WildcardTypeData())
         }
     }
 

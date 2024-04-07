@@ -27,29 +27,23 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
 
         // check if the same type with the same type parameters has already been resolved -> reuse existing
         val id = TypeId.build(clazz.qualifiedName ?: "?", resolvedTypeParameters.values.map { it.type })
-        if (!typeParser.config.inline && typeParser.context.has(id)) {
+        if (typeParser.context.has(id)) {
             return ContextTypeRef(id)
         }
 
         // check custom parsers
         typeParser.parseCustom(id, clazz)?.also {
-            if (typeParser.config.inline) {
-                return@parse InlineTypeRef(it)
-            } else {
                 return@parse typeParser.context.add(it)
-            }
         }
 
         // add placeholder to break out of some infinite recursions
-        if (!typeParser.config.inline) {
             typeParser.context.reserve(id)
-        }
 
         // determine type (object, primitive, map, collection, ...)
         val classType = typeParser.config.typeDecider.determineType(typeParser.config, clazz, id)
 
-        // collect information about supertypes (would cause infinite loop with inline enabled)
-        val supertypes = if (!typeParser.config.inline && classType == ClassType.OBJECT) {
+        // collect information about supertypes
+        val supertypes = if (classType == ClassType.OBJECT) {
             typeParser.getSupertypeParser().parse(clazz, resolvedTypeParameters)
         } else {
             emptyList()
@@ -85,7 +79,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 qualifiedName = clazz.qualifiedName!!,
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList()
-            ).let { typeParser.asRef(it) }
+            ).let { typeParser.context.add(it) }
             ClassType.OBJECT -> ObjectTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
@@ -95,7 +89,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 supertypes = supertypes.toMutableList(),
                 members = members.toMutableList(),
                 annotations = annotations.toMutableList()
-            ).let { typeParser.asRef(it) }
+            ).let { typeParser.context.add(it) }
             ClassType.ENUM -> EnumTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
@@ -106,7 +100,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                 members = members.toMutableList(),
                 enumConstants = enumValues.toMutableList(),
                 annotations = annotations.toMutableList()
-            ).let { typeParser.asRef(it) }
+            ).let { typeParser.context.add(it) }
             ClassType.COLLECTION -> CollectionTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
@@ -136,7 +130,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                     )
                 }
                 ?: unknownPropertyData("item")
-            ).let { typeParser.asRef(it) }
+            ).let { typeParser.context.add(it) }
             ClassType.MAP -> MapTypeData(
                 id = id,
                 simpleName = clazz.simpleName!!,
@@ -166,7 +160,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
                         annotations = emptyList()
                     )
                 } ?: unknownPropertyData("item")
-            ).let { typeParser.asRef(it) }
+            ).let { typeParser.context.add(it) }
         }
     }
 

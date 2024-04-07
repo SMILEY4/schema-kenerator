@@ -53,20 +53,13 @@ class KotlinxSerializationTypeParser(
 
     private fun parseInternal(descriptor: SerialDescriptor): TypeRef {
         val type = parseAsBaseTypeData(descriptor)
-        return if (config.inline) {
-            InlineTypeRef(type)
-        } else {
-            context.add(type)
-        }
+        context.add(type)
+        return InlineTypeRef(type)
     }
 
     private fun parseInternalAsWildcard(): TypeRef {
         val type = WildcardTypeData()
-        return if (config.inline) {
-            InlineTypeRef(type)
-        } else {
-            context.add(type)
-        }
+        return InlineTypeRef(type)
     }
 
 

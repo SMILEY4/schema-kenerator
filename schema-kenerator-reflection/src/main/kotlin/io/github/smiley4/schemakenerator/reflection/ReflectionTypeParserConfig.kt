@@ -13,10 +13,6 @@ class ReflectionTypeParserConfig(
      */
     val clearContext: Boolean,
     /**
-     * Whether to inline additional types or keep them separate in the context and reference them.
-     */
-    val inline: Boolean,
-    /**
      * An optional custom parser for all types, overwriting the default parser logic is required.
      */
     val customParser: CustomReflectionTypeParser?,
@@ -52,13 +48,6 @@ class ReflectionTypeParserConfigBuilder {
      * Automatically clear the context before parsing.
      */
     var clearContext = true
-
-
-    /**
-     * whether to inline types into one single data-object or keep them separated in the context for later reference.
-     * Note: `true` may cause infinite loops for some types.
-     */
-    var inline = false
 
 
     /**
@@ -164,7 +153,6 @@ class ReflectionTypeParserConfigBuilder {
             typeDecider = typeDecider,
             customParser = customParser,
             customParsers = parsers,
-            inline = inline,
             propertyFilters = buildList {
                 add(FunctionReflectionPropertyFilter())
                 add(GetterReflectionPropertyFilter(includeGetters))

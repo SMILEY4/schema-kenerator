@@ -19,7 +19,6 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
         withData(TEST_DATA) { data ->
             val context = TypeDataContext()
             val resultParser = ReflectionTypeParser(context = context, config = {
-                inline = true
                 includeGetters = data.includeGetters
                 includeWeakGetters = data.includeWeakGetters
                 includeHidden = data.includeHidden

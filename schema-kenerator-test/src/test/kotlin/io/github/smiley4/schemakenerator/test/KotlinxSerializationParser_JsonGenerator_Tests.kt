@@ -38,23 +38,10 @@ import kotlin.reflect.KType
 @Suppress("ClassName")
 class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
-//    context("(manual testing)") {
-//        withData(listOf(getKType<ClassWithLocalDateTime>())) { data ->
-//            val context = TypeDataContext()
-//            val resultParser = KotlinxSerializationTypeParser(context = context, config = { inline = false }).parse(data)
-//            val generatorResult = JsonSchemaGenerator()
-//                .withModule(InliningGenerator())
-//                .generate(resultParser, context)
-//            val jsonResult = generatorResult.asJson().prettyPrint()
-//            println(jsonResult)
-//        }
-//    }
-
-    context("basics; parser: no-inline; generator: inlining") {
+    context("generator: inlining") {
         withData(TEST_DATA) { data ->
             val context = TypeDataContext()
             val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                inline = false
                 data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
             }).parse(data.type)
             val generatorResult = JsonSchemaGenerator()
@@ -72,33 +59,10 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         }
     }
 
-    context("basics; parser: with-inline; generator: inlining") {
+    context("generator: referencing") {
         withData(TEST_DATA) { data ->
             val context = TypeDataContext()
             val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                inline = true
-                data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
-            }).parse(data.type)
-            val generatorResult = JsonSchemaGenerator()
-                .withModule(InliningGenerator())
-                .withModules(data.generatorModules)
-                .generate(resultParser, context)
-            generatorResult.asJson().prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultInlining
-            }
-        }
-    }
-
-    context("basics; parser: no-inline; generator: referencing") {
-        withData(TEST_DATA) { data ->
-            val context = TypeDataContext()
-            val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                inline = false
                 data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
             }).parse(data.type)
             val generatorResult = JsonSchemaGenerator()
@@ -116,55 +80,10 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         }
     }
 
-    context("basics; parser: with-inline; generator: referencing") {
+    context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
             val context = TypeDataContext()
             val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                inline = true
-                data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
-            }).parse(data.type)
-            val generatorResult = JsonSchemaGenerator()
-                .withModule(ReferencingGenerator(referenceRoot = false))
-                .withModules(data.generatorModules)
-                .generate(resultParser, context)
-            generatorResult.asJson().prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencing
-            }
-        }
-    }
-
-    context("basics; parser: no-inline; generator: referencing-root") {
-        withData(TEST_DATA) { data ->
-            val context = TypeDataContext()
-            val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                inline = false
-                data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
-            }).parse(data.type)
-            val generatorResult = JsonSchemaGenerator()
-                .withModule(ReferencingGenerator(referenceRoot = true))
-                .withModules(data.generatorModules)
-                .generate(resultParser, context)
-            generatorResult.asJson().prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencingRoot
-            }
-        }
-    }
-
-    context("basics; parser: with-inline; generator: referencing-root") {
-        withData(TEST_DATA) { data ->
-            val context = TypeDataContext()
-            val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                inline = true
                 data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
             }).parse(data.type)
             val generatorResult = JsonSchemaGenerator()

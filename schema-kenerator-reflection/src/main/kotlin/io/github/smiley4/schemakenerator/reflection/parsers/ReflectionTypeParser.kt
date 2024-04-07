@@ -1,10 +1,9 @@
 package io.github.smiley4.schemakenerator.reflection.parsers
 
 import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
-import io.github.smiley4.schemakenerator.core.parser.InlineTypeRef
+import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeId
 import io.github.smiley4.schemakenerator.core.parser.TypeParser
-import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.TypeRef
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeParserConfig
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeParserConfigBuilder
@@ -28,7 +27,7 @@ class ReflectionTypeParser(
     inline fun <reified T> parse() = parse(getKType<T>())
 
     override fun parse(type: KType): TypeRef {
-        if(config.clearContext) {
+        if (config.clearContext) {
             context.clear()
         }
         if (type.classifier is KClass<*>) {
@@ -44,14 +43,6 @@ class ReflectionTypeParser(
             return customParser.parse(id, clazz)
         }
         return null
-    }
-
-    internal fun asRef(data: BaseTypeData): TypeRef {
-        return if (config.inline) {
-            InlineTypeRef(data)
-        } else {
-            context.add(data)
-        }
     }
 
 }

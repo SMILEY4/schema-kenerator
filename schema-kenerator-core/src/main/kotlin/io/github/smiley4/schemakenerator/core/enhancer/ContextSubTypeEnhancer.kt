@@ -6,7 +6,11 @@ import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
 import io.github.smiley4.schemakenerator.core.parser.idStr
 
-class SubTypeEnhancer(private val inlineTypes: Boolean) : TypeDataEnhancer {
+/**
+ * Detects and adds missing supertype-subtype-relations between type-data in the provided context.
+ * Type-data not present in the context is not included.
+ */
+class ContextSubTypeEnhancer(private val inlineTypes: Boolean) : TypeDataEnhancer {
 
     override fun enhance(context: TypeDataContext) {
         context.getTypes()

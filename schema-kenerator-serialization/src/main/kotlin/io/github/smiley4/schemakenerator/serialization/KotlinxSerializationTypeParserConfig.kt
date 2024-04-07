@@ -12,10 +12,6 @@ class KotlinxSerializationTypeParserConfig(
      */
     val clearContext: Boolean,
     /**
-     * Whether to inline additional types or keep them separate in the context and reference them.
-     */
-    val inline: Boolean,
-    /**
      * An optional custom parser for all types, overwriting the default parser logic is required.
      */
     val customParser: CustomKotlinxSerializationTypeParser?,
@@ -35,12 +31,6 @@ class KotlinxSerializationTypeParserConfigBuilder {
      * Automatically clear the context before parsing.
      */
     var clearContext = true
-
-
-    /**
-     * Whether to inline additional types or keep them separate in the context and reference them.
-     */
-    var inline: Boolean = true
 
 
     /**
@@ -83,7 +73,6 @@ class KotlinxSerializationTypeParserConfigBuilder {
             clearContext = clearContext,
             customParser = customParser,
             customParsers = parsers,
-            inline = inline
         )
     }
 

@@ -14,5 +14,6 @@ dependencies {
     testImplementation(project(":schema-kenerator-jsonschema"))
     testImplementation(project(":schema-kenerator-swagger"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.15.3")
 
 }

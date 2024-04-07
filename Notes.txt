@@ -1,27 +1,5 @@
-Parser: Reflection
-- parser config ✅
-- type specific parser config ❌
-- base data ✅
-- properties ✅
-- supertypes ✅
-- type parameters (generics) ✅
-- enums ✅
-- annotations ✅
-- custom parsers ✅
-
-Parser: Serialization
-- parser config ✅
-- type specific parser config ❌
-- base data ✅
-- properties ✅
-- supertypes ✅
-- type parameters (generics) ✅
-- enums ✅
-- annotations ⭕
-- custom parsers ✅
-
-Generator: Swagger-Schema
-
-
-Generator: Json-Schema
-❌
+❌ handle jackson annotations -> enhancer in core
+❌ merge getters with fields -> enhancer in core
+❌ type specific configuration
+❌ custom type data modifiers (e.g. add metadata as custom annotation and later add to schema with module)
+❌ schema pipeline + dsl
