@@ -53,7 +53,7 @@ class KotlinxSerializationTypeParser(
 
     private fun parseInternal(descriptor: SerialDescriptor): TypeRef {
         val type = parseAsBaseTypeData(descriptor)
-        context.add(type)
+//        context.add(type)
         return InlineTypeRef(type)
     }
 
