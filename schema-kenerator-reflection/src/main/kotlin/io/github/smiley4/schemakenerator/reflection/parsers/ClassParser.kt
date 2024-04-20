@@ -37,7 +37,7 @@ class ClassParser(private val typeParser: ReflectionTypeParser) {
         }
 
         // add placeholder to break out of some infinite recursions
-            typeParser.context.reserve(id)
+        typeParser.context.reserve(id)
 
         // determine type (object, primitive, map, collection, ...)
         val classType = typeParser.config.typeDecider.determineType(typeParser.config, clazz, id)
