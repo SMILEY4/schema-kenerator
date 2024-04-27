@@ -1,24 +1,14 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.TypeDataContext
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompiler
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
-import io.github.smiley4.schemakenerator.jsonschema.asJson
-import io.github.smiley4.schemakenerator.jsonschema.module.AutoTitleModule
-import io.github.smiley4.schemakenerator.jsonschema.module.AutoTitleModule.Companion.AutoTitleType
-import io.github.smiley4.schemakenerator.jsonschema.module.CoreAnnotationsModule
-import io.github.smiley4.schemakenerator.jsonschema.module.InliningGenerator
-import io.github.smiley4.schemakenerator.jsonschema.module.JsonSchemaGeneratorModule
-import io.github.smiley4.schemakenerator.jsonschema.module.ReferencingGenerator
+import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.json.obj
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.serialization.CustomKotlinxSerializationTypeParser
-import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeParser
+import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeProcessor
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
-import io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
@@ -31,8 +21,6 @@ import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
-import java.time.LocalDateTime
-import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
 @Suppress("ClassName")
@@ -40,15 +28,14 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
-            val context = TypeDataContext()
-            val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
-            }).parse(data.type)
-            val generatorResult = JsonSchemaGenerator()
-                .withModule(InliningGenerator())
-                .withModules(data.generatorModules)
-                .generate(resultParser, context)
-            generatorResult.asJson().prettyPrint().shouldEqualJson {
+
+            val schema = listOf(data.type)
+                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { JsonSchemaGenerator().generate(it) }
+                .let { JsonSchemaCompiler().compileInlining(it) }
+                .first()
+
+            schema.json.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient
                 fieldComparison = FieldComparison.Strict
@@ -56,20 +43,29 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 typeCoercion = TypeCoercion.Disabled
                 data.expectedResultInlining
             }
+
         }
     }
 
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
-            val context = TypeDataContext()
-            val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
-            }).parse(data.type)
-            val generatorResult = JsonSchemaGenerator()
-                .withModule(ReferencingGenerator(referenceRoot = false))
-                .withModules(data.generatorModules)
-                .generate(resultParser, context)
-            generatorResult.asJson().prettyPrint().shouldEqualJson {
+
+            val schema = listOf(data.type)
+                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { JsonSchemaGenerator().generate(it) }
+                .let { JsonSchemaCompiler().compileReferencing(it) }
+                .first()
+                .also {
+                    if (it.definitions.isNotEmpty()) {
+                        (it.json as JsonObject).properties["definitions"] = obj {
+                            it.definitions.forEach { (k, v) ->
+                                k.id to v
+                            }
+                        }
+                    }
+                }
+
+            schema.json.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient
                 fieldComparison = FieldComparison.Strict
@@ -77,20 +73,29 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 typeCoercion = TypeCoercion.Disabled
                 data.expectedResultReferencing
             }
+
         }
     }
 
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
-            val context = TypeDataContext()
-            val resultParser = KotlinxSerializationTypeParser(context = context, config = {
-                data.customParsers.forEach { (type, parser) -> registerParser(type, parser) }
-            }).parse(data.type)
-            val generatorResult = JsonSchemaGenerator()
-                .withModule(ReferencingGenerator(referenceRoot = true))
-                .withModules(data.generatorModules)
-                .generate(resultParser, context)
-            generatorResult.asJson().prettyPrint().shouldEqualJson {
+
+            val schema = listOf(data.type)
+                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { JsonSchemaGenerator().generate(it) }
+                .let { JsonSchemaCompiler().compileReferencingRoot(it) }
+                .first()
+                .also {
+                    if (it.definitions.isNotEmpty()) {
+                        (it.json as JsonObject).properties["definitions"] = obj {
+                            it.definitions.forEach { (k, v) ->
+                                k.id to v
+                            }
+                        }
+                    }
+                }
+
+            schema.json.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient
                 fieldComparison = FieldComparison.Strict
@@ -98,6 +103,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 typeCoercion = TypeCoercion.Disabled
                 data.expectedResultReferencingRoot
             }
+
         }
     }
 
@@ -108,8 +114,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
-            val generatorModules: List<JsonSchemaGeneratorModule> = emptyList(),
-            val customParsers: Map<KClass<*>, CustomKotlinxSerializationTypeParser> = emptyMap(),
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
             val expectedResultReferencingRoot: String,
@@ -270,9 +274,9 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/Polymorphic<List>",
+                        "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<List>",
                         "definitions": {
-                            "Polymorphic<List>": {
+                            "kotlinx.serialization.Polymorphic<List>": {
                                 "type": "object",
                                 "required": [],
                                 "properties": {}
@@ -301,9 +305,9 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/Polymorphic<Map>",
+                        "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<Map>",
                         "definitions": {
-                            "Polymorphic<Map>": {
+                            "kotlinx.serialization.Polymorphic<Map>": {
                                 "type": "object",
                                 "required": [],
                                 "properties": {}
@@ -361,9 +365,9 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/ClassWithSimpleFields",
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields",
                         "definitions": {
-                            "ClassWithSimpleFields": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields": {
                                 "type": "object",
                                 "required": [
                                     "someBoolList",
@@ -405,9 +409,9 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                 {
-                    "${'$'}ref": "#/definitions/TestEnum",
+                    "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum",
                     "definitions": {
-                        "TestEnum": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum": {
                             "enum": [ "ONE", "TWO", "THREE" ]
                         }
                     }
@@ -430,7 +434,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                      "type": "object"
+                        "type": "object"
                     }
                 """.trimIndent(),
             ),
@@ -450,7 +454,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                      "type": "object"
+                        "type": "object"
                     }
                 """.trimIndent(),
             ),
@@ -470,7 +474,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                      "type": "object"
+                        "type": "object"
                     }
                 """.trimIndent(),
             ),
@@ -515,19 +519,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     {
                         "anyOf": [
                             {
-                                "${'$'}ref": "#/definitions/SubClassA"
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA"
                             },
                             {
-                                "${'$'}ref": "#/definitions/SubClassB"
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB"
                             }
                         ],
                         "definitions": {
-                            "SubClassA": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA": {
                                 "type": "object",
-                                "required": [
-                                    "a",
-                                    "sealedValue"
-                                ],
+                                "required": ["a", "sealedValue"],
                                 "properties": {
                                     "a": {
                                         "type": "integer",
@@ -539,12 +540,9 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                     }
                                 }
                             },
-                            "SubClassB": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB": {
                                 "type": "object",
-                                "required": [
-                                    "b",
-                                    "sealedValue"
-                                ],
+                                "required": ["b", "sealedValue"],
                                 "properties": {
                                     "b": {
                                         "type": "integer",
@@ -561,19 +559,19 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/SealedClass",
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass",
                         "definitions": {
-                            "SealedClass": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass": {
                                 "anyOf": [
                                     {
-                                        "${'$'}ref": "#/definitions/SubClassA"
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA"
                                     },
                                     {
-                                        "${'$'}ref": "#/definitions/SubClassB"
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB"
                                     }
                                 ]
                             },
-                            "SubClassA": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA": {
                                 "type": "object",
                                 "required": [
                                     "a",
@@ -590,7 +588,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                     }
                                 }
                             },
-                            "SubClassB": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB": {
                                 "type": "object",
                                 "required": [
                                     "b",
@@ -651,9 +649,9 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/SubClassA",
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
                         "definitions": {
-                            "SubClassA": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA": {
                                 "type": "object",
                                 "required": [
                                     "a",
@@ -674,202 +672,202 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-            TestData(
-                // annotations not supported with kotlinx-serialization: ignoring annotations
-                type = getKType<CoreAnnotatedClass>(),
-                testName = "annotated class (core)",
-                generatorModules = listOf(CoreAnnotationsModule()),
-                expectedResultInlining = """
-                    {
-                        "type": "object",
-                        "required": [ "value" ],
-                        "properties": {
-                            "value": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "type": "object",
-                        "required": [ "value" ],
-                        "properties": {
-                            "value": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "${'$'}ref": "#/definitions/CoreAnnotatedClass",
-                        "definitions": {
-                            "CoreAnnotatedClass": {
-                                "type": "object",
-                                "required": [
-                                    "value"
-                                ],
-                                "properties": {
-                                    "value": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                """.trimIndent(),
-            ),
-            TestData(
-                type = getKType<ClassWithLocalDateTime>(),
-                testName = "class with java local-date-time and custom parser",
-                customParsers = mapOf(
-                    LocalDateTime::class to CustomKotlinxSerializationTypeParser { typeId, _ ->
-                        PrimitiveTypeData(
-                            id = typeId,
-                            simpleName = String::class.simpleName!!,
-                            qualifiedName = String::class.qualifiedName!!,
-                            typeParameters = mutableMapOf()
-                        )
-                    }
-                ),
-                expectedResultInlining = """
-                    {
-                        "type": "object",
-                        "required": [
-                            "dateTime"
-                        ],
-                        "properties": {
-                            "dateTime": {
-                                 "type": "string"
-                            }
-                        }
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "type": "object",
-                        "required": [
-                            "dateTime"
-                        ],
-                        "properties": {
-                            "dateTime": {
-                                 "type": "string"
-                            }
-                        }
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "${'$'}ref": "#/definitions/ClassWithLocalDateTime",
-                        "definitions": {
-                            "ClassWithLocalDateTime": {
-                                "type": "object",
-                                "required": [
-                                    "dateTime"
-                                ],
-                                "properties": {
-                                    "dateTime": {
-                                         "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                """.trimIndent(),
-            ),
-            TestData(
-                type = getKType<ClassWithNestedClass>(),
-                testName = "auto title",
-                generatorModules = listOf(
-                    AutoTitleModule(type = AutoTitleType.SIMPLE_NAME)
-                ),
-                expectedResultInlining = """
-                    {
-                        "type": "object",
-                        "required": [
-                            "nested"
-                        ],
-                        "properties": {
-                            "nested": {
-                                "type": "object",
-                                "required": [
-                                    "text"
-                                ],
-                                "properties": {
-                                    "text": {
-                                        "type": "string",
-                                        "title": "String"
-                                    }
-                                },
-                                "title": "NestedClass"
-                            }
-                        },
-                        "title": "ClassWithNestedClass"
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "type": "object",
-                        "required": [
-                            "nested"
-                        ],
-                        "properties": {
-                            "nested": {
-                                "${'$'}ref": "#/definitions/NestedClass"
-                            }
-                        },
-                        "title": "ClassWithNestedClass",
-                        "definitions": {
-                            "NestedClass": {
-                                "type": "object",
-                                "required": [
-                                    "text"
-                                ],
-                                "properties": {
-                                    "text": {
-                                        "type": "string",
-                                        "title": "String"
-                                    }
-                                },
-                                "title": "NestedClass"
-                            }
-                        }
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "${'$'}ref": "#/definitions/ClassWithNestedClass",
-                        "definitions": {
-                            "NestedClass": {
-                                "type": "object",
-                                "required": [
-                                    "text"
-                                ],
-                                "properties": {
-                                    "text": {
-                                        "type": "string",
-                                        "title": "String"
-                                    }
-                                },
-                                "title": "NestedClass"
-                            },
-                            "ClassWithNestedClass": {
-                                "type": "object",
-                                "required": [
-                                    "nested"
-                                ],
-                                "properties": {
-                                    "nested": {
-                                        "${'$'}ref": "#/definitions/NestedClass"
-                                    }
-                                },
-                                "title": "ClassWithNestedClass"
-                            }
-                        }
-                    }
-                """.trimIndent(),
-            ),
+//            TestData(
+//                // annotations not supported with kotlinx-serialization: ignoring annotations
+//                type = getKType<CoreAnnotatedClass>(),
+//                testName = "annotated class (core)",
+//                generatorModules = listOf(CoreAnnotationsModule()),
+//                expectedResultInlining = """
+//                    {
+//                        "type": "object",
+//                        "required": [ "value" ],
+//                        "properties": {
+//                            "value": {
+//                                "type": "string"
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencing = """
+//                    {
+//                        "type": "object",
+//                        "required": [ "value" ],
+//                        "properties": {
+//                            "value": {
+//                                "type": "string"
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencingRoot = """
+//                    {
+//                        "${'$'}ref": "#/definitions/CoreAnnotatedClass",
+//                        "definitions": {
+//                            "CoreAnnotatedClass": {
+//                                "type": "object",
+//                                "required": [
+//                                    "value"
+//                                ],
+//                                "properties": {
+//                                    "value": {
+//                                        "type": "string"
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//            ),
+//            TestData(
+//                type = getKType<ClassWithLocalDateTime>(),
+//                testName = "class with java local-date-time and custom parser",
+//                customParsers = mapOf(
+//                    LocalDateTime::class to CustomKotlinxSerializationTypeParser { typeId, _ ->
+//                        PrimitiveTypeData(
+//                            id = typeId,
+//                            simpleName = String::class.simpleName!!,
+//                            qualifiedName = String::class.qualifiedName!!,
+//                            typeParameters = mutableMapOf()
+//                        )
+//                    }
+//                ),
+//                expectedResultInlining = """
+//                    {
+//                        "type": "object",
+//                        "required": [
+//                            "dateTime"
+//                        ],
+//                        "properties": {
+//                            "dateTime": {
+//                                 "type": "string"
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencing = """
+//                    {
+//                        "type": "object",
+//                        "required": [
+//                            "dateTime"
+//                        ],
+//                        "properties": {
+//                            "dateTime": {
+//                                 "type": "string"
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencingRoot = """
+//                    {
+//                        "${'$'}ref": "#/definitions/ClassWithLocalDateTime",
+//                        "definitions": {
+//                            "ClassWithLocalDateTime": {
+//                                "type": "object",
+//                                "required": [
+//                                    "dateTime"
+//                                ],
+//                                "properties": {
+//                                    "dateTime": {
+//                                         "type": "string"
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//            ),
+//            TestData(
+//                type = getKType<ClassWithNestedClass>(),
+//                testName = "auto title",
+//                generatorModules = listOf(
+//                    AutoTitleModule(type = AutoTitleType.SIMPLE_NAME)
+//                ),
+//                expectedResultInlining = """
+//                    {
+//                        "type": "object",
+//                        "required": [
+//                            "nested"
+//                        ],
+//                        "properties": {
+//                            "nested": {
+//                                "type": "object",
+//                                "required": [
+//                                    "text"
+//                                ],
+//                                "properties": {
+//                                    "text": {
+//                                        "type": "string",
+//                                        "title": "String"
+//                                    }
+//                                },
+//                                "title": "NestedClass"
+//                            }
+//                        },
+//                        "title": "ClassWithNestedClass"
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencing = """
+//                    {
+//                        "type": "object",
+//                        "required": [
+//                            "nested"
+//                        ],
+//                        "properties": {
+//                            "nested": {
+//                                "${'$'}ref": "#/definitions/NestedClass"
+//                            }
+//                        },
+//                        "title": "ClassWithNestedClass",
+//                        "definitions": {
+//                            "NestedClass": {
+//                                "type": "object",
+//                                "required": [
+//                                    "text"
+//                                ],
+//                                "properties": {
+//                                    "text": {
+//                                        "type": "string",
+//                                        "title": "String"
+//                                    }
+//                                },
+//                                "title": "NestedClass"
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencingRoot = """
+//                    {
+//                        "${'$'}ref": "#/definitions/ClassWithNestedClass",
+//                        "definitions": {
+//                            "NestedClass": {
+//                                "type": "object",
+//                                "required": [
+//                                    "text"
+//                                ],
+//                                "properties": {
+//                                    "text": {
+//                                        "type": "string",
+//                                        "title": "String"
+//                                    }
+//                                },
+//                                "title": "NestedClass"
+//                            },
+//                            "ClassWithNestedClass": {
+//                                "type": "object",
+//                                "required": [
+//                                    "nested"
+//                                ],
+//                                "properties": {
+//                                    "nested": {
+//                                        "${'$'}ref": "#/definitions/NestedClass"
+//                                    }
+//                                },
+//                                "title": "ClassWithNestedClass"
+//                            }
+//                        }
+//                    }
+//                """.trimIndent(),
+//            ),
         )
 
     }

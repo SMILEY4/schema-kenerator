@@ -1,5 +1,0 @@
-❌ handle jackson annotations -> enhancer in core
-❌ merge getters with fields -> enhancer in core
-❌ type specific configuration
-❌ custom type data modifiers (e.g. add metadata as custom annotation and later add to schema with module)
-❌ schema pipeline + dsl

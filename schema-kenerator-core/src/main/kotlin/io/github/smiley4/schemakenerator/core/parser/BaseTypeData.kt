@@ -12,9 +12,7 @@ sealed class BaseTypeData(
 ) {
 
     companion object {
-
         fun placeholder(id: TypeId) = PlaceholderTypeData(id)
-
     }
 
 }
@@ -38,7 +36,7 @@ class PlaceholderTypeData(
  * Data for a wildcard-type
  */
 class WildcardTypeData : BaseTypeData(
-    id = TypeId("*"),
+    id = TypeId.wildcard(),
     simpleName = "*",
     qualifiedName = "*",
     typeParameters = mutableMapOf(),
@@ -66,8 +64,8 @@ open class ObjectTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
-    var subtypes: MutableList<TypeRef> = mutableListOf(),
-    var supertypes: MutableList<TypeRef> = mutableListOf(),
+    var subtypes: MutableList<TypeId> = mutableListOf(),
+    var supertypes: MutableList<TypeId> = mutableListOf(),
     var members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf()
 ) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
@@ -81,8 +79,8 @@ class EnumTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
-    subtypes: MutableList<TypeRef> = mutableListOf(),
-    supertypes: MutableList<TypeRef> = mutableListOf(),
+    subtypes: MutableList<TypeId> = mutableListOf(),
+    supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
     var enumConstants: MutableList<String>,
@@ -97,8 +95,8 @@ class MapTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
-    subtypes: MutableList<TypeRef> = mutableListOf(),
-    supertypes: MutableList<TypeRef> = mutableListOf(),
+    subtypes: MutableList<TypeId> = mutableListOf(),
+    supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
     var keyType: PropertyData,
@@ -114,8 +112,8 @@ class CollectionTypeData(
     simpleName: String,
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
-    subtypes: MutableList<TypeRef> = mutableListOf(),
-    supertypes: MutableList<TypeRef> = mutableListOf(),
+    subtypes: MutableList<TypeId> = mutableListOf(),
+    supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
     val itemType: PropertyData,
