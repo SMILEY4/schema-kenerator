@@ -46,7 +46,7 @@ class KotlinxSerializationTypeProcessor {
     }
 
     private fun parse(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        return when (descriptor.serialName) {
+        return when (descriptor.cleanSerialName()) {
             Unit::class.qualifiedName -> parsePrimitive(descriptor, typeData)
             UByte::class.qualifiedName -> parsePrimitive(descriptor, typeData)
             UShort::class.qualifiedName -> parsePrimitive(descriptor, typeData)
@@ -80,7 +80,7 @@ class KotlinxSerializationTypeProcessor {
     }
 
     private fun parsePrimitive(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id = TypeId.build(descriptor.serialName)
+        val id = TypeId.build(descriptor.cleanSerialName())
         return typeData.find(id)
             ?: PrimitiveTypeData(
                 id = id,
@@ -92,7 +92,7 @@ class KotlinxSerializationTypeProcessor {
     private fun parseList(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
         val itemDescriptor = descriptor.getElementDescriptor(0)
         val itemType = parse(itemDescriptor, typeData)
-        val id = TypeId.build(descriptor.serialName, listOf(itemType.id))
+        val id = TypeId.build(descriptor.cleanSerialName(), listOf(itemType.id))
         return typeData.find(id)
             ?: CollectionTypeData(
                 id = id,
@@ -113,7 +113,7 @@ class KotlinxSerializationTypeProcessor {
         val valueDescriptor = descriptor.getElementDescriptor(1)
         val keyType = parse(keyDescriptor, typeData)
         val valueType = parse(valueDescriptor, typeData)
-        val id = TypeId.build(descriptor.serialName, listOf(keyType.id, valueType.id))
+        val id = TypeId.build(descriptor.cleanSerialName(), listOf(keyType.id, valueType.id))
         return typeData.find(id)
             ?: MapTypeData(
                 id = id,
@@ -179,7 +179,7 @@ class KotlinxSerializationTypeProcessor {
 
 
     private fun parseObject(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id = TypeId.build(descriptor.serialName)
+        val id = TypeId.build(descriptor.cleanSerialName())
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -190,7 +190,7 @@ class KotlinxSerializationTypeProcessor {
 
 
     private fun parseEnum(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id = TypeId.build(descriptor.serialName)
+        val id = TypeId.build(descriptor.cleanSerialName())
         return typeData.find(id)
             ?: EnumTypeData(
                 id = id,
@@ -201,15 +201,17 @@ class KotlinxSerializationTypeProcessor {
     }
 
     private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {
-        return if (typeData.find(TypeId.build(descriptor.serialName, typeParameters)) != null) {
-            TypeId.build(descriptor.serialName, typeParameters, true)
+        return if (typeData.find(TypeId.build(descriptor.cleanSerialName(), typeParameters)) != null) {
+            TypeId.build(descriptor.cleanSerialName(), typeParameters, true)
         } else {
-            TypeId.build(descriptor.serialName, typeParameters)
+            TypeId.build(descriptor.cleanSerialName(), typeParameters)
         }
     }
 
     private fun Collection<BaseTypeData>.find(id: TypeId): BaseTypeData? {
         return this.find { it.id.full() == id.full() }
     }
+
+    private fun SerialDescriptor.cleanSerialName() = this.serialName.replace("?", "")
 
 }

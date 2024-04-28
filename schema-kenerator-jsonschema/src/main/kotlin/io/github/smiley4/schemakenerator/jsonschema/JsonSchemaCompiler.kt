@@ -15,7 +15,7 @@ import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaWithDefinit
 /**
  * Resolves references in schemas - either inlining them or collecting them in the definitions-section and referncing them.
  */
-class JsonSchemaCompiler {
+class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
 
     private val schema = JsonSchemaUtils()
 
@@ -44,7 +44,7 @@ class JsonSchemaCompiler {
             if (shouldReference(it.json)) {
                 JsonSchemaWithDefinitions(
                     typeId = it.typeId,
-                    json = schema.referenceSchema(it.typeId, true),
+                    json = schema.referenceSchema(getRefPath(it.typeId), true),
                     definitions = buildMap {
                         this.putAll(it.definitions)
                         this[it.typeId] = it.json
@@ -73,7 +73,7 @@ class JsonSchemaCompiler {
             if (shouldReference(referencedSchema.json)) {
                 definitions[referencedId] = procReferencedSchema.json
                 definitions.putAll(procReferencedSchema.definitions)
-                schema.referenceSchema(referencedId, true)
+                schema.referenceSchema(getRefPath(referencedId), true)
             } else {
                 definitions.putAll(procReferencedSchema.definitions)
                 procReferencedSchema.json
@@ -87,8 +87,12 @@ class JsonSchemaCompiler {
     }
 
     private fun shouldReference(json: JsonNode): Boolean {
+        val complexProperties = setOf(
+            "required",
+            "properties"
+        )
         return if (json is JsonObject) {
-            (getTextProperty(json, "type") == "object" && json.properties.size > 1 && !existsProperty(json, "additionalProperties"))
+            (getTextProperty(json, "type") == "object" && json.properties.keys.any { complexProperties.contains(it) } && !existsProperty(json, "additionalProperties"))
                     || existsProperty(json, "enum")
                     || existsProperty(json, "anyOf")
         } else {
@@ -133,6 +137,13 @@ class JsonSchemaCompiler {
                 }
                 is JsonValue<*> -> node
             }
+        }
+    }
+
+    private fun getRefPath(typeId: TypeId): String {
+        return when(pathType) {
+            TitleType.FULL -> typeId.full()
+            TitleType.SIMPLE -> typeId.simple()
         }
     }
 

@@ -832,52 +832,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
 //            TestData(
-//                // annotations not supported with kotlinx-serialization: ignoring annotations
-//                type = getKType<CoreAnnotatedClass>(),
-//                testName = "annotated class (core)",
-//                generatorModules = listOf(CoreAnnotationsModule()),
-//                expectedResultInlining = """
-//                    {
-//                        "type": "object",
-//                        "required": [ "value" ],
-//                        "properties": {
-//                            "value": {
-//                                "type": "string"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "type": "object",
-//                        "required": [ "value" ],
-//                        "properties": {
-//                            "value": {
-//                                "type": "string"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "${'$'}ref": "#/definitions/CoreAnnotatedClass",
-//                        "definitions": {
-//                            "CoreAnnotatedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "value"
-//                                ],
-//                                "properties": {
-//                                    "value": {
-//                                        "type": "string"
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
-//            TestData(
 //                type = getKType<ClassWithLocalDateTime>(),
 //                testName = "class with java local-date-time and custom parser",
 //                customParsers = mapOf(

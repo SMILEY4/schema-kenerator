@@ -122,6 +122,17 @@ class TypeId(
             }
     }
 
+    fun simple(): String {
+        var title = base.split(".").last()
+        if (typeParameters.isNotEmpty()) {
+            title = title + "<" + typeParameters.joinToString(",") { it.simple() } + ">"
+        }
+        if (additionalId != null) {
+            title = "$title#$additionalId"
+        }
+        return title
+    }
+
     fun withoutAdditionId() = TypeId(
         base = this.base,
         typeParameters = this.typeParameters,
