@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.core.parser
+package io.github.smiley4.schemakenerator.core.data
 
 /**
  * Base data for a type
@@ -25,8 +25,8 @@ class PlaceholderTypeData(
     id: TypeId
 ) : BaseTypeData(
     id = id,
-    simpleName = id.id,
-    qualifiedName = id.id,
+    simpleName = id.full(),
+    qualifiedName = id.full(),
     typeParameters = mutableMapOf(),
     annotations = mutableListOf()
 )

@@ -12,7 +12,7 @@
 //import io.github.smiley4.schemakenerator.core.parser.resolve
 //import io.github.smiley4.schemakenerator.swagger.SwaggerSchema
 //import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
-//import io.github.smiley4.schemakenerator.swagger.swagger.SwaggerSchemaUtils
+//import io.github.smiley4.schemakenerator.swagger.schema.SwaggerSchemaUtils
 //import io.swagger.v3.oas.models.media.Schema
 //import java.math.BigDecimal
 //

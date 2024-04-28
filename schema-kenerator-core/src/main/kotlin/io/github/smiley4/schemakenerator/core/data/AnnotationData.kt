@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.core.parser
+package io.github.smiley4.schemakenerator.core.data
 
 data class AnnotationData(
     val name: String,

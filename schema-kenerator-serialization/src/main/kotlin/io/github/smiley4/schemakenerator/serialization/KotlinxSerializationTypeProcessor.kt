@@ -2,17 +2,17 @@
 
 package io.github.smiley4.schemakenerator.serialization
 
-import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
-import io.github.smiley4.schemakenerator.core.parser.CollectionTypeData
-import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
-import io.github.smiley4.schemakenerator.core.parser.MapTypeData
-import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.PropertyData
-import io.github.smiley4.schemakenerator.core.parser.PropertyType
-import io.github.smiley4.schemakenerator.core.parser.TypeId
-import io.github.smiley4.schemakenerator.core.parser.Visibility
-import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
+import io.github.smiley4.schemakenerator.core.data.EnumTypeData
+import io.github.smiley4.schemakenerator.core.data.MapTypeData
+import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.PropertyType
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.Visibility
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.descriptors.PolymorphicKind

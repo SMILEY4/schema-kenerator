@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.schema
 
-import io.github.smiley4.schemakenerator.core.parser.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.array
@@ -146,7 +146,7 @@ class JsonSchemaUtils {
     //=====  REFERENCE ==============================
 
     fun referenceSchema(id: TypeId, isInDefinitions: Boolean = false): JsonObject {
-        return referenceSchema(id.id, isInDefinitions)
+        return referenceSchema(id.full(), isInDefinitions)
     }
 
     fun referenceSchema(id: String, isInDefinitions: Boolean = false): JsonObject {

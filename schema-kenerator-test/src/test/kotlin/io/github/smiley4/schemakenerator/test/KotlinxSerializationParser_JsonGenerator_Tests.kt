@@ -59,7 +59,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
                             it.definitions.forEach { (k, v) ->
-                                k.id to v
+                                k.full() to v
                             }
                         }
                     }
@@ -89,7 +89,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
                             it.definitions.forEach { (k, v) ->
-                                k.id to v
+                                k.full() to v
                             }
                         }
                     }

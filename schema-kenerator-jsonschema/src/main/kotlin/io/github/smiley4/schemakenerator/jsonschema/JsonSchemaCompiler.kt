@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.parser.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
@@ -12,6 +12,9 @@ import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaWithDefinitions
 
+/**
+ * Resolves references in schemas - either inlining them or collecting them in the definitions-section and referncing them.
+ */
 class JsonSchemaCompiler {
 
     private val schema = JsonSchemaUtils()
@@ -55,8 +58,8 @@ class JsonSchemaCompiler {
 
     private fun inlineReferences(node: JsonNode, schemaList: Collection<JsonSchema>): JsonNode {
         return replaceReferences(node) { refObj ->
-            val referencedId = (refObj.properties["\$ref"] as JsonTextValue).value
-            val referencedSchema = schemaList.find { it.typeId.id == referencedId }!!
+            val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
+            val referencedSchema = schemaList.find { it.typeId == referencedId }!!
             inlineReferences(referencedSchema.json, schemaList)
         }
     }
@@ -64,7 +67,7 @@ class JsonSchemaCompiler {
     private fun referenceDefinitionsReferences(node: JsonNode, schemaList: Collection<JsonSchema>): JsonSchemaWithDefinitions {
         val definitions = mutableMapOf<TypeId, JsonNode>()
         val json = replaceReferences(node) { refObj ->
-            val referencedId = TypeId.build((refObj.properties["\$ref"] as JsonTextValue).value)
+            val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
             val referencedSchema = schemaList.find { it.typeId == referencedId }!!
             val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.json, schemaList)
             if (shouldReference(referencedSchema.json)) {

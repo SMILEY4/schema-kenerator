@@ -1,5 +1,6 @@
-package io.github.smiley4.schemakenerator.swagger.swagger
+package io.github.smiley4.schemakenerator.swagger.schema
 
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
@@ -156,9 +157,13 @@ class SwaggerSchemaUtils {
 
     //=====  REFERENCE ==============================
 
-    fun referenceSchema(id: String): Schema<*> {
+    fun referenceSchema(id: TypeId, isInDefinitions: Boolean = false): Schema<*> {
+        return referenceSchema(id.full(), isInDefinitions)
+    }
+
+    fun referenceSchema(id: String, isInDefinitions: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
-            schema.`$ref` = "#/definitions/$id"
+            schema.`raw$ref`(if(isInDefinitions) "#/components/schemas/$id" else id)
         }
     }
 

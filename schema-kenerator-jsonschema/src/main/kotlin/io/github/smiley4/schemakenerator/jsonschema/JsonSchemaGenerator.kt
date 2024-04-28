@@ -1,18 +1,21 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
-import io.github.smiley4.schemakenerator.core.parser.CollectionTypeData
-import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
-import io.github.smiley4.schemakenerator.core.parser.MapTypeData
-import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.PropertyData
-import io.github.smiley4.schemakenerator.core.parser.TypeId
-import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
+import io.github.smiley4.schemakenerator.core.data.EnumTypeData
+import io.github.smiley4.schemakenerator.core.data.MapTypeData
+import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchemaUtils
 
+/**
+ * Generates json-schemas from [BaseTypeData]. All types in the schema are referenced by type-id
+ */
 class JsonSchemaGenerator {
 
     private val schema = JsonSchemaUtils()
@@ -144,7 +147,7 @@ class JsonSchemaGenerator {
     private fun buildWithSubtypes(typeData: ObjectTypeData): JsonSchema {
         return JsonSchema(
             json = schema.subtypesSchema(
-                typeData.subtypes.map { schema.referenceSchema(it.id) }
+                typeData.subtypes.map { schema.referenceSchema(it.full()) }
             ),
             typeId = typeData.id
         )

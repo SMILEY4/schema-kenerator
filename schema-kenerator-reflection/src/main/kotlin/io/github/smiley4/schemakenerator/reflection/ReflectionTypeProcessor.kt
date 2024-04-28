@@ -1,18 +1,18 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.core.parser.AnnotationData
-import io.github.smiley4.schemakenerator.core.parser.BaseTypeData
-import io.github.smiley4.schemakenerator.core.parser.CollectionTypeData
-import io.github.smiley4.schemakenerator.core.parser.EnumTypeData
-import io.github.smiley4.schemakenerator.core.parser.MapTypeData
-import io.github.smiley4.schemakenerator.core.parser.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.parser.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.parser.PropertyData
-import io.github.smiley4.schemakenerator.core.parser.PropertyType
-import io.github.smiley4.schemakenerator.core.parser.TypeId
-import io.github.smiley4.schemakenerator.core.parser.TypeParameterData
-import io.github.smiley4.schemakenerator.core.parser.Visibility
-import io.github.smiley4.schemakenerator.core.parser.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
+import io.github.smiley4.schemakenerator.core.data.EnumTypeData
+import io.github.smiley4.schemakenerator.core.data.MapTypeData
+import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.PropertyType
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeParameterData
+import io.github.smiley4.schemakenerator.core.data.Visibility
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -27,6 +27,7 @@ class ReflectionTypeProcessor(
     private val includeGetters: Boolean = false,
     private val includeWeakGetters: Boolean = false,
     private val includeFunctions: Boolean = false,
+    private val includeHidden: Boolean = false
 ) {
 
     private val primitiveTypes = setOf<KClass<*>>(
@@ -75,8 +76,10 @@ class ReflectionTypeProcessor(
         // resolve type parameters, i.e. generic types
         val resolvedTypeParameters = parseTypeParameters(type, clazz, typeParameters, typeData)
 
-        // build id & check if type already parsed
+        // build id
         val id = TypeId.build(clazz.qualifiedName ?: "?", resolvedTypeParameters.values.map { it.type })
+
+        // check if type already parsed
         val existing = typeData.find { it.id == id }
         if (existing != null) {
             return existing
@@ -275,6 +278,11 @@ class ReflectionTypeProcessor(
     }
 
     private fun filterMember(member: KCallable<*>): Boolean {
+        val visibility = determinePropertyVisibility(member)
+        when(visibility) {
+            Visibility.PUBLIC -> Unit
+            Visibility.HIDDEN -> if(!includeHidden) return false
+        }
         if (member is KFunction<*>) {
             return when(determineFunctionPropertyType(member)) {
                 FunctionPropertyType.GETTER -> includeGetters
@@ -297,7 +305,7 @@ class ReflectionTypeProcessor(
             nullable = member.returnType.isMarkedNullable,
             annotations = parseAnnotation(member),
             kind = PropertyType.PROPERTY,
-            visibility = if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
+            visibility = determinePropertyVisibility(member)
         )
     }
 
@@ -312,7 +320,7 @@ class ReflectionTypeProcessor(
             nullable = member.returnType.isMarkedNullable,
             annotations = parseAnnotation(member),
             kind = PropertyType.FUNCTION,
-            visibility = if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
+            visibility = determinePropertyVisibility(member)
         )
     }
 
@@ -459,10 +467,10 @@ class ReflectionTypeProcessor(
         }
     }
 
-    // ====== FUNCTION TYPE DECIDER ====================================
+    // ====== UTILS ====================================================
 
     private fun determineFunctionPropertyType(function: KFunction<*>): FunctionPropertyType {
-        if (function.returnType == Unit::class || function.parameters.isNotEmpty()) {
+        if (function.returnType == Unit::class || function.parameters.any { it.name !== null }) {
             return FunctionPropertyType.FUNCTION
         }
         if (function.name.startsWith("get") || function.name.startsWith("is")) {
@@ -471,7 +479,9 @@ class ReflectionTypeProcessor(
         return FunctionPropertyType.WEAK_GETTER
     }
 
-    // ====== UTILS ====================================================
+    private fun determinePropertyVisibility(member: KCallable<*>): Visibility {
+        return if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
+    }
 
     private fun unknownPropertyData(name: String, typeData: MutableList<BaseTypeData>): PropertyData {
         if (typeData.none { it.id == TypeId.wildcard() }) {
