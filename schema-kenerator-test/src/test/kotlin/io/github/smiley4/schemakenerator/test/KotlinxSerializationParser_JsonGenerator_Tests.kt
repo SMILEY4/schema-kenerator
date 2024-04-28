@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
 import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeProcessor
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
@@ -50,8 +51,15 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
+            val additionalIds = mutableListOf<String>()
+
             val schema = listOf(data.type)
                 .let { KotlinxSerializationTypeProcessor().process(it) }
+                .onEach { schema ->
+                    if (schema.id.additionalId != null) {
+                        additionalIds.add(schema.id.additionalId!!)
+                    }
+                }
                 .let { JsonSchemaGenerator().generate(it) }
                 .let { JsonSchemaCompiler().compileReferencing(it) }
                 .first()
@@ -65,14 +73,22 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencing
-            }
+            schema.json.prettyPrint()
+                .let {
+                    var jsonStr = it
+                    additionalIds.forEachIndexed { index, addId ->
+                        jsonStr = jsonStr.replace("#$addId", "#$index")
+                    }
+                    jsonStr
+                }
+                .shouldEqualJson {
+                    propertyOrder = PropertyOrder.Lenient
+                    arrayOrder = ArrayOrder.Lenient
+                    fieldComparison = FieldComparison.Strict
+                    numberFormat = NumberFormat.Lenient
+                    typeCoercion = TypeCoercion.Disabled
+                    data.expectedResultReferencing
+                }
 
         }
     }
@@ -80,8 +96,15 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
+            val additionalIds = mutableListOf<String>()
+
             val schema = listOf(data.type)
                 .let { KotlinxSerializationTypeProcessor().process(it) }
+                .onEach { schema ->
+                    if (schema.id.additionalId != null) {
+                        additionalIds.add(schema.id.additionalId!!)
+                    }
+                }
                 .let { JsonSchemaGenerator().generate(it) }
                 .let { JsonSchemaCompiler().compileReferencingRoot(it) }
                 .first()
@@ -95,14 +118,22 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencingRoot
-            }
+            schema.json.prettyPrint()
+                .let {
+                    var jsonStr = it
+                    additionalIds.forEachIndexed { index, addId ->
+                        jsonStr = jsonStr.replace("#$addId", "#$index")
+                    }
+                    jsonStr
+                }
+                .shouldEqualJson {
+                    propertyOrder = PropertyOrder.Lenient
+                    arrayOrder = ArrayOrder.Lenient
+                    fieldComparison = FieldComparison.Strict
+                    numberFormat = NumberFormat.Lenient
+                    typeCoercion = TypeCoercion.Disabled
+                    data.expectedResultReferencingRoot
+                }
 
         }
     }
@@ -665,6 +696,134 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                     },
                                     "sealedValue": {
                                         "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = getKType<ClassWIthDifferentGenerics>(),
+                testName = "class with multiple different generics",
+                expectedResultInlining = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "valueInt",
+                            "valueString"
+                        ],
+                        "properties": {
+                            "valueInt": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "integer",
+                                        "minimum": -2147483648,
+                                        "maximum": 2147483647
+                                    }
+                                }
+                            },
+                            "valueString": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "valueInt",
+                            "valueString"
+                        ],
+                        "properties": {
+                            "valueInt": {
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
+                            },
+                            "valueString": {
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                            }
+                        },
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "integer",
+                                        "minimum": -2147483648,
+                                        "maximum": 2147483647
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics",
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "integer",
+                                        "minimum": -2147483648,
+                                        "maximum": 2147483647
+                                    }
+                                }
+                            },
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics": {
+                                "type": "object",
+                                "required": [
+                                    "valueInt",
+                                    "valueString"
+                                ],
+                                "properties": {
+                                    "valueInt": {
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
+                                    },
+                                    "valueString": {
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
                                     }
                                 }
                             }

@@ -88,7 +88,7 @@ class SwaggerSchemaCompiler {
     }
 
     private fun replaceReferences(node: Schema<*>, mapping: (refObj: Schema<*>) -> Schema<*>): Schema<*> {
-        if (node.`$ref` !== null) {
+        if (node.`$ref` != null) {
             return mapping(node)
         } else {
             // todo: clone node ?

@@ -1,5 +1,8 @@
 package io.github.smiley4.schemakenerator.core.data
 
+import kotlin.math.abs
+import kotlin.random.Random
+
 class TypeId(
     val base: String,
     val typeParameters: List<TypeId>,
@@ -14,7 +17,9 @@ class TypeId(
 
         fun build(name: String) = TypeId(name, emptyList(), null)
 
-        fun build(name: String, typeParameters: List<TypeId>) = TypeId(name, typeParameters, null)
+        fun build(name: String, withAdditionalId: Boolean = false) = TypeId(name, emptyList(), if (withAdditionalId) abs(Random.nextLong()).toString() else null)
+
+        fun build(name: String, typeParameters: List<TypeId>, withAdditionalId: Boolean = false) = TypeId(name, typeParameters, if (withAdditionalId) abs(Random.nextLong()).toString() else null)
 
         fun parse(fullTypeId: String): TypeId {
 
@@ -97,25 +102,6 @@ class TypeId(
             )
         }
 
-//        fun build(name: String): TypeId {
-//            return TypeId(name.replace("?", ""))
-//        }
-//
-//
-//        @JvmName("buildTypeIdParams")
-//        fun build(name: String, typeParameters: List<TypeId>): TypeId {
-//            return build(name.replace("?", ""), typeParameters.map { it.id })
-//        }
-//
-//        @JvmName("buildTypeStringParams")
-//        fun build(name: String, typeParameters: List<String>): TypeId {
-//            var id = name.replace("?", "")
-//            if (typeParameters.isNotEmpty()) {
-//                id += "<${typeParameters.joinToString(",")}>"
-//            }
-//            return TypeId(id)
-//        }
-
     }
 
     fun full(): String {
@@ -135,6 +121,12 @@ class TypeId(
                 }
             }
     }
+
+    fun withoutAdditionId() = TypeId(
+        base = this.base,
+        typeParameters = this.typeParameters,
+        additionalId = null
+    )
 
     override fun equals(other: Any?): Boolean {
         if (other !is TypeId) return false

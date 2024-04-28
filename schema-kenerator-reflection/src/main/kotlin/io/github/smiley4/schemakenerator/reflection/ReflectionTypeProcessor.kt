@@ -440,7 +440,7 @@ class ReflectionTypeProcessor(
 
 
     private fun isEnum(clazz: KClass<*>): Boolean {
-        return clazz.java.enumConstants !== null
+        return clazz.java.enumConstants != null
     }
 
     private fun isCollection(clazz: KClass<*>): Boolean {
@@ -470,7 +470,7 @@ class ReflectionTypeProcessor(
     // ====== UTILS ====================================================
 
     private fun determineFunctionPropertyType(function: KFunction<*>): FunctionPropertyType {
-        if (function.returnType == Unit::class || function.parameters.any { it.name !== null }) {
+        if (function.returnType == Unit::class || function.parameters.any { it.name != null }) {
             return FunctionPropertyType.FUNCTION
         }
         if (function.name.startsWith("get") || function.name.startsWith("is")) {

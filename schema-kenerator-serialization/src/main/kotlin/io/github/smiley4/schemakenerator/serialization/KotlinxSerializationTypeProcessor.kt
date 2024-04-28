@@ -138,7 +138,7 @@ class KotlinxSerializationTypeProcessor {
     }
 
     private fun parseClass(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id = TypeId.build(descriptor.serialName)
+        val id = getUniqueId(descriptor, emptyList(), typeData) // generate unique for each object since generic types cannot be respected in id
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -163,9 +163,8 @@ class KotlinxSerializationTypeProcessor {
             ).also { typeData.add(it) }
     }
 
-
     private fun parseSealed(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id = TypeId.build(descriptor.serialName)
+        val id = getUniqueId(descriptor, emptyList(), typeData) // generate unique for each object since generic types cannot be respected in id
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -201,8 +200,16 @@ class KotlinxSerializationTypeProcessor {
             ).also { typeData.add(it) }
     }
 
+    private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {
+        return if (typeData.find(TypeId.build(descriptor.serialName, typeParameters)) != null) {
+            TypeId.build(descriptor.serialName, typeParameters, true)
+        } else {
+            TypeId.build(descriptor.serialName, typeParameters)
+        }
+    }
+
     private fun Collection<BaseTypeData>.find(id: TypeId): BaseTypeData? {
-        return this.find { it.id == id }
+        return this.find { it.id.full() == id.full() }
     }
 
 }

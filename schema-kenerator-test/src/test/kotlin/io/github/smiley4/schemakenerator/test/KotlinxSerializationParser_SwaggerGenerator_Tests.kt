@@ -325,11 +325,16 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
-                            "properties": {},
+                            "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<List>",
                             "exampleSetFlag": false
                         },
-                        "definitions": {}
+                        "definitions": {
+                            "kotlinx.serialization.Polymorphic<List>": {
+                                "type": "object",
+                                "properties": {},
+                                "exampleSetFlag": false
+                            }
+                        }
                     }
                 """.trimIndent(),
             ),
@@ -357,11 +362,16 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
-                            "properties": {},
+                            "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<Map>",
                             "exampleSetFlag": false
                         },
-                        "definitions": {}
+                        "definitions": {
+                            "kotlinx.serialization.Polymorphic<Map>": {
+                                "type": "object",
+                                "properties": {},
+                                "exampleSetFlag": false
+                            }
+                        }
                     }
                 """.trimIndent(),
             ),
@@ -432,7 +442,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields",
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields",
                             "exampleSetFlag": false
                         },
                         "definitions": {
@@ -488,7 +498,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum",
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum",
                             "exampleSetFlag": false
                         },
                         "definitions": {
@@ -641,11 +651,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false,
                             "anyOf": [
                                 {
-                                    "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
                                     "exampleSetFlag": false
                                 },
                                 {
-                                    "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB",
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB",
                                     "exampleSetFlag": false
                                 }
                             ]
@@ -695,7 +705,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass",
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass",
                             "exampleSetFlag": false
                         },
                         "definitions": {
@@ -703,11 +713,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "exampleSetFlag": false,
                                 "anyOf": [
                                     {
-                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
+                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
                                         "exampleSetFlag": false
                                     },
                                     {
-                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB",
+                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB",
                                         "exampleSetFlag": false
                                     }
                                 ]
@@ -805,7 +815,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
                             "exampleSetFlag": false
                         },
                         "definitions": {
