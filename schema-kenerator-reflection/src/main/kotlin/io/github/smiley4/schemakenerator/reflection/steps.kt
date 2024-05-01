@@ -10,8 +10,10 @@ import kotlin.reflect.KType
 /**
  * See [ReflectionAnnotationSubTypeStep]
  */
-fun Collection<KType>.collectSubTypes(): Collection<KType> {
-    return ReflectionAnnotationSubTypeStep().process(this)
+fun Collection<KType>.collectSubTypes(maxRecursionDepth: Int = 10): Collection<KType> {
+    return ReflectionAnnotationSubTypeStep(
+        maxRecursionDepth = maxRecursionDepth
+    ).process(this)
 }
 
 
