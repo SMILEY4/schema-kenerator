@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
-import io.github.smiley4.schemakenerator.reflection.ReflectionTypeProcessor
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.reflection.getKType
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
@@ -18,14 +18,14 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { ReflectionTypeProcessor(
+                .let { ReflectionTypeProcessingStep(
                     includeFunctions = false,
                     includeGetters = data.includeGetters,
                     includeWeakGetters = data.includeWeakGetters,
                     includeHidden = data.includeHidden
                 ).process(it) }
-                .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaCompiler().compileInlining(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
+                .let { JsonSchemaCompileStep().compileInlining(it) }
                 .first()
 
             ((schema.json as JsonObject).properties["properties"] as JsonObject).properties.keys shouldContainExactlyInAnyOrder data.expectedProperties

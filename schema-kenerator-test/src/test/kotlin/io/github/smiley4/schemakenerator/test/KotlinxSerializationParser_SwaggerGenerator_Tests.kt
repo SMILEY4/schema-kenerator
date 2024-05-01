@@ -3,11 +3,11 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeProcessor
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaAutoTitleAppender
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaCompiler
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaGenerator
-import io.github.smiley4.schemakenerator.swagger.modules.TitleType
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
@@ -34,20 +34,20 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
-                .let { SwaggerSchemaGenerator().generate(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompiler().compileInlining(it) }
+                .let { SwaggerSchemaCompileStep().compileInlining(it) }
                 .first()
 
-            json.writeValueAsString(schema.schema).shouldEqualJson {
+            json.writeValueAsString(schema.swagger).shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
                 arrayOrder = ArrayOrder.Lenient
                 fieldComparison = FieldComparison.Strict
@@ -62,22 +62,22 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
-                .let { SwaggerSchemaGenerator().generate(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompiler().compileReferencing(it) }
+                .let { SwaggerSchemaCompileStep().compileReferencing(it) }
                 .first()
                 .let {
                     Result(
-                        schema = it.schema,
-                        definitions = it.definitions.mapKeys { (k, _) -> k.full() }
+                        schema = it.swagger,
+                        definitions = it.componentSchemas.mapKeys { (k, _) -> k.full() }
                     )
                 }
 
@@ -96,22 +96,22 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
-                .let { SwaggerSchemaGenerator().generate(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompiler().compileReferencingRoot(it) }
+                .let { SwaggerSchemaCompileStep().compileReferencingRoot(it) }
                 .first()
                 .let {
                     Result(
-                        schema = it.schema,
-                        definitions = it.definitions.mapKeys { (k, _) -> k.full() }
+                        schema = it.swagger,
+                        definitions = it.componentSchemas.mapKeys { (k, _) -> k.full() }
                     )
                 }
 

@@ -1,13 +1,13 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaAutoTitleAppender
-import io.github.smiley4.schemakenerator.jsonschema.modules.TitleType
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.json.obj
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeProcessor
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
@@ -32,15 +32,15 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
                 .onEach { schema ->
                     if (schema.id.additionalId != null) {
                         additionalIds.add(schema.id.additionalId!!)
                     }
                 }
-                .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaAutoTitleAppender(TitleType.FULL).append(it) }
-                .let { JsonSchemaCompiler().compileInlining(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
+                .let { JsonSchemaAutoTitleStep(TitleType.FULL).process(it) }
+                .let { JsonSchemaCompileStep().compileInlining(it) }
                 .first()
 
             schema.json.prettyPrint()
@@ -68,15 +68,15 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
                 .onEach { schema ->
                     if (schema.id.additionalId != null) {
                         additionalIds.add(schema.id.additionalId!!)
                     }
                 }
-                .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
-                .let { JsonSchemaCompiler().compileInlining(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
+                .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                .let { JsonSchemaCompileStep().compileInlining(it) }
                 .first()
 
             schema.json.prettyPrint()
@@ -104,15 +104,15 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
                 .onEach { schema ->
                     if (schema.id.additionalId != null) {
                         additionalIds.add(schema.id.additionalId!!)
                     }
                 }
-                .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
-                .let { JsonSchemaCompiler(TitleType.SIMPLE).compileReferencingRoot(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
+                .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                .let { JsonSchemaCompileStep(TitleType.SIMPLE).compileReferencingRoot(it) }
                 .first()
                 .also {
                     if (it.definitions.isNotEmpty()) {

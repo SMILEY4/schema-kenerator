@@ -3,6 +3,9 @@ package io.github.smiley4.schemakenerator.core.data
 import kotlin.math.abs
 import kotlin.random.Random
 
+/**
+ * Identifier of a type
+ */
 class TypeId(
     val base: String,
     val typeParameters: List<TypeId>,
@@ -13,11 +16,7 @@ class TypeId(
 
         fun wildcard() = TypeId("*", emptyList(), null)
 
-        fun unknown() = TypeId("?", emptyList(), null)
-
         fun build(name: String) = TypeId(name, emptyList(), null)
-
-        fun build(name: String, withAdditionalId: Boolean = false) = TypeId(name, emptyList(), if (withAdditionalId) abs(Random.nextLong()).toString() else null)
 
         fun build(name: String, typeParameters: List<TypeId>, withAdditionalId: Boolean = false) = TypeId(name, typeParameters, if (withAdditionalId) abs(Random.nextLong()).toString() else null)
 
@@ -132,12 +131,6 @@ class TypeId(
         }
         return title
     }
-
-    fun withoutAdditionId() = TypeId(
-        base = this.base,
-        typeParameters = this.typeParameters,
-        additionalId = null
-    )
 
     override fun equals(other: Any?): Boolean {
         if (other !is TypeId) return false

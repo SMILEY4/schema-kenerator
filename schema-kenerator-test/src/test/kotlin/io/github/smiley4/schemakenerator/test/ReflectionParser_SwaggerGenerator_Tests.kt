@@ -2,13 +2,17 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.reflection.ReflectionTypeProcessor
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaAutoTitleAppender
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaCompiler
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaCoreAnnotationHandler
-import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaGenerator
-import io.github.smiley4.schemakenerator.swagger.modules.TitleType
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
@@ -36,16 +40,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { ReflectionTypeProcessor().process(it) }
-                .let { SwaggerSchemaGenerator().generate(it) }
+                .let { ReflectionTypeProcessingStep().process(it) }
+                .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAnnotations) {
                         list
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendTitle(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDescription(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDefaults(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendExamples(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
                     } else {
                         list
                     }
@@ -53,16 +57,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompiler().compileInlining(it) }
+                .let { SwaggerSchemaCompileStep().compileInlining(it) }
                 .first()
                 .let {
                     Result(
-                        schema = it.schema,
+                        schema = it.swagger,
                         definitions = emptyMap()
                     )
                 }
@@ -82,16 +86,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { ReflectionTypeProcessor().process(it) }
-                .let { SwaggerSchemaGenerator().generate(it) }
+                .let { ReflectionTypeProcessingStep().process(it) }
+                .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAnnotations) {
                         list
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendTitle(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDescription(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDefaults(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendExamples(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
                     } else {
                         list
                     }
@@ -99,17 +103,17 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompiler().compileReferencing(it) }
+                .let { SwaggerSchemaCompileStep().compileReferencing(it) }
                 .first()
                 .let {
                     Result(
-                        schema = it.schema,
-                        definitions = it.definitions.mapKeys { (k, _) -> k.full() }
+                        schema = it.swagger,
+                        definitions = it.componentSchemas.mapKeys { (k, _) -> k.full() }
                     )
                 }
 
@@ -128,16 +132,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { ReflectionTypeProcessor().process(it) }
-                .let { SwaggerSchemaGenerator().generate(it) }
+                .let { ReflectionTypeProcessingStep().process(it) }
+                .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAnnotations) {
                         list
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendTitle(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDescription(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDefaults(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendExamples(it) }
-                            .let { SwaggerSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
                     } else {
                         list
                     }
@@ -145,17 +149,17 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompiler().compileReferencingRoot(it) }
+                .let { SwaggerSchemaCompileStep().compileReferencingRoot(it) }
                 .first()
                 .let {
                     Result(
-                        schema = it.schema,
-                        definitions = it.definitions.mapKeys { (k, _) -> k.full() }
+                        schema = it.swagger,
+                        definitions = it.componentSchemas.mapKeys { (k, _) -> k.full() }
                     )
                 }
 

@@ -1,13 +1,13 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
-import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.json.obj
-import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaAutoTitleAppender
-import io.github.smiley4.schemakenerator.jsonschema.modules.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeProcessor
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
@@ -34,17 +34,17 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
-                .let { JsonSchemaGenerator().generate(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompiler().compileInlining(it) }
+                .let { JsonSchemaCompileStep().compileInlining(it) }
                 .first()
 
             schema.json.prettyPrint().shouldEqualJson {
@@ -65,22 +65,22 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
                 .onEach { schema ->
                     if (schema.id.additionalId != null) {
                         additionalIds.add(schema.id.additionalId!!)
                     }
                 }
-                .let { JsonSchemaGenerator().generate(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompiler().compileReferencing(it) }
+                .let { JsonSchemaCompileStep().compileReferencing(it) }
                 .first()
                 .also {
                     if (it.definitions.isNotEmpty()) {
@@ -118,22 +118,22 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = listOf(data.type)
-                .let { KotlinxSerializationTypeProcessor().process(it) }
+                .let { KotlinxSerializationTypeProcessingStep().process(it) }
                 .onEach { schema ->
                     if (schema.id.additionalId != null) {
                         additionalIds.add(schema.id.additionalId!!)
                     }
                 }
-                .let { JsonSchemaGenerator().generate(it) }
+                .let { JsonSchemaGenerationStep().generate(it) }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompiler().compileReferencingRoot(it) }
+                .let { JsonSchemaCompileStep().compileReferencingRoot(it) }
                 .first()
                 .also {
                     if (it.definitions.isNotEmpty()) {
