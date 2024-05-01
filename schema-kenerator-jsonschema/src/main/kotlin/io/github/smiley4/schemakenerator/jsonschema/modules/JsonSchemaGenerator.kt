@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.jsonschema
+package io.github.smiley4.schemakenerator.jsonschema.modules
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
@@ -37,13 +37,13 @@ class JsonSchemaGenerator {
             is WildcardTypeData -> buildAnySchema()
             else -> JsonSchema(
                 json = schema.nullSchema(),
-                typeId = TypeId.unknown()
+                typeData = WildcardTypeData()
             )
         }
     }
 
     private fun buildAnySchema(): JsonSchema {
-        return JsonSchema(schema.anyObjectSchema(), TypeId.wildcard())
+        return JsonSchema(schema.anyObjectSchema(), WildcardTypeData())
     }
 
     private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): JsonSchema {
@@ -118,7 +118,7 @@ class JsonSchemaGenerator {
         }.let {
             JsonSchema(
                 json = it,
-                typeId = typeData.id
+                typeData = typeData
             )
         }
     }
@@ -126,21 +126,21 @@ class JsonSchemaGenerator {
     private fun buildEnumSchema(typeData: EnumTypeData): JsonSchema {
         return JsonSchema(
             json = schema.enumSchema(typeData.enumConstants),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
     private fun buildCollectionSchema(typeData: CollectionTypeData): JsonSchema {
         return JsonSchema(
             json = schema.arraySchema(schema.referenceSchema(typeData.itemType.type)),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
     private fun buildMapSchema(typeData: MapTypeData): JsonSchema {
         return JsonSchema(
             json = schema.mapObjectSchema(schema.referenceSchema(typeData.valueType.type)),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
@@ -149,7 +149,7 @@ class JsonSchemaGenerator {
             json = schema.subtypesSchema(
                 typeData.subtypes.map { schema.referenceSchema(it.full()) }
             ),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
     
@@ -167,7 +167,7 @@ class JsonSchemaGenerator {
 
         return JsonSchema(
             json = schema.objectSchema(propertySchemas, requiredProperties),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 

@@ -1,10 +1,10 @@
-package io.github.smiley4.schemakenerator.jsonschema
+package io.github.smiley4.schemakenerator.jsonschema.modules
 
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.schema.JsonSchema
 
-class JsonSchemaTitleAppender(val type: TitleType = TitleType.FULL) {
+class JsonSchemaAutoTitleAppender(val type: TitleType = TitleType.FULL) {
 
     fun append(schemas: Collection<JsonSchema>): List<JsonSchema> {
         schemas.forEach { append(it) }
@@ -19,8 +19,8 @@ class JsonSchemaTitleAppender(val type: TitleType = TitleType.FULL) {
 
     private fun determineTitle(schema: JsonSchema): String {
         return when (type) {
-            TitleType.FULL -> schema.typeId.full()
-            TitleType.SIMPLE -> schema.typeId.simple()
+            TitleType.FULL -> schema.typeData.id.full()
+            TitleType.SIMPLE -> schema.typeData.id.simple()
         }
     }
 

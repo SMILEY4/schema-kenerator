@@ -1,14 +1,19 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaAutoTitleAppender
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCoreAnnotationHandler
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
+import io.github.smiley4.schemakenerator.jsonschema.modules.TitleType
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeProcessor
 import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields
+import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SubClassA
 import io.github.smiley4.schemakenerator.test.models.reflection.TestEnum
@@ -32,6 +37,26 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { ReflectionTypeProcessor().process(it) }
                 .let { JsonSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { JsonSchemaCoreAnnotationHandler().appendTitle(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDescription(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDefaults(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendExamples(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                    } else {
+                        list
+                    }
+                }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { JsonSchemaCompiler().compileInlining(it) }
                 .first()
 
@@ -53,6 +78,26 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { ReflectionTypeProcessor().process(it) }
                 .let { JsonSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { JsonSchemaCoreAnnotationHandler().appendTitle(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDescription(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDefaults(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendExamples(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                    } else {
+                        list
+                    }
+                }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { JsonSchemaCompiler().compileReferencing(it) }
                 .first()
                 .also {
@@ -83,6 +128,26 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { ReflectionTypeProcessor().process(it) }
                 .let { JsonSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { JsonSchemaCoreAnnotationHandler().appendTitle(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDescription(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDefaults(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendExamples(it) }
+                            .let { JsonSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                    } else {
+                        list
+                    }
+                }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { JsonSchemaCompiler().compileReferencingRoot(it) }
                 .first()
                 .also {
@@ -113,6 +178,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val withAnnotations: Boolean = false,
+            val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
             val expectedResultReferencingRoot: String,
@@ -758,78 +825,78 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            TestData(
-//                type = getKType<CoreAnnotatedClass>(),
-//                testName = "annotated class (core)",
-//                generatorModules = listOf(CoreAnnotationsModule()),
-//                expectedResultInlining = """
-//                    {
-//                        "type": "object",
-//                        "required": ["value"],
-//                        "properties": {
-//                            "value": {
-//                                "type": "string",
-//                                "description": "field description"
-//                            }
-//                        },
-//                        "title": "Annotated Class",
-//                        "description": "some description",
-//                        "default": "default value",
-//                        "examples": [
-//                            "example 1",
-//                            "example 2"
-//                        ],
-//                        "deprecated": true
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "type": "object",
-//                        "required": ["value"],
-//                        "properties": {
-//                            "value": {
-//                                "type": "string",
-//                                "description": "field description"
-//                            }
-//                        },
-//                        "title": "Annotated Class",
-//                        "description": "some description",
-//                        "default": "default value",
-//                        "examples": [
-//                            "example 1",
-//                            "example 2"
-//                        ],
-//                        "deprecated": true
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "${'$'}ref": "#/definitions/CoreAnnotatedClass",
-//                        "definitions": {
-//                            "CoreAnnotatedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "value"
-//                                ],
-//                                "properties": {
-//                                    "value": {
-//                                        "type": "string",
-//                                        "description": "field description"
-//                                    }
-//                                },
-//                                "title": "Annotated Class",
-//                                "description": "some description",
-//                                "default": "default value",
-//                                "examples": [
-//                                    "example 1",
-//                                    "example 2"
-//                                ],
-//                                "deprecated": true
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = getKType<CoreAnnotatedClass>(),
+                testName = "annotated class (core)",
+                withAnnotations = true,
+                expectedResultInlining = """
+                    {
+                        "type": "object",
+                        "required": ["value"],
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "description": "field description"
+                            }
+                        },
+                        "title": "Annotated Class",
+                        "description": "some description",
+                        "default": "default value",
+                        "examples": [
+                            "example 1",
+                            "example 2"
+                        ],
+                        "deprecated": true
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "type": "object",
+                        "required": ["value"],
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "description": "field description"
+                            }
+                        },
+                        "title": "Annotated Class",
+                        "description": "some description",
+                        "default": "default value",
+                        "examples": [
+                            "example 1",
+                            "example 2"
+                        ],
+                        "deprecated": true
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass",
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass": {
+                                "type": "object",
+                                "required": [
+                                    "value"
+                                ],
+                                "properties": {
+                                    "value": {
+                                        "type": "string",
+                                        "description": "field description"
+                                    }
+                                },
+                                "title": "Annotated Class",
+                                "description": "some description",
+                                "default": "default value",
+                                "examples": [
+                                    "example 1",
+                                    "example 2"
+                                ],
+                                "deprecated": true
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
 //            TestData(
 //                type = getKType<ClassWithLocalDateTime>(),
 //                testName = "class with java local-date-time and custom parser",
@@ -888,98 +955,96 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
 //                    }
 //                """.trimIndent(),
 //            ),
-//            TestData(
-//                type = getKType<ClassWithNestedClass>(),
-//                testName = "auto title",
-//                generatorModules = listOf(
-//                    AutoTitleModule(type = AutoTitleType.SIMPLE_NAME)
-//                ),
-//                expectedResultInlining = """
-//                    {
-//                        "type": "object",
-//                        "required": [
-//                            "nested"
-//                        ],
-//                        "properties": {
-//                            "nested": {
-//                                "type": "object",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "properties": {
-//                                    "text": {
-//                                        "type": "string",
-//                                        "title": "String"
-//                                    }
-//                                },
-//                                "title": "NestedClass"
-//                            }
-//                        },
-//                        "title": "ClassWithNestedClass"
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "type": "object",
-//                        "required": [
-//                            "nested"
-//                        ],
-//                        "properties": {
-//                            "nested": {
-//                                "${'$'}ref": "#/definitions/NestedClass"
-//                            }
-//                        },
-//                        "title": "ClassWithNestedClass",
-//                        "definitions": {
-//                            "NestedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "properties": {
-//                                    "text": {
-//                                        "type": "string",
-//                                        "title": "String"
-//                                    }
-//                                },
-//                                "title": "NestedClass"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "${'$'}ref": "#/definitions/ClassWithNestedClass",
-//                        "definitions": {
-//                            "NestedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "properties": {
-//                                    "text": {
-//                                        "type": "string",
-//                                        "title": "String"
-//                                    }
-//                                },
-//                                "title": "NestedClass"
-//                            },
-//                            "ClassWithNestedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "nested"
-//                                ],
-//                                "properties": {
-//                                    "nested": {
-//                                        "${'$'}ref": "#/definitions/NestedClass"
-//                                    }
-//                                },
-//                                "title": "ClassWithNestedClass"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = getKType<ClassWithNestedClass>(),
+                testName = "auto title",
+                withAutoTitle = true,
+                expectedResultInlining = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "nested"
+                        ],
+                        "properties": {
+                            "nested": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedClass"
+                            }
+                        },
+                        "title": "ClassWithNestedClass"
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "nested"
+                        ],
+                        "properties": {
+                            "nested": {
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass"
+                            }
+                        },
+                        "title": "ClassWithNestedClass",
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedClass"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass",
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedClass"
+                            },
+                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "nested"
+                                ],
+                                "properties": {
+                                    "nested": {
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass"
+                                    }
+                                },
+                                "title": "ClassWithNestedClass"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
         )
 
     }

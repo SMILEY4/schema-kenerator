@@ -279,12 +279,12 @@ class ReflectionTypeProcessor(
 
     private fun filterMember(member: KCallable<*>): Boolean {
         val visibility = determinePropertyVisibility(member)
-        when(visibility) {
+        when (visibility) {
             Visibility.PUBLIC -> Unit
-            Visibility.HIDDEN -> if(!includeHidden) return false
+            Visibility.HIDDEN -> if (!includeHidden) return false
         }
         if (member is KFunction<*>) {
-            return when(determineFunctionPropertyType(member)) {
+            return when (determineFunctionPropertyType(member)) {
                 FunctionPropertyType.GETTER -> includeGetters
                 FunctionPropertyType.WEAK_GETTER -> includeWeakGetters
                 FunctionPropertyType.FUNCTION -> includeFunctions
@@ -349,7 +349,9 @@ class ReflectionTypeProcessor(
         resolvedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
     ): List<BaseTypeData> {
-        return clazz.supertypes.map { resolveSupertype(it, resolvedTypeParameters, typeData) }
+        return clazz.supertypes
+            .filter { it.classifier != Any::class }
+            .map { resolveSupertype(it, resolvedTypeParameters, typeData) }
     }
 
     private fun resolveSupertype(

@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeProcessor
 import io.github.smiley4.schemakenerator.reflection.getKType

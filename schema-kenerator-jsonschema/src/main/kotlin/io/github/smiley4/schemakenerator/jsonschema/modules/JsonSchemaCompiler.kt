@@ -1,6 +1,7 @@
-package io.github.smiley4.schemakenerator.jsonschema
+package io.github.smiley4.schemakenerator.jsonschema.modules
 
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
@@ -23,7 +24,7 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
         return schemas.map { schema ->
             JsonSchema(
                 json = inlineReferences(schema.json, schemas),
-                typeId = schema.typeId
+                typeData = schema.typeData
             )
         }
     }
@@ -32,7 +33,7 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
         return schemas.map { schema ->
             val result = referenceDefinitionsReferences(schema.json, schemas)
             JsonSchemaWithDefinitions(
-                typeId = schema.typeId,
+                typeData = schema.typeData,
                 json = result.json,
                 definitions = result.definitions
             )
@@ -43,11 +44,11 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
         return compileReferencing(schemas).map {
             if (shouldReference(it.json)) {
                 JsonSchemaWithDefinitions(
-                    typeId = it.typeId,
-                    json = schema.referenceSchema(getRefPath(it.typeId), true),
+                    typeData = it.typeData,
+                    json = schema.referenceSchema(getRefPath(it.typeData.id), true),
                     definitions = buildMap {
                         this.putAll(it.definitions)
-                        this[it.typeId] = it.json
+                        this[it.typeData.id] = it.json
                     }
                 )
             } else {
@@ -59,8 +60,15 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
     private fun inlineReferences(node: JsonNode, schemaList: Collection<JsonSchema>): JsonNode {
         return replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
-            val referencedSchema = schemaList.find { it.typeId == referencedId }!!
-            inlineReferences(referencedSchema.json, schemaList)
+            val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
+            inlineReferences(referencedSchema.json, schemaList).also {
+                if(it is JsonObject) {
+                    it.properties.putAll(buildMap {
+                        this.putAll(refObj.properties)
+                        this.remove("\$ref")
+                    })
+                }
+            }
         }
     }
 
@@ -68,8 +76,15 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
         val definitions = mutableMapOf<TypeId, JsonNode>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
-            val referencedSchema = schemaList.find { it.typeId == referencedId }!!
-            val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.json, schemaList)
+            val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
+            val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.json, schemaList).also {
+                if(it.json is JsonObject) {
+                    it.json.properties.putAll(buildMap {
+                        this.putAll(refObj.properties)
+                        this.remove("\$ref")
+                    })
+                }
+            }
             if (shouldReference(referencedSchema.json)) {
                 definitions[referencedId] = procReferencedSchema.json
                 definitions.putAll(procReferencedSchema.definitions)
@@ -80,7 +95,7 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
             }
         }
         return JsonSchemaWithDefinitions(
-            typeId = TypeId.unknown(),
+            typeData = WildcardTypeData(),
             json = json,
             definitions = definitions
         )
@@ -119,7 +134,7 @@ class JsonSchemaCompiler(val pathType: TitleType = TitleType.FULL) {
     }
 
     private fun replaceReferences(node: JsonNode, mapping: (refObj: JsonObject) -> JsonNode): JsonNode {
-        if (node is JsonObject && node.properties.size == 1 && node.properties["\$ref"] != null) {
+        if (node is JsonObject && node.properties.containsKey("\$ref")) {
             return mapping(node)
         } else {
             return when (node) {

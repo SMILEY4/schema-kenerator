@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.ReflectionTypeProcessor
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompiler
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerator
+import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaAutoTitleAppender
+import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaCompiler
+import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaCoreAnnotationHandler
+import io.github.smiley4.schemakenerator.swagger.modules.SwaggerSchemaGenerator
+import io.github.smiley4.schemakenerator.swagger.modules.TitleType
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields
+import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SubClassA
 import io.github.smiley4.schemakenerator.test.models.reflection.TestEnum
@@ -33,6 +38,26 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { ReflectionTypeProcessor().process(it) }
                 .let { SwaggerSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendTitle(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDescription(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDefaults(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendExamples(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                    } else {
+                        list
+                    }
+                }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { SwaggerSchemaCompiler().compileInlining(it) }
                 .first()
                 .let {
@@ -59,6 +84,26 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { ReflectionTypeProcessor().process(it) }
                 .let { SwaggerSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendTitle(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDescription(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDefaults(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendExamples(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                    } else {
+                        list
+                    }
+                }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { SwaggerSchemaCompiler().compileReferencing(it) }
                 .first()
                 .let {
@@ -85,6 +130,26 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { ReflectionTypeProcessor().process(it) }
                 .let { SwaggerSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendTitle(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDescription(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDefaults(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendExamples(it) }
+                            .let { SwaggerSchemaCoreAnnotationHandler().appendDeprecated(it) }
+                    } else {
+                        list
+                    }
+                }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { SwaggerSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { SwaggerSchemaCompiler().compileReferencingRoot(it) }
                 .first()
                 .let {
@@ -119,6 +184,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val withAnnotations: Boolean = false,
+            val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
             val expectedResultReferencingRoot: String,
@@ -1007,97 +1074,97 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            TestData(
-//                type = getKType<CoreAnnotatedClass>(),
-//                testName = "annotated class (core)",
-//                generatorModules = listOf(CoreAnnotationsModule()),
-//                expectedResultInlining = """
-//                    {
-//                        "schema": {
-//                            "title": "Annotated Class",
-//                            "required": [
-//                                "value"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "value": {
-//                                    "type": "string",
-//                                    "description": "field description",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "description": "some description",
-//                            "deprecated": true,
-//                            "exampleSetFlag": false,
-//                            "examples": [
-//                                "example 1",
-//                                "example 2"
-//                            ],
-//                            "default": "default value"
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "schema": {
-//                            "title": "Annotated Class",
-//                            "required": [
-//                                "value"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "value": {
-//                                    "type": "string",
-//                                    "description": "field description",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "description": "some description",
-//                            "deprecated": true,
-//                            "exampleSetFlag": false,
-//                            "examples": [
-//                                "example 1",
-//                                "example 2"
-//                            ],
-//                            "default": "default value"
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "schema": {
-//                            "${'$'}ref": "#/definitions/CoreAnnotatedClass",
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {
-//                            "CoreAnnotatedClass": {
-//                                "title": "Annotated Class",
-//                                "required": [
-//                                    "value"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "value": {
-//                                        "type": "string",
-//                                        "description": "field description",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "description": "some description",
-//                                "deprecated": true,
-//                                "exampleSetFlag": false,
-//                                "examples": [
-//                                    "example 1",
-//                                    "example 2"
-//                                ],
-//                                "default": "default value"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = getKType<CoreAnnotatedClass>(),
+                testName = "annotated class (core)",
+                withAnnotations = true,
+                expectedResultInlining = """
+                    {
+                        "schema": {
+                            "title": "Annotated Class",
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "string",
+                                    "description": "field description",
+                                    "exampleSetFlag": false
+                                }
+                            },
+                            "description": "some description",
+                            "deprecated": true,
+                            "exampleSetFlag": false,
+                            "examples": [
+                                "example 1",
+                                "example 2"
+                            ],
+                            "default": "default value"
+                        },
+                        "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "schema": {
+                            "title": "Annotated Class",
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "string",
+                                    "description": "field description",
+                                    "exampleSetFlag": false
+                                }
+                            },
+                            "description": "some description",
+                            "deprecated": true,
+                            "exampleSetFlag": false,
+                            "examples": [
+                                "example 1",
+                                "example 2"
+                            ],
+                            "default": "default value"
+                        },
+                        "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "schema": {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass",
+                            "exampleSetFlag": false
+                        },
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass": {
+                                "title": "Annotated Class",
+                                "required": [
+                                    "value"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "value": {
+                                        "type": "string",
+                                        "description": "field description",
+                                        "exampleSetFlag": false
+                                    }
+                                },
+                                "description": "some description",
+                                "deprecated": true,
+                                "exampleSetFlag": false,
+                                "examples": [
+                                    "example 1",
+                                    "example 2"
+                                ],
+                                "default": "default value"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
 //            TestData(
 //                type = getKType<ClassWithLocalDateTime>(),
 //                testName = "class with java local-date-time and custom parser",
@@ -1171,117 +1238,115 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
 //                    }
 //                """.trimIndent(),
 //            ),
-//            TestData(
-//                type = getKType<ClassWithNestedClass>(),
-//                testName = "auto title",
-//                generatorModules = listOf(
-//                    AutoTitleModule(type = AutoTitleModule.Companion.AutoTitleType.SIMPLE_NAME)
-//                ),
-//                expectedResultInlining = """
-//                    {
-//                        "schema": {
-//                            "title": "ClassWithNestedClass",
-//                            "required": [
-//                                "nested"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "nested": {
-//                                    "title": "NestedClass",
-//                                    "required": [
-//                                        "text"
-//                                    ],
-//                                    "type": "object",
-//                                    "properties": {
-//                                        "text": {
-//                                            "title": "String",
-//                                            "type": "string",
-//                                            "exampleSetFlag": false
-//                                        }
-//                                    },
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "schema": {
-//                            "title": "ClassWithNestedClass",
-//                            "required": [
-//                                "nested"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "nested": {
-//                                    "${'$'}ref": "#/definitions/NestedClass",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {
-//                            "NestedClass": {
-//                                "title": "NestedClass",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "text": {
-//                                        "title": "String",
-//                                        "type": "string",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "exampleSetFlag": false
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "schema": {
-//                            "${'$'}ref": "#/definitions/ClassWithNestedClass",
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {
-//                            "NestedClass": {
-//                                "title": "NestedClass",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "text": {
-//                                        "title": "String",
-//                                        "type": "string",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "exampleSetFlag": false
-//                            },
-//                            "ClassWithNestedClass": {
-//                                "title": "ClassWithNestedClass",
-//                                "required": [
-//                                    "nested"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "nested": {
-//                                        "${'$'}ref": "#/definitions/NestedClass",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "exampleSetFlag": false
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = getKType<ClassWithNestedClass>(),
+                testName = "auto title",
+                withAutoTitle = true,
+                expectedResultInlining = """
+                    {
+                        "schema": {
+                            "title": "ClassWithNestedClass",
+                            "required": [
+                                "nested"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "nested": {
+                                    "title": "NestedClass",
+                                    "required": [
+                                        "text"
+                                    ],
+                                    "type": "object",
+                                    "properties": {
+                                        "text": {
+                                            "title": "String",
+                                            "type": "string",
+                                            "exampleSetFlag": false
+                                        }
+                                    },
+                                    "exampleSetFlag": false
+                                }
+                            },
+                            "exampleSetFlag": false
+                        },
+                        "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "schema": {
+                            "title": "ClassWithNestedClass",
+                            "required": [
+                                "nested"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "nested": {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass",
+                                    "exampleSetFlag": false
+                                }
+                            },
+                            "exampleSetFlag": false
+                        },
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass": {
+                                "title": "NestedClass",
+                                "required": [
+                                    "text"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "text": {
+                                        "title": "String",
+                                        "type": "string",
+                                        "exampleSetFlag": false
+                                    }
+                                },
+                                "exampleSetFlag": false
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "schema": {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass",
+                            "exampleSetFlag": false
+                        },
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass": {
+                                "title": "NestedClass",
+                                "required": [
+                                    "text"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "text": {
+                                        "title": "String",
+                                        "type": "string",
+                                        "exampleSetFlag": false
+                                    }
+                                },
+                                "exampleSetFlag": false
+                            },
+                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass": {
+                                "title": "ClassWithNestedClass",
+                                "required": [
+                                    "nested"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "nested": {
+                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass",
+                                        "exampleSetFlag": false
+                                    }
+                                },
+                                "exampleSetFlag": false
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
         )
 
     }

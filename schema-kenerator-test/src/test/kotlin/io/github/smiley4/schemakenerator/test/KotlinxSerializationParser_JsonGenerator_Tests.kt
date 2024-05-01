@@ -1,14 +1,17 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaAutoTitleAppender
+import io.github.smiley4.schemakenerator.jsonschema.modules.TitleType
 import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.serialization.KotlinxSerializationTypeProcessor
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
@@ -33,6 +36,14 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val schema = listOf(data.type)
                 .let { KotlinxSerializationTypeProcessor().process(it) }
                 .let { JsonSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { JsonSchemaCompiler().compileInlining(it) }
                 .first()
 
@@ -61,6 +72,14 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { JsonSchemaCompiler().compileReferencing(it) }
                 .first()
                 .also {
@@ -106,6 +125,14 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerator().generate(it) }
+                .let { list ->
+                    if (data.withAutoTitle) {
+                        list
+                            .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { JsonSchemaCompiler().compileReferencingRoot(it) }
                 .first()
                 .also {
@@ -145,6 +172,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
             val expectedResultReferencingRoot: String,
@@ -889,98 +917,96 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 //                    }
 //                """.trimIndent(),
 //            ),
-//            TestData(
-//                type = getKType<ClassWithNestedClass>(),
-//                testName = "auto title",
-//                generatorModules = listOf(
-//                    AutoTitleModule(type = AutoTitleType.SIMPLE_NAME)
-//                ),
-//                expectedResultInlining = """
-//                    {
-//                        "type": "object",
-//                        "required": [
-//                            "nested"
-//                        ],
-//                        "properties": {
-//                            "nested": {
-//                                "type": "object",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "properties": {
-//                                    "text": {
-//                                        "type": "string",
-//                                        "title": "String"
-//                                    }
-//                                },
-//                                "title": "NestedClass"
-//                            }
-//                        },
-//                        "title": "ClassWithNestedClass"
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "type": "object",
-//                        "required": [
-//                            "nested"
-//                        ],
-//                        "properties": {
-//                            "nested": {
-//                                "${'$'}ref": "#/definitions/NestedClass"
-//                            }
-//                        },
-//                        "title": "ClassWithNestedClass",
-//                        "definitions": {
-//                            "NestedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "properties": {
-//                                    "text": {
-//                                        "type": "string",
-//                                        "title": "String"
-//                                    }
-//                                },
-//                                "title": "NestedClass"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "${'$'}ref": "#/definitions/ClassWithNestedClass",
-//                        "definitions": {
-//                            "NestedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "text"
-//                                ],
-//                                "properties": {
-//                                    "text": {
-//                                        "type": "string",
-//                                        "title": "String"
-//                                    }
-//                                },
-//                                "title": "NestedClass"
-//                            },
-//                            "ClassWithNestedClass": {
-//                                "type": "object",
-//                                "required": [
-//                                    "nested"
-//                                ],
-//                                "properties": {
-//                                    "nested": {
-//                                        "${'$'}ref": "#/definitions/NestedClass"
-//                                    }
-//                                },
-//                                "title": "ClassWithNestedClass"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = getKType<ClassWithNestedClass>(),
+                testName = "auto title",
+                withAutoTitle = true,
+                expectedResultInlining = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "nested"
+                        ],
+                        "properties": {
+                            "nested": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedClass"
+                            }
+                        },
+                        "title": "ClassWithNestedClass"
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "nested"
+                        ],
+                        "properties": {
+                            "nested": {
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass"
+                            }
+                        },
+                        "title": "ClassWithNestedClass",
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedClass"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass",
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedClass"
+                            },
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass": {
+                                "type": "object",
+                                "required": [
+                                    "nested"
+                                ],
+                                "properties": {
+                                    "nested": {
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass"
+                                    }
+                                },
+                                "title": "ClassWithNestedClass"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
         )
 
     }

@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.swagger
+package io.github.smiley4.schemakenerator.swagger.modules
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
@@ -7,7 +7,6 @@ import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.schema.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.schema.SwaggerSchemaUtils
@@ -38,13 +37,13 @@ class SwaggerSchemaGenerator {
             is WildcardTypeData -> buildAnySchema()
             else -> SwaggerSchema(
                 schema = schema.nullSchema(),
-                typeId = TypeId.unknown()
+                typeData = WildcardTypeData()
             )
         }
     }
 
     private fun buildAnySchema(): SwaggerSchema {
-        return SwaggerSchema(schema.anyObjectSchema(), TypeId.wildcard())
+        return SwaggerSchema(schema.anyObjectSchema(), WildcardTypeData())
     }
 
     private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): SwaggerSchema {
@@ -95,7 +94,7 @@ class SwaggerSchemaGenerator {
         }.let {
             SwaggerSchema(
                 schema = it,
-                typeId = typeData.id
+                typeData = typeData
             )
         }
     }
@@ -103,21 +102,21 @@ class SwaggerSchemaGenerator {
     private fun buildEnumSchema(typeData: EnumTypeData): SwaggerSchema {
         return SwaggerSchema(
             schema = schema.enumSchema(typeData.enumConstants),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
     private fun buildCollectionSchema(typeData: CollectionTypeData): SwaggerSchema {
         return SwaggerSchema(
             schema = schema.arraySchema(schema.referenceSchema(typeData.itemType.type)),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
     private fun buildMapSchema(typeData: MapTypeData): SwaggerSchema {
         return SwaggerSchema(
             schema = schema.mapObjectSchema(schema.referenceSchema(typeData.valueType.type)),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
@@ -126,12 +125,12 @@ class SwaggerSchemaGenerator {
             schema = schema.subtypesSchema(
                 typeData.subtypes.map { schema.referenceSchema(it.full()) }
             ),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
-    
+
     private fun buildObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
-        
+
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, Schema<*>>()
 
@@ -144,7 +143,7 @@ class SwaggerSchemaGenerator {
 
         return SwaggerSchema(
             schema = schema.objectSchema(propertySchemas, requiredProperties),
-            typeId = typeData.id
+            typeData = typeData
         )
     }
 
@@ -159,5 +158,5 @@ class SwaggerSchemaGenerator {
             }
         }
     }
-    
+
 }

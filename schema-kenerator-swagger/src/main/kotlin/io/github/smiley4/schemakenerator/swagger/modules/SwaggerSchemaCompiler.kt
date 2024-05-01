@@ -1,6 +1,7 @@
-package io.github.smiley4.schemakenerator.swagger
+package io.github.smiley4.schemakenerator.swagger.modules
 
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.schema.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.schema.SwaggerSchemaUtils
 import io.github.smiley4.schemakenerator.swagger.schema.SwaggerSchemaWithDefinitions
@@ -17,7 +18,7 @@ class SwaggerSchemaCompiler {
         return schemas.map { schema ->
             SwaggerSchema(
                 schema = inlineReferences(schema.schema, schemas),
-                typeId = schema.typeId
+                typeData = schema.typeData
             )
         }
     }
@@ -26,7 +27,7 @@ class SwaggerSchemaCompiler {
         return schemas.map { schema ->
             val result = referenceDefinitionsReferences(schema.schema, schemas)
             SwaggerSchemaWithDefinitions(
-                typeId = schema.typeId,
+                typeData = schema.typeData,
                 schema = result.schema,
                 definitions = result.definitions
             )
@@ -37,11 +38,11 @@ class SwaggerSchemaCompiler {
         return compileReferencing(schemas).map {
             if (shouldReference(it.schema)) {
                 SwaggerSchemaWithDefinitions(
-                    typeId = it.typeId,
-                    schema = schema.referenceSchema(it.typeId, true),
+                    typeData = it.typeData,
+                    schema = schema.referenceSchema(it.typeData.id, true),
                     definitions = buildMap {
                         this.putAll(it.definitions)
-                        this[it.typeId] = it.schema
+                        this[it.typeData.id] = it.schema
                     }
                 )
             } else {
@@ -53,17 +54,22 @@ class SwaggerSchemaCompiler {
     private fun inlineReferences(node: Schema<*>, schemaList: Collection<SwaggerSchema>): Schema<*> {
         return replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`)
-            val referencedSchema = schemaList.find { it.typeId == referencedId }!!
-            inlineReferences(referencedSchema.schema, schemaList)
+            val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
+            inlineReferences(referencedSchema.schema, schemaList).also {
+                mergeInto(refObj, it)
+            }
         }
     }
+
 
     private fun referenceDefinitionsReferences(node: Schema<*>, schemaList: Collection<SwaggerSchema>): SwaggerSchemaWithDefinitions {
         val definitions = mutableMapOf<TypeId, Schema<*>>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`)
-            val referencedSchema = schemaList.find { it.typeId == referencedId }!!
-            val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.schema, schemaList)
+            val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
+            val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.schema, schemaList).also {
+                mergeInto(refObj, it.schema)
+            }
             if (shouldReference(referencedSchema.schema)) {
                 definitions[referencedId] = procReferencedSchema.schema
                 definitions.putAll(procReferencedSchema.definitions)
@@ -74,10 +80,45 @@ class SwaggerSchemaCompiler {
             }
         }
         return SwaggerSchemaWithDefinitions(
-            typeId = TypeId.unknown(),
+            typeData = WildcardTypeData(),
             schema = json,
             definitions = definitions
         )
+    }
+
+    private fun mergeInto(other: Schema<*>, dst: Schema<*>) {
+        other.default?.also { dst.setDefault(it) }
+        other.title?.also { dst.title = it }
+        other.maximum?.also { dst.maximum = it }
+        other.exclusiveMaximum?.also { dst.exclusiveMaximum = it }
+        other.minimum?.also { dst.minimum = it }
+        other.exclusiveMinimum?.also { dst.exclusiveMinimum = it }
+        other.maxLength?.also { dst.maxLength = it }
+        other.minLength?.also { dst.minLength = it }
+        other.pattern?.also { dst.pattern = it }
+        other.maxItems?.also { dst.maxItems = it }
+        other.minItems?.also { dst.minItems = it }
+        other.uniqueItems?.also { dst.uniqueItems = it }
+        other.maxProperties?.also { dst.maxProperties = it }
+        other.minProperties?.also { dst.minProperties = it }
+        other.required?.also { dst.required = it }
+        other.type?.also { dst.type = it }
+        other.not?.also { dst.not = it }
+        other.description?.also { dst.description = it }
+        other.format?.also { dst.format = it }
+        other.nullable?.also { dst.nullable = it }
+        other.readOnly?.also { dst.readOnly = it }
+        other.writeOnly?.also { dst.writeOnly = it }
+        other.example?.also { dst.example = it }
+        other.externalDocs?.also { dst.externalDocs = it }
+        other.deprecated?.also { dst.deprecated = it }
+        other.specVersion?.also { dst.specVersion = it }
+        other.exclusiveMaximumValue?.also { dst.exclusiveMaximumValue = it }
+        other.exclusiveMinimumValue?.also { dst.exclusiveMinimumValue = it }
+        other.contains?.also { dst.contains = it }
+        other.maxContains?.also { dst.maxContains = it }
+        other.minContains?.also { dst.minContains = it }
+        other.examples?.also { dst.examples = it }
     }
 
     private fun shouldReference(schema: Schema<*>): Boolean {

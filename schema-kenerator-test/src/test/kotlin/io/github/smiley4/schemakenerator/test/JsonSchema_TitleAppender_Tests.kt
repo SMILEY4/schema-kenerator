@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompiler
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerator
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaTitleAppender
-import io.github.smiley4.schemakenerator.jsonschema.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaCompiler
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaGenerator
+import io.github.smiley4.schemakenerator.jsonschema.modules.JsonSchemaAutoTitleAppender
+import io.github.smiley4.schemakenerator.jsonschema.modules.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.json.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.json.obj
 import io.github.smiley4.schemakenerator.reflection.getKType
@@ -39,7 +39,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaTitleAppender(TitleType.FULL).append(it) }
+                .let { JsonSchemaAutoTitleAppender(TitleType.FULL).append(it) }
                 .let { JsonSchemaCompiler().compileInlining(it) }
                 .first()
 
@@ -75,7 +75,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaTitleAppender(TitleType.SIMPLE).append(it) }
+                .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
                 .let { JsonSchemaCompiler().compileInlining(it) }
                 .first()
 
@@ -98,7 +98,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
         }
     }
 
-    context("simple title, referencing ") {
+    context("simple title, simple references ") {
         withData(TEST_DATA) { data ->
 
             val additionalIds = mutableListOf<String>()
@@ -111,7 +111,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerator().generate(it) }
-                .let { JsonSchemaTitleAppender(TitleType.SIMPLE).append(it) }
+                .let { JsonSchemaAutoTitleAppender(TitleType.SIMPLE).append(it) }
                 .let { JsonSchemaCompiler(TitleType.SIMPLE).compileReferencingRoot(it) }
                 .first()
                 .also {
