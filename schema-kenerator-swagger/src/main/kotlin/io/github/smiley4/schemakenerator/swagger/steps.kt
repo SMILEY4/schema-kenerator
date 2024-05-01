@@ -4,6 +4,7 @@ import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
@@ -32,7 +33,7 @@ fun Collection<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): C
 /**
  * See [SwaggerSchemaCoreAnnotationDefaultStep]
  */
-fun Collection<SwaggerSchema>.withCoreAnnotationDefault(): Collection<SwaggerSchema> {
+fun Collection<SwaggerSchema>.handleDefaultAnnotation(): Collection<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationDefaultStep().process(this)
 }
 
@@ -40,7 +41,7 @@ fun Collection<SwaggerSchema>.withCoreAnnotationDefault(): Collection<SwaggerSch
 /**
  * See [SwaggerSchemaCoreAnnotationDeprecatedStep]
  */
-fun Collection<SwaggerSchema>.withCoreAnnotationDeprecated(): Collection<SwaggerSchema> {
+fun Collection<SwaggerSchema>.handleDeprecatedAnnotation(): Collection<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationDeprecatedStep().process(this)
 }
 
@@ -48,7 +49,7 @@ fun Collection<SwaggerSchema>.withCoreAnnotationDeprecated(): Collection<Swagger
 /**
  * See [SwaggerSchemaCoreAnnotationDescriptionStep]
  */
-fun Collection<SwaggerSchema>.withCoreAnnotationDescription(): Collection<SwaggerSchema> {
+fun Collection<SwaggerSchema>.handleDescriptionAnnotation(): Collection<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationDescriptionStep().process(this)
 }
 
@@ -56,7 +57,7 @@ fun Collection<SwaggerSchema>.withCoreAnnotationDescription(): Collection<Swagge
 /**
  * See [SwaggerSchemaCoreAnnotationExamplesStep]
  */
-fun Collection<SwaggerSchema>.withCoreAnnotationExamples(): Collection<SwaggerSchema> {
+fun Collection<SwaggerSchema>.handleExampleAnnotation(): Collection<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationExamplesStep().process(this)
 }
 
@@ -64,8 +65,16 @@ fun Collection<SwaggerSchema>.withCoreAnnotationExamples(): Collection<SwaggerSc
 /**
  * See [SwaggerSchemaCoreAnnotationTitleStep]
  */
-fun Collection<SwaggerSchema>.withCoreAnnotationTitle(): Collection<SwaggerSchema> {
+fun Collection<SwaggerSchema>.handleTitleAnnotation(): Collection<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationTitleStep().process(this)
+}
+
+
+/**
+ * See [SwaggerSchemaAnnotationTypeHintStep]
+ */
+fun Collection<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Collection<SwaggerSchema> {
+    return SwaggerSchemaAnnotationTypeHintStep().process(this)
 }
 
 

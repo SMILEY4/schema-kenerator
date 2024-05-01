@@ -33,7 +33,9 @@ import kotlin.reflect.KType
  * - input: [KType]
  * - output: [BaseTypeData] for each input type
  */
-class KotlinxSerializationTypeProcessingStep {
+class KotlinxSerializationTypeProcessingStep(
+    private val customProcessors: Map<String, () -> BaseTypeData> = emptyMap()
+) {
 
     fun process(types: Collection<KType>): List<BaseTypeData> {
         val typeData = mutableListOf<BaseTypeData>()
@@ -52,6 +54,12 @@ class KotlinxSerializationTypeProcessingStep {
     }
 
     private fun parse(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
+        if (customProcessors.containsKey(descriptor.cleanSerialName())) {
+            return customProcessors[descriptor.cleanSerialName()]!!.invoke().also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
+        }
         return when (descriptor.cleanSerialName()) {
             Unit::class.qualifiedName -> parsePrimitive(descriptor, typeData)
             UByte::class.qualifiedName -> parsePrimitive(descriptor, typeData)
@@ -92,7 +100,10 @@ class KotlinxSerializationTypeProcessingStep {
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
     private fun parseList(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
@@ -111,7 +122,10 @@ class KotlinxSerializationTypeProcessingStep {
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
     private fun parseMap(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
@@ -140,7 +154,10 @@ class KotlinxSerializationTypeProcessingStep {
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
     private fun parseClass(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
@@ -167,7 +184,10 @@ class KotlinxSerializationTypeProcessingStep {
                         )
                     }
                 }.toMutableList(),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
     private fun parseSealed(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
@@ -182,7 +202,10 @@ class KotlinxSerializationTypeProcessingStep {
                     .toList()[1].elementDescriptors
                     .map { parse(it, typeData).id }
                     .toMutableList(),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
 
@@ -193,7 +216,10 @@ class KotlinxSerializationTypeProcessingStep {
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
 
@@ -205,7 +231,10 @@ class KotlinxSerializationTypeProcessingStep {
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
                 enumConstants = descriptor.elementNames.toMutableList(),
-            ).also { typeData.add(it) }
+            ).also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
     }
 
     private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {

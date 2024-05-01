@@ -4,6 +4,7 @@ import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDefaultStep
@@ -32,7 +33,7 @@ fun Collection<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Coll
 /**
  * See [JsonSchemaCoreAnnotationDefaultStep]
  */
-fun Collection<JsonSchema>.withCoreAnnotationDefault(): Collection<JsonSchema> {
+fun Collection<JsonSchema>.handleDefaultAnnotation(): Collection<JsonSchema> {
     return JsonSchemaCoreAnnotationDefaultStep().process(this)
 }
 
@@ -40,7 +41,7 @@ fun Collection<JsonSchema>.withCoreAnnotationDefault(): Collection<JsonSchema> {
 /**
  * See [JsonSchemaCoreAnnotationDeprecatedStep]
  */
-fun Collection<JsonSchema>.withCoreAnnotationDeprecated(): Collection<JsonSchema> {
+fun Collection<JsonSchema>.handleDeprecatedAnnotation(): Collection<JsonSchema> {
     return JsonSchemaCoreAnnotationDeprecatedStep().process(this)
 }
 
@@ -48,7 +49,7 @@ fun Collection<JsonSchema>.withCoreAnnotationDeprecated(): Collection<JsonSchema
 /**
  * See [JsonSchemaCoreAnnotationDescriptionStep]
  */
-fun Collection<JsonSchema>.withCoreAnnotationDescription(): Collection<JsonSchema> {
+fun Collection<JsonSchema>.handleDescriptionAnnotation(): Collection<JsonSchema> {
     return JsonSchemaCoreAnnotationDescriptionStep().process(this)
 }
 
@@ -56,7 +57,7 @@ fun Collection<JsonSchema>.withCoreAnnotationDescription(): Collection<JsonSchem
 /**
  * See [JsonSchemaCoreAnnotationExamplesStep]
  */
-fun Collection<JsonSchema>.withCoreAnnotationExamples(): Collection<JsonSchema> {
+fun Collection<JsonSchema>.handleExampleAnnotation(): Collection<JsonSchema> {
     return JsonSchemaCoreAnnotationExamplesStep().process(this)
 }
 
@@ -64,8 +65,16 @@ fun Collection<JsonSchema>.withCoreAnnotationExamples(): Collection<JsonSchema> 
 /**
  * See [JsonSchemaCoreAnnotationTitleStep]
  */
-fun Collection<JsonSchema>.withCoreAnnotationTitle(): Collection<JsonSchema> {
+fun Collection<JsonSchema>.handleTitleAnnotation(): Collection<JsonSchema> {
     return JsonSchemaCoreAnnotationTitleStep().process(this)
+}
+
+
+/**
+ * See [JsonSchemaAnnotationTypeHintStep]
+ */
+fun Collection<JsonSchema>.handleJsonTypeHintAnnotation(): Collection<JsonSchema> {
+    return JsonSchemaAnnotationTypeHintStep().process(this)
 }
 
 

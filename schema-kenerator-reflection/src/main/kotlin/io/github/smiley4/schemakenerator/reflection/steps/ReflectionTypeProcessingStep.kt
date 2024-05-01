@@ -14,6 +14,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.reflection.getMembersSafe
+import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -23,6 +24,8 @@ import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.javaMethod
 
 /**
  * Parses the given types and extracts information
@@ -33,27 +36,32 @@ class ReflectionTypeProcessingStep(
     private val includeGetters: Boolean = false,
     private val includeWeakGetters: Boolean = false,
     private val includeFunctions: Boolean = false,
-    private val includeHidden: Boolean = false
+    private val includeHidden: Boolean = false,
+    private val includeStatic: Boolean = false,
+    private val primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES,
+    private val customProcessors: Map<KClass<*>, () -> BaseTypeData> = emptyMap()
 ) {
 
-    private val primitiveTypes = setOf<KClass<*>>(
-        Number::class,
-        Byte::class,
-        Short::class,
-        Int::class,
-        Long::class,
-        UByte::class,
-        UShort::class,
-        UInt::class,
-        ULong::class,
-        Float::class,
-        Double::class,
-        Boolean::class,
-        Char::class,
-        String::class,
-        Any::class,
-        Unit::class,
-    )
+    companion object {
+        val DEFAULT_PRIMITIVE_TYPES = setOf<KClass<*>>(
+            Number::class,
+            Byte::class,
+            Short::class,
+            Int::class,
+            Long::class,
+            UByte::class,
+            UShort::class,
+            UInt::class,
+            ULong::class,
+            Float::class,
+            Double::class,
+            Boolean::class,
+            Char::class,
+            String::class,
+            Any::class,
+            Unit::class,
+        )
+    }
 
     fun process(types: Collection<KType>): List<BaseTypeData> {
         val typeData = mutableListOf<BaseTypeData>()
@@ -78,6 +86,14 @@ class ReflectionTypeProcessingStep(
         typeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
     ): BaseTypeData {
+
+        // check custom type processors
+        if (customProcessors.containsKey(clazz)) {
+            return customProcessors[clazz]!!.invoke().also { result ->
+                typeData.removeIf { it.id == result.id }
+                typeData.add(result)
+            }
+        }
 
         // resolve type parameters, i.e. generic types
         val resolvedTypeParameters = parseTypeParameters(type, clazz, typeParameters, typeData)
@@ -284,11 +300,24 @@ class ReflectionTypeProcessingStep(
     }
 
     private fun filterMember(member: KCallable<*>): Boolean {
+        // check static
+        if (!includeStatic) {
+            when (member) {
+                is KProperty<*> -> if (Modifier.isStatic(member.javaField?.modifiers ?: 0)) {
+                    return false
+                }
+                is KFunction<*> -> if (Modifier.isStatic(member.javaMethod?.modifiers ?: 0)) {
+                    return false
+                }
+            }
+        }
+        // check visibility
         val visibility = determinePropertyVisibility(member)
         when (visibility) {
             Visibility.PUBLIC -> Unit
             Visibility.HIDDEN -> if (!includeHidden) return false
         }
+        // check function type
         if (member is KFunction<*>) {
             return when (determineFunctionPropertyType(member)) {
                 FunctionPropertyType.GETTER -> includeGetters
