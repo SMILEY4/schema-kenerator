@@ -3,6 +3,7 @@ object Meta {
 }
 
 plugins {
+    `maven-publish`
 }
 
 dependencies {
@@ -13,4 +14,18 @@ dependencies {
     testImplementation(project(":schema-kenerator-reflection"))
     testImplementation(project(":schema-kenerator-test"))
     testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifactId = Meta.artifactId
+            from(components["java"])
+            pom {
+                name.set("schema-kenerator")
+                description.set("Kotlin generator for various schemas")
+                url.set("https://github.com/SMILEY4/schema-kenerator")
+            }
+        }
+    }
 }

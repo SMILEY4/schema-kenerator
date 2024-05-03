@@ -11,4 +11,18 @@ class CompiledSwaggerSchema(
     val typeData: BaseTypeData,
     val swagger: Schema<*>,
     val componentSchemas: Map<TypeId, Schema<*>>
-)
+) {
+
+    companion object {
+
+        fun mergeComponentSchemas(schemas: List<CompiledSwaggerSchema>): Map<TypeId, Schema<*>> {
+            return buildMap {
+                schemas.forEach { schema ->
+                    this.putAll(schema.componentSchemas)
+                }
+            }
+        }
+
+    }
+
+}
