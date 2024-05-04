@@ -68,7 +68,7 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
     private fun referenceDefinitionsReferences(node: Schema<*>, schemaList: Collection<SwaggerSchema>): CompiledSwaggerSchema {
         val definitions = mutableMapOf<TypeId, Schema<*>>()
         val json = replaceReferences(node) { refObj ->
-            val referencedId = TypeId.parse(refObj.`$ref`)
+            val referencedId = TypeId.parse(refObj.`$ref`.replace("#/components/schemas/", ""))
             val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
             val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.swagger, schemaList).also {
                 mergeInto(refObj, it.swagger)
