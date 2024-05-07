@@ -79,6 +79,20 @@ class SubAndSuperTypesTest : StringSpec({
 
     }
 
+    "without reflection subtype-annotation" {
+
+        val result = listOf(getKType<NormalClass>())
+            .let { ReflectionAnnotationSubTypeStep().process(it) }
+            .let { ReflectionTypeProcessingStep().process(it) }
+            .let { ConnectSubTypesStep().process(it) }
+
+        result.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
+            NormalClass::class.qualifiedName,
+            String::class.qualifiedName
+        )
+
+    }
+
     "jackson subtype-annotation" {
 
         val result = listOf(getKType<JacksonBaseClass1>())
@@ -145,6 +159,22 @@ class SubAndSuperTypesTest : StringSpec({
 
     }
 
+
+    "without jackson subtype-annotation" {
+
+        val result = listOf(getKType<NormalClass>())
+            .let { JacksonSubTypeStep(typeProcessing = { types -> ReflectionTypeProcessingStep().process(types) }).process(it) }
+            .let { ReflectionTypeProcessingStep().process(it) }
+            .let { ConnectSubTypesStep().process(it) }
+
+        result.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
+            NormalClass::class.qualifiedName,
+            String::class.qualifiedName
+        )
+
+    }
+
+
 }) {
 
     companion object {
@@ -183,6 +213,9 @@ class SubAndSuperTypesTest : StringSpec({
         private open class JacksonBaseClass2
         private class JacksonSubClass2A : JacksonBaseClass2()
         private class JacksonSubClass2B : JacksonBaseClass2()
+
+
+        private class NormalClass(val value: String)
 
     }
 

@@ -157,13 +157,13 @@ class SwaggerSchemaUtils {
 
     //=====  REFERENCE ==============================
 
-    fun referenceSchema(id: TypeId, isInDefinitions: Boolean = false): Schema<*> {
-        return referenceSchema(id.full(), isInDefinitions)
+    fun referenceSchema(id: TypeId, isInComponents: Boolean = false): Schema<*> {
+        return referenceSchema(id.full(), isInComponents)
     }
 
-    fun referenceSchema(id: String, isInDefinitions: Boolean = false): Schema<*> {
+    fun referenceSchema(id: String, isInComponents: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
-            schema.`raw$ref`(if(isInDefinitions) "#/components/schemas/$id" else id)
+            schema.`raw$ref`(if(isInComponents) "#/components/schemas/$id" else id)
         }
     }
 

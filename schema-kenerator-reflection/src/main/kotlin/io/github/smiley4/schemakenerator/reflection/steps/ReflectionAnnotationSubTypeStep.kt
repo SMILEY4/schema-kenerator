@@ -28,7 +28,7 @@ class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
             depth++
         } while (countPrev != entries.size && depth < maxRecursionDepth)
 
-        return entries
+        return (entries + data).distinct()
     }
 
     private fun findSubTypes(data: BaseTypeData): List<KType> {

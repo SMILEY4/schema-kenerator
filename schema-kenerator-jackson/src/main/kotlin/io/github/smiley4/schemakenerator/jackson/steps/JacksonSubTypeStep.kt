@@ -29,7 +29,7 @@ class JacksonSubTypeStep(
             depth++
         } while (countPrev != entries.size && depth < maxRecursionDepth)
 
-        return entries
+        return (entries + data).distinct()
     }
 
     private fun findSubTypes(typeData: BaseTypeData): List<KType> {
