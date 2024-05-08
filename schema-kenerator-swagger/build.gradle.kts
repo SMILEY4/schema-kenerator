@@ -16,6 +16,11 @@ dependencies {
     testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3")
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {

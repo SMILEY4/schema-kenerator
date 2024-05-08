@@ -15,6 +15,11 @@ dependencies {
     testImplementation(project(":schema-kenerator-test"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {

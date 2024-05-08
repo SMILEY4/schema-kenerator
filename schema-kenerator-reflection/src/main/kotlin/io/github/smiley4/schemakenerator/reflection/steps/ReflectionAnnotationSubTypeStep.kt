@@ -18,11 +18,11 @@ class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
 
         var depth = 0
         var countPrev = 0
-        var subtypes = listOf(data)
+        val subtypes = mutableListOf(data)
 
         do {
             countPrev = subtypes.size
-            subtypes = subtypes
+            subtypes += subtypes
                 .let { process(it) }
                 .flatMap { findSubTypes(it) }
                 .distinct()
