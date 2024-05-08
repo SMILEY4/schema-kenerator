@@ -2,6 +2,7 @@ package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.SchemaDefault
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
@@ -13,8 +14,11 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
  */
 class JsonSchemaCoreAnnotationDefaultStep {
 
-    fun process(schemas: Collection<JsonSchema>): Collection<JsonSchema> {
-        return schemas.onEach { process(it) }
+    fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
+        return bundle.also { schema ->
+            process(schema.data)
+            schema.supporting.forEach { process(it) }
+        }
     }
 
     private fun process(schema: JsonSchema) {

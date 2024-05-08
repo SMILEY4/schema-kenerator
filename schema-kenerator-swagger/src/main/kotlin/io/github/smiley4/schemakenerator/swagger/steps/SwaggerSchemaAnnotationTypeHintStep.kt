@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
 
@@ -11,8 +12,12 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
  */
 class SwaggerSchemaAnnotationTypeHintStep {
 
-    fun process(schemas: Collection<SwaggerSchema>): Collection<SwaggerSchema> {
-        return schemas.onEach { process(it) }
+
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        return bundle.also { schema ->
+            process(schema.data)
+            schema.supporting.forEach { process(it) }
+        }
     }
 
     private fun process(schema: SwaggerSchema) {

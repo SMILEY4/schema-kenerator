@@ -17,7 +17,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
     context("filter properties") {
         withData(TEST_DATA) { data ->
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { ReflectionTypeProcessingStep(
                     includeFunctions = false,
                     includeGetters = data.includeGetters,
@@ -26,7 +26,6 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 ).process(it) }
                 .let { JsonSchemaGenerationStep().generate(it) }
                 .let { JsonSchemaCompileStep().compileInlining(it) }
-                .first()
 
             ((schema.json as JsonObject).properties["properties"] as JsonObject).properties.keys shouldContainExactlyInAnyOrder data.expectedProperties
         }

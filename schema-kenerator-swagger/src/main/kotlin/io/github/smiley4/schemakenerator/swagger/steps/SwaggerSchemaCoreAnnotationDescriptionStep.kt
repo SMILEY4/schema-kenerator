@@ -2,6 +2,7 @@ package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.SchemaDescription
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
@@ -12,8 +13,11 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
  */
 class SwaggerSchemaCoreAnnotationDescriptionStep {
 
-    fun process(schemas: Collection<SwaggerSchema>): List<SwaggerSchema> {
-        return schemas.onEach { process(it) }.toList()
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        return bundle.also { schema ->
+            process(schema.data)
+            schema.supporting.forEach { process(it) }
+        }
     }
 
     private fun process(schema: SwaggerSchema) {

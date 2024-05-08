@@ -5,19 +5,20 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withAutoTitle
-import io.github.smiley4.schemakenerator.jsonschema.handleJsonTypeHintAnnotation
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.getKType
-import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.withAutoTitle
-import io.github.smiley4.schemakenerator.swagger.handleSwaggerTypeHintAnnotation
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
@@ -32,12 +33,12 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime without custom processor" {
 
-        val result = listOf(getKType<ClassWithLocalDateTime>())
-            .processReflection()
-            .generateJsonSchema()
-            .withAutoTitle()
-            .compileInlining()
-            .first()
+        val result = getKType<ClassWithLocalDateTime>()
+            .let { ReflectionTypeProcessingStep().process(it) }
+            .let { JsonSchemaGenerationStep().generate(it) }
+            .let { JsonSchemaAnnotationTypeHintStep().process(it) }
+            .let { JsonSchemaAutoTitleStep(TitleType.FULL).process(it) }
+            .let { JsonSchemaCompileStep().compileInlining(it) }
 
         result.json.prettyPrint().shouldEqualJson {
             propertyOrder = PropertyOrder.Lenient
@@ -68,30 +69,31 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime with custom processor" {
 
-        val result = listOf(getKType<ClassWithLocalDateTime>())
-            .processReflection {
-                customProcessor(LocalDateTime::class) {
-                    PrimitiveTypeData(
-                        id = TypeId.build(LocalDateTime::class.qualifiedName!!),
-                        simpleName = LocalDateTime::class.simpleName!!,
-                        qualifiedName = LocalDateTime::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = JsonTypeHint::class.qualifiedName!!,
-                                values = mutableMapOf(
-                                    "type" to "date"
-                                ),
-                                annotation = null
+        val result = getKType<ClassWithLocalDateTime>()
+            .let {
+                ReflectionTypeProcessingStep(
+                    customProcessors = mapOf(LocalDateTime::class to {
+                        PrimitiveTypeData(
+                            id = TypeId.build(LocalDateTime::class.qualifiedName!!),
+                            simpleName = LocalDateTime::class.simpleName!!,
+                            qualifiedName = LocalDateTime::class.qualifiedName!!,
+                            annotations = mutableListOf(
+                                AnnotationData(
+                                    name = JsonTypeHint::class.qualifiedName!!,
+                                    values = mutableMapOf(
+                                        "type" to "date"
+                                    ),
+                                    annotation = null
+                                )
                             )
                         )
-                    )
-                }
+                    })
+                ).process(it)
             }
-            .generateJsonSchema()
-            .withAutoTitle()
-            .handleJsonTypeHintAnnotation()
-            .compileInlining()
-            .first()
+            .let { JsonSchemaGenerationStep().generate(it) }
+            .let { JsonSchemaAnnotationTypeHintStep().process(it) }
+            .let { JsonSchemaAutoTitleStep(TitleType.FULL).process(it) }
+            .let { JsonSchemaCompileStep().compileInlining(it) }
 
         result.json.prettyPrint().shouldEqualJson {
             propertyOrder = PropertyOrder.Lenient
@@ -122,12 +124,12 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime without custom processor" {
 
-        val result = listOf(getKType<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>())
-            .processKotlinxSerialization()
-            .generateSwaggerSchema()
-            .withAutoTitle()
-            .compileInlining()
-            .first()
+        val result = getKType<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+            .let { KotlinxSerializationTypeProcessingStep().process(it) }
+            .let { SwaggerSchemaGenerationStep().generate(it) }
+            .let { SwaggerSchemaAnnotationTypeHintStep().process(it) }
+            .let { SwaggerSchemaAutoTitleStep(io.github.smiley4.schemakenerator.swagger.data.TitleType.FULL).process(it) }
+            .let { SwaggerSchemaCompileStep().compileInlining(it) }
 
         json.writeValueAsString(result.swagger).shouldEqualJson {
             propertyOrder = PropertyOrder.Lenient
@@ -159,30 +161,31 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime with custom processor" {
 
-        val result = listOf(getKType<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>())
-            .processKotlinxSerialization {
-                customProcessor(LocalDateTime::class) {
-                    PrimitiveTypeData(
-                        id = TypeId.build(LocalDateTime::class.qualifiedName!!),
-                        simpleName = LocalDateTime::class.simpleName!!,
-                        qualifiedName = LocalDateTime::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = SwaggerTypeHint::class.qualifiedName!!,
-                                values = mutableMapOf(
-                                    "type" to "date"
-                                ),
-                                annotation = null
+        val result = getKType<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+            .let {
+                KotlinxSerializationTypeProcessingStep(
+                    customProcessors = mapOf(LocalDateTime::class.qualifiedName!! to {
+                        PrimitiveTypeData(
+                            id = TypeId.build(LocalDateTime::class.qualifiedName!!),
+                            simpleName = LocalDateTime::class.simpleName!!,
+                            qualifiedName = LocalDateTime::class.qualifiedName!!,
+                            annotations = mutableListOf(
+                                AnnotationData(
+                                    name = SwaggerTypeHint::class.qualifiedName!!,
+                                    values = mutableMapOf(
+                                        "type" to "date"
+                                    ),
+                                    annotation = null
+                                )
                             )
                         )
-                    )
-                }
+                    })
+                ).process(it)
             }
-            .generateSwaggerSchema()
-            .withAutoTitle()
-            .handleSwaggerTypeHintAnnotation()
-            .compileInlining()
-            .first()
+            .let { SwaggerSchemaGenerationStep().generate(it) }
+            .let { SwaggerSchemaAnnotationTypeHintStep().process(it) }
+            .let { SwaggerSchemaAutoTitleStep(io.github.smiley4.schemakenerator.swagger.data.TitleType.FULL).process(it) }
+            .let { SwaggerSchemaCompileStep().compileInlining(it) }
 
         json.writeValueAsString(result.swagger).shouldEqualJson {
             propertyOrder = PropertyOrder.Lenient

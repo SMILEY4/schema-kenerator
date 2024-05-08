@@ -33,7 +33,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
                 .let { JsonSchemaGenerationStep().generate(it) }
                 .let { list ->
@@ -45,7 +45,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaCompileStep().compileInlining(it) }
-                .first()
 
             schema.json.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
@@ -64,11 +63,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .onEach { schema ->
-                    if (schema.id.additionalId != null) {
-                        additionalIds.add(schema.id.additionalId!!)
+                .also { schema ->
+                    if (schema.data.id.additionalId != null) {
+                        additionalIds.add(schema.data.id.additionalId!!)
+                    }
+                    schema.supporting.forEach {
+                        if (it.id.additionalId != null) {
+                            additionalIds.add(it.id.additionalId!!)
+                        }
                     }
                 }
                 .let { JsonSchemaGenerationStep().generate(it) }
@@ -81,7 +85,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaCompileStep().compileReferencing(it) }
-                .first()
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -117,11 +120,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .onEach { schema ->
-                    if (schema.id.additionalId != null) {
-                        additionalIds.add(schema.id.additionalId!!)
+                .also { schema ->
+                    if (schema.data.id.additionalId != null) {
+                        additionalIds.add(schema.data.id.additionalId!!)
+                    }
+                    schema.supporting.forEach {
+                        if (it.id.additionalId != null) {
+                            additionalIds.add(it.id.additionalId!!)
+                        }
                     }
                 }
                 .let { JsonSchemaGenerationStep().generate(it) }
@@ -134,7 +142,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaCompileStep().compileReferencingRoot(it) }
-                .first()
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {

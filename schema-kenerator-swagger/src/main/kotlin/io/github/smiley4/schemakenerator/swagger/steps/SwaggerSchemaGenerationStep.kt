@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
@@ -21,8 +22,12 @@ class SwaggerSchemaGenerationStep {
 
     private val schema = SwaggerSchemaUtils()
 
-    fun generate(types: Collection<BaseTypeData>): List<SwaggerSchema> {
-        return types.map { generate(it, types) }
+    fun generate(bundle: Bundle<BaseTypeData>): Bundle<SwaggerSchema> {
+        val allTypeData = listOf(bundle.data) + bundle.supporting
+        return Bundle(
+            data = generate(bundle.data, allTypeData),
+            supporting = bundle.supporting.map { generate(it, allTypeData) }
+        )
     }
 
     private fun generate(typeData: BaseTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {

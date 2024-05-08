@@ -2,6 +2,7 @@ package io.github.smiley4.schemakenerator.reflection.steps
 
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
@@ -63,16 +64,26 @@ class ReflectionTypeProcessingStep(
         )
     }
 
-    fun process(types: Collection<KType>): List<BaseTypeData> {
-        val typeData = mutableListOf<BaseTypeData>()
-        types.forEach { process(it, typeData) }
-        return typeData.reversed()
+
+    fun process(type: KType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
+
+    fun process(type: Bundle<KType>): Bundle<BaseTypeData> {
+        val supportingTypeData = mutableListOf<BaseTypeData>()
+        type.supporting.forEach { process(it, supportingTypeData) }
+
+        val typeData = process(type.data, supportingTypeData)
+        supportingTypeData.remove(typeData)
+
+        return Bundle(
+            data = typeData,
+            supporting = supportingTypeData
+        )
     }
 
 
-    private fun process(type: KType, typeData: MutableList<BaseTypeData>) {
+    private fun process(type: KType, typeData: MutableList<BaseTypeData>): BaseTypeData {
         if (type.classifier is KClass<*>) {
-            parseClass(type, type.classifier as KClass<*>, mapOf(), typeData)
+            return parseClass(type, type.classifier as KClass<*>, mapOf(), typeData)
         } else {
             throw Exception("Type is not a class.")
         }

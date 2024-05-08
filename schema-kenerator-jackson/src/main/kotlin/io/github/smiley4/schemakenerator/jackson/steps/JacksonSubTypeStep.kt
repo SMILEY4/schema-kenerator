@@ -2,6 +2,7 @@ package io.github.smiley4.schemakenerator.jackson.steps
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
@@ -12,24 +13,33 @@ import kotlin.reflect.full.starProjectedType
  */
 class JacksonSubTypeStep(
     private val maxRecursionDepth: Int = 10,
-    val typeProcessing: (types: Collection<KType>) -> Collection<BaseTypeData>
+    val typeProcessing: (type: KType) -> Bundle<BaseTypeData>
 ) {
 
-    fun process(data: Collection<KType>): List<KType> {
+    fun process(data: KType): Bundle<KType> {
         var depth = 0
         var countPrev = 0
-        var entries = data.toList()
+        var subtypes = listOf(data)
 
         do {
-            countPrev = entries.size
-            entries = entries
-                .let { typeProcessing(it) }
+            countPrev = subtypes.size
+            subtypes = subtypes
+                .let { process(it) }
                 .flatMap { findSubTypes(it) }
                 .distinct()
             depth++
-        } while (countPrev != entries.size && depth < maxRecursionDepth)
+        } while (countPrev != subtypes.size && depth < maxRecursionDepth)
 
-        return (entries + data).distinct()
+        return Bundle(
+            data = data,
+            supporting = subtypes
+        )
+    }
+
+    private fun process(types: List<KType>): Collection<BaseTypeData> {
+        return types
+            .map { typeProcessing(it) }
+            .flatMap { listOf(it.data) + it.supporting }
     }
 
     private fun findSubTypes(typeData: BaseTypeData): List<KType> {

@@ -39,7 +39,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { ReflectionTypeProcessingStep().process(it) }
                 .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
@@ -63,7 +63,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 }
                 .let { SwaggerSchemaCompileStep().compileInlining(it) }
-                .first()
                 .let {
                     Result(
                         schema = it.swagger,
@@ -85,7 +84,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { ReflectionTypeProcessingStep().process(it) }
                 .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
@@ -109,7 +108,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 }
                 .let { SwaggerSchemaCompileStep().compileReferencing(it) }
-                .first()
                 .let {
                     Result(
                         schema = it.swagger,
@@ -131,7 +129,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
-            val schema = listOf(data.type)
+            val schema = data.type
                 .let { ReflectionTypeProcessingStep().process(it) }
                 .let { SwaggerSchemaGenerationStep().generate(it) }
                 .let { list ->
@@ -155,7 +153,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 }
                 .let { SwaggerSchemaCompileStep().compileReferencingRoot(it) }
-                .first()
                 .let {
                     Result(
                         schema = it.swagger,

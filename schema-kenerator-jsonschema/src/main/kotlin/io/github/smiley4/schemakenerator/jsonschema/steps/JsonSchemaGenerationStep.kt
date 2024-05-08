@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
@@ -20,8 +21,12 @@ class JsonSchemaGenerationStep {
 
     private val schemaUtils = JsonSchemaUtils()
 
-    fun generate(types: Collection<BaseTypeData>): List<JsonSchema> {
-        return types.map { generate(it, types) }
+    fun generate(bundle: Bundle<BaseTypeData>): Bundle<JsonSchema> {
+        val types = listOf(bundle.data) + bundle.supporting
+        return Bundle(
+            data = generate(bundle.data, types),
+            supporting = bundle.supporting.map { generate(it, types) }
+        )
     }
 
     private fun generate(typeData: BaseTypeData, typeDataList: Collection<BaseTypeData>): JsonSchema {

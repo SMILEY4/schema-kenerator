@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
@@ -17,7 +18,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationSt
 /**
  * See [SwaggerSchemaGenerationStep]
  */
-fun Collection<BaseTypeData>.generateSwaggerSchema(): Collection<SwaggerSchema> {
+fun Bundle<BaseTypeData>.generateSwaggerSchema(): Bundle<SwaggerSchema> {
     return SwaggerSchemaGenerationStep().generate(this)
 }
 
@@ -25,7 +26,7 @@ fun Collection<BaseTypeData>.generateSwaggerSchema(): Collection<SwaggerSchema> 
 /**
  * See [SwaggerSchemaAutoTitleStep]
  */
-fun Collection<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<SwaggerSchema> {
     return SwaggerSchemaAutoTitleStep(type).process(this)
 }
 
@@ -33,7 +34,7 @@ fun Collection<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): C
 /**
  * See [SwaggerSchemaCoreAnnotationDefaultStep]
  */
-fun Collection<SwaggerSchema>.handleDefaultAnnotation(): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleDefaultAnnotation(): Bundle<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationDefaultStep().process(this)
 }
 
@@ -41,7 +42,7 @@ fun Collection<SwaggerSchema>.handleDefaultAnnotation(): Collection<SwaggerSchem
 /**
  * See [SwaggerSchemaCoreAnnotationDeprecatedStep]
  */
-fun Collection<SwaggerSchema>.handleDeprecatedAnnotation(): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleDeprecatedAnnotation(): Bundle<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationDeprecatedStep().process(this)
 }
 
@@ -49,7 +50,7 @@ fun Collection<SwaggerSchema>.handleDeprecatedAnnotation(): Collection<SwaggerSc
 /**
  * See [SwaggerSchemaCoreAnnotationDescriptionStep]
  */
-fun Collection<SwaggerSchema>.handleDescriptionAnnotation(): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleDescriptionAnnotation(): Bundle<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationDescriptionStep().process(this)
 }
 
@@ -57,7 +58,7 @@ fun Collection<SwaggerSchema>.handleDescriptionAnnotation(): Collection<SwaggerS
 /**
  * See [SwaggerSchemaCoreAnnotationExamplesStep]
  */
-fun Collection<SwaggerSchema>.handleExampleAnnotation(): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleExampleAnnotation(): Bundle<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationExamplesStep().process(this)
 }
 
@@ -65,7 +66,7 @@ fun Collection<SwaggerSchema>.handleExampleAnnotation(): Collection<SwaggerSchem
 /**
  * See [SwaggerSchemaCoreAnnotationTitleStep]
  */
-fun Collection<SwaggerSchema>.handleTitleAnnotation(): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleTitleAnnotation(): Bundle<SwaggerSchema> {
     return SwaggerSchemaCoreAnnotationTitleStep().process(this)
 }
 
@@ -73,7 +74,7 @@ fun Collection<SwaggerSchema>.handleTitleAnnotation(): Collection<SwaggerSchema>
 /**
  * See [SwaggerSchemaAnnotationTypeHintStep]
  */
-fun Collection<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Collection<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Bundle<SwaggerSchema> {
     return SwaggerSchemaAnnotationTypeHintStep().process(this)
 }
 
@@ -81,7 +82,7 @@ fun Collection<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Collection<Swag
 /**
  * See [SwaggerSchemaCompileStep]
  */
-fun Collection<SwaggerSchema>.compileInlining(pathType: TitleType = TitleType.FULL): List<CompiledSwaggerSchema> {
+fun Bundle<SwaggerSchema>.compileInlining(pathType: TitleType = TitleType.FULL): CompiledSwaggerSchema {
     return SwaggerSchemaCompileStep(pathType).compileInlining(this)
 }
 
@@ -89,7 +90,7 @@ fun Collection<SwaggerSchema>.compileInlining(pathType: TitleType = TitleType.FU
 /**
  * See [SwaggerSchemaCompileStep]
  */
-fun Collection<SwaggerSchema>.compileReferencing(pathType: TitleType = TitleType.FULL): List<CompiledSwaggerSchema> {
+fun Bundle<SwaggerSchema>.compileReferencing(pathType: TitleType = TitleType.FULL): CompiledSwaggerSchema {
     return SwaggerSchemaCompileStep(pathType).compileReferencing(this)
 }
 
@@ -97,6 +98,6 @@ fun Collection<SwaggerSchema>.compileReferencing(pathType: TitleType = TitleType
 /**
  * See [SwaggerSchemaCompileStep]
  */
-fun Collection<SwaggerSchema>.compileReferencingRoot(pathType: TitleType = TitleType.FULL): List<CompiledSwaggerSchema> {
+fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: TitleType = TitleType.FULL): CompiledSwaggerSchema {
     return SwaggerSchemaCompileStep(pathType).compileReferencingRoot(this)
 }

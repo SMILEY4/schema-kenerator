@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.core.steps
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 
 /**
@@ -13,11 +14,15 @@ class ConnectSubTypesStep {
     /**
      * Adds missing subtype-supertype relations between the given types
      */
-    fun process(data: Collection<BaseTypeData>): List<BaseTypeData> {
-        return data.map { process(it, data) }
+    fun process(bundle: Bundle<BaseTypeData>): Bundle<BaseTypeData> {
+        val types = listOf(bundle.data) + bundle.supporting
+        return bundle.also { schema ->
+            process(schema.data, types)
+            schema.supporting.forEach { process(it, types) }
+        }
     }
 
-    private fun process(data: BaseTypeData, dataList: Collection<BaseTypeData>): BaseTypeData {
+    private fun process(data: BaseTypeData, dataList: Collection<BaseTypeData>) {
 
         if (data is ObjectTypeData) {
 
@@ -37,7 +42,6 @@ class ConnectSubTypesStep {
 
         }
 
-        return data
     }
 
 }

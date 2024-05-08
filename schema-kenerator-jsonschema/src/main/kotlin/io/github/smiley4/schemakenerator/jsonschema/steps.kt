@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
@@ -17,7 +18,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationSt
 /**
  * See [JsonSchemaGenerationStep]
  */
-fun Collection<BaseTypeData>.generateJsonSchema(): Collection<JsonSchema> {
+fun Bundle<BaseTypeData>.generateJsonSchema(): Bundle<JsonSchema> {
     return JsonSchemaGenerationStep().generate(this)
 }
 
@@ -25,7 +26,7 @@ fun Collection<BaseTypeData>.generateJsonSchema(): Collection<JsonSchema> {
 /**
  * See [JsonSchemaAutoTitleStep]
  */
-fun Collection<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
     return JsonSchemaAutoTitleStep(type).process(this)
 }
 
@@ -33,7 +34,7 @@ fun Collection<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Coll
 /**
  * See [JsonSchemaCoreAnnotationDefaultStep]
  */
-fun Collection<JsonSchema>.handleDefaultAnnotation(): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.handleDefaultAnnotation(): Bundle<JsonSchema> {
     return JsonSchemaCoreAnnotationDefaultStep().process(this)
 }
 
@@ -41,7 +42,7 @@ fun Collection<JsonSchema>.handleDefaultAnnotation(): Collection<JsonSchema> {
 /**
  * See [JsonSchemaCoreAnnotationDeprecatedStep]
  */
-fun Collection<JsonSchema>.handleDeprecatedAnnotation(): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.handleDeprecatedAnnotation(): Bundle<JsonSchema> {
     return JsonSchemaCoreAnnotationDeprecatedStep().process(this)
 }
 
@@ -49,7 +50,7 @@ fun Collection<JsonSchema>.handleDeprecatedAnnotation(): Collection<JsonSchema> 
 /**
  * See [JsonSchemaCoreAnnotationDescriptionStep]
  */
-fun Collection<JsonSchema>.handleDescriptionAnnotation(): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.handleDescriptionAnnotation(): Bundle<JsonSchema> {
     return JsonSchemaCoreAnnotationDescriptionStep().process(this)
 }
 
@@ -57,7 +58,7 @@ fun Collection<JsonSchema>.handleDescriptionAnnotation(): Collection<JsonSchema>
 /**
  * See [JsonSchemaCoreAnnotationExamplesStep]
  */
-fun Collection<JsonSchema>.handleExampleAnnotation(): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.handleExampleAnnotation(): Bundle<JsonSchema> {
     return JsonSchemaCoreAnnotationExamplesStep().process(this)
 }
 
@@ -65,7 +66,7 @@ fun Collection<JsonSchema>.handleExampleAnnotation(): Collection<JsonSchema> {
 /**
  * See [JsonSchemaCoreAnnotationTitleStep]
  */
-fun Collection<JsonSchema>.handleTitleAnnotation(): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.handleTitleAnnotation(): Bundle<JsonSchema> {
     return JsonSchemaCoreAnnotationTitleStep().process(this)
 }
 
@@ -73,7 +74,7 @@ fun Collection<JsonSchema>.handleTitleAnnotation(): Collection<JsonSchema> {
 /**
  * See [JsonSchemaAnnotationTypeHintStep]
  */
-fun Collection<JsonSchema>.handleJsonTypeHintAnnotation(): Collection<JsonSchema> {
+fun Bundle<JsonSchema>.handleJsonTypeHintAnnotation(): Bundle<JsonSchema> {
     return JsonSchemaAnnotationTypeHintStep().process(this)
 }
 
@@ -81,7 +82,7 @@ fun Collection<JsonSchema>.handleJsonTypeHintAnnotation(): Collection<JsonSchema
 /**
  * See [JsonSchemaCompileStep]
  */
-fun Collection<JsonSchema>.compileInlining(pathType: TitleType = TitleType.FULL): List<CompiledJsonSchema> {
+fun Bundle<JsonSchema>.compileInlining(pathType: TitleType = TitleType.FULL): CompiledJsonSchema {
     return JsonSchemaCompileStep(pathType).compileInlining(this)
 }
 
@@ -89,7 +90,7 @@ fun Collection<JsonSchema>.compileInlining(pathType: TitleType = TitleType.FULL)
 /**
  * See [JsonSchemaCompileStep]
  */
-fun Collection<JsonSchema>.compileReferencing(pathType: TitleType = TitleType.FULL): List<CompiledJsonSchema> {
+fun Bundle<JsonSchema>.compileReferencing(pathType: TitleType = TitleType.FULL): CompiledJsonSchema {
     return JsonSchemaCompileStep(pathType).compileReferencing(this)
 }
 
@@ -97,6 +98,6 @@ fun Collection<JsonSchema>.compileReferencing(pathType: TitleType = TitleType.FU
 /**
  * See [JsonSchemaCompileStep]
  */
-fun Collection<JsonSchema>.compileReferencingRoot(pathType: TitleType = TitleType.FULL): List<CompiledJsonSchema> {
+fun Bundle<JsonSchema>.compileReferencingRoot(pathType: TitleType = TitleType.FULL): CompiledJsonSchema {
     return JsonSchemaCompileStep(pathType).compileReferencingRoot(this)
 }
