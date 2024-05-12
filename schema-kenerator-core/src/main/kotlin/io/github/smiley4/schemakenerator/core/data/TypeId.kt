@@ -7,19 +7,48 @@ import kotlin.random.Random
  * Identifier of a type
  */
 class TypeId(
+    /**
+     * the base name (e.g. the qualified class-name
+     */
     val base: String,
+    /**
+     * ids of type parameters, i.e. generics (order is relevant)
+     */
     val typeParameters: List<TypeId>,
+    /**
+     * optional (random) additional id to avoid collisions
+     */
     val additionalId: String?
 ) {
 
     companion object {
 
+        /**
+         * @return id for a wildcard type
+         */
         fun wildcard() = TypeId("*", emptyList(), null)
 
+
+        /**
+         * @param name the (qualified) name of the type
+         * @return id with the given name
+         */
         fun build(name: String) = TypeId(name, emptyList(), null)
 
+
+        /**
+         * @param name the (qualified) name of the type
+         * @param typeParameters the list of ids of the type parameters
+         * @param withAdditionalId whether set the [TypeId.additionalId] to a random value
+         * @return id with the given name and type parameters
+         */
         fun build(name: String, typeParameters: List<TypeId>, withAdditionalId: Boolean = false) = TypeId(name, typeParameters, if (withAdditionalId) abs(Random.nextLong()).toString() else null)
 
+
+        /**
+         * @param fullTypeId id of a type as a formatted string, i.e. the output of [TypeId.full]
+         * @return a id with the data from the given string
+         */
         fun parse(fullTypeId: String): TypeId {
 
             // base
@@ -93,7 +122,6 @@ class TypeId(
                 typeParameters = paramFullIds.map { parse(it) }
             }
 
-
             return TypeId(
                 base = base,
                 typeParameters = typeParameters,
@@ -103,6 +131,10 @@ class TypeId(
 
     }
 
+
+    /**
+     * @return this id as a formatted string containing all information
+     */
     fun full(): String {
         return base
             .let {
@@ -121,6 +153,10 @@ class TypeId(
             }
     }
 
+
+    /**
+     * @return this id as a simpler, shorter formatted string
+     */
     fun simple(): String {
         var title = base.split(".").last()
         if (typeParameters.isNotEmpty()) {

@@ -6,9 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 /**
- * Adds additional metadata from core annotation [SchemaTitle]
- * - input: [SwaggerSchema]
- * - output: [SwaggerSchema] with added information from annotations
+ * Adds a title specified by the [SchemaTitle]-annotation
  */
 class SwaggerSchemaCoreAnnotationTitleStep {
 

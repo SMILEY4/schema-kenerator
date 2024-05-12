@@ -8,9 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
 /**
- * Modifies type from annotation [JsonTypeHint]
- * - input: [JsonSchema]
- * - output: [JsonSchema] with modified type from annotations
+ * Modifies type of json-objects with the [JsonTypeHint]-annotation.
  */
 class JsonSchemaAnnotationTypeHintStep {
 

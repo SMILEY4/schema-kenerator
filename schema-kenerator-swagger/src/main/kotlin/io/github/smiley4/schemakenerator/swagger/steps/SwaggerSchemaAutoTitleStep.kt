@@ -5,9 +5,8 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 
 /**
- * Adds an automatically determined title to schemas
- * - input: [SwaggerSchema]
- * - output: [SwaggerSchema] with added 'title'
+ * Adds an automatically determined title to schemas.
+ * @param type the type of the title
  */
 class SwaggerSchemaAutoTitleStep(val type: TitleType = TitleType.FULL) {
 

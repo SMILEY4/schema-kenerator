@@ -8,11 +8,10 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
 /**
- * Adds additional metadata from core annotation [SchemaExample]
- * - input: [JsonSchema]
- * - output: [JsonSchema] with added information from annotations
+ * Adds example-values from [SchemaExample]-annotations.
  */
 class JsonSchemaCoreAnnotationExamplesStep {
 

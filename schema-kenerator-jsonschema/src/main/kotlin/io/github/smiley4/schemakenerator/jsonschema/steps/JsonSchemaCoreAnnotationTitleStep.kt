@@ -8,9 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
 /**
- * Adds additional title from core annotation [SchemaTitle]
- * - input: [JsonSchema]
- * - output: [JsonSchema] with added title from annotations
+ * Adds a title specified by the [SchemaTitle]-annotation
  */
 class JsonSchemaCoreAnnotationTitleStep {
 

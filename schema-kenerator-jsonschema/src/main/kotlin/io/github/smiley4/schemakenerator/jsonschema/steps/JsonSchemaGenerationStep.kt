@@ -13,9 +13,8 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 
 /**
- * Generates json-schemas from type data. All types in the schema are referenced by type-id
- * - input: [BaseTypeData]
- * - output: [JsonSchema] for each input type
+ * Generates json-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
+ * Result needs to be "compiled" to get the final json-schema.
  */
 class JsonSchemaGenerationStep {
 

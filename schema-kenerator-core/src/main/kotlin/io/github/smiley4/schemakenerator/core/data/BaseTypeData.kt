@@ -4,24 +4,36 @@ package io.github.smiley4.schemakenerator.core.data
  * Base data for any type
  */
 sealed class BaseTypeData(
+    /**
+     * the id of this type
+     */
     val id: TypeId,
+    /**
+     * a shorter, simplified name of this type
+     */
     var simpleName: String,
+    /**
+     * the full name of this type
+     */
     var qualifiedName: String,
+    /**
+     * the type parameters (i.e. generics) of this type by their name
+     */
     var typeParameters: MutableMap<String, TypeParameterData>,
+    /**
+     * list of annotations on this type
+     */
     var annotations: MutableList<AnnotationData>
-) {
-
-    companion object {
-        fun placeholder(id: TypeId) = PlaceholderTypeData(id)
-    }
-
-}
+)
 
 
 /**
- * Data for a wildcard-type
+ * A placeholder type data. "Reserves" the given id for a yet to be resolved type.
  */
 class PlaceholderTypeData(
+    /**
+     * the id of the type to "reserve".
+     */
     id: TypeId
 ) : BaseTypeData(
     id = id,
@@ -57,17 +69,26 @@ class PrimitiveTypeData(
 
 
 /**
- * Data of an object with members (fields,methods) and inheritance information
+ * Data of an object with members (fields,methods) and inheritance information (usually normal classes).
  */
 open class ObjectTypeData(
     id: TypeId,
     simpleName: String,
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
+    annotations: MutableList<AnnotationData> = mutableListOf(),
+    /**
+     * the list of subtypes, i.e. types that extend this type
+     */
     var subtypes: MutableList<TypeId> = mutableListOf(),
+    /**
+     * the list of supertype, i.e. types this type extends
+     */
     var supertypes: MutableList<TypeId> = mutableListOf(),
+    /**
+     * list of members, e.g. properties, functions
+     */
     var members: MutableList<PropertyData> = mutableListOf(),
-    annotations: MutableList<AnnotationData> = mutableListOf()
 ) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
@@ -83,8 +104,11 @@ class EnumTypeData(
     supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
+    /**
+     * the possible values of the enum
+     */
     var enumConstants: MutableList<String>,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 
 
 /**
@@ -99,13 +123,19 @@ class MapTypeData(
     supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
+    /**
+     * the type of the key
+     */
     var keyType: PropertyData,
+    /**
+     * the type of the values
+     */
     var valueType: PropertyData,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 
 
 /**
- * Data of a collection-object with information about item type
+ * Data of a collection-object with information about the item type
  */
 class CollectionTypeData(
     id: TypeId,
@@ -116,6 +146,9 @@ class CollectionTypeData(
     supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
+    /**
+     * the type of the items
+     */
     val itemType: PropertyData,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, subtypes, supertypes, members, annotations)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 

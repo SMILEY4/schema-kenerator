@@ -3,20 +3,24 @@ package io.github.smiley4.schemakenerator.jackson.steps
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import kotlin.reflect.KClass
+import io.github.smiley4.schemakenerator.core.data.flatten
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
 /**
- * Finds all additional subtypes from jackson [JsonSubTypes]-Annotation and adds them to the list
- * - input: [KType]
- * - output: [KType] including additional subtypes
+ * Finds additional subtypes from jackson [JsonSubTypes]-annotation.
+ * An additional step to add missing subtype-supertype relations later may be required - see [io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep].
+ * @param maxRecursionDepth how many "levels" to search for subtypes
+ * @param typeProcessing processor to get annotation data from [KType]
  */
 class JacksonSubTypeStep(
     private val maxRecursionDepth: Int = 10,
-    val typeProcessing: (type: KType) -> Bundle<BaseTypeData>
+    val typeProcessing: (type: KType) -> Bundle<BaseTypeData> // todo: change to "Ktype -> AnnotationData[]" and add steps: "Reflection#processAnnotations(KType)" and "Core#collectAnnotations(Bundle<BaseTypeData>)",
 ) {
 
+    /**
+     * Finds additional subtypes from jackson [JsonSubTypes]-annotation.
+     */
     fun process(data: KType): Bundle<KType> {
         var depth = 0
         var countPrev = 0
@@ -45,7 +49,7 @@ class JacksonSubTypeStep(
     private fun process(types: List<KType>): Collection<BaseTypeData> {
         return types
             .map { typeProcessing(it) }
-            .flatMap { listOf(it.data) + it.supporting }
+            .flatMap { it.flatten() }
     }
 
     private fun findSubTypes(typeData: BaseTypeData): List<KType> {

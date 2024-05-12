@@ -8,9 +8,9 @@ import kotlin.reflect.full.starProjectedType
 
 
 /**
- * Finds all additional subtypes from [SubType]-Annotation and adds them to the list
- * - input: [KType]
- * - output: [KType] including additional subtypes
+ * Finds additional subtypes from [SubType]-annotation.
+ * An additional step to add missing subtype-supertype relations later may be required - see [io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep].
+ * @param maxRecursionDepth how many "levels" to search for subtypes
  */
 class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
 

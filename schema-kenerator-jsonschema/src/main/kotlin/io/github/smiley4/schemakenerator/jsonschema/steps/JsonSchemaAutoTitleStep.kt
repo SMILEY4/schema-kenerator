@@ -7,9 +7,8 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 
 /**
- * Adds an automatically determined title to schemas
- * - input: [JsonSchema]
- * - output: [JsonSchema] with added 'title'
+ * Adds an automatically determined title to schemas.
+ * @param type the type of the title
  */
 class JsonSchemaAutoTitleStep(val type: TitleType = TitleType.FULL) {
 

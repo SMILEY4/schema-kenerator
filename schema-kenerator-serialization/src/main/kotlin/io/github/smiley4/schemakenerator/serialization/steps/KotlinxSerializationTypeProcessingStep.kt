@@ -30,11 +30,12 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
 /**
- * Parses the given types and extracts information. Types must be serializable, i.e. annotated with [Serializable]
- * - input: [KType]
- * - output: [BaseTypeData] for each input type
+ * Processes the given type and extracts information about it using kotlinx-serialization. Types must be serializable, i.e. annotated with [Serializable]
  */
 class KotlinxSerializationTypeProcessingStep(
+    /**
+     * custom processors for given types that overwrite the default behaviour
+     */
     private val customProcessors: Map<String, () -> BaseTypeData> = emptyMap()
 ) {
 

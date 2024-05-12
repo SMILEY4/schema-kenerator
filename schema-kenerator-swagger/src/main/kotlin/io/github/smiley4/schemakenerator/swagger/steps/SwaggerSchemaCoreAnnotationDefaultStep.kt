@@ -6,9 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 /**
- * Adds additional metadata from core annotation [SchemaDefault]
- * - input: [SwaggerSchema]
- * - output: [SwaggerSchema] with added information from annotations
+ * Adds default values from [SchemaDefault]-annotation
  */
 class SwaggerSchemaCoreAnnotationDefaultStep {
 

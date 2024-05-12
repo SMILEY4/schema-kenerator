@@ -14,9 +14,8 @@ import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
 /**
- * Generates json-schemas from type data. All types in the schema are referenced by type-id
- * - input: [BaseTypeData]
- * - output: [SwaggerSchema] for each input type
+ * Generates swagger-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
+ * Result needs to be "compiled" to get the final swagger-schema.
  */
 class SwaggerSchemaGenerationStep {
 

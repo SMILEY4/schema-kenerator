@@ -6,11 +6,10 @@ import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
 /**
- * Adds additional metadata from core annotation [SchemaDeprecated] and [Deprecated]
- * - input: [SwaggerSchema]
- * - output: [SwaggerSchema] with added information from annotations
+ * Sets deprecated-flag from [SchemaDeprecated] or kotlin's [Deprecated]-annotation.
  */
 class SwaggerSchemaCoreAnnotationDeprecatedStep {
 

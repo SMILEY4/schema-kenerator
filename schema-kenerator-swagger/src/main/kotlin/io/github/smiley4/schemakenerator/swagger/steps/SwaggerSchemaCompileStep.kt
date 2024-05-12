@@ -9,9 +9,8 @@ import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.swagger.v3.oas.models.media.Schema
 
 /**
- * Resolves references in schemas - either inlining them or collecting them in the definitions-section and referencing them.
- * - input: [SwaggerSchema]
- * - output: [CompiledSwaggerSchema]
+ * Resolves references in prepared swagger-schemas - either inlining them or collecting them in the components-section and referencing them.
+ * @param pathType when referencing types, either use the full id of a shorter, simplified version
  */
 class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
 

@@ -8,11 +8,10 @@ import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
 /**
- * Adds additional metadata from core annotations [SchemaDeprecated] or [Deprecated]
- * - input: [JsonSchema]
- * - output: [JsonSchema] with added information from annotations
+ * Sets deprecated-flag from [SchemaDeprecated] or kotlin's [Deprecated]-annotation.
  */
 class JsonSchemaCoreAnnotationDeprecatedStep {
 

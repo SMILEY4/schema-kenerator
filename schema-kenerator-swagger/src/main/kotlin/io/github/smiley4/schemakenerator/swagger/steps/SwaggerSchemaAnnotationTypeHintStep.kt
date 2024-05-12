@@ -6,9 +6,7 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
 
 /**
- * Modifies type from annotation [SwaggerTypeHint]
- * - input: [SwaggerSchema]
- * - output: [SwaggerSchema] with modified type from annotations
+ * Modifies type of swagger-objects with the [SwaggerTypeHint]-annotation.
  */
 class SwaggerSchemaAnnotationTypeHintStep {
 

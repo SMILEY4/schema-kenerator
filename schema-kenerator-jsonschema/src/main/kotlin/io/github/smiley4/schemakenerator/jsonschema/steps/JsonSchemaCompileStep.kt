@@ -15,9 +15,8 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.array
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 
 /**
- * Resolves references in schemas - either inlining them or collecting them in the definitions-section and referencing them.
- * - input: [JsonSchema]
- * - output: [CompiledJsonSchema]
+ * Resolves references in prepared json-schemas - either inlining them or collecting them in the definitions-section and referencing them.
+ * @param pathType when referencing types, either use the full id of a shorter, simplified version
  */
 class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
 

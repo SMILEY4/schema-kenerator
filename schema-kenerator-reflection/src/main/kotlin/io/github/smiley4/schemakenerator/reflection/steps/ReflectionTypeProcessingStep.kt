@@ -7,6 +7,7 @@ import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.data.PlaceholderTypeData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
@@ -29,17 +30,36 @@ import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
 
 /**
- * Parses the given types and extracts information
- * - input: [KType]
- * - output: [BaseTypeData] for each input type
+ * Processes the given type and extracts information about it using reflection.
  */
 class ReflectionTypeProcessingStep(
+    /**
+     * Whether to include getters as members of classes (see [FunctionPropertyType.GETTER]).
+     */
     private val includeGetters: Boolean = false,
+    /**
+     * Whether to include weak getters as members of classes (see [FunctionPropertyType.WEAK_GETTER]).
+     */
     private val includeWeakGetters: Boolean = false,
+    /**
+     * Whether to include functions as members of classes (see [FunctionPropertyType.FUNCTION]).
+     */
     private val includeFunctions: Boolean = false,
+    /**
+     * Whether to include hidden (e.g. private) members
+     */
     private val includeHidden: Boolean = false,
+    /**
+     * Whether to include static members
+     */
     private val includeStatic: Boolean = false,
+    /**
+     * The list of types that are considered "primitive types" and returned as [PrimitiveTypeData]
+     */
     private val primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES,
+    /**
+     * custom processors for given types that overwrite the default behaviour
+     */
     private val customProcessors: Map<KClass<*>, () -> BaseTypeData> = emptyMap()
 ) {
 
@@ -119,7 +139,7 @@ class ReflectionTypeProcessingStep(
         }
 
         // add placeholder to break out of some infinite recursions
-        typeData.add(BaseTypeData.placeholder(id))
+        typeData.add(PlaceholderTypeData(id))
 
         // determine class type, i.e. whether type is primitive, class, enum, collection, map, ...
         val classType = determineClassType(clazz)

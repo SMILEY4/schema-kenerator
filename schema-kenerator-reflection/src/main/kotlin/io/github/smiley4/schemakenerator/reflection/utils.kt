@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-inline fun <reified T> getKType(): KType {
+inline fun <reified T> getKType(): KType { // todo: remove & replace directly with typeof
     return typeOf<T>()
 }
 

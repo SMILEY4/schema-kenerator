@@ -1,9 +1,16 @@
 package io.github.smiley4.schemakenerator.jsonschema.jsonDsl
 
+/**
+ * Construct a new [JsonObject].
+ */
 fun obj(block: JsonObjectDsl.() -> Unit): JsonObject {
     return JsonObjectDsl().apply(block).build()
 }
 
+
+/**
+ * Dsl for a [JsonObject].
+ */
 class JsonObjectDsl {
 
     private val properties = mutableMapOf<String, JsonNode>()
@@ -80,10 +87,18 @@ class JsonObjectDsl {
 
 }
 
+
+/**
+ * Construct a new [JsonArray].
+ */
 fun array(block: JsonArrayDsl.() -> Unit): JsonArray {
     return JsonArrayDsl().apply(block).build()
 }
 
+
+/**
+ * Dsl for a [JsonArray].
+ */
 class JsonArrayDsl {
 
     private val items = mutableListOf<JsonNode>()
