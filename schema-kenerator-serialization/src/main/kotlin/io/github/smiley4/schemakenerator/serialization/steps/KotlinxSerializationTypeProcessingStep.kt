@@ -60,10 +60,11 @@ class KotlinxSerializationTypeProcessingStep(
                 ?.let { parse(it.descriptor, typeData) }
                 ?: parseWildcard(typeData)
         } else {
-            throw Exception("Type is not a class.")
+            throw IllegalArgumentException("Type is not a class.")
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun parse(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
         if (customProcessors.containsKey(descriptor.cleanSerialName())) {
             return customProcessors[descriptor.cleanSerialName()]!!.invoke().also { result ->

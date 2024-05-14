@@ -7,7 +7,28 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
 
-class KotlinxSerializationTypeProcessingStepConfig {
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+    val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
+    return KotlinxSerializationTypeProcessingStep(
+        customProcessors = config.customProcessors
+    ).process(this)
+}
+
+
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+    val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
+    return KotlinxSerializationTypeProcessingStep(
+        customProcessors = config.customProcessors
+    ).process(this)
+}
+
+class KotlinxSerializationTypeProcessingConfig {
     internal var customProcessors = mutableMapOf<String, () -> BaseTypeData>()
 
     fun customProcessor(serializerName: String, processor: () -> BaseTypeData) {
@@ -33,27 +54,3 @@ class KotlinxSerializationTypeProcessingStepConfig {
     }
 
 }
-
-
-/**
- * See [KotlinxSerializationTypeProcessingStep]
- */
-fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
-    val config = KotlinxSerializationTypeProcessingStepConfig().apply(configBlock)
-    return KotlinxSerializationTypeProcessingStep(
-        customProcessors = config.customProcessors
-    ).process(this)
-}
-
-
-/**
- * See [KotlinxSerializationTypeProcessingStep]
- */
-fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
-    val config = KotlinxSerializationTypeProcessingStepConfig().apply(configBlock)
-    return KotlinxSerializationTypeProcessingStep(
-        customProcessors = config.customProcessors
-    ).process(this)
-}
-
-

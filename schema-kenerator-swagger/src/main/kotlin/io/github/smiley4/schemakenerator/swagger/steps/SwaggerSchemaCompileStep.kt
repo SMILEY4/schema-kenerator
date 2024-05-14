@@ -94,6 +94,7 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
         )
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun mergeInto(other: Schema<*>, dst: Schema<*>) {
         other.default?.also { dst.setDefault(it) }
         other.title?.also { dst.title = it }

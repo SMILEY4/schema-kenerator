@@ -81,10 +81,6 @@ class JsonObjectDsl {
         } ?: JsonNullValue()
     }
 
-    infix fun String.to(value: Nothing?) {
-        properties[this] = JsonNullValue()
-    }
-
 }
 
 
@@ -121,10 +117,6 @@ class JsonArrayDsl {
 
     fun item(value: Boolean?) {
         items.add(value?.let { JsonBooleanValue(it) } ?: JsonNullValue())
-    }
-
-    fun item(value: Nothing?) {
-        items.add(JsonNullValue())
     }
 
 }

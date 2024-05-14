@@ -50,6 +50,7 @@ class JsonSchemaGenerationStep {
         return JsonSchema(schemaUtils.anyObjectSchema(), WildcardTypeData())
     }
 
+    @Suppress("LongMethod")
     private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): JsonSchema {
         return when (typeData.qualifiedName) {
             Number::class.qualifiedName -> schemaUtils.numericSchema(

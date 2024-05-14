@@ -105,12 +105,13 @@ class ReflectionTypeProcessingStep(
         if (type.classifier is KClass<*>) {
             return parseClass(type, type.classifier as KClass<*>, mapOf(), typeData)
         } else {
-            throw Exception("Type is not a class.")
+            throw IllegalArgumentException("Type is not a class.")
         }
     }
 
     // ====== CLASS ====================================================
 
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun parseClass(
         type: KType,
         clazz: KClass<*>,
@@ -295,10 +296,11 @@ class ReflectionTypeProcessingStep(
                 parseClass(typeProjection.type!!, classifier, providedTypeParameters, typeData)
             }
             is KTypeParameter -> {
-                typeData.find { it.id == providedTypeParameters[classifier.name]?.type } ?: throw Exception("No type parameter provided")
+                typeData.find { it.id == providedTypeParameters[classifier.name]?.type }
+                    ?: throw IllegalArgumentException("No type parameter provided")
             }
             else -> {
-                throw Exception("Unhandled classifier type")
+                throw IllegalArgumentException("Unhandled classifier type")
             }
         }
     }
@@ -400,10 +402,11 @@ class ReflectionTypeProcessingStep(
                 parseClass(type, classifier, providedTypeParameters, typeData)
             }
             is KTypeParameter -> {
-                typeData.find { it.id == providedTypeParameters[classifier.name]?.type } ?: throw Exception("No type parameter provided")
+                typeData.find { it.id == providedTypeParameters[classifier.name]?.type }
+                    ?: throw IllegalArgumentException("No type parameter provided")
             }
             else -> {
-                throw Exception("Unhandled classifier type")
+                throw IllegalArgumentException("Unhandled classifier type")
             }
         }
     }
@@ -430,7 +433,7 @@ class ReflectionTypeProcessingStep(
                 parseClass(type, classifier, providedTypeParameters, typeData)
             }
             else -> {
-                throw Exception("Unhandled classifier type")
+                throw IllegalArgumentException("Unhandled classifier type")
             }
         }
     }
@@ -472,6 +475,7 @@ class ReflectionTypeProcessingStep(
             .contains("kotlin.jvm.internal.RepeatableContainer")
     }
 
+    @Suppress("SwallowedException")
     private fun unwrapContainer(annotation: Annotation): List<Annotation> {
         try {
             // A repeatable annotation container must have a method "value" returning the array of repeated annotations.

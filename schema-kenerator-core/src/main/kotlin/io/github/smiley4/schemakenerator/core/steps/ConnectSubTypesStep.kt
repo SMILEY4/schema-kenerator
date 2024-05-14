@@ -7,7 +7,9 @@ import io.github.smiley4.schemakenerator.core.data.flatten
 
 /**
  * Adds missing subtype-supertype relations between the given types. Types not already present in the input are not included.
- * Example: B is a subtype of A. B has A in its list of supertypes, but A not B as a subtype. This step finds these missing connections and adds them.
+ * Example:
+ * B is a subtype of A. B has A in its list of supertypes, but A not B as a subtype.
+ * This step finds these missing connections and adds them.
  */
 class ConnectSubTypesStep {
 

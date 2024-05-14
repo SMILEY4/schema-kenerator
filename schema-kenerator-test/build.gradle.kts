@@ -1,9 +1,5 @@
-import io.gitlab.arturbosch.detekt.Detekt
-
 plugins {
     kotlin("jvm") version "1.9.21"
-    id("org.owasp.dependencycheck") version "8.2.1"
-    id("io.gitlab.arturbosch.detekt") version "1.23.0"
     kotlin("plugin.serialization") version "1.9.21"
 }
 
@@ -26,18 +22,4 @@ dependencies {
     testImplementation(project(":schema-kenerator-jsonschema"))
     testImplementation(project(":schema-kenerator-swagger"))
     testImplementation(project(":schema-kenerator-jackson"))
-}
-
-tasks.withType<Detekt>().configureEach {
-    ignoreFailures = false
-    buildUponDefaultConfig = true
-    allRules = false
-    config.setFrom("$projectDir/../detekt/detekt.yml")
-    reports {
-        html.required.set(true)
-        md.required.set(true)
-        xml.required.set(false)
-        txt.required.set(false)
-        sarif.required.set(false)
-    }
 }

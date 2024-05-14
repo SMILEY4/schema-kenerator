@@ -42,7 +42,8 @@ class TypeId(
          * @param withAdditionalId whether set the [TypeId.additionalId] to a random value
          * @return id with the given name and type parameters
          */
-        fun build(name: String, typeParameters: List<TypeId>, withAdditionalId: Boolean = false) = TypeId(name, typeParameters, if (withAdditionalId) abs(Random.nextLong()).toString() else null)
+        fun build(name: String, typeParameters: List<TypeId>, withAdditionalId: Boolean = false) =
+            TypeId(name, typeParameters, if (withAdditionalId) abs(Random.nextLong()).toString() else null)
 
 
         /**
@@ -50,9 +51,15 @@ class TypeId(
          * @return a id with the data from the given string
          */
         fun parse(fullTypeId: String): TypeId {
+            return TypeId(
+                base = parseBase(fullTypeId),
+                typeParameters = parseTypeParameters(fullTypeId),
+                additionalId = parseAdditionalId(fullTypeId)
+            )
+        }
 
-            // base
-            val base = fullTypeId
+        private fun parseBase(fullTypeId: String): String {
+            return fullTypeId
                 .let {
                     if (it.contains("<")) {
                         it.split("<").first()
@@ -70,63 +77,63 @@ class TypeId(
                         it
                     }
                 }
+        }
 
-            // additional id
-            var additionalId: String? = null
-            if (fullTypeId.contains("#")) {
-                additionalId = fullTypeId.split("#").last()
-            }
-
-            var typeParameters = emptyList<TypeId>()
+        private fun parseTypeParameters(fullTypeId: String): List<TypeId> {
             if (fullTypeId.contains("<")) {
-                val paramList = fullTypeId
-                    .split("<")
-                    .toMutableList().also { it.removeFirst() }
-                    .joinToString("<")
-                    .let {
-                        if (it.contains("#")) {
-                            it
-                                .split("#")
-                                .toMutableList()
-                                .also { l -> l.removeLast() }
-                                .joinToString("#")
-                        } else {
-                            it
-                        }
-                    }
-                    .let { it.substring(0, it.length - 1) }
-
-                val paramFullIds = mutableListOf<String>()
-                var current = ""
-                var nestedLevel = 0
-                paramList.toCharArray().forEach { c ->
-                    when (c) {
-                        ',' -> if (nestedLevel == 0) {
-                            paramFullIds.add(current)
-                            current = ""
-                        } else {
-                            current += c
-                        }
-                        '<' -> {
-                            nestedLevel++
-                            current += c
-                        }
-                        '>' -> {
-                            nestedLevel--
-                            current += c
-                        }
-                        else -> current += c
+                return emptyList()
+            }
+            var typeParameters = emptyList<TypeId>()
+            val paramList = fullTypeId
+                .split("<")
+                .toMutableList().also { it.removeFirst() }
+                .joinToString("<")
+                .let {
+                    if (it.contains("#")) {
+                        it
+                            .split("#")
+                            .toMutableList()
+                            .also { l -> l.removeLast() }
+                            .joinToString("#")
+                    } else {
+                        it
                     }
                 }
-                paramFullIds.add(current)
-                typeParameters = paramFullIds.map { parse(it) }
-            }
+                .let { it.substring(0, it.length - 1) }
 
-            return TypeId(
-                base = base,
-                typeParameters = typeParameters,
-                additionalId = additionalId
-            )
+            val paramFullIds = mutableListOf<String>()
+            var current = ""
+            var nestedLevel = 0
+            paramList.toCharArray().forEach { c ->
+                when (c) {
+                    ',' -> if (nestedLevel == 0) {
+                        paramFullIds.add(current)
+                        current = ""
+                    } else {
+                        current += c
+                    }
+                    '<' -> {
+                        nestedLevel++
+                        current += c
+                    }
+                    '>' -> {
+                        nestedLevel--
+                        current += c
+                    }
+                    else -> current += c
+                }
+            }
+            paramFullIds.add(current)
+            typeParameters = paramFullIds.map { parse(it) }
+            return typeParameters
+        }
+
+        private fun parseAdditionalId(fullTypeId: String): String? {
+            return if (fullTypeId.contains("#")) {
+                fullTypeId.split("#").last()
+            } else {
+                null
+            }
         }
 
     }
