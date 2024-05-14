@@ -52,7 +52,7 @@ val jsonSchema = typeOf<MyExampleClass>()
     .generateJsonSchema()
     .compileInlining()
     .json
-    .prettyPrint()
+    .prettyPrint()        
 ```
 
 ```json
