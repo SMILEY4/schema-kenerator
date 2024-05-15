@@ -1,19 +1,17 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
 
-object Meta {
-    const val artifactId = "schema-kenerator-jsonschema"
-}
-
-val schemaKeneratorVersion: String by project
-val schemaKeneratorGroupId: String by project
-group = schemaKeneratorGroupId
-version = schemaKeneratorVersion
+val projectGroupId: String by project
+val projectVersion: String by project
+group = projectGroupId
+version = projectVersion
 
 plugins {
     kotlin("jvm")
     id("org.owasp.dependencycheck")
     id("io.gitlab.arturbosch.detekt")
-    `maven-publish`
+    id("com.vanniktech.maven.publish")
+    id("org.jetbrains.dokka")
 }
 
 repositories {
@@ -24,27 +22,8 @@ dependencies {
     implementation(project(":schema-kenerator-core"))
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
 kotlin {
     jvmToolchain(11)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            artifactId = Meta.artifactId
-            from(components["java"])
-            pom {
-                name.set("schema-kenerator")
-                description.set("Kotlin generator for various schemas")
-                url.set("https://github.com/SMILEY4/schema-kenerator")
-            }
-        }
-    }
 }
 
 detekt {
@@ -60,5 +39,46 @@ tasks.withType<Detekt>().configureEach {
         xml.required.set(false)
         txt.required.set(false)
         sarif.required.set(false)
+    }
+}
+
+mavenPublishing {
+    val projectGroupId: String by project
+    val projectVersion: String by project
+    val projectArtifactIdBase: String by project
+    val projectNameBase: String by project
+    val projectDescriptionBase: String by project
+    val projectScmUrl: String by project
+    val projectScmConnection: String by project
+    val projectLicenseName: String by project
+    val projectLicenseUrl: String by project
+    val projectDeveloperName: String by project
+    val projectDeveloperUrl: String by project
+
+    publishToMavenCentral(SonatypeHost.S01)
+    signAllPublications()
+    coordinates(projectGroupId, "$projectArtifactIdBase-jsonschema", projectVersion)
+    pom {
+        name.set("$projectNameBase JSON Schema")
+        description.set("$projectDescriptionBase - automatically generates JSON Schemas")
+        url.set(projectScmUrl)
+        licenses {
+            license {
+                name.set(projectLicenseName)
+                url.set(projectLicenseUrl)
+                distribution.set(projectLicenseUrl)
+            }
+        }
+        scm {
+            url.set(projectScmUrl)
+            connection.set(projectScmConnection)
+        }
+        developers {
+            developer {
+                id.set(projectDeveloperName)
+                name.set(projectDeveloperName)
+                url.set(projectDeveloperUrl)
+            }
+        }
     }
 }
