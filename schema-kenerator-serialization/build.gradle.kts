@@ -11,9 +11,9 @@ version = schemaKeneratorVersion
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     id("org.owasp.dependencycheck")
     id("io.gitlab.arturbosch.detekt")
-    kotlin("plugin.serialization") version "1.9.21"
     `maven-publish`
 }
 
@@ -26,6 +26,10 @@ dependencies {
     implementation(kotlin("reflect"))
     val versionKotlinxSerializationJson: String by project
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$versionKotlinxSerializationJson")
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 java {
@@ -47,11 +51,13 @@ publishing {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
+detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true
     allRules = false
     config.setFrom("$projectDir/../detekt/detekt.yml")
+}
+tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
         md.required.set(true)

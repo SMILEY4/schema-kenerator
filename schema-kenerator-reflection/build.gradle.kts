@@ -25,6 +25,10 @@ dependencies {
     implementation(kotlin("reflect"))
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 java {
     withJavadocJar()
     withSourcesJar()
@@ -44,11 +48,13 @@ publishing {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
+detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true
     allRules = false
     config.setFrom("$projectDir/../detekt/detekt.yml")
+}
+tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
         md.required.set(true)

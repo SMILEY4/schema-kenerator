@@ -31,6 +31,10 @@ java {
     withSourcesJar()
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -45,11 +49,13 @@ publishing {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
+detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true
     allRules = false
     config.setFrom("$projectDir/../detekt/detekt.yml")
+}
+tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
         md.required.set(true)
