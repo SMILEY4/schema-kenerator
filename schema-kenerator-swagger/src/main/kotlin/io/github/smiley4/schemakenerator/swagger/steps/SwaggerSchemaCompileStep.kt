@@ -127,7 +127,10 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
         other.contains?.also { dst.contains = it }
         other.maxContains?.also { dst.maxContains = it }
         other.minContains?.also { dst.minContains = it }
-        other.examples?.also { dst.examples = it }
+        other.examples?.also {
+            @Suppress("UNCHECKED_CAST")
+            (dst as Schema<Any?>).examples = it
+        }
     }
 
     private fun shouldReference(schema: Schema<*>): Boolean {
@@ -141,7 +144,6 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
         if (node.`$ref` != null) {
             return mapping(node)
         } else {
-            // todo: clone node ?
             return node.also { n ->
                 n.items = n.items?.let { replaceReferences(it, mapping) }
                 n.properties = n.properties?.let { it.mapValues { e -> replaceReferences(e.value, mapping) } }

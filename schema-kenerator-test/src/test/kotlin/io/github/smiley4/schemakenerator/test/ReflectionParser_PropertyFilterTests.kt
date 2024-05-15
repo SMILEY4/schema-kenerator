@@ -4,12 +4,12 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
-import io.github.smiley4.schemakenerator.reflection.getKType
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Suppress("ClassName")
 class ReflectionParser_PropertyFilterTests : FunSpec({
@@ -68,7 +68,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
 
         private val TEST_DATA = listOf(
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = false,
                 includeWeakGetters = false,
                 includeHidden = false,
@@ -88,7 +88,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 )
             ),
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = true,
                 includeWeakGetters = false,
                 includeHidden = false,
@@ -108,7 +108,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 )
             ),
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = false,
                 includeWeakGetters = true,
                 includeHidden = false,
@@ -128,7 +128,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 )
             ),
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = true,
                 includeWeakGetters = true,
                 includeHidden = false,
@@ -148,7 +148,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 )
             ),
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = false,
                 includeWeakGetters = false,
                 includeHidden = true,
@@ -168,7 +168,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 )
             ),
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = true,
                 includeWeakGetters = false,
                 includeHidden = true,
@@ -188,7 +188,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 )
             ),
             TestData(
-                type = getKType<FilterableClassPublicGetters>(),
+                type = typeOf<FilterableClassPublicGetters>(),
                 includeGetters = true,
                 includeWeakGetters = true,
                 includeHidden = true,

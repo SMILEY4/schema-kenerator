@@ -6,7 +6,6 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
-import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
@@ -26,6 +25,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Suppress("ClassName")
 class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
@@ -189,7 +189,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
         private val TEST_DATA = listOf(
             TestData(
-                type = getKType<Any>(),
+                type = typeOf<Any>(),
                 testName = "any",
                 expectedResultInlining = """
                     {
@@ -208,7 +208,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<UByte>(),
+                type = typeOf<UByte>(),
                 testName = "ubyte",
                 expectedResultInlining = """
                     {
@@ -233,7 +233,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<Int>(),
+                type = typeOf<Int>(),
                 testName = "int",
                 expectedResultInlining = """
                     {
@@ -258,7 +258,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent()
             ),
             TestData(
-                type = getKType<Float>(),
+                type = typeOf<Float>(),
                 testName = "float",
                 expectedResultInlining = """
                     {
@@ -283,7 +283,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<Boolean>(),
+                type = typeOf<Boolean>(),
                 testName = "boolean",
                 expectedResultInlining = """
                     {
@@ -302,7 +302,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<String>(),
+                type = typeOf<String>(),
                 testName = "string",
                 expectedResultInlining = """
                     {
@@ -322,7 +322,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             ),
             TestData(
                 // top-level lists not directly supported: weird result
-                type = getKType<List<String>>(),
+                type = typeOf<List<String>>(),
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
@@ -353,7 +353,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             ),
             // top-level maps not directly supported: weird result
             TestData(
-                type = getKType<Map<String, Int>>(),
+                type = typeOf<Map<String, Int>>(),
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
@@ -383,7 +383,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWithSimpleFields>(),
+                type = typeOf<ClassWithSimpleFields>(),
                 testName = "class with simple fields",
                 expectedResultInlining = """
                     {
@@ -461,7 +461,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<TestEnum>(),
+                type = typeOf<TestEnum>(),
                 testName = "enum",
                 expectedResultInlining = """
                     {
@@ -486,7 +486,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             ),
             TestData(
                 // generics not supported with kotlinx-serialization -> fallback to "any"-schema
-                type = getKType<ClassWithGenericField<String>>(),
+                type = typeOf<ClassWithGenericField<String>>(),
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
@@ -506,7 +506,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             ),
             TestData(
                 // generics not supported with kotlinx-serialization -> fallback to "any"-schema
-                type = getKType<ClassWithGenericField<*>>(),
+                type = typeOf<ClassWithGenericField<*>>(),
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
                     {
@@ -526,7 +526,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             ),
             TestData(
                 // generics not supported with kotlinx-serialization -> fallback to "any"-schema
-                type = getKType<ClassWithDeepGeneric<String>>(),
+                type = typeOf<ClassWithDeepGeneric<String>>(),
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
@@ -545,7 +545,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<SealedClass>(),
+                type = typeOf<SealedClass>(),
                 testName = "sealed class with subtypes",
                 expectedResultInlining = """
                     {
@@ -676,7 +676,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<SubClassA>(),
+                type = typeOf<SubClassA>(),
                 testName = "sub class",
                 expectedResultInlining = """
                     {
@@ -739,7 +739,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWIthDifferentGenerics>(),
+                type = typeOf<ClassWIthDifferentGenerics>(),
                 testName = "class with multiple different generics",
                 expectedResultInlining = """
                     {
@@ -867,7 +867,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
 //            TestData(
-//                type = getKType<ClassWithLocalDateTime>(),
+//                type = typeOf<ClassWithLocalDateTime>(),
 //                testName = "class with java local-date-time and custom parser",
 //                customParsers = mapOf(
 //                    LocalDateTime::class to CustomKotlinxSerializationTypeParser { typeId, _ ->
@@ -925,7 +925,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 //                """.trimIndent(),
 //            ),
             TestData(
-                type = getKType<ClassWithNestedClass>(),
+                type = typeOf<ClassWithNestedClass>(),
                 testName = "auto title",
                 withAutoTitle = true,
                 expectedResultInlining = """

@@ -6,7 +6,6 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
@@ -22,6 +21,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Suppress("ClassName")
 class JsonSchema_TitleAppender_Tests : FunSpec({
@@ -171,7 +171,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
 
         private val TEST_DATA = listOf(
             TestData(
-                type = getKType<Any>(),
+                type = typeOf<Any>(),
                 testName = "any",
                 expectedResultFullTitle = """
                     {
@@ -193,7 +193,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<UByte>(),
+                type = typeOf<UByte>(),
                 testName = "ubyte",
                 expectedResultFullTitle = """
                     {
@@ -221,7 +221,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWithSimpleFields>(),
+                type = typeOf<ClassWithSimpleFields>(),
                 testName = "class with simple fields",
                 expectedResultFullTitle = """
                     {
@@ -314,7 +314,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<TestEnum>(),
+                type = typeOf<TestEnum>(),
                 testName = "enum",
                 expectedResultFullTitle = """
                     {
@@ -345,7 +345,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<SealedClass>(),
+                type = typeOf<SealedClass>(),
                 testName = "sealed class with subtypes",
                 expectedResultFullTitle = """
                     {
@@ -489,7 +489,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWIthDifferentGenerics>(),
+                type = typeOf<ClassWIthDifferentGenerics>(),
                 testName = "class with multiple different generics",
                 expectedResultFullTitle = """
                     {

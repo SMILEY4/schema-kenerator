@@ -15,7 +15,6 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
-import io.github.smiley4.schemakenerator.reflection.getMembersSafe
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
@@ -568,5 +567,26 @@ class ReflectionTypeProcessingStep(
             annotations = emptyList()
         )
     }
+
+    @Suppress("SwallowedException")
+    private fun KClass<*>.getMembersSafe(): Collection<KCallable<*>> {
+        /*
+        Throws error for function-types (for unknown reasons). Catch and ignore this error
+
+        Example:
+        class MyClass(
+            val myField: (v: Int) -> String
+        )
+        "Unknown origin of public abstract operator fun invoke(p1: P1):
+        R defined in kotlin.Function1[FunctionInvokeDescriptor@162989f2]
+        (class kotlin.reflect.jvm.internal.impl.builtins.functions.FunctionInvokeDescriptor)"
+        */
+        return try {
+            this.members
+        } catch (e: Throwable) {
+            emptyList()
+        }
+    }
+
 
 }

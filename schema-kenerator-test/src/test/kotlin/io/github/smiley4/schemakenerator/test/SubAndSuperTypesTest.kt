@@ -5,18 +5,18 @@ import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.data.SubType
-import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import kotlin.reflect.typeOf
 
 class SubAndSuperTypesTest : StringSpec({
 
     "reflection subtype-annotation" {
 
-        val result = getKType<BaseClass1>()
+        val result = typeOf<BaseClass1>()
             .let { ReflectionAnnotationSubTypeStep().process(it) }
             .let { ReflectionTypeProcessingStep().process(it) }
             .let { ConnectSubTypesStep().process(it) }
@@ -83,7 +83,7 @@ class SubAndSuperTypesTest : StringSpec({
 
     "without reflection subtype-annotation" {
 
-        val result = getKType<NormalClass>()
+        val result = typeOf<NormalClass>()
             .let { ReflectionAnnotationSubTypeStep().process(it) }
             .let { ReflectionTypeProcessingStep().process(it) }
             .let { ConnectSubTypesStep().process(it) }
@@ -97,7 +97,7 @@ class SubAndSuperTypesTest : StringSpec({
 
     "jackson subtype-annotation" {
 
-        val result = getKType<JacksonBaseClass1>()
+        val result = typeOf<JacksonBaseClass1>()
             .let { JacksonSubTypeStep(typeProcessing = { type -> ReflectionTypeProcessingStep().process(type) }).process(it) }
             .let { ReflectionTypeProcessingStep().process(it) }
             .let { ConnectSubTypesStep().process(it) }
@@ -164,7 +164,7 @@ class SubAndSuperTypesTest : StringSpec({
 
     "without jackson subtype-annotation" {
 
-        val result = getKType<NormalClass>()
+        val result = typeOf<NormalClass>()
             .let { JacksonSubTypeStep(typeProcessing = { type -> ReflectionTypeProcessingStep().process(type) }).process(it) }
             .let { ReflectionTypeProcessingStep().process(it) }
             .let { ConnectSubTypesStep().process(it) }

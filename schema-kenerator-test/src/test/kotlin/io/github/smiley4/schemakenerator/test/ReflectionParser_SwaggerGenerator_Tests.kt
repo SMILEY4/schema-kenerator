@@ -2,7 +2,6 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
@@ -32,6 +31,7 @@ import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
 import io.swagger.v3.oas.models.media.Schema
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Suppress("ClassName")
 class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
@@ -196,7 +196,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
 
         private val TEST_DATA = listOf(
             TestData(
-                type = getKType<Any>(),
+                type = typeOf<Any>(),
                 testName = "any",
                 expectedResultInlining = """
                     {
@@ -227,7 +227,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<UByte>(),
+                type = typeOf<UByte>(),
                 testName = "ubyte",
                 expectedResultInlining = """
                     {
@@ -264,7 +264,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<Int>(),
+                type = typeOf<Int>(),
                 testName = "int",
                 expectedResultInlining = """
                     {
@@ -298,7 +298,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent()
             ),
             TestData(
-                type = getKType<Float>(),
+                type = typeOf<Float>(),
                 testName = "float",
                 expectedResultInlining = """
                     {
@@ -332,7 +332,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<Boolean>(),
+                type = typeOf<Boolean>(),
                 testName = "boolean",
                 expectedResultInlining = """
                     {
@@ -363,7 +363,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<String>(),
+                type = typeOf<String>(),
                 testName = "string",
                 expectedResultInlining = """
                     {
@@ -394,7 +394,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<List<String>>(),
+                type = typeOf<List<String>>(),
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
@@ -437,7 +437,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<Map<String, Int>>(),
+                type = typeOf<Map<String, Int>>(),
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
@@ -483,7 +483,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWithSimpleFields>(),
+                type = typeOf<ClassWithSimpleFields>(),
                 testName = "class with simple fields",
                 expectedResultInlining = """
                     {
@@ -588,7 +588,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<TestEnum>(),
+                type = typeOf<TestEnum>(),
                 testName = "enum",
                 expectedResultInlining = """
                     {
@@ -624,7 +624,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWithGenericField<String>>(),
+                type = typeOf<ClassWithGenericField<String>>(),
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
@@ -687,7 +687,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWithGenericField<*>>(),
+                type = typeOf<ClassWithGenericField<*>>(),
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
                     {
@@ -750,7 +750,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<ClassWithDeepGeneric<String>>(),
+                type = typeOf<ClassWithDeepGeneric<String>>(),
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
@@ -825,7 +825,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<SealedClass>(),
+                type = typeOf<SealedClass>(),
                 testName = "sealed class with subtypes",
                 expectedResultInlining = """
                     {
@@ -995,7 +995,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<SubClassA>(),
+                type = typeOf<SubClassA>(),
                 testName = "sub class",
                 expectedResultInlining = """
                     {
@@ -1076,7 +1076,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                type = getKType<CoreAnnotatedClass>(),
+                type = typeOf<CoreAnnotatedClass>(),
                 testName = "annotated class (core)",
                 withAnnotations = true,
                 expectedResultInlining = """
@@ -1167,7 +1167,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
 //            TestData(
-//                type = getKType<ClassWithLocalDateTime>(),
+//                type = typeOf<ClassWithLocalDateTime>(),
 //                testName = "class with java local-date-time and custom parser",
 //                customParsers = mapOf(
 //                    LocalDateTime::class to CustomReflectionTypeParser { typeId, _ ->
@@ -1240,7 +1240,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
 //                """.trimIndent(),
 //            ),
             TestData(
-                type = getKType<ClassWithNestedClass>(),
+                type = typeOf<ClassWithNestedClass>(),
                 testName = "auto title",
                 withAutoTitle = true,
                 expectedResultInlining = """

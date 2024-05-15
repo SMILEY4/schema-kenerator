@@ -17,8 +17,6 @@ import kotlin.reflect.full.starProjectedType
 class JacksonSubTypeStep(
     private val maxRecursionDepth: Int = 10,
     val typeProcessing: (type: KType) -> Bundle<BaseTypeData>
-    // todo: change to "Ktype -> AnnotationData[]" and add steps:
-    //  "Reflection#processAnnotations(KType)" and "Core#collectAnnotations(Bundle<BaseTypeData>)",
 ) {
 
     /**

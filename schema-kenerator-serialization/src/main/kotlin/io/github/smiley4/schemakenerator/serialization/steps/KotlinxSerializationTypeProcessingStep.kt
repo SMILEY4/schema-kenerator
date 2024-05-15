@@ -14,8 +14,6 @@ import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
-import io.github.smiley4.schemakenerator.serialization.qualifiedName
-import io.github.smiley4.schemakenerator.serialization.simpleName
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.descriptors.PolymorphicKind
@@ -262,5 +260,13 @@ class KotlinxSerializationTypeProcessingStep(
     }
 
     private fun SerialDescriptor.cleanSerialName() = this.serialName.replace("?", "")
+
+
+    @OptIn(ExperimentalSerializationApi::class)
+    fun SerialDescriptor.qualifiedName() = this.serialName.replace("?", "")
+
+
+    @OptIn(ExperimentalSerializationApi::class)
+    fun SerialDescriptor.simpleName() = this.serialName.split(".").last().replace("?", "")
 
 }

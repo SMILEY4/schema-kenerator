@@ -11,7 +11,6 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTy
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.reflection.getKType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
@@ -28,12 +27,13 @@ import io.kotest.assertions.json.TypeCoercion
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import java.time.LocalDateTime
+import kotlin.reflect.typeOf
 
 class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime without custom processor" {
 
-        val result = getKType<ClassWithLocalDateTime>()
+        val result = typeOf<ClassWithLocalDateTime>()
             .let { ReflectionTypeProcessingStep().process(it) }
             .let { JsonSchemaGenerationStep().generate(it) }
             .let { JsonSchemaAnnotationTypeHintStep().process(it) }
@@ -69,7 +69,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime with custom processor" {
 
-        val result = getKType<ClassWithLocalDateTime>()
+        val result = typeOf<ClassWithLocalDateTime>()
             .let {
                 ReflectionTypeProcessingStep(
                     customProcessors = mapOf(LocalDateTime::class to {
@@ -124,7 +124,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime without custom processor" {
 
-        val result = getKType<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .let { KotlinxSerializationTypeProcessingStep().process(it) }
             .let { SwaggerSchemaGenerationStep().generate(it) }
             .let { SwaggerSchemaAnnotationTypeHintStep().process(it) }
@@ -161,7 +161,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime with custom processor" {
 
-        val result = getKType<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .let {
                 KotlinxSerializationTypeProcessingStep(
                     customProcessors = mapOf(LocalDateTime::class.qualifiedName!! to {
