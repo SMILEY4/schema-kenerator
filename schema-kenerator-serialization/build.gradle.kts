@@ -20,9 +20,9 @@ repositories {
 }
 
 dependencies {
+    val versionKotlinxSerializationJson: String by project
     implementation(project(":schema-kenerator-core"))
     implementation(kotlin("reflect"))
-    val versionKotlinxSerializationJson: String by project
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$versionKotlinxSerializationJson")
 }
 

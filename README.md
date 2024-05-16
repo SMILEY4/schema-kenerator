@@ -29,18 +29,15 @@ Customizable kotlin library to extract information from classes using reflection
 A wiki with a short documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
 
 
-
-## Installation
+## Example (json-schema & reflection)
 
 ```kotlin
 dependencies {
-    implementation "io.github.smiley4:schema-kenerator:<VERSION>"
+    implementation("io.github.smiley4:schema-kenerator-core:<VERSION>")
+    implementation("io.github.smiley4:schema-kenerator-reflection:<VERSION>")
+    implementation("io.github.smiley4:schema-kenerator-jsonschema:<VERSION>")
 }
 ```
-
-
-
-## Example (json-schema & reflection)
 
 ```kotlin
 class MyExampleClass(
@@ -56,7 +53,7 @@ val jsonSchema = typeOf<MyExampleClass>()
     .generateJsonSchema()
     .compileInlining()
     .json
-    .prettyPrint()        
+    .prettyPrint()
 ```
 
 ```json
@@ -65,31 +62,39 @@ val jsonSchema = typeOf<MyExampleClass>()
    "title": "MyExampleClass",
    "required": [ "someBoolList", "someText" ],
    "properties": {
-      "someBoolList": {
-         "type": "array",
-         "title": "List<Boolean>",         
-         "items": {
-            "type": "boolean",
-            "title": "Boolean"
-         }
-      },
-      "someNullableInt": {
-         "type": "integer",
-         "title": "Int",
-         "minimum": -2147483648,
-         "maximum": 2147483647
-      },
-      "someText": {
-         "type": "string",
-         "title": "String"
-      }
-   
+     "someBoolList": {
+       "type": "array",
+       "title": "List<Boolean>",
+       "items": {
+         "type": "boolean",
+         "title": "Boolean"
+       }
+     },
+     "someNullableInt": {
+       "type": "integer",
+       "title": "Int",
+       "minimum": -2147483648,
+       "maximum": 2147483647
+     },
+     "someText": {
+       "type": "string",
+       "title": "String"
+     }
+   }
 }
 ```
 
 
 
 ## Example (swagger & kotlinx-serialization)
+
+```kotlin
+dependencies {
+    implementation("io.github.smiley4:schema-kenerator-core:<VERSION>")
+    implementation("io.github.smiley4:schema-kenerator-serialization:<VERSION>")
+    implementation("io.github.smiley4:schema-kenerator-swagger:<VERSION>")
+}
+```
 
 ```kotlin
 @Serializable
