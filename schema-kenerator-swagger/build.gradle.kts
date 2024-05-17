@@ -21,13 +21,17 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":schema-kenerator-core"))
     val versionSwaggerParser: String by project
+    implementation(project(":schema-kenerator-core"))
     implementation("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
 }
 
 kotlin {
     jvmToolchain(11)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 detekt {

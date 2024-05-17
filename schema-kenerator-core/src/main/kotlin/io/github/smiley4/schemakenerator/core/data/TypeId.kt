@@ -80,10 +80,9 @@ class TypeId(
         }
 
         private fun parseTypeParameters(fullTypeId: String): List<TypeId> {
-            if (fullTypeId.contains("<")) {
+            if (!fullTypeId.contains("<") || !fullTypeId.contains(">")) {
                 return emptyList()
             }
-            var typeParameters = emptyList<TypeId>()
             val paramList = fullTypeId
                 .split("<")
                 .toMutableList().also { it.removeFirst() }
@@ -124,8 +123,7 @@ class TypeId(
                 }
             }
             paramFullIds.add(current)
-            typeParameters = paramFullIds.map { parse(it) }
-            return typeParameters
+            return paramFullIds.map { parse(it) }
         }
 
         private fun parseAdditionalId(fullTypeId: String): String? {

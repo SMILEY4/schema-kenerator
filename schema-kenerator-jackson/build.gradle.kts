@@ -20,13 +20,17 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":schema-kenerator-core"))
     val versionJackson: String by project
+    implementation(project(":schema-kenerator-core"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$versionJackson")
 }
 
 kotlin {
     jvmToolchain(11)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 detekt {
