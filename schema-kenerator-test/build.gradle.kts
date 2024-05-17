@@ -27,3 +27,7 @@ dependencies {
     testImplementation(project(":schema-kenerator-swagger"))
     testImplementation(project(":schema-kenerator-jackson"))
 }
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}

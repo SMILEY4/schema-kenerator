@@ -31,6 +31,10 @@ kotlin {
     jvmToolchain(11)
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true

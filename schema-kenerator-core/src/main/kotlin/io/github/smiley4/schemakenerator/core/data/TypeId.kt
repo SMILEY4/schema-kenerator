@@ -83,9 +83,10 @@ class TypeId(
             if (fullTypeId.contains("<")) {
                 return emptyList()
             }
-            var typeParameters = emptyList<TypeId>()
+            var typeParameters: List<TypeId>
             val paramList = fullTypeId
                 .split("<")
+                // todo bug: removes everything if typeId does not contain typeParams, i.e. "<" & ">" => check for "<" & ">" first
                 .toMutableList().also { it.removeFirst() }
                 .joinToString("<")
                 .let {
