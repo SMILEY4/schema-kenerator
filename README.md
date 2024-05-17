@@ -14,7 +14,7 @@ Customizable kotlin library to extract information from classes using reflection
 
 - supports nested types, inheritance, generics, annotations 
 
-- generate json-schema or swagger-schema
+- generate json-schema or [swagger](https://github.com/swagger-api/swagger-parser)-schema
 
 - add metadata using annotations (subtypes, title, description, deprecation, ...)
 
@@ -23,6 +23,24 @@ Customizable kotlin library to extract information from classes using reflection
 - customizable and extendable
 
 
+## Installation
+
+```kotlin
+dependencies {
+    implementation("io.github.smiley4:schema-kenerator-core:<VERSION>")
+    // only for using reflection
+    implementation("io.github.smiley4:schema-kenerator-reflection:<VERSION>")
+    // only for using kotlinx-serialization
+    implementation("io.github.smiley4:schema-kenerator-serialization:<VERSION>")
+    // only for generating json-schemas
+    implementation("io.github.smiley4:schema-kenerator-jsonschema:<VERSION>")
+    // only for generating swagger-schemas
+    implementation("io.github.smiley4:schema-kenerator-swagger:<VERSION>")
+    // only for support of Jackson-annotations
+    implementation("io.github.smiley4:schema-kenerator-jackson:<VERSION>")
+}
+```
+
 
 ## Documentation
 
@@ -30,14 +48,6 @@ A wiki with a short documentation is available [here](https://github.com/SMILEY4
 
 
 ## Example (json-schema & reflection)
-
-```kotlin
-dependencies {
-    implementation("io.github.smiley4:schema-kenerator-core:<VERSION>")
-    implementation("io.github.smiley4:schema-kenerator-reflection:<VERSION>")
-    implementation("io.github.smiley4:schema-kenerator-jsonschema:<VERSION>")
-}
-```
 
 ```kotlin
 class MyExampleClass(
@@ -51,6 +61,7 @@ class MyExampleClass(
 val jsonSchema = typeOf<MyExampleClass>()
     .processReflection()
     .generateJsonSchema()
+    .withAutoTitle(TitleType.SIMPLE)
     .compileInlining()
     .json
     .prettyPrint()

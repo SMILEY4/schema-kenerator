@@ -9,6 +9,7 @@ import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessi
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * See [ReflectionAnnotationSubTypeStep]
@@ -67,6 +68,12 @@ class ReflectionTypeProcessingStepConfig {
         customProcessors[type] = processor
     }
 
+    /**
+     * Add a custom processor for the given type that overwrites the default behaviour
+     */
+    inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
+        customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
+    }
 
     /**
      * Add custom processors for given type that overwrites the default behaviour
