@@ -80,13 +80,11 @@ class TypeId(
         }
 
         private fun parseTypeParameters(fullTypeId: String): List<TypeId> {
-            if (fullTypeId.contains("<")) {
+            if (!fullTypeId.contains("<") || !fullTypeId.contains(">")) {
                 return emptyList()
             }
-            var typeParameters: List<TypeId>
             val paramList = fullTypeId
                 .split("<")
-                // todo bug: removes everything if typeId does not contain typeParams, i.e. "<" & ">" => check for "<" & ">" first
                 .toMutableList().also { it.removeFirst() }
                 .joinToString("<")
                 .let {
@@ -125,8 +123,7 @@ class TypeId(
                 }
             }
             paramFullIds.add(current)
-            typeParameters = paramFullIds.map { parse(it) }
-            return typeParameters
+            return paramFullIds.map { parse(it) }
         }
 
         private fun parseAdditionalId(fullTypeId: String): String? {
