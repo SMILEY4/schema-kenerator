@@ -82,8 +82,8 @@ fun Bundle<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Bundle<SwaggerSchem
 /**
  * See [SwaggerSchemaCompileStep]
  */
-fun Bundle<SwaggerSchema>.compileInlining(pathType: TitleType = TitleType.FULL): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileStep(pathType).compileInlining(this)
+fun Bundle<SwaggerSchema>.compileInlining(): CompiledSwaggerSchema {
+    return SwaggerSchemaCompileStep().compileInlining(this)
 }
 
 

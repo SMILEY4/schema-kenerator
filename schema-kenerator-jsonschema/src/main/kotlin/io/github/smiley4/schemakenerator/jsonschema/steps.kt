@@ -82,8 +82,8 @@ fun Bundle<JsonSchema>.handleJsonTypeHintAnnotation(): Bundle<JsonSchema> {
 /**
  * See [JsonSchemaCompileStep]
  */
-fun Bundle<JsonSchema>.compileInlining(pathType: TitleType = TitleType.FULL): CompiledJsonSchema {
-    return JsonSchemaCompileStep(pathType).compileInlining(this)
+fun Bundle<JsonSchema>.compileInlining(): CompiledJsonSchema {
+    return JsonSchemaCompileStep().compileInlining(this)
 }
 
 
