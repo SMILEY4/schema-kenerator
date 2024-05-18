@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
@@ -125,12 +126,12 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 }
                 .let { JsonSchemaGenerationStep().generate(it) }
                 .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
-                .let { JsonSchemaCompileStep(TitleType.SIMPLE).compileReferencingRoot(it) }
+                .let { JsonSchemaCompileStep(RefType.SIMPLE).compileReferencingRoot(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
                             it.definitions.forEach { (k, v) ->
-                                k.simple() to v
+                                k to v
                             }
                         }
                     }

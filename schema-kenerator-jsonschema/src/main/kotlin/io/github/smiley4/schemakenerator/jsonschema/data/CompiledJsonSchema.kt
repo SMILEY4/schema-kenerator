@@ -19,5 +19,5 @@ class CompiledJsonSchema(
     /**
      * the referenced json schemas
      */
-    val definitions: Map<TypeId, JsonNode>
+    val definitions: Map<String, JsonNode>
 )

@@ -4,15 +4,16 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.swagger.v3.oas.models.media.Schema
 
 /**
  * Resolves references in prepared swagger-schemas - either inlining them or collecting them in the components-section and referencing them.
- * @param pathType when referencing types, either use the full id of a shorter, simplified version
+ * @param pathType how to reference the type, i.e. which name to use
  */
-class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
+class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -61,7 +62,7 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
                     swagger = schemaUtils.referenceSchema(getRefPath(result.typeData.id), true),
                     componentSchemas = buildMap {
                         this.putAll(result.componentSchemas)
-                        this[result.typeData.id] = result.swagger
+                        this[getRefPath(result.typeData.id)] = result.swagger
                     }
                 )
             } else {
@@ -71,7 +72,7 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
 
 
     private fun referenceDefinitionsReferences(node: Schema<*>, schemaList: Collection<SwaggerSchema>): CompiledSwaggerSchema {
-        val definitions = mutableMapOf<TypeId, Schema<*>>()
+        val definitions = mutableMapOf<String, Schema<*>>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`.replace("#/components/schemas/", ""))
             val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
@@ -79,7 +80,7 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
                 mergeInto(refObj, it.swagger)
             }
             if (shouldReference(referencedSchema.swagger)) {
-                definitions[referencedId] = procReferencedSchema.swagger
+                definitions[getRefPath(referencedId)] = procReferencedSchema.swagger
                 definitions.putAll(procReferencedSchema.componentSchemas)
                 schemaUtils.referenceSchema(getRefPath(referencedId), true)
             } else {
@@ -158,8 +159,8 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
 
     private fun getRefPath(typeId: TypeId): String {
         return when (pathType) {
-            TitleType.FULL -> typeId.full()
-            TitleType.SIMPLE -> typeId.simple()
+            RefType.FULL -> typeId.full()
+            RefType.SIMPLE -> typeId.simple()
         }
     }
 

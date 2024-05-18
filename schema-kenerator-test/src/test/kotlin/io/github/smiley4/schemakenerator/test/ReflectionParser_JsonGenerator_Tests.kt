@@ -106,7 +106,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
                             it.definitions.forEach { (k, v) ->
-                                k.full() to v
+                                k to v
                             }
                         }
                     }
@@ -155,7 +155,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
                             it.definitions.forEach { (k, v) ->
-                                k.full() to v
+                                k to v
                             }
                         }
                     }

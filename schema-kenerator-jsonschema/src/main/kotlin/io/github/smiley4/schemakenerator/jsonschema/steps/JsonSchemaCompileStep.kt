@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
@@ -16,9 +17,9 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 
 /**
  * Resolves references in prepared json-schemas - either inlining them or collecting them in the definitions-section and referencing them.
- * @param pathType when referencing types, either use the full id of a shorter, simplified version
+ * @param pathType how to reference the type, i.e. which name to use
  */
-class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
+class JsonSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
 
     private val schemaUtils = JsonSchemaUtils()
 
@@ -74,7 +75,7 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
                 json = schemaUtils.referenceSchema(getRefPath(result.typeData.id), true),
                 definitions = buildMap {
                     this.putAll(result.definitions)
-                    this[result.typeData.id] = result.json
+                    this[getRefPath(result.typeData.id)] = result.json
                 }
             )
         } else {
@@ -83,7 +84,7 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
     }
 
     private fun referenceDefinitionsReferences(node: JsonNode, schemaList: Collection<JsonSchema>): CompiledJsonSchema {
-        val definitions = mutableMapOf<TypeId, JsonNode>()
+        val definitions = mutableMapOf<String, JsonNode>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
             val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
@@ -96,7 +97,7 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
                 }
             }
             if (shouldReference(referencedSchema.json)) {
-                definitions[referencedId] = procReferencedSchema.json
+                definitions[getRefPath(referencedId)] = procReferencedSchema.json
                 definitions.putAll(procReferencedSchema.definitions)
                 schemaUtils.referenceSchema(getRefPath(referencedId), true)
             } else {
@@ -170,8 +171,8 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
 
     private fun getRefPath(typeId: TypeId): String {
         return when (pathType) {
-            TitleType.FULL -> typeId.full()
-            TitleType.SIMPLE -> typeId.simple()
+            RefType.FULL -> typeId.full()
+            RefType.SIMPLE -> typeId.simple()
         }
     }
 

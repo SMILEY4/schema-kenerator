@@ -111,7 +111,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let {
                     Result(
                         schema = it.swagger,
-                        definitions = it.componentSchemas.mapKeys { (k, _) -> k.full() }
+                        definitions = it.componentSchemas
                     )
                 }
 
@@ -156,7 +156,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let {
                     Result(
                         schema = it.swagger,
-                        definitions = it.componentSchemas.mapKeys { (k, _) -> k.full() }
+                        definitions = it.componentSchemas
                     )
                 }
 

@@ -3,6 +3,7 @@ package io.github.smiley4.schemakenerator.swagger
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
@@ -90,7 +91,7 @@ fun Bundle<SwaggerSchema>.compileInlining(): CompiledSwaggerSchema {
 /**
  * See [SwaggerSchemaCompileStep]
  */
-fun Bundle<SwaggerSchema>.compileReferencing(pathType: TitleType = TitleType.FULL): CompiledSwaggerSchema {
+fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledSwaggerSchema {
     return SwaggerSchemaCompileStep(pathType).compileReferencing(this)
 }
 
@@ -98,6 +99,6 @@ fun Bundle<SwaggerSchema>.compileReferencing(pathType: TitleType = TitleType.FUL
 /**
  * See [SwaggerSchemaCompileStep]
  */
-fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: TitleType = TitleType.FULL): CompiledSwaggerSchema {
+fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledSwaggerSchema {
     return SwaggerSchemaCompileStep(pathType).compileReferencingRoot(this)
 }
