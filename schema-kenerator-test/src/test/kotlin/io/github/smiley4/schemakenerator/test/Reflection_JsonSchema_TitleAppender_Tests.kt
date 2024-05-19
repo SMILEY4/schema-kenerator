@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.steps.RenameTypesStep
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -7,11 +8,12 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
+import io.github.smiley4.schemakenerator.test.models.reflection.RenamedTestData
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -25,7 +27,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 @Suppress("ClassName")
-class JsonSchema_TitleAppender_Tests : FunSpec({
+class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
     context("full title") {
         withData(TEST_DATA) { data ->
@@ -33,7 +35,8 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { ReflectionTypeProcessingStep().process(it) }
+                .let { RenameTypesStep().process(it) }
                 .also { schema ->
                     if (schema.data.id.additionalId != null) {
                         additionalIds.add(schema.data.id.additionalId!!)
@@ -73,7 +76,8 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { ReflectionTypeProcessingStep().process(it) }
+                .let { RenameTypesStep().process(it) }
                 .also { schema ->
                     if (schema.data.id.additionalId != null) {
                         additionalIds.add(schema.data.id.additionalId!!)
@@ -113,7 +117,8 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
+                .let { ReflectionTypeProcessingStep().process(it) }
+                .let { RenameTypesStep().process(it) }
                 .also { schema ->
                     if (schema.data.id.additionalId != null) {
                         additionalIds.add(schema.data.id.additionalId!!)
@@ -177,19 +182,19 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                 expectedResultFullTitle = """
                     {
                         "type": "object",
-                        "title": "*"
+                        "title": "kotlin.Any"
                     }
                 """.trimIndent(),
                 expectedResultSimpleTitle = """
                     {
                         "type": "object",
-                        "title": "*"
+                        "title": "Any"
                     }
                 """.trimIndent(),
                 expectedResultSimpleTitleReferencing = """
                     {
                         "type": "object",
-                        "title": "*"
+                        "title": "Any"
                     }
                 """.trimIndent(),
             ),
@@ -245,7 +250,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                     "type": "boolean",
                                     "title": "kotlin.Boolean"
                                 },
-                                "title": "kotlin.collections.ArrayList<kotlin.Boolean>"
+                                "title": "kotlin.collections.List<kotlin.Boolean>"
                             }
                         },
                         "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields"
@@ -272,7 +277,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                     "type": "boolean",
                                     "title": "Boolean"
                                 },
-                                "title": "ArrayList<Boolean>"
+                                "title": "List<Boolean>"
                             }
                         },
                         "title": "ClassWithSimpleFields"
@@ -305,7 +310,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                             "type": "boolean",
                                             "title": "Boolean"
                                         },
-                                        "title": "ArrayList<Boolean>"
+                                        "title": "List<Boolean>"
                                     }
                                 },
                                 "title": "ClassWithSimpleFields"
@@ -513,7 +518,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "kotlin.Int"
                                     }
                                 },
-                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
+                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField<kotlin.Int>"
                             },
                             "valueString": {
                                 "type": "object",
@@ -526,7 +531,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "kotlin.String"
                                     }
                                 },
-                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField<kotlin.String>"
                             }
                         },
                         "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics"
@@ -553,7 +558,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "Int"
                                     }
                                 },
-                                "title": "ClassWithGenericField"
+                                "title": "ClassWithGenericField<Int>"
                             },
                             "valueString": {
                                 "type": "object",
@@ -566,7 +571,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "String"
                                     }
                                 },
-                                "title": "ClassWithGenericField#0"
+                                "title": "ClassWithGenericField<String>"
                             }
                         },
                         "title": "ClassWIthDifferentGenerics"
@@ -576,7 +581,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                     {
                         "${'$'}ref": "#/definitions/ClassWIthDifferentGenerics",
                         "definitions": {
-                            "ClassWithGenericField": {
+                            "ClassWithGenericField<Int>": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -589,9 +594,9 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "Int"
                                     }
                                 },
-                                "title": "ClassWithGenericField"
+                                "title": "ClassWithGenericField<Int>"
                             },
-                            "ClassWithGenericField#0": {
+                            "ClassWithGenericField<String>": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -602,7 +607,7 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "String"
                                     }
                                 },
-                                "title": "ClassWithGenericField#0"
+                                "title": "ClassWithGenericField<String>"
                             },
                             "ClassWIthDifferentGenerics": {
                                 "type": "object",
@@ -612,13 +617,97 @@ class JsonSchema_TitleAppender_Tests : FunSpec({
                                 ],
                                 "properties": {
                                     "valueInt": {
-                                        "${'$'}ref": "#/definitions/ClassWithGenericField"
+                                        "${'$'}ref": "#/definitions/ClassWithGenericField<Int>"
                                     },
                                     "valueString": {
-                                        "${'$'}ref": "#/definitions/ClassWithGenericField#0"
+                                        "${'$'}ref": "#/definitions/ClassWithGenericField<String>"
                                     }
                                 },
                                 "title": "ClassWIthDifferentGenerics"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<RenamedTestData>(),
+                testName = "class renamed with @SchemaName",
+                expectedResultFullTitle = """
+                    {
+                        "type": "object",
+                        "required": [
+                        "nestedValue"
+                        ],
+                        "properties": {
+                            "nestedValue": {
+                                "type": "object",
+                                "required": [
+                                    "someValue"
+                                ],
+                                "properties": {
+                                    "someValue": {
+                                        "type": "string",
+                                        "title": "kotlin.String"
+                                    }
+                                },
+                                "title": "NestedData<kotlin.String>"
+                            }
+                        },
+                        "title": "test.TestData"
+                    }
+                """.trimIndent(),
+                expectedResultSimpleTitle = """
+                    {
+                        "type": "object",
+                        "required": [
+                            "nestedValue"
+                        ],
+                        "properties": {
+                            "nestedValue": {
+                                "type": "object",
+                                "required": [
+                                    "someValue"
+                                ],
+                                "properties": {
+                                    "someValue": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedData<String>"
+                            }
+                        },
+                        "title": "TestData"
+                    }
+                """.trimIndent(),
+                expectedResultSimpleTitleReferencing = """
+                    {
+                        "${'$'}ref": "#/definitions/TestData",
+                        "definitions": {
+                            "NestedData<String>": {
+                                "type": "object",
+                                "required": [
+                                    "someValue"
+                                ],
+                                "properties": {
+                                    "someValue": {
+                                        "type": "string",
+                                        "title": "String"
+                                    }
+                                },
+                                "title": "NestedData<String>"
+                            },
+                            "TestData": {
+                                "type": "object",
+                                "required": [
+                                    "nestedValue"
+                                ],
+                                "properties": {
+                                    "nestedValue": {
+                                        "${'$'}ref": "#/definitions/NestedData<String>"
+                                    }
+                                },
+                                "title": "TestData"
                             }
                         }
                     }

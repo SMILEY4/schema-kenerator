@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -61,6 +62,7 @@ class KotlinxSerializationTypeProcessingStep(
             throw IllegalArgumentException("Type is not a class.")
         }
     }
+
 
     @Suppress("CyclomaticComplexMethod")
     private fun parse(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
@@ -118,6 +120,7 @@ class KotlinxSerializationTypeProcessingStep(
 
     private fun parseList(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
         val itemDescriptor = descriptor.getElementDescriptor(0)
+        val itemName = descriptor.getElementName(0)
         val itemType = parse(itemDescriptor, typeData)
         val id = TypeId.build(descriptor.cleanSerialName(), listOf(itemType.id))
         return typeData.find(id)
@@ -125,6 +128,13 @@ class KotlinxSerializationTypeProcessingStep(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
+                typeParameters = mutableMapOf(
+                    itemName to TypeParameterData(
+                        name = itemName,
+                        type = itemType.id,
+                        nullable = itemDescriptor.isNullable,
+                    )
+                ),
                 itemType = PropertyData(
                     name = "item",
                     type = itemType.id,
@@ -140,15 +150,31 @@ class KotlinxSerializationTypeProcessingStep(
 
     private fun parseMap(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
         val keyDescriptor = descriptor.getElementDescriptor(0)
-        val valueDescriptor = descriptor.getElementDescriptor(1)
+        val keyName = descriptor.getElementName(0)
         val keyType = parse(keyDescriptor, typeData)
+
+        val valueDescriptor = descriptor.getElementDescriptor(1)
+        val valueName = descriptor.getElementName(1)
         val valueType = parse(valueDescriptor, typeData)
+
         val id = TypeId.build(descriptor.cleanSerialName(), listOf(keyType.id, valueType.id))
         return typeData.find(id)
             ?: MapTypeData(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
+                typeParameters = mutableMapOf(
+                    keyName to TypeParameterData(
+                        name = keyName,
+                        type = keyType.id,
+                        nullable = keyDescriptor.isNullable,
+                    ),
+                    valueName to TypeParameterData(
+                        name = valueName,
+                        type = valueType.id,
+                        nullable = valueDescriptor.isNullable,
+                    )
+                ),
                 keyType = PropertyData(
                     name = "key",
                     type = keyType.id,
