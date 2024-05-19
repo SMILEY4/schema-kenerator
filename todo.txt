@@ -1,0 +1,12 @@
+todo:
+
+- support stand-ins
+    - classes/config that can be defined separately from the actual model to be affected/customized
+    - Example: rename LocalDateTime with @SchemaName or describe with @SchemaDescription
+    - Example: add "annotations" via config-dsl to system using kotlinx
+
+- support (more) jackson-annotations
+
+- support (more) swagger-annotations
+
+- support alternative enum values: toString(), ...
