@@ -61,10 +61,12 @@ class ReflectionTypeProcessingStepConfig {
      */
     var primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES
 
+
     /**
      * Whether to use toString for enum values or the declared name
      */
     var enumConstType: EnumConstType = EnumConstType.NAME
+
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
@@ -73,12 +75,14 @@ class ReflectionTypeProcessingStepConfig {
         customProcessors[type] = processor
     }
 
+
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
     inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
         customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
     }
+
 
     /**
      * Add custom processors for given type that overwrites the default behaviour
