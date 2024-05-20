@@ -3,6 +3,7 @@ package io.github.smiley4.schemakenerator.reflection
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.steps.FunctionPropertyType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
@@ -61,9 +62,9 @@ class ReflectionTypeProcessingStepConfig {
     var primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES
 
     /**
-     * Use toString for enum values instead of the constant name
+     * Whether to use toString for enum values or the declared name
      */
-    var enumToString: Boolean = false
+    var enumConstType: EnumConstType = EnumConstType.NAME
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
@@ -101,7 +102,7 @@ fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
-        enumToString = config.enumToString
+        enumConstType = config.enumConstType
     ).process(this)
 }
 
@@ -119,7 +120,7 @@ fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepCon
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
-        enumToString = config.enumToString
+        enumConstType = config.enumConstType
     ).process(this)
 }
 

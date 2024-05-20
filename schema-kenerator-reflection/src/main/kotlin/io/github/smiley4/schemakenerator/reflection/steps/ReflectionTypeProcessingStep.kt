@@ -15,6 +15,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
@@ -59,7 +60,7 @@ class ReflectionTypeProcessingStep(
     /**
      * Use toString for enum values instead of the constant name
      */
-    private val enumToString: Boolean = false,
+    private val enumConstType: EnumConstType = EnumConstType.NAME,
     /**
      * custom processors for given types that overwrite the default behaviour
      */
@@ -446,10 +447,9 @@ class ReflectionTypeProcessingStep(
     private fun parseEnum(clazz: KClass<*>): List<String> {
         return clazz.java.enumConstants
             ?.map {
-                if (enumToString) {
-                    it.toString()
-                } else {
-                    (it as Enum<*>).name
+                when(enumConstType) {
+                    EnumConstType.NAME -> (it as Enum<*>).name
+                    EnumConstType.TO_STRING -> it.toString()
                 }
             }
             ?: emptyList()
