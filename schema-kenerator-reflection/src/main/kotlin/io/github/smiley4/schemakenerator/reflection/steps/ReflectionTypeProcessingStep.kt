@@ -57,6 +57,10 @@ class ReflectionTypeProcessingStep(
      */
     private val primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES,
     /**
+     * Use toString for enum values instead of the constant name
+     */
+    private val enumToString: Boolean = false,
+    /**
      * custom processors for given types that overwrite the default behaviour
      */
     private val customProcessors: Map<KClass<*>, () -> BaseTypeData> = emptyMap()
@@ -440,7 +444,15 @@ class ReflectionTypeProcessingStep(
     // ====== ENUM =====================================================
 
     private fun parseEnum(clazz: KClass<*>): List<String> {
-        return clazz.java.enumConstants?.map { it.toString() } ?: emptyList()
+        return clazz.java.enumConstants
+            ?.map {
+                if (enumToString) {
+                    it.toString()
+                } else {
+                    (it as Enum<*>).name
+                }
+            }
+            ?: emptyList()
     }
 
     // ====== ANNOTATION ===============================================
@@ -473,6 +485,7 @@ class ReflectionTypeProcessingStep(
             .map { it.annotationClass.qualifiedName }
             .contains("kotlin.jvm.internal.RepeatableContainer")
     }
+
 
     @Suppress("SwallowedException")
     private fun unwrapContainer(annotation: Annotation): List<Annotation> {
@@ -567,6 +580,7 @@ class ReflectionTypeProcessingStep(
             annotations = emptyList()
         )
     }
+
 
     @Suppress("SwallowedException")
     private fun KClass<*>.getMembersSafe(): Collection<KCallable<*>> {

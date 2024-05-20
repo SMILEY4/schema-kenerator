@@ -60,6 +60,10 @@ class ReflectionTypeProcessingStepConfig {
      */
     var primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES
 
+    /**
+     * Use toString for enum values instead of the constant name
+     */
+    var enumToString: Boolean = false
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
@@ -97,6 +101,7 @@ fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
+        enumToString = config.enumToString
     ).process(this)
 }
 
@@ -114,6 +119,7 @@ fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepCon
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
+        enumToString = config.enumToString
     ).process(this)
 }
 
