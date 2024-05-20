@@ -7,7 +7,6 @@ import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.swagger.v3.oas.models.media.Schema
 
 /**
@@ -40,6 +39,7 @@ class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
         }
     }
 
+
     /**
      * Put referenced schemas into definitions and reference them
      */
@@ -52,27 +52,32 @@ class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
         )
     }
 
+
     /**
      * Put referenced schemas and root-schema into definitions and reference them
      */
     fun compileReferencingRoot(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-            val result = compileReferencing(bundle)
-            return if (shouldReference(bundle.data.swagger)) {
-                CompiledSwaggerSchema(
-                    typeData = result.typeData,
-                    swagger = schemaUtils.referenceSchema(getRefPath(result.typeData, bundle.buildTypeDataMap()), true),
-                    componentSchemas = buildMap {
-                        this.putAll(result.componentSchemas)
-                        this[getRefPath(result.typeData, bundle.buildTypeDataMap())] = result.swagger
-                    }
-                )
-            } else {
-                result
-            }
+        val result = compileReferencing(bundle)
+        return if (shouldReference(bundle.data.swagger)) {
+            CompiledSwaggerSchema(
+                typeData = result.typeData,
+                swagger = schemaUtils.referenceSchema(getRefPath(result.typeData, bundle.buildTypeDataMap()), true),
+                componentSchemas = buildMap {
+                    this.putAll(result.componentSchemas)
+                    this[getRefPath(result.typeData, bundle.buildTypeDataMap())] = result.swagger
+                }
+            )
+        } else {
+            result
+        }
     }
 
 
-    private fun referenceDefinitionsReferences(bundle: Bundle<SwaggerSchema>, node: Schema<*>, schemaList: Collection<SwaggerSchema>): CompiledSwaggerSchema {
+    private fun referenceDefinitionsReferences(
+        bundle: Bundle<SwaggerSchema>,
+        node: Schema<*>,
+        schemaList: Collection<SwaggerSchema>
+    ): CompiledSwaggerSchema {
         val definitions = mutableMapOf<String, Schema<*>>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`.replace("#/components/schemas/", ""))
@@ -95,6 +100,7 @@ class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
             componentSchemas = definitions
         )
     }
+
 
     @Suppress("CyclomaticComplexMethod")
     private fun mergeInto(other: Schema<*>, dst: Schema<*>) {

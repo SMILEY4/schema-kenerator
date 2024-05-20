@@ -650,7 +650,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "kotlin.String"
                                     }
                                 },
-                                "title": "NestedData<kotlin.String>"
+                                "title": "test.NestedData<kotlin.String>"
                             }
                         },
                         "title": "test.TestData"
