@@ -1,18 +1,19 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.swagger.v3.oas.models.media.Schema
 
 /**
  * Resolves references in prepared swagger-schemas - either inlining them or collecting them in the components-section and referencing them.
- * @param pathType when referencing types, either use the full id of a shorter, simplified version
+ * @param pathType how to reference the type, i.e. which name to use
  */
-class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
+class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -38,11 +39,12 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
         }
     }
 
+
     /**
      * Put referenced schemas into definitions and reference them
      */
     fun compileReferencing(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-        val result = referenceDefinitionsReferences(bundle.data.swagger, bundle.supporting)
+        val result = referenceDefinitionsReferences(bundle, bundle.data.swagger, bundle.supporting)
         return CompiledSwaggerSchema(
             typeData = bundle.data.typeData,
             swagger = result.swagger,
@@ -50,38 +52,43 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
         )
     }
 
+
     /**
      * Put referenced schemas and root-schema into definitions and reference them
      */
     fun compileReferencingRoot(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-            val result = compileReferencing(bundle)
-            return if (shouldReference(bundle.data.swagger)) {
-                CompiledSwaggerSchema(
-                    typeData = result.typeData,
-                    swagger = schemaUtils.referenceSchema(getRefPath(result.typeData.id), true),
-                    componentSchemas = buildMap {
-                        this.putAll(result.componentSchemas)
-                        this[result.typeData.id] = result.swagger
-                    }
-                )
-            } else {
-                result
-            }
+        val result = compileReferencing(bundle)
+        return if (shouldReference(bundle.data.swagger)) {
+            CompiledSwaggerSchema(
+                typeData = result.typeData,
+                swagger = schemaUtils.referenceSchema(getRefPath(result.typeData, bundle.buildTypeDataMap()), true),
+                componentSchemas = buildMap {
+                    this.putAll(result.componentSchemas)
+                    this[getRefPath(result.typeData, bundle.buildTypeDataMap())] = result.swagger
+                }
+            )
+        } else {
+            result
+        }
     }
 
 
-    private fun referenceDefinitionsReferences(node: Schema<*>, schemaList: Collection<SwaggerSchema>): CompiledSwaggerSchema {
-        val definitions = mutableMapOf<TypeId, Schema<*>>()
+    private fun referenceDefinitionsReferences(
+        bundle: Bundle<SwaggerSchema>,
+        node: Schema<*>,
+        schemaList: Collection<SwaggerSchema>
+    ): CompiledSwaggerSchema {
+        val definitions = mutableMapOf<String, Schema<*>>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`.replace("#/components/schemas/", ""))
             val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
-            val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.swagger, schemaList).also {
+            val procReferencedSchema = referenceDefinitionsReferences(bundle, referencedSchema.swagger, schemaList).also {
                 mergeInto(refObj, it.swagger)
             }
             if (shouldReference(referencedSchema.swagger)) {
-                definitions[referencedId] = procReferencedSchema.swagger
+                definitions[getRefPath(referencedSchema.typeData, bundle.buildTypeDataMap())] = procReferencedSchema.swagger
                 definitions.putAll(procReferencedSchema.componentSchemas)
-                schemaUtils.referenceSchema(getRefPath(referencedId), true)
+                schemaUtils.referenceSchema(getRefPath(referencedSchema.typeData, bundle.buildTypeDataMap()), true)
             } else {
                 definitions.putAll(procReferencedSchema.componentSchemas)
                 procReferencedSchema.swagger
@@ -93,6 +100,7 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
             componentSchemas = definitions
         )
     }
+
 
     @Suppress("CyclomaticComplexMethod")
     private fun mergeInto(other: Schema<*>, dst: Schema<*>) {
@@ -156,10 +164,28 @@ class SwaggerSchemaCompileStep(private val pathType: TitleType = TitleType.FULL)
         }
     }
 
-    private fun getRefPath(typeId: TypeId): String {
+//    private fun getRefPath(typeId: TypeId): String {
+//        return when (pathType) {
+//            RefType.FULL -> typeId.full()
+//            RefType.SIMPLE -> typeId.simple()
+//        }
+//    }
+
+    private fun getRefPath(typeData: BaseTypeData, typeDataMap: Map<TypeId, BaseTypeData>): String {
         return when (pathType) {
-            TitleType.FULL -> typeId.full()
-            TitleType.SIMPLE -> typeId.simple()
+            RefType.FULL -> typeData.qualifiedName
+            RefType.SIMPLE -> typeData.simpleName
+        }.let {
+            if (typeData.typeParameters.isNotEmpty()) {
+                val paramString = typeData.typeParameters
+                    .map { (_, param) -> getRefPath(typeDataMap[param.type]!!, typeDataMap) }
+                    .joinToString(",")
+                "$it<$paramString>"
+            } else {
+                it
+            }
+        }.let {
+            it + (typeData.id.additionalId?.let { a -> "#$a" } ?: "")
         }
     }
 

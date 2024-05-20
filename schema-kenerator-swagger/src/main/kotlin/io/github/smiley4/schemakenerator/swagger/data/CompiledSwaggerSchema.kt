@@ -19,5 +19,5 @@ class CompiledSwaggerSchema(
     /**
      * the referenced swagger schemas
      */
-    val componentSchemas: Map<TypeId, Schema<*>>
+    val componentSchemas: Map<String, Schema<*>>
 )

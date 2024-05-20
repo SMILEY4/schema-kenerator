@@ -1,11 +1,12 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -16,9 +17,9 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 
 /**
  * Resolves references in prepared json-schemas - either inlining them or collecting them in the definitions-section and referencing them.
- * @param pathType when referencing types, either use the full id of a shorter, simplified version
+ * @param pathType how to reference the type, i.e. which name to use
  */
-class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
+class JsonSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
 
     private val schemaUtils = JsonSchemaUtils()
 
@@ -54,7 +55,7 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
      * Put referenced schemas into definitions and reference them
      */
     fun compileReferencing(bundle: Bundle<JsonSchema>): CompiledJsonSchema {
-        val result = referenceDefinitionsReferences(bundle.data.json, bundle.supporting)
+        val result = referenceDefinitionsReferences(bundle, bundle.data.json, bundle.supporting)
         return CompiledJsonSchema(
             typeData = bundle.data.typeData,
             json = result.json,
@@ -71,10 +72,10 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
         return if (shouldReference(bundle.data.json)) {
             CompiledJsonSchema(
                 typeData = result.typeData,
-                json = schemaUtils.referenceSchema(getRefPath(result.typeData.id), true),
+                json = schemaUtils.referenceSchema(getRefPath(result.typeData, bundle.buildTypeDataMap()), true),
                 definitions = buildMap {
                     this.putAll(result.definitions)
-                    this[result.typeData.id] = result.json
+                    this[getRefPath(result.typeData, bundle.buildTypeDataMap())] = result.json
                 }
             )
         } else {
@@ -82,12 +83,16 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
         }
     }
 
-    private fun referenceDefinitionsReferences(node: JsonNode, schemaList: Collection<JsonSchema>): CompiledJsonSchema {
-        val definitions = mutableMapOf<TypeId, JsonNode>()
+    private fun referenceDefinitionsReferences(
+        bundle: Bundle<JsonSchema>,
+        node: JsonNode,
+        schemaList: Collection<JsonSchema>
+    ): CompiledJsonSchema {
+        val definitions = mutableMapOf<String, JsonNode>()
         val json = replaceReferences(node) { refObj ->
             val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
             val referencedSchema = schemaList.find { it.typeData.id == referencedId }!!
-            val procReferencedSchema = referenceDefinitionsReferences(referencedSchema.json, schemaList).also {
+            val procReferencedSchema = referenceDefinitionsReferences(bundle, referencedSchema.json, schemaList).also {
                 if (it.json is JsonObject) {
                     it.json.properties.putAll(buildMap {
                         this.putAll(refObj.properties)
@@ -96,9 +101,9 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
                 }
             }
             if (shouldReference(referencedSchema.json)) {
-                definitions[referencedId] = procReferencedSchema.json
+                definitions[getRefPath(referencedSchema.typeData, bundle.buildTypeDataMap())] = procReferencedSchema.json
                 definitions.putAll(procReferencedSchema.definitions)
-                schemaUtils.referenceSchema(getRefPath(referencedId), true)
+                schemaUtils.referenceSchema(getRefPath(referencedSchema.typeData, bundle.buildTypeDataMap()), true)
             } else {
                 definitions.putAll(procReferencedSchema.definitions)
                 procReferencedSchema.json
@@ -168,10 +173,21 @@ class JsonSchemaCompileStep(private val pathType: TitleType = TitleType.FULL) {
         }
     }
 
-    private fun getRefPath(typeId: TypeId): String {
+    private fun getRefPath(typeData: BaseTypeData, typeDataMap: Map<TypeId, BaseTypeData>): String {
         return when (pathType) {
-            TitleType.FULL -> typeId.full()
-            TitleType.SIMPLE -> typeId.simple()
+            RefType.FULL -> typeData.qualifiedName
+            RefType.SIMPLE -> typeData.simpleName
+        }.let {
+            if (typeData.typeParameters.isNotEmpty()) {
+                val paramString = typeData.typeParameters
+                    .map { (_, param) -> getRefPath(typeDataMap[param.type]!!, typeDataMap) }
+                    .joinToString(",")
+                "$it<$paramString>"
+            } else {
+                it
+            }
+        }.let {
+            it + (typeData.id.additionalId?.let { a -> "#$a" } ?: "")
         }
     }
 

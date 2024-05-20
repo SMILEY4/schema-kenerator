@@ -18,7 +18,7 @@ class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
     fun process(data: KType): Bundle<KType> {
 
         var depth = 0
-        var countPrev = 0
+        var countPrev: Int
         val subtypes = mutableListOf(data)
 
         do {

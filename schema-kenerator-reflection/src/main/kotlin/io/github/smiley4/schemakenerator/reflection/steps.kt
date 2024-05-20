@@ -3,12 +3,14 @@ package io.github.smiley4.schemakenerator.reflection
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.steps.FunctionPropertyType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * See [ReflectionAnnotationSubTypeStep]
@@ -61,10 +63,24 @@ class ReflectionTypeProcessingStepConfig {
 
 
     /**
+     * Whether to use toString for enum values or the declared name
+     */
+    var enumConstType: EnumConstType = EnumConstType.NAME
+
+
+    /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
     fun customProcessor(type: KClass<*>, processor: () -> BaseTypeData) {
         customProcessors[type] = processor
+    }
+
+
+    /**
+     * Add a custom processor for the given type that overwrites the default behaviour
+     */
+    inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
+        customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
     }
 
 
@@ -90,6 +106,7 @@ fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
+        enumConstType = config.enumConstType
     ).process(this)
 }
 
@@ -107,6 +124,7 @@ fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepCon
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
+        enumConstType = config.enumConstType
     ).process(this)
 }
 

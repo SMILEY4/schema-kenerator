@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 
 /**
@@ -31,21 +32,38 @@ fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationT
 class KotlinxSerializationTypeProcessingConfig {
     internal var customProcessors = mutableMapOf<String, () -> BaseTypeData>()
 
+    /**
+     * Add a custom processor for the given type that overwrites the default behaviour
+     */
     fun customProcessor(serializerName: String, processor: () -> BaseTypeData) {
         customProcessors[serializerName] = processor
     }
 
+    /**
+     * Add a custom processor for the given type that overwrites the default behaviour
+     */
     fun customProcessor(type: KClass<*>, processor: () -> BaseTypeData) {
         customProcessors[type.qualifiedName!!] = processor
     }
 
+    /**
+     * Add a custom processor for the given type that overwrites the default behaviour
+     */
+    inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
+        customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
+    }
 
+    /**
+     * Add custom processors for the given types that overwrites the default behaviour
+     */
     @JvmName("customProcessors_serializerName")
     fun customProcessors(processors: Map<String, () -> BaseTypeData>) {
         customProcessors.putAll(processors)
     }
 
-
+    /**
+     * Add custom processors for the given types that overwrites the default behaviour
+     */
     @JvmName("customProcessors_type")
     fun customProcessors(processors: Map<KClass<*>, () -> BaseTypeData>) {
         processors.forEach { (k, v) ->
