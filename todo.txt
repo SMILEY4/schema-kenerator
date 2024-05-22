@@ -20,3 +20,15 @@ todo:
 - readme for each subproject
 
 - write docu
+
+
+
+
+
+PIPELINE PHASES
+- collect types -> Bundle<KType>
+- process types -> Bundle<BaseTypeData>
+- enrich type data -> Bundle<BaseTypeData>
+- generate schema -> Bundle<SomeSchema>
+- modify schema -> Bundle<SomeSchema>
+- compile schema -> Bundle<CompiledSomeSchema>

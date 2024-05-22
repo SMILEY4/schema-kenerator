@@ -26,6 +26,7 @@ dependencies {
     testImplementation(project(":schema-kenerator-jsonschema"))
     testImplementation(project(":schema-kenerator-swagger"))
     testImplementation(project(":schema-kenerator-jackson"))
+    testImplementation(project(":schema-kenerator-jackson-jsonschema"))
 }
 
 tasks.withType<Test>().configureEach {
