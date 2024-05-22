@@ -164,13 +164,6 @@ class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
         }
     }
 
-//    private fun getRefPath(typeId: TypeId): String {
-//        return when (pathType) {
-//            RefType.FULL -> typeId.full()
-//            RefType.SIMPLE -> typeId.simple()
-//        }
-//    }
-
     private fun getRefPath(typeData: BaseTypeData, typeDataMap: Map<TypeId, BaseTypeData>): String {
         return when (pathType) {
             RefType.FULL -> typeData.qualifiedName
