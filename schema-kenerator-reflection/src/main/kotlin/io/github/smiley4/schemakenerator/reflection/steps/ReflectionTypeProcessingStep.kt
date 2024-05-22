@@ -178,7 +178,7 @@ class ReflectionTypeProcessingStep(
         }
 
         // collect annotation information
-        val annotations = parseAnnotation(clazz)
+        val annotations = parseAnnotations(clazz)
 
         return when (classType) {
             TypeCategory.PRIMITIVE -> PrimitiveTypeData(
@@ -375,7 +375,7 @@ class ReflectionTypeProcessingStep(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
-            annotations = parseAnnotation(member),
+            annotations = parseAnnotations(member),
             kind = PropertyType.PROPERTY,
             visibility = determinePropertyVisibility(member)
         )
@@ -390,7 +390,7 @@ class ReflectionTypeProcessingStep(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
-            annotations = parseAnnotation(member),
+            annotations = parseAnnotations(member),
             kind = PropertyType.FUNCTION,
             visibility = determinePropertyVisibility(member)
         )
@@ -447,7 +447,7 @@ class ReflectionTypeProcessingStep(
     private fun parseEnum(clazz: KClass<*>): List<String> {
         return clazz.java.enumConstants
             ?.map {
-                when(enumConstType) {
+                when (enumConstType) {
                     EnumConstType.NAME -> (it as Enum<*>).name
                     EnumConstType.TO_STRING -> it.toString()
                 }
@@ -457,15 +457,18 @@ class ReflectionTypeProcessingStep(
 
     // ====== ANNOTATION ===============================================
 
-    private fun parseAnnotation(clazz: KClass<*>): List<AnnotationData> {
+    private fun parseAnnotations(clazz: KClass<*>): List<AnnotationData> {
         return unwrapAnnotations(clazz.annotations).map { parseAnnotation(it) }
     }
 
-    private fun parseAnnotation(property: KProperty<*>): List<AnnotationData> {
-        return unwrapAnnotations(property.annotations).map { parseAnnotation(it) }
+    private fun parseAnnotations(property: KProperty<*>): List<AnnotationData> {
+        return buildList {
+            addAll(unwrapAnnotations(property.javaField?.annotations?.toList() ?: emptyList()).map { parseAnnotation(it) })
+            addAll(unwrapAnnotations(property.annotations).map { parseAnnotation(it) })
+        }
     }
 
-    private fun parseAnnotation(property: KFunction<*>): List<AnnotationData> {
+    private fun parseAnnotations(property: KFunction<*>): List<AnnotationData> {
         return unwrapAnnotations(property.annotations).map { parseAnnotation(it) }
     }
 
