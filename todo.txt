@@ -6,16 +6,19 @@ todo:
     - Example: add "annotations" via config-dsl to system using kotlinx
 
 - support (more) jackson-annotations
-    - JsonPropertyDescription, JsonClassDescription
-    - JsonIgnore, JsonIgnoreType, JsonIgnoreProperties
+    - JsonPropertyDescription ✅
+    - JsonIgnore, JsonIgnoreType, JsonIgnoreProperties ✅
     - JsonProperty
     - JsonTypeInfo
+    - JsonGetter, JsonSetter
 
 - support (more) swagger-annotations
     - @Schema
     - @ArraySchema
 
 - support alternative enum values: toString() ✅
+
+- check getter/setter -> generate as fields, i.e. without "get" or "is" in name
 
 - readme for each subproject
 

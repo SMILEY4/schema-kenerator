@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
-class JacksonJsonSchemaAnnotationPropertyDescriptionStep {
+class JacksonJsonSchemaPropertyDescriptionStep {
 
     fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
         return bundle.also { schema ->
@@ -18,13 +18,13 @@ class JacksonJsonSchemaAnnotationPropertyDescriptionStep {
 
     private fun process(schema: JsonSchema) {
         iterateProperties(schema) { prop, data ->
-            determineDescription(data)?.also { description ->
+            shouldIgnore(data)?.also { description ->
                 prop.properties["description"] = JsonTextValue(description)
             }
         }
     }
 
-    private fun determineDescription(typeData: PropertyData): String? {
+    private fun shouldIgnore(typeData: PropertyData): String? {
         return typeData.annotations
             .filter { it.name == JsonPropertyDescription::class.qualifiedName }
             .map { it.values["value"] as String }
