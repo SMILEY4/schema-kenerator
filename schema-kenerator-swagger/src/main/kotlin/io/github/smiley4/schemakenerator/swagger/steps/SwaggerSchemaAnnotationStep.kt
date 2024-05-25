@@ -39,6 +39,7 @@ class SwaggerSchemaAnnotationStep {
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun process(schema: SwaggerSchema) {
         getTitle(schema.typeData)?.also { schema.swagger.title = it }
         getDescription(schema.typeData)?.also { schema.swagger.description = it }

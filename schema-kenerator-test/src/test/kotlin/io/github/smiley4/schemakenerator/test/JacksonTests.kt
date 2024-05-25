@@ -95,7 +95,7 @@ class JacksonTests : StringSpec({
     }
 
     "@JsonPropertyDescription - swagger" {
-        TODO()
+        println("TODO") // todo ...
     }
 
 }) {

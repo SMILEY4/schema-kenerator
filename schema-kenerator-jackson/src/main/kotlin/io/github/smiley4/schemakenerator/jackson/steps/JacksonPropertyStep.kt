@@ -7,7 +7,8 @@ import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 
 /**
- * Adds support for the jackson [JsonProperty]-annotation. Renames annotated members and modifies their nullability according to the specified values.
+ * Adds support for the jackson [JsonProperty]-annotation.
+ * Renames annotated members and modifies their nullability according to the specified values.
  */
 class JacksonPropertyStep {
 

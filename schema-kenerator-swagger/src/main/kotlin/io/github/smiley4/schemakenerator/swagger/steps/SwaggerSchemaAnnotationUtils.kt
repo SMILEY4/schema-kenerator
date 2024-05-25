@@ -8,7 +8,7 @@ import io.swagger.v3.oas.models.media.Schema
 object SwaggerSchemaAnnotationUtils {
 
     /**
-     * iterate over the properties of the given schema as pairs of [Schema] and [PropertyData].
+     * Iterate over the properties of the given schema as pairs of [Schema] and [PropertyData].
      */
     fun iterateProperties(schema: SwaggerSchema, action: (property: Schema<*>, data: PropertyData) -> Unit) {
         if (schema.typeData is ObjectTypeData && schema.swagger.properties != null) {
@@ -21,7 +21,8 @@ object SwaggerSchemaAnnotationUtils {
     }
 
     /**
-     * iterate over the properties of the given schema as pairs of [Schema] and [PropertyData] and removes them if the condition returns true.
+     * Iterate over the properties of the given schema as pairs of [Schema] and [PropertyData] and
+     * removes them if the condition returns true.
      */
     fun removePropertyIf(schema: SwaggerSchema, condition: (property: Schema<*>, data: PropertyData) -> Boolean) {
         if (schema.typeData is ObjectTypeData && schema.swagger.properties != null) {
@@ -41,4 +42,3 @@ object SwaggerSchemaAnnotationUtils {
     }
 
 }
-
