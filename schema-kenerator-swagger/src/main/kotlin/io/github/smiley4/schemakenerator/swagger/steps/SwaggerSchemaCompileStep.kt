@@ -115,6 +115,11 @@ class SwaggerSchemaCompileStep(private val pathType: RefType = RefType.FULL) {
         other.pattern?.also { dst.pattern = it }
         other.maxItems?.also { dst.maxItems = it }
         other.minItems?.also { dst.minItems = it }
+        other.enum?.also {
+            @Suppress("TYPE_MISMATCH_WARNING")
+            dst.enum = it
+        }
+        other.const?.also { dst.setConst(it) }
         other.uniqueItems?.also { dst.uniqueItems = it }
         other.maxProperties?.also { dst.maxProperties = it }
         other.minProperties?.also { dst.minProperties = it }

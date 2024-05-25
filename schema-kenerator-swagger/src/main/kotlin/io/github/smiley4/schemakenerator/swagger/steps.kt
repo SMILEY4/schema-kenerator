@@ -6,6 +6,8 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
@@ -79,6 +81,19 @@ fun Bundle<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Bundle<SwaggerSchem
     return SwaggerSchemaAnnotationTypeHintStep().process(this)
 }
 
+/**
+ * See [SwaggerSchemaAnnotationStep]
+ */
+fun Bundle<SwaggerSchema>.handleSwaggerSchemaAnnotation(): Bundle<SwaggerSchema> {
+    return SwaggerSchemaAnnotationStep().process(this)
+}
+
+/**
+ * See [SwaggerArraySchemaAnnotationStep]
+ */
+fun Bundle<SwaggerSchema>.handleSwaggerArraySchemaAnnotation(): Bundle<SwaggerSchema> {
+    return SwaggerArraySchemaAnnotationStep().process(this)
+}
 
 /**
  * See [SwaggerSchemaCompileStep]
