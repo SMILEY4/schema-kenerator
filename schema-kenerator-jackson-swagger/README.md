@@ -1,9 +1,9 @@
-# Schema-Kenerator Jackson JSON-Schema
+# Schema-Kenerator Jackson Swagger
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-jackson-jsonschema/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-jackson-jsonschema)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-jackson-swagger/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-jackson-swagger)
 
 This project provides steps to support [Jackson](https://github.com/FasterXML/jackson-annotations)-annotations specific
-to JSON-schema generation.
+to [Swagger](https://github.com/swagger-api/swagger-parser)-schema generation.
 
 ## Supported Jackson Annotations
 
