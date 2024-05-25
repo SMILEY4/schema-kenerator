@@ -9,6 +9,7 @@ import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.jackson.handleJacksonIgnoreAnnotation
 import io.github.smiley4.schemakenerator.jackson.handleJacksonIgnorePropertiesAnnotation
 import io.github.smiley4.schemakenerator.jackson.handleJacksonIgnoreTypeAnnotation
+import io.github.smiley4.schemakenerator.jackson.handleJacksonPropertyAnnotation
 import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonPropertyDescriptionAnnotation
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
@@ -52,6 +53,17 @@ class JacksonTests : StringSpec({
         (result.data as ObjectTypeData).members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
+        }
+    }
+
+    "@JsonProperty" {
+        val result = typeOf<JsonPropertyTestClass>()
+            .processReflection()
+            .handleJacksonPropertyAnnotation()
+        (result.data as ObjectTypeData).members.also { members ->
+            members shouldHaveSize 1
+            members.first().name shouldBe "someValue"
+            members.first().nullable shouldBe false
         }
     }
 
@@ -116,6 +128,11 @@ class JacksonTests : StringSpec({
             val ignoredValue: String,
             val anotherIgnoredValue: Int,
             val someValue: Boolean,
+        )
+
+        private class JsonPropertyTestClass(
+            @field:JsonProperty("someValue", required = true)
+            val myValue: String?,
         )
 
     }

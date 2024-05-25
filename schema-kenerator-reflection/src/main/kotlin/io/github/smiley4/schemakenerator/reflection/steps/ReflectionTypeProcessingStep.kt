@@ -508,6 +508,7 @@ class ReflectionTypeProcessingStep(
             annotation = annotation,
             values = annotation.annotationClass.members
                 .filterIsInstance<KProperty<*>>()
+                .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }
                 .associate { it.name to it.getter.call(annotation) }
                 .toMutableMap()
         )
