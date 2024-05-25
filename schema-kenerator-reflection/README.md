@@ -1,8 +1,14 @@
-# Schema-Kenerator Kotlinx-Serialization
+# Schema-Kenerator Reflection
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-serialization/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-serialization)
 
-This project provides steps and annotations to extract information from kotlin types using reflection.
+This project provides steps and annotations to extract and modify information from kotlin types using reflection.
+
+```kotlin
+dependencies {
+    implementation "io.github.smiley4:schema-kenerator-reflection:<VERSION>"
+}
+```
 
 ## Annotations
 

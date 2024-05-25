@@ -10,15 +10,10 @@ Kotlin library to extract information from classes using reflection or kotlinx-s
 ## Features
 
 - extract information from classes using reflection or kotlinx-serialization
-
-- supports nested types, inheritance, generics, annotations 
-
+- supports nested types, inheritance, generics, annotations
 - generate json-schema or [swagger](https://github.com/swagger-api/swagger-parser)-schema
-
 - add metadata using additional annotations (subtypes, title, description, deprecation, ...)
-
-- supports jackson-annotations
-
+- supports Jackson and Swagger-annotations
 - customizable and extendable
 
 
@@ -46,7 +41,7 @@ dependencies {
 A wiki with a short documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
 
 
-## Concept
+## Concept Overview
 
 Data extraction and schema generation happens in several steps that can be grouped into the following phases:
 

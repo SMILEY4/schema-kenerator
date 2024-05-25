@@ -2,7 +2,13 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-core)
 
-This project provides the base data models as well as some common steps and annotations.
+Contains the core data models as well as some common steps and annotations.
+
+```kotlin
+dependencies {
+    implementation "io.github.smiley4:schema-kenerator-core:<VERSION>"
+}
+```
 
 ## Annotations
 

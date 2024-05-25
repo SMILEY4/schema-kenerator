@@ -5,6 +5,12 @@
 This project provides steps to support [Jackson](https://github.com/FasterXML/jackson-annotations)-annotations specific
 to JSON-schema generation.
 
+```kotlin
+dependencies {
+    implementation "io.github.smiley4:schema-kenerator-jackson-jsonschema:<VERSION>"
+}
+```
+
 ## Supported Jackson Annotations
 
 | Step                       | Description                              | Relevant Steps                                 |

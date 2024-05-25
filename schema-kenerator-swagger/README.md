@@ -2,8 +2,13 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-swagger/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-swagger)
 
-This project provides steps and annotations to create [Swagger](https://github.com/swagger-api/swagger-parser)-Schema
-from type data and to customize the generated schema.
+This project provides steps and annotations to create [Swagger](https://github.com/swagger-api/swagger-parser)-Schema  from type data and to customize the generated schema.
+
+```kotlin
+dependencies {
+    implementation "io.github.smiley4:schema-kenerator-swagger:<VERSION>"
+}
+```
 
 ## Annotations
 

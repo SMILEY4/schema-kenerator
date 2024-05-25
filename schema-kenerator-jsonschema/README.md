@@ -4,6 +4,12 @@
 
 This project provides steps and annotations to create JSON-Schema from type data and to customize the generated schema.
 
+```kotlin
+dependencies {
+    implementation "io.github.smiley4:schema-kenerator-jsonschema:<VERSION>"
+}
+```
+
 ## Annotations
 
 | Annotation      | Description                                                                                                                                                                   | Relevant Steps                 |

@@ -4,6 +4,12 @@
 
 This project provides common steps to support [Jackson](https://github.com/FasterXML/jackson-annotations)-annotations.
 
+```kotlin
+dependencies {
+    implementation "io.github.smiley4:schema-kenerator-jackson:<VERSION>"
+}
+```
+
 ## Supported Jackson Annotations
 
 | Step                    | Description                                                           | Relevant Steps                              |
