@@ -9,3 +9,6 @@ data class Bundle<T>(
 )
 
 fun <T> Bundle<T>.flatten(): List<T> = listOf(data) + supporting
+
+
+fun Bundle<BaseTypeData>.flattenToMap(): Map<TypeId, BaseTypeData> = flatten().associateBy { it.id }

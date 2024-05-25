@@ -34,15 +34,15 @@ import kotlin.reflect.jvm.javaMethod
  */
 class ReflectionTypeProcessingStep(
     /**
-     * Whether to include getters as members of classes (see [FunctionPropertyType.GETTER]).
+     * Whether to include getters as members of classes (see [PropertyType.GETTER]).
      */
     private val includeGetters: Boolean = false,
     /**
-     * Whether to include weak getters as members of classes (see [FunctionPropertyType.WEAK_GETTER]).
+     * Whether to include weak getters as members of classes (see [PropertyType.WEAK_GETTER]).
      */
     private val includeWeakGetters: Boolean = false,
     /**
-     * Whether to include functions as members of classes (see [FunctionPropertyType.FUNCTION]).
+     * Whether to include functions as members of classes (see [PropertyType.FUNCTION]).
      */
     private val includeFunctions: Boolean = false,
     /**
@@ -178,7 +178,7 @@ class ReflectionTypeProcessingStep(
         }
 
         // collect annotation information
-        val annotations = parseAnnotation(clazz)
+        val annotations = parseAnnotations(clazz)
 
         return when (classType) {
             TypeCategory.PRIMITIVE -> PrimitiveTypeData(
@@ -219,7 +219,7 @@ class ReflectionTypeProcessingStep(
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
-                        annotations = emptyList()
+                        annotations = mutableListOf()
                     )
                 } ?: resolvedTypeParameters["T"]?.let {
                     PropertyData(
@@ -228,7 +228,7 @@ class ReflectionTypeProcessingStep(
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
-                        annotations = emptyList()
+                        annotations = mutableListOf()
                     )
                 }
                 ?: unknownPropertyData("item", typeData)
@@ -246,7 +246,7 @@ class ReflectionTypeProcessingStep(
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
-                        annotations = emptyList()
+                        annotations = mutableListOf()
                     )
                 } ?: unknownPropertyData("item", typeData),
                 valueType = resolvedTypeParameters["V"]?.let {
@@ -256,7 +256,7 @@ class ReflectionTypeProcessingStep(
                         nullable = it.nullable,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
-                        annotations = emptyList()
+                        annotations = mutableListOf()
                     )
                 } ?: unknownPropertyData("item", typeData)
             )
@@ -355,14 +355,15 @@ class ReflectionTypeProcessingStep(
             Visibility.HIDDEN -> if (!includeHidden) return false
         }
         // check function type
-        if (member is KFunction<*>) {
-            return when (determineFunctionPropertyType(member)) {
-                FunctionPropertyType.GETTER -> includeGetters
-                FunctionPropertyType.WEAK_GETTER -> includeWeakGetters
-                FunctionPropertyType.FUNCTION -> includeFunctions
+        return if (member is KFunction<*>) {
+            when (determineFunctionPropertyType(member)) {
+                PropertyType.GETTER -> includeGetters
+                PropertyType.WEAK_GETTER -> includeWeakGetters
+                PropertyType.FUNCTION -> includeFunctions
+                else -> true
             }
         } else {
-            return true
+            true
         }
     }
 
@@ -375,7 +376,7 @@ class ReflectionTypeProcessingStep(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
-            annotations = parseAnnotation(member),
+            annotations = parseAnnotations(member).toMutableList(),
             kind = PropertyType.PROPERTY,
             visibility = determinePropertyVisibility(member)
         )
@@ -390,8 +391,8 @@ class ReflectionTypeProcessingStep(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
-            annotations = parseAnnotation(member),
-            kind = PropertyType.FUNCTION,
+            annotations = parseAnnotations(member).toMutableList(),
+            kind = determineFunctionPropertyType(member),
             visibility = determinePropertyVisibility(member)
         )
     }
@@ -447,7 +448,7 @@ class ReflectionTypeProcessingStep(
     private fun parseEnum(clazz: KClass<*>): List<String> {
         return clazz.java.enumConstants
             ?.map {
-                when(enumConstType) {
+                when (enumConstType) {
                     EnumConstType.NAME -> (it as Enum<*>).name
                     EnumConstType.TO_STRING -> it.toString()
                 }
@@ -457,15 +458,18 @@ class ReflectionTypeProcessingStep(
 
     // ====== ANNOTATION ===============================================
 
-    private fun parseAnnotation(clazz: KClass<*>): List<AnnotationData> {
+    private fun parseAnnotations(clazz: KClass<*>): List<AnnotationData> {
         return unwrapAnnotations(clazz.annotations).map { parseAnnotation(it) }
     }
 
-    private fun parseAnnotation(property: KProperty<*>): List<AnnotationData> {
-        return unwrapAnnotations(property.annotations).map { parseAnnotation(it) }
+    private fun parseAnnotations(property: KProperty<*>): List<AnnotationData> {
+        return buildList {
+            addAll(unwrapAnnotations(property.javaField?.annotations?.toList() ?: emptyList()).map { parseAnnotation(it) })
+            addAll(unwrapAnnotations(property.annotations).map { parseAnnotation(it) })
+        }
     }
 
-    private fun parseAnnotation(property: KFunction<*>): List<AnnotationData> {
+    private fun parseAnnotations(property: KFunction<*>): List<AnnotationData> {
         return unwrapAnnotations(property.annotations).map { parseAnnotation(it) }
     }
 
@@ -505,6 +509,7 @@ class ReflectionTypeProcessingStep(
             annotation = annotation,
             values = annotation.annotationClass.members
                 .filterIsInstance<KProperty<*>>()
+                .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }
                 .associate { it.name to it.getter.call(annotation) }
                 .toMutableMap()
         )
@@ -553,14 +558,14 @@ class ReflectionTypeProcessingStep(
 
     // ====== UTILS ====================================================
 
-    private fun determineFunctionPropertyType(function: KFunction<*>): FunctionPropertyType {
+    private fun determineFunctionPropertyType(function: KFunction<*>): PropertyType {
         if (function.returnType == Unit::class || function.parameters.any { it.name != null }) {
-            return FunctionPropertyType.FUNCTION
+            return PropertyType.FUNCTION
         }
         if (function.name.startsWith("get") || function.name.startsWith("is")) {
-            return FunctionPropertyType.GETTER
+            return PropertyType.GETTER
         }
-        return FunctionPropertyType.WEAK_GETTER
+        return PropertyType.WEAK_GETTER
     }
 
     private fun determinePropertyVisibility(member: KCallable<*>): Visibility {
@@ -577,7 +582,7 @@ class ReflectionTypeProcessingStep(
             nullable = false,
             visibility = Visibility.PUBLIC,
             kind = PropertyType.PROPERTY,
-            annotations = emptyList()
+            annotations = mutableListOf()
         )
     }
 

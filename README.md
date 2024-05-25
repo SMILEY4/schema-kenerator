@@ -4,22 +4,16 @@
 [![Checks Passing](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml/badge.svg?branch=develop)](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml)
 
 
-Customizable kotlin library to extract information from classes using reflection or kotlinx-serialization and generate schemas (json-schema, swagger) from the resulting information.
-
+Kotlin library to extract information from classes using reflection or kotlinx-serialization and generate schemas like json-schema or swagger-schemas from the resulting information.
 
 
 ## Features
 
 - extract information from classes using reflection or kotlinx-serialization
-
-- supports nested types, inheritance, generics, annotations 
-
+- supports nested types, inheritance, generics, annotations
 - generate json-schema or [swagger](https://github.com/swagger-api/swagger-parser)-schema
-
-- add metadata using annotations (subtypes, title, description, deprecation, ...)
-
-- supports jackson-annotations
-
+- add metadata using additional annotations (subtypes, title, description, deprecation, ...)
+- supports Jackson and Swagger-annotations
 - customizable and extendable
 
 
@@ -45,6 +39,22 @@ dependencies {
 ## Documentation
 
 A wiki with a short documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
+
+
+## Concept Overview
+
+Data extraction and schema generation happens in several steps that can be grouped into the following phases:
+
+1. Information extraction
+   1. collect relevant types that need to be analyzed
+   2. process types, i.e. extract information from each type and nested types 
+   3. enrich and modify extracted type data, e.g. with annotations
+2. Schema generation
+   1. generate individual schema for each type (and nested type)
+   2. enrich and modify generated schemas, e.g. using annotations
+   3. compile individual schemas into one final schema, either inlining all types or properly referencing them
+
+Schema-Kenerator provides independent steps for each phase that can be chained together to achieve the desired result. 
 
 
 ## Example (json-schema & reflection)

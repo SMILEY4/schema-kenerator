@@ -6,7 +6,16 @@ todo:
     - Example: add "annotations" via config-dsl to system using kotlinx
 
 - support (more) jackson-annotations
+    - JsonTypeInfo
+    - JsonGetter, JsonSetter
 
 - support (more) swagger-annotations
+    - @Schema
+    - @ArraySchema
 
-- support alternative enum values: toString() ✅
+- rethink naming
+
+- process type
+    - detect if collection is set and add "unique" flag
+
+- write docu

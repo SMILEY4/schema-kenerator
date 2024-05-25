@@ -3,8 +3,8 @@ package io.github.smiley4.schemakenerator.reflection
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
+import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.steps.FunctionPropertyType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES
@@ -27,19 +27,19 @@ class ReflectionTypeProcessingStepConfig {
 
 
     /**
-     * Whether to include getters as members of classes (see [FunctionPropertyType.GETTER]).
+     * Whether to include getters as members of classes (see [PropertyType.GETTER]).
      */
     var includeGetters: Boolean = false
 
 
     /**
-     * Whether to include weak getters as members of classes (see [FunctionPropertyType.WEAK_GETTER]).
+     * Whether to include weak getters as members of classes (see [PropertyType.WEAK_GETTER]).
      */
     var includeWeakGetters: Boolean = false
 
 
     /**
-     * Whether to include functions as members of classes (see [FunctionPropertyType.FUNCTION]).
+     * Whether to include functions as members of classes (see [PropertyType.FUNCTION]).
      */
     var includeFunctions: Boolean = false
 

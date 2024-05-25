@@ -7,25 +7,25 @@ data class PropertyData(
     /**
      * the name of the property
      */
-    val name: String,
+    var name: String,
     /**
      * the id of the (return) type
      */
-    val type: TypeId,
+    var type: TypeId,
     /**
      * whether the (return) type is nullable
      */
-    val nullable: Boolean,
+    var nullable: Boolean,
     /**
      * the general visibility of this property
      */
-    val visibility: Visibility,
+    var visibility: Visibility,
     /**
      * the kind of property (e.g. field/property or function
      */
-    val kind: PropertyType,
+    var kind: PropertyType,
     /**
      * the list of annotations of this property
      */
-    val annotations: List<AnnotationData> = emptyList()
+    val annotations: MutableList<AnnotationData> = mutableListOf()
 )
