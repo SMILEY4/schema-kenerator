@@ -6,9 +6,6 @@ todo:
     - Example: add "annotations" via config-dsl to system using kotlinx
 
 - support (more) jackson-annotations
-    - JsonPropertyDescription ✅
-    - JsonIgnore, JsonIgnoreType, JsonIgnoreProperties ✅
-    - JsonProperty ✅
     - JsonTypeInfo
     - JsonGetter, JsonSetter
 
@@ -16,23 +13,4 @@ todo:
     - @Schema
     - @ArraySchema
 
-- support alternative enum values: toString() ✅
-
-- check getter/setter -> generate as fields, i.e. without "get" or "is" in name ✅
-    -> review jackson annotations
-
-- readme for each subproject
-
 - write docu
-
-
-
-
-
-PIPELINE PHASES
-- collect types -> Bundle<KType>
-- process types -> Bundle<BaseTypeData>
-- enrich type data -> Bundle<BaseTypeData>
-- generate schema -> Bundle<SomeSchema>
-- modify schema -> Bundle<SomeSchema>
-- compile schema -> Bundle<CompiledSomeSchema>

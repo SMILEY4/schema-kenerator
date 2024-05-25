@@ -8,6 +8,9 @@ import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.flattenToMap
 
+/**
+ * Adds support for jackson [JsonIgnoreType]-annotation and removes members of the annotated type.
+ */
 class JacksonIgnoreTypeStep {
 
     fun process(bundle: Bundle<BaseTypeData>): Bundle<BaseTypeData> {

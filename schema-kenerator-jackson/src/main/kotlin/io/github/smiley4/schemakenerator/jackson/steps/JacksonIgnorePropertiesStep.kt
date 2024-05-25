@@ -6,6 +6,9 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 
+/**
+ * Adds support for jackson [JsonIgnoreProperties]-annotation and removes specified members from the annotated types.
+ */
 class JacksonIgnorePropertiesStep {
 
     fun process(bundle: Bundle<BaseTypeData>): Bundle<BaseTypeData> {

@@ -7,6 +7,9 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
+/**
+ * Adds a description to properties according to the jackson [JsonPropertyDescription]-annotation.
+ */
 class JacksonJsonSchemaPropertyDescriptionStep {
 
     fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
