@@ -27,5 +27,5 @@ data class PropertyData(
     /**
      * the list of annotations of this property
      */
-    val annotations: List<AnnotationData> = emptyList()
+    val annotations: MutableList<AnnotationData> = mutableListOf()
 )

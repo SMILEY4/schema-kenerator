@@ -1,24 +1,36 @@
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonPropertyDescriptionAnnotation
+import io.github.smiley4.schemakenerator.core.annotations.SchemaDescription
+import io.github.smiley4.schemakenerator.core.mergeGetters
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.handleDescriptionAnnotation
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import kotlin.reflect.typeOf
 
 class MyTestClass(
-    @field:JsonPropertyDescription("Core description")
-    val someValue: String
-)
+    val myNumber: Int,
+    @SchemaDescription("some test value")
+    private val someValue: String
+) {
+
+    fun getSomeValue(): String = someValue
+
+}
+
+
 
 
 fun main() {
 
     val result = typeOf<MyTestClass>()
-        .processReflection()
+        .processReflection {
+            includeGetters = true
+            includeHidden = true
+        }
+        .mergeGetters()
         .generateJsonSchema()
-        .handleJacksonPropertyDescriptionAnnotation()
+        .handleDescriptionAnnotation()
         .compileInlining()
         .json
         .prettyPrint()

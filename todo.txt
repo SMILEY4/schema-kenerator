@@ -18,7 +18,7 @@ todo:
 
 - support alternative enum values: toString() ✅
 
-- check getter/setter -> generate as fields, i.e. without "get" or "is" in name
+- check getter/setter -> generate as fields, i.e. without "get" or "is" in name ✅
     -> review jackson annotations
 
 - readme for each subproject
