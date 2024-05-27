@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaExample
+import io.github.smiley4.schemakenerator.core.annotations.Example
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
 /**
- * Adds example-values from [SchemaExample]-annotations.
+ * Adds example-values from [Example]-annotations.
  */
 class JsonSchemaCoreAnnotationExamplesStep {
 
@@ -37,7 +37,7 @@ class JsonSchemaCoreAnnotationExamplesStep {
 
     private fun determineExamples(typeData: PropertyData): List<String>? {
         return typeData.annotations
-            .filter { it.name == SchemaExample::class.qualifiedName }
+            .filter { it.name == Example::class.qualifiedName }
             .map { it.values["example"] as String }
             .let {
                 it.ifEmpty {
@@ -48,7 +48,7 @@ class JsonSchemaCoreAnnotationExamplesStep {
 
     private fun determineExamples(typeData: BaseTypeData): List<String>? {
         return typeData.annotations
-            .filter { it.name == SchemaExample::class.qualifiedName }
+            .filter { it.name == Example::class.qualifiedName }
             .map { it.values["example"] as String }
             .let {
                 it.ifEmpty {

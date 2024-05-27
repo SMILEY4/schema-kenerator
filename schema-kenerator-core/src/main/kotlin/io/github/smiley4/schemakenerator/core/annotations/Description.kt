@@ -11,4 +11,4 @@ package io.github.smiley4.schemakenerator.core.annotations
     AnnotationTarget.FUNCTION
 )
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SchemaDescription(val description: String)
+annotation class Description(val description: String)

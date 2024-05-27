@@ -13,12 +13,12 @@ dependencies {
 
 ## Supported Jackson Annotations
 
-| Step                       | Description                              | Relevant Steps                                 |
-|----------------------------|------------------------------------------|------------------------------------------------|
-| `@JsonPropertyDescription` | Adds description to annotated properties | `handleJacksonPropertyDescriptionAnnotation()` |
+| Step                       | Description                              | Relevant Steps                         |
+|----------------------------|------------------------------------------|----------------------------------------|
+| `@JsonPropertyDescription` | Adds description to annotated properties | `handleJacksonJsonSchemaAnnotations()` |
 
 ## Steps
 
-| Step                                           | Description                                                                                      |
-|------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| `handleJacksonPropertyDescriptionAnnotation()` | Adds a description to properties according to the jackson `@JsonPropertyDescription`-annotation. |
+| Step                                   | Description                                                                                      |
+|----------------------------------------|--------------------------------------------------------------------------------------------------|
+| `handleJacksonJsonSchemaAnnotations()` | Adds a description to properties according to the jackson `@JsonPropertyDescription`-annotation. |

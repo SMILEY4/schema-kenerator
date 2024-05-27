@@ -12,19 +12,19 @@ dependencies {
 
 ## Annotations
 
-| Annotation           | Description                                                                    | Relevant Steps                                      |
-|----------------------|--------------------------------------------------------------------------------|-----------------------------------------------------|
-| `@SchemaName`        | Specify a new name for the type.                                               | `renameTypes` (core)                                |
-| `@SchemaTitle`       | Provide an additional title for the resulting schema.                          | `handleTitleAnnotation` (jsonschema, swagger)       |
-| `@SchemaDescription` | Provide a description for the annotated type or property.                      | `handleDescriptionAnnotation` (jsonschema, swagger) |
-| `@SchemaDeprecated`  | Specify whether the annotated type or property should be marked as deprecated. | `handleDeprecatedAnnotation` (jsonschema, swagger)  |
-| `@SchemaExample`     | Provide example values for the annotated type or property                      | `handleExampleAnnotation` (jsonschema, swagger)     |
-| `@SchemaDefault`     | Specify a default value for the annotated type or property                     | `handleDefaultAnnotation` (jsonschema, swagger)     |
+| Annotation     | Description                                                                    | Relevant Steps                                |
+|----------------|--------------------------------------------------------------------------------|-----------------------------------------------|
+| `@Name`        | Specify a new name for the type.                                               | `handleNameAnnotation` (core)                 |
+| `@Title`       | Provide an additional title for the resulting schema.                          | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Description` | Provide a description for the annotated type or property.                      | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Deprecated`  | Specify whether the annotated type or property should be marked as deprecated. | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Example`     | Provide example values for the annotated type or property                      | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Default`     | Specify a default value for the annotated type or property                     | `handleCoreAnnotations` (jsonschema, swagger) |
 
 ## Steps
 
-| Step                | Description                                                                                                                                                                                                                   |
-|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `connectSubTypes()` | Adds missing subtype-supertype-relations between processed types. Types not already present in the input are not included. This step is mainly used to find and fix missing connections between types added from other steps. |
-| `renameTypes()`     | Renames types according to provided `@SchemaName`-annotations.                                                                                                                                                                |
-| `mergeGetters()`    | Removes getter-functions and merges them with their matching properties or creates new properties when no matching one could be found.                                                                                        |
+| Step                     | Description                                                                                                                                                                                                                   |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `connectSubTypes()`      | Adds missing subtype-supertype-relations between processed types. Types not already present in the input are not included. This step is mainly used to find and fix missing connections between types added from other steps. |
+| `mergeGetters()`         | Removes getter-functions and merges them with their matching properties or creates new properties when no matching one could be found.                                                                                        |
+| `handleNameAnnotation()` | Renames types according to provided `@Name`-annotations.                                                                                                                                                                      |

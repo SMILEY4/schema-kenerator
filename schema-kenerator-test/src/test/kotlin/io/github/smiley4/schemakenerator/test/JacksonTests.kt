@@ -8,13 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.jackson.handleJacksonIgnoreAnnotation
-import io.github.smiley4.schemakenerator.jackson.handleJacksonIgnorePropertiesAnnotation
-import io.github.smiley4.schemakenerator.jackson.handleJacksonIgnoreTypeAnnotation
-import io.github.smiley4.schemakenerator.jackson.handleJacksonPropertyAnnotation
-import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonPropertyDescriptionAnnotation
-import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonPropertyDescriptionAnnotation
-import io.github.smiley4.schemakenerator.jackson.swagger.steps.JacksonSwaggerPropertyDescriptionStep
+import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
+import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonJsonSchemaAnnotations
+import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.reflection.processReflection
@@ -40,7 +36,7 @@ class JacksonTests : StringSpec({
     "@JsonIgnore" {
         val result = typeOf<JsonIgnoreTestClass>()
             .processReflection()
-            .handleJacksonIgnoreAnnotation()
+            .handleJacksonAnnotations()
         (result.data as ObjectTypeData).members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
@@ -50,7 +46,7 @@ class JacksonTests : StringSpec({
     "@JsonIgnoreType" {
         val result = typeOf<JsonIgnoreTypeTestClass>()
             .processReflection()
-            .handleJacksonIgnoreTypeAnnotation()
+            .handleJacksonAnnotations()
         (result.data as ObjectTypeData).members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
@@ -60,7 +56,7 @@ class JacksonTests : StringSpec({
     "@JsonIgnoreProperties" {
         val result = typeOf<JsonIgnorePropertiesTestClass>()
             .processReflection()
-            .handleJacksonIgnorePropertiesAnnotation()
+            .handleJacksonAnnotations()
         (result.data as ObjectTypeData).members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
@@ -70,7 +66,7 @@ class JacksonTests : StringSpec({
     "@JsonProperty" {
         val result = typeOf<JsonPropertyTestClass>()
             .processReflection()
-            .handleJacksonPropertyAnnotation()
+            .handleJacksonAnnotations()
         (result.data as ObjectTypeData).members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
@@ -82,7 +78,7 @@ class JacksonTests : StringSpec({
         val result = typeOf<JsonPropertyDescriptionTestClass>()
             .processReflection()
             .generateJsonSchema()
-            .handleJacksonPropertyDescriptionAnnotation()
+            .handleJacksonJsonSchemaAnnotations()
             .compileInlining()
             .json
             .prettyPrint()
@@ -109,7 +105,7 @@ class JacksonTests : StringSpec({
         val result = typeOf<JsonPropertyDescriptionTestClass>()
             .processReflection()
             .generateSwaggerSchema()
-            .handleJacksonPropertyDescriptionAnnotation()
+            .handleJacksonSwaggerAnnotations()
             .compileInlining()
 
         jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()

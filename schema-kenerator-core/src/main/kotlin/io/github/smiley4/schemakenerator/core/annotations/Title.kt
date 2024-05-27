@@ -8,4 +8,4 @@ package io.github.smiley4.schemakenerator.core.annotations
     AnnotationTarget.CLASS,
 )
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SchemaTitle(val title: String)
+annotation class Title(val title: String)

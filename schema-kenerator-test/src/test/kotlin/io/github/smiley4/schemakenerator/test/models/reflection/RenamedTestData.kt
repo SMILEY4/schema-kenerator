@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.test.models.reflection
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaName
+import io.github.smiley4.schemakenerator.core.annotations.Name
 
-@SchemaName("TestData", "test.TestData")
+@Name("TestData", "test.TestData")
 data class RenamedTestData(val nestedValue: RenamedNestedData<String>)
 
-@SchemaName("NestedData", "test.NestedData")
+@Name("NestedData", "test.NestedData")
 data class RenamedNestedData<T>(val someValue: T)

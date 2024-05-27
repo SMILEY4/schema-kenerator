@@ -5,8 +5,10 @@ import io.github.smiley4.schemakenerator.jackson.jsonschema.steps.JacksonJsonSch
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 
 /**
+ * Handles the jackson "JsonPropertyDescription"-annotation.
  * See [JacksonJsonSchemaPropertyDescriptionStep]
  */
-fun Bundle<JsonSchema>.handleJacksonPropertyDescriptionAnnotation(): Bundle<JsonSchema> {
-    return JacksonJsonSchemaPropertyDescriptionStep().process(this)
+fun Bundle<JsonSchema>.handleJacksonJsonSchemaAnnotations(): Bundle<JsonSchema> {
+    return this
+        .let { JacksonJsonSchemaPropertyDescriptionStep().process(this) }
 }

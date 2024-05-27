@@ -5,8 +5,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleSwaggerArraySchemaAnnotation
-import io.github.smiley4.schemakenerator.swagger.handleSwaggerSchemaAnnotation
+import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
+import io.github.smiley4.schemakenerator.swagger.handleSwaggerAnnotations
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -24,8 +24,8 @@ class SwaggerAnnotationsTest : StringSpec({
         val result = typeOf<MyTestClass>()
             .processReflection()
             .generateSwaggerSchema()
-            .handleSwaggerSchemaAnnotation()
-            .handleSwaggerArraySchemaAnnotation()
+            .handleSwaggerAnnotations()
+            .handleSchemaAnnotations()
             .compileInlining()
         jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()
             .writeValueAsString(result.swagger).shouldEqualJson {

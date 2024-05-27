@@ -1,12 +1,12 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaTitle
+import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 /**
- * Adds a title specified by the [SchemaTitle]-annotation
+ * Adds a title specified by the [Title]-annotation
  */
 class SwaggerSchemaCoreAnnotationTitleStep {
 
@@ -27,7 +27,7 @@ class SwaggerSchemaCoreAnnotationTitleStep {
 
     private fun determineTitle(typeData: BaseTypeData): String? {
         return typeData.annotations
-            .filter { it.name == SchemaTitle::class.qualifiedName }
+            .filter { it.name == Title::class.qualifiedName }
             .map { it.values["title"] as String }
             .firstOrNull()
     }

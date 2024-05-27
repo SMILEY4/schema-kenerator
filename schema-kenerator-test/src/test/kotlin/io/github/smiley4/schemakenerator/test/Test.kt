@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleSwaggerSchemaAnnotation
+import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import kotlin.reflect.typeOf
@@ -54,7 +54,7 @@ fun main() {
     val result = typeOf<MyTestClass>()
         .processReflection()
         .generateSwaggerSchema()
-        .handleSwaggerSchemaAnnotation()
+        .handleSchemaAnnotations()
         .compileInlining()
 
     val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()

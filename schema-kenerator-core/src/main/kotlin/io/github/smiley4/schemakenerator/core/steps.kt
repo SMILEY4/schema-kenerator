@@ -16,7 +16,7 @@ fun Bundle<BaseTypeData>.connectSubTypes(): Bundle<BaseTypeData> {
 /**
  * See [RenameTypesStep]
  */
-fun Bundle<BaseTypeData>.renameTypes(): Bundle<BaseTypeData> {
+fun Bundle<BaseTypeData>.handleNameAnnotation(): Bundle<BaseTypeData> {
     return RenameTypesStep().process(this)
 }
 
