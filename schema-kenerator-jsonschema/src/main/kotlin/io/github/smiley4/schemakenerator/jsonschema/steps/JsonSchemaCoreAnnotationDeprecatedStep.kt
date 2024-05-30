@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDeprecated
+import io.github.smiley4.schemakenerator.core.annotations.Deprecated
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
 /**
- * Sets deprecated-flag from [SchemaDeprecated] or kotlin's [Deprecated]-annotation.
+ * Sets deprecated-flag from [Deprecated] or kotlin's [Deprecated]-annotation.
  */
 class JsonSchemaCoreAnnotationDeprecatedStep {
 
@@ -46,7 +46,7 @@ class JsonSchemaCoreAnnotationDeprecatedStep {
 
     private fun determineDeprecatedCore(annotations: Collection<AnnotationData>): Boolean? {
         return annotations
-            .filter { it.name == SchemaDeprecated::class.qualifiedName }
+            .filter { it.name == Deprecated::class.qualifiedName }
             .map { it.values["deprecated"] as Boolean }
             .firstOrNull()
     }

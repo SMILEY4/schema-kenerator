@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDescription
+import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
@@ -10,7 +10,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
 /**
- * Adds a description from the [SchemaDescription]-annotation.
+ * Adds a description from the [Description]-annotation.
  */
 class JsonSchemaCoreAnnotationDescriptionStep {
 
@@ -36,14 +36,14 @@ class JsonSchemaCoreAnnotationDescriptionStep {
 
     private fun determineDescription(typeData: BaseTypeData): String? {
         return typeData.annotations
-            .filter { it.name == SchemaDescription::class.qualifiedName }
+            .filter { it.name == Description::class.qualifiedName }
             .map { it.values["description"] as String }
             .firstOrNull()
     }
 
     private fun determineDescription(typeData: PropertyData): String? {
         return typeData.annotations
-            .filter { it.name == SchemaDescription::class.qualifiedName }
+            .filter { it.name == Description::class.qualifiedName }
             .map { it.values["description"] as String }
             .firstOrNull()
     }

@@ -5,8 +5,10 @@ import io.github.smiley4.schemakenerator.jackson.swagger.steps.JacksonSwaggerPro
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 /**
+ * Handles the jackson "JsonPropertyDescription"-annotation.
  * See [JacksonSwaggerPropertyDescriptionStep]
  */
-fun Bundle<SwaggerSchema>.handleJacksonPropertyDescriptionAnnotation(): Bundle<SwaggerSchema> {
-    return JacksonSwaggerPropertyDescriptionStep().process(this)
+fun Bundle<SwaggerSchema>.handleJacksonSwaggerAnnotations(): Bundle<SwaggerSchema> {
+    return this
+        .let { JacksonSwaggerPropertyDescriptionStep().process(this) }
 }

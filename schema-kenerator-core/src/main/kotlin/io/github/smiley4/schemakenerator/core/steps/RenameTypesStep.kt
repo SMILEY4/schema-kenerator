@@ -1,11 +1,11 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaName
+import io.github.smiley4.schemakenerator.core.annotations.Name
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 
 /**
- * Changes the [BaseTypeData.qualifiedName] and [BaseTypeData.simpleName] to the name specified with a [SchemaName]
+ * Changes the [BaseTypeData.qualifiedName] and [BaseTypeData.simpleName] to the name specified with a [Name]-annotation.
  */
 class RenameTypesStep {
 
@@ -18,7 +18,7 @@ class RenameTypesStep {
 
     private fun process(data: BaseTypeData) {
         data.annotations
-            .find { it.name == SchemaName::class.qualifiedName }
+            .find { it.name == Name::class.qualifiedName }
             ?.let {
                 val name = it.values["name"] as String
                 val qualifiedName = it.values["qualifiedName"] as String

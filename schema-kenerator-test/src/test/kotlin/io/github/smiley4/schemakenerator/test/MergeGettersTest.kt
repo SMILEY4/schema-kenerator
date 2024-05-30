@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDescription
+import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.Visibility
@@ -57,7 +57,7 @@ class MergeGettersTest : StringSpec({
 
         private class MyTestClass(
             val myNumber: Int,
-            @SchemaDescription("some test value")
+            @Description("some test value")
             private val someValue: String
         ) {
 

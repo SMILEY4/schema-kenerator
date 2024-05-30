@@ -1,23 +1,20 @@
 package io.github.smiley4.schemakenerator.test.models.kotlinx
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDefault
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDeprecated
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDescription
-import io.github.smiley4.schemakenerator.core.annotations.SchemaExample
-import io.github.smiley4.schemakenerator.core.annotations.SchemaTitle
+import io.github.smiley4.schemakenerator.core.annotations.Default
+import io.github.smiley4.schemakenerator.core.annotations.Deprecated
+import io.github.smiley4.schemakenerator.core.annotations.Description
+import io.github.smiley4.schemakenerator.core.annotations.Example
+import io.github.smiley4.schemakenerator.core.annotations.Title
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SchemaTitle("Annotated Class")
-@SchemaDescription("some description")
-//@SchemaDefault("{\"value\": \"test\"}")
-//@SchemaExample("{\"value\": \"example 1\"}")
-//@SchemaExample("{\"value\": \"example 2\"}")
-@SchemaDefault("default value")
-@SchemaExample("example 1")
-@SchemaExample("example 2")
-@SchemaDeprecated
+@Title("Annotated Class")
+@Description("some description")
+@Default("default value")
+@Example("example 1")
+@Example("example 2")
+@Deprecated
 class CoreAnnotatedClass(
-    @SchemaDescription("field description")
+    @Description("field description")
     val value: String
 )

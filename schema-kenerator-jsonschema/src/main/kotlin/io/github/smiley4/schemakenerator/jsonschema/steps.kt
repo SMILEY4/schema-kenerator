@@ -33,50 +33,25 @@ fun Bundle<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<J
 
 
 /**
- * See [JsonSchemaCoreAnnotationDefaultStep]
+ * See [JsonSchemaCoreAnnotationDefaultStep], [JsonSchemaCoreAnnotationDeprecatedStep], [JsonSchemaCoreAnnotationDescriptionStep],
+ * [JsonSchemaCoreAnnotationExamplesStep], [JsonSchemaCoreAnnotationTitleStep]
  */
-fun Bundle<JsonSchema>.handleDefaultAnnotation(): Bundle<JsonSchema> {
-    return JsonSchemaCoreAnnotationDefaultStep().process(this)
-}
-
-
-/**
- * See [JsonSchemaCoreAnnotationDeprecatedStep]
- */
-fun Bundle<JsonSchema>.handleDeprecatedAnnotation(): Bundle<JsonSchema> {
-    return JsonSchemaCoreAnnotationDeprecatedStep().process(this)
-}
-
-
-/**
- * See [JsonSchemaCoreAnnotationDescriptionStep]
- */
-fun Bundle<JsonSchema>.handleDescriptionAnnotation(): Bundle<JsonSchema> {
-    return JsonSchemaCoreAnnotationDescriptionStep().process(this)
-}
-
-
-/**
- * See [JsonSchemaCoreAnnotationExamplesStep]
- */
-fun Bundle<JsonSchema>.handleExampleAnnotation(): Bundle<JsonSchema> {
-    return JsonSchemaCoreAnnotationExamplesStep().process(this)
-}
-
-
-/**
- * See [JsonSchemaCoreAnnotationTitleStep]
- */
-fun Bundle<JsonSchema>.handleTitleAnnotation(): Bundle<JsonSchema> {
-    return JsonSchemaCoreAnnotationTitleStep().process(this)
+fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
+    return this
+        .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
+        .let { JsonSchemaCoreAnnotationDeprecatedStep().process(this) }
+        .let { JsonSchemaCoreAnnotationDescriptionStep().process(this) }
+        .let { JsonSchemaCoreAnnotationExamplesStep().process(this) }
+        .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
 }
 
 
 /**
  * See [JsonSchemaAnnotationTypeHintStep]
  */
-fun Bundle<JsonSchema>.handleJsonTypeHintAnnotation(): Bundle<JsonSchema> {
-    return JsonSchemaAnnotationTypeHintStep().process(this)
+fun Bundle<JsonSchema>.handleJsonSchemaAnnotations(): Bundle<JsonSchema> {
+    return this
+        .let { JsonSchemaAnnotationTypeHintStep().process(this) }
 }
 
 

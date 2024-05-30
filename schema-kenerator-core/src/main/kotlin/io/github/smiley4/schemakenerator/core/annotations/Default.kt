@@ -10,4 +10,4 @@ package io.github.smiley4.schemakenerator.core.annotations
      AnnotationTarget.FUNCTION
  )
  @Retention(AnnotationRetention.RUNTIME)
-annotation class SchemaDefault(val default: String)
+annotation class Default(val default: String)

@@ -12,4 +12,4 @@ package io.github.smiley4.schemakenerator.core.annotations
      AnnotationTarget.FUNCTION
  )
  @Retention(AnnotationRetention.RUNTIME)
-annotation class SchemaDeprecated(val deprecated: Boolean = true)
+annotation class Deprecated(val deprecated: Boolean = true)

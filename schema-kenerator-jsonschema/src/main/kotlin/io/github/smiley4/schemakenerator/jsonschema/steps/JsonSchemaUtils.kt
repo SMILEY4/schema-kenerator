@@ -66,11 +66,13 @@ class JsonSchemaUtils {
     //=====  ARRAYS =================================
     // https://cswr.github.io/JsonSchema/spec/arrays/
 
-    fun arraySchema(items: JsonNode): JsonObject {
+    fun arraySchema(items: JsonNode, uniqueItems: Boolean = false): JsonObject {
         return obj {
             "type" to "array"
             "items" to items
-            //"uniqueItems" to false
+            if(uniqueItems) {
+                "uniqueItems" to true
+            }
             //"maxItems" to 10
             //"minItems" to 0
             //"maxItems" to 99

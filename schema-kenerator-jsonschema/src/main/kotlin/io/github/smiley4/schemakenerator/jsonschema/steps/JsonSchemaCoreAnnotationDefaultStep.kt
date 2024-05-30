@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaDefault
+import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
@@ -8,7 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
 /**
- * Adds default values from [SchemaDefault]-annotation
+ * Adds default values from [Default]-annotation
  */
 class JsonSchemaCoreAnnotationDefaultStep {
 
@@ -29,7 +29,7 @@ class JsonSchemaCoreAnnotationDefaultStep {
 
     private fun determineDefaults(typeData: BaseTypeData): String? {
         return typeData.annotations
-            .filter { it.name == SchemaDefault::class.qualifiedName }
+            .filter { it.name == Default::class.qualifiedName }
             .map { it.values["default"] as String }
             .firstOrNull()
     }

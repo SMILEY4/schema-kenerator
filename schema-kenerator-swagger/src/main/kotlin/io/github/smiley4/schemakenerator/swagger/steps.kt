@@ -35,65 +35,36 @@ fun Bundle<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundl
 
 
 /**
- * See [SwaggerSchemaCoreAnnotationDefaultStep]
+ * See [SwaggerSchemaCoreAnnotationDefaultStep], [SwaggerSchemaCoreAnnotationDeprecatedStep], [SwaggerSchemaCoreAnnotationDescriptionStep],
+ * [SwaggerSchemaCoreAnnotationExamplesStep], [SwaggerSchemaCoreAnnotationTitleStep]
  */
-fun Bundle<SwaggerSchema>.handleDefaultAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaCoreAnnotationDefaultStep().process(this)
-}
-
-
-/**
- * See [SwaggerSchemaCoreAnnotationDeprecatedStep]
- */
-fun Bundle<SwaggerSchema>.handleDeprecatedAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaCoreAnnotationDeprecatedStep().process(this)
-}
-
-
-/**
- * See [SwaggerSchemaCoreAnnotationDescriptionStep]
- */
-fun Bundle<SwaggerSchema>.handleDescriptionAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaCoreAnnotationDescriptionStep().process(this)
-}
-
-
-/**
- * See [SwaggerSchemaCoreAnnotationExamplesStep]
- */
-fun Bundle<SwaggerSchema>.handleExampleAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaCoreAnnotationExamplesStep().process(this)
-}
-
-
-/**
- * See [SwaggerSchemaCoreAnnotationTitleStep]
- */
-fun Bundle<SwaggerSchema>.handleTitleAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaCoreAnnotationTitleStep().process(this)
+fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
+    return this
+        .let { SwaggerSchemaCoreAnnotationDefaultStep().process(this) }
+        .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(this) }
+        .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(this) }
+        .let { SwaggerSchemaCoreAnnotationExamplesStep().process(this) }
+        .let { SwaggerSchemaCoreAnnotationTitleStep().process(this) }
 }
 
 
 /**
  * See [SwaggerSchemaAnnotationTypeHintStep]
  */
-fun Bundle<SwaggerSchema>.handleSwaggerTypeHintAnnotation(): Bundle<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.handleSwaggerAnnotations(): Bundle<SwaggerSchema> {
     return SwaggerSchemaAnnotationTypeHintStep().process(this)
 }
 
-/**
- * See [SwaggerSchemaAnnotationStep]
- */
-fun Bundle<SwaggerSchema>.handleSwaggerSchemaAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaAnnotationStep().process(this)
-}
 
 /**
- * See [SwaggerArraySchemaAnnotationStep]
+ * See [SwaggerSchemaAnnotationStep], [SwaggerArraySchemaAnnotationStep]
  */
-fun Bundle<SwaggerSchema>.handleSwaggerArraySchemaAnnotation(): Bundle<SwaggerSchema> {
-    return SwaggerArraySchemaAnnotationStep().process(this)
+fun Bundle<SwaggerSchema>.handleSchemaAnnotations(): Bundle<SwaggerSchema> {
+    return this
+        .let { SwaggerSchemaAnnotationStep().process(this) }
+        .let { SwaggerArraySchemaAnnotationStep().process(this) }
 }
+
 
 /**
  * See [SwaggerSchemaCompileStep]

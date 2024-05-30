@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
@@ -1043,6 +1044,141 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "title": "ClassWithNestedClass"
                             }
                         }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithCollections>(),
+                testName = "class with collections",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "someArray",
+                        "someList",
+                        "someMap",
+                        "someSet"
+                      ],
+                      "properties": {
+                        "someArray": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "someList": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "someMap": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "someSet": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "someArray",
+                        "someList",
+                        "someMap",
+                        "someSet"
+                      ],
+                      "properties": {
+                        "someArray": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "someList": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "someMap": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "someSet": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections": {
+                          "type": "object",
+                          "required": [
+                            "someArray",
+                            "someList",
+                            "someMap",
+                            "someSet"
+                          ],
+                          "properties": {
+                            "someArray": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "minimum": -2147483648,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "someList": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "someMap": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer",
+                                "minimum": -2147483648,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "someSet": {
+                              "type": "array",
+                              "uniqueItems": true,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                 """.trimIndent(),
             ),

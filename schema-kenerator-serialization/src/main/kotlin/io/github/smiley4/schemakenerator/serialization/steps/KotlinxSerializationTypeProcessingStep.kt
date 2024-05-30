@@ -35,7 +35,11 @@ class KotlinxSerializationTypeProcessingStep(
     /**
      * custom processors for given types that overwrite the default behaviour
      */
-    private val customProcessors: Map<String, () -> BaseTypeData> = emptyMap()
+    private val customProcessors: Map<String, () -> BaseTypeData> = emptyMap(),
+    /**
+     * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
+     */
+    private val typeRedirects: Map<String, KType> = emptyMap()
 ) {
 
     fun process(type: KType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
@@ -66,12 +70,21 @@ class KotlinxSerializationTypeProcessingStep(
 
     @Suppress("CyclomaticComplexMethod")
     private fun parse(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
+
+        // check redirects
+        if(typeRedirects.containsKey(descriptor.cleanSerialName())) {
+            return process(typeRedirects[descriptor.cleanSerialName()]!!, typeData)
+        }
+
+        // check custom processors
         if (customProcessors.containsKey(descriptor.cleanSerialName())) {
             return customProcessors[descriptor.cleanSerialName()]!!.invoke().also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
             }
         }
+
+        // process
         return when (descriptor.cleanSerialName()) {
             Unit::class.qualifiedName -> parsePrimitive(descriptor, typeData)
             UByte::class.qualifiedName -> parsePrimitive(descriptor, typeData)
@@ -142,6 +155,7 @@ class KotlinxSerializationTypeProcessingStep(
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
+                unique = false
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)

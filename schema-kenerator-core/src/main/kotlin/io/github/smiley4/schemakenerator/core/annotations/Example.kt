@@ -12,4 +12,4 @@ package io.github.smiley4.schemakenerator.core.annotations
 )
 @Retention(AnnotationRetention.RUNTIME)
 @Repeatable
-annotation class SchemaExample(val example: String)
+annotation class Example(val example: String)

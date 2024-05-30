@@ -1,6 +1,6 @@
 # Schema-Kenerator
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-core/badge.svg)](https://search.maven.org/search?q=g:io.github.smiley4%20a:schema-kenerator-*)
 [![Checks Passing](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml/badge.svg?branch=develop)](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml)
 
 

@@ -150,5 +150,9 @@ class CollectionTypeData(
      * the type of the items
      */
     val itemType: PropertyData,
+    /**
+     * whether the items in the collection are unique
+     */
+    val unique: Boolean
 ) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 

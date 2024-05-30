@@ -10,7 +10,8 @@ import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
 import kotlin.reflect.KType
 
 /**
- * See [JacksonSubTypeStep]
+ * Handles the jackson "JsonSubTypes"-annotation.
+ * See [JacksonSubTypeStep] for more info.
  */
 fun KType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<BaseTypeData>, maxRecursionDepth: Int = 10): Bundle<KType> {
     return JacksonSubTypeStep(
@@ -19,32 +20,14 @@ fun KType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<BaseTyp
     ).process(this)
 }
 
-
 /**
- * See [JacksonIgnoreStep]
+ *  Handles the jackson annotations "JsonIgnore", "JsonIgnoreType", "JsonIgnoreProperties", "JsonProperty".
+ * See [JacksonIgnoreStep], [JacksonIgnoreTypeStep], [JacksonIgnorePropertiesStep], [JacksonPropertyStep] for more info.
  */
-fun Bundle<BaseTypeData>.handleJacksonIgnoreAnnotation(): Bundle<BaseTypeData> {
-    return JacksonIgnoreStep().process(this)
-}
-
-/**
- * See [JacksonIgnoreTypeStep]
- */
-fun Bundle<BaseTypeData>.handleJacksonIgnoreTypeAnnotation(): Bundle<BaseTypeData> {
-    return JacksonIgnoreTypeStep().process(this)
-}
-
-
-/**
- * See [JacksonIgnorePropertiesStep]
- */
-fun Bundle<BaseTypeData>.handleJacksonIgnorePropertiesAnnotation(): Bundle<BaseTypeData> {
-    return JacksonIgnorePropertiesStep().process(this)
-}
-
-/**
- * See [JacksonPropertyStep]
- */
-fun Bundle<BaseTypeData>.handleJacksonPropertyAnnotation(): Bundle<BaseTypeData> {
-    return JacksonPropertyStep().process(this)
+fun Bundle<BaseTypeData>.handleJacksonAnnotations(): Bundle<BaseTypeData> {
+    return this
+        .let { JacksonIgnoreStep().process(this) }
+        .let { JacksonIgnoreTypeStep().process(this) }
+        .let { JacksonIgnorePropertiesStep().process(this) }
+        .let { JacksonPropertyStep().process(this) }
 }

@@ -25,12 +25,17 @@ fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProce
 fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
-        customProcessors = config.customProcessors
+        customProcessors = config.customProcessors,
+        typeRedirects = config.typeRedirects
     ).process(this)
 }
 
 class KotlinxSerializationTypeProcessingConfig {
-    internal var customProcessors = mutableMapOf<String, () -> BaseTypeData>()
+
+    var customProcessors = mutableMapOf<String, () -> BaseTypeData>()
+
+    var typeRedirects = mutableMapOf<String, KType>()
+
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
@@ -39,6 +44,7 @@ class KotlinxSerializationTypeProcessingConfig {
         customProcessors[serializerName] = processor
     }
 
+
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
@@ -46,12 +52,14 @@ class KotlinxSerializationTypeProcessingConfig {
         customProcessors[type.qualifiedName!!] = processor
     }
 
+
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
     inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
         customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
     }
+
 
     /**
      * Add custom processors for the given types that overwrites the default behaviour
@@ -61,6 +69,7 @@ class KotlinxSerializationTypeProcessingConfig {
         customProcessors.putAll(processors)
     }
 
+
     /**
      * Add custom processors for the given types that overwrites the default behaviour
      */
@@ -69,6 +78,34 @@ class KotlinxSerializationTypeProcessingConfig {
         processors.forEach { (k, v) ->
             customProcessors[k.qualifiedName!!] = v
         }
+    }
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    fun redirect(from: String, to: KType) {
+        typeRedirects[from] = to
+    }
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    fun redirect(from: KType, to: KType) {
+        typeRedirects[(from.classifier!! as KClass<*>).qualifiedName!!] = to
+    }
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    inline fun <reified FROM, reified TO> redirect() {
+        redirect(typeOf<FROM>(), typeOf<TO>())
+    }
+
+    /**
+     * Redirect from the given types to the other given types, i.e. when a type is processed, the associated type is used instead.
+     */
+    fun redirect(redirects: Map<String, KType>) {
+        typeRedirects.putAll(redirects)
     }
 
 }

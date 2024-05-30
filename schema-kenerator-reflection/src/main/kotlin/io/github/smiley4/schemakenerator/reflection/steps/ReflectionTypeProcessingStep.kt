@@ -25,9 +25,11 @@ import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.KVisibility
+import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
+import kotlin.reflect.typeOf
 
 /**
  * Processes the given type and extracts information about it using reflection.
@@ -64,7 +66,11 @@ class ReflectionTypeProcessingStep(
     /**
      * custom processors for given types that overwrite the default behaviour
      */
-    private val customProcessors: Map<KClass<*>, () -> BaseTypeData> = emptyMap()
+    private val customProcessors: Map<KClass<*>, () -> BaseTypeData> = emptyMap(),
+    /**
+     * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
+     */
+    private val typeRedirects: Map<KType, KType> = DEFAULT_REDIRECTS
 ) {
 
     companion object {
@@ -86,6 +92,23 @@ class ReflectionTypeProcessingStep(
             Any::class,
             Unit::class,
         )
+
+
+        @OptIn(ExperimentalUnsignedTypes::class)
+        val DEFAULT_REDIRECTS = mapOf(
+            typeOf<BooleanArray>() to typeOf<Array<Boolean>>(),
+            typeOf<ByteArray>() to typeOf<Array<Byte>>(),
+            typeOf<UByteArray>() to typeOf<Array<UByte>>(),
+            typeOf<ShortArray>() to typeOf<Array<Short>>(),
+            typeOf<UShortArray>() to typeOf<Array<UShort>>(),
+            typeOf<CharArray>() to typeOf<Array<Char>>(),
+            typeOf<IntArray>() to typeOf<Array<Int>>(),
+            typeOf<UIntArray>() to typeOf<Array<UInt>>(),
+            typeOf<LongArray>() to typeOf<Array<Long>>(),
+            typeOf<ULongArray>() to typeOf<Array<ULong>>(),
+            typeOf<FloatArray>() to typeOf<Array<Float>>(),
+            typeOf<DoubleArray>() to typeOf<Array<Double>>(),
+        )
     }
 
 
@@ -106,8 +129,10 @@ class ReflectionTypeProcessingStep(
 
 
     private fun process(type: KType, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        if (type.classifier is KClass<*>) {
-            return parseClass(type, type.classifier as KClass<*>, mapOf(), typeData)
+        return if (typeRedirects.containsKey(type)) {
+            process(typeRedirects[type]!!, typeData)
+        } else if (type.classifier is KClass<*>) {
+            parseClass(type, type.classifier as KClass<*>, mapOf(), typeData)
         } else {
             throw IllegalArgumentException("Type is not a class.")
         }
@@ -122,6 +147,11 @@ class ReflectionTypeProcessingStep(
         typeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
     ): BaseTypeData {
+
+        // check type redirects
+        if (typeRedirects.containsKey(type)) {
+            return process(typeRedirects[type]!!, typeData)
+        }
 
         // check custom type processors
         if (customProcessors.containsKey(clazz)) {
@@ -147,7 +177,7 @@ class ReflectionTypeProcessingStep(
         typeData.add(PlaceholderTypeData(id))
 
         // determine class type, i.e. whether type is primitive, class, enum, collection, map, ...
-        val classType = determineClassType(clazz)
+        val classType = determineClassType(type)
 
         // collect supertypes
         val supertypes = if (classType == TypeCategory.OBJECT) {
@@ -169,6 +199,9 @@ class ReflectionTypeProcessingStep(
         } else {
             emptyList()
         }
+
+        // check if collection set of unique items
+        val uniqueCollection = isCollectionUnique(type)
 
         // collect member information
         val members = if (classType == TypeCategory.OBJECT) {
@@ -230,8 +263,18 @@ class ReflectionTypeProcessingStep(
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
                     )
+                } ?: resolvedTypeParameters.entries.firstOrNull()?.let {
+                    PropertyData(
+                        name = "item",
+                        type = it.value.type,
+                        nullable = it.value.nullable,
+                        visibility = Visibility.PUBLIC,
+                        kind = PropertyType.PROPERTY,
+                        annotations = mutableListOf()
+                    )
                 }
-                ?: unknownPropertyData("item", typeData)
+                ?: unknownPropertyData("item", typeData),
+                unique = uniqueCollection
             )
             TypeCategory.MAP -> MapTypeData(
                 id = id,
@@ -274,9 +317,10 @@ class ReflectionTypeProcessingStep(
         providedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
     ): Map<String, TypeParameterData> {
+        val namesProvided = clazz.typeParameters.size == type.arguments.size
         return buildMap {
             for (index in type.arguments.indices) {
-                val name = clazz.typeParameters[index].name
+                val name = if (namesProvided) clazz.typeParameters[index].name else "T"
                 val argType = type.arguments[index]
                 this[name] = TypeParameterData(
                     name = name,
@@ -340,10 +384,10 @@ class ReflectionTypeProcessingStep(
         // check static
         if (!includeStatic) {
             when (member) {
-                is KProperty<*> -> if (Modifier.isStatic(member.javaField?.modifiers ?: 0)) {
+                is KProperty<*> -> if (canAccessJavaField(member) && Modifier.isStatic(member.javaField?.modifiers ?: 0)) {
                     return false
                 }
-                is KFunction<*> -> if (Modifier.isStatic(member.javaMethod?.modifiers ?: 0)) {
+                is KFunction<*> -> if (canAccessJavaMethod(member) && Modifier.isStatic(member.javaMethod?.modifiers ?: 0)) {
                     return false
                 }
             }
@@ -364,6 +408,24 @@ class ReflectionTypeProcessingStep(
             }
         } else {
             true
+        }
+    }
+
+    @Suppress("SwallowedException")
+    private fun canAccessJavaField(property: KProperty<*>): Boolean {
+        return try {
+            property.javaField != null
+        } catch (e: Throwable) {
+            false
+        }
+    }
+
+    @Suppress("SwallowedException")
+    private fun canAccessJavaMethod(property: KFunction<*>): Boolean {
+        return try {
+            property.javaMethod != null
+        } catch (e: Throwable) {
+            false
         }
     }
 
@@ -418,7 +480,7 @@ class ReflectionTypeProcessingStep(
 
     // ====== SUPERTYPES ==============================================
 
-    fun parseSupertypes(
+    private fun parseSupertypes(
         clazz: KClass<*>,
         resolvedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
@@ -517,42 +579,35 @@ class ReflectionTypeProcessingStep(
 
     // ====== CLASS TYPE DECIDER =======================================
 
-    private fun determineClassType(clazz: KClass<*>): TypeCategory {
+    private fun determineClassType(type: KType): TypeCategory {
         return when {
-            primitiveTypes.contains(clazz) -> TypeCategory.PRIMITIVE
-            isEnum(clazz) -> TypeCategory.ENUM
-            isCollection(clazz) -> TypeCategory.COLLECTION
-            isMap(clazz) -> TypeCategory.MAP
+            primitiveTypes.contains(type.classifier as KClass<*>) -> TypeCategory.PRIMITIVE
+            isEnum(type) -> TypeCategory.ENUM
+            isCollection(type) -> TypeCategory.COLLECTION
+            isMap(type) -> TypeCategory.MAP
             else -> TypeCategory.OBJECT
         }
     }
 
 
-    private fun isEnum(clazz: KClass<*>): Boolean {
-        return clazz.java.enumConstants != null
+    private fun isEnum(type: KType): Boolean {
+        return (type.classifier as KClass<*>).java.enumConstants != null
     }
 
-    private fun isCollection(clazz: KClass<*>): Boolean {
-        return if (clazz.qualifiedName == Collection::class.qualifiedName || clazz.qualifiedName == Array::class.qualifiedName) {
+    private fun isCollection(type: KType): Boolean {
+        return if (type.isSubtypeOf(typeOf<Collection<*>>()) || type.isSubtypeOf(typeOf<Array<*>>())) {
             true
         } else {
-            clazz.supertypes
-                .asSequence()
-                .mapNotNull { it.classifier }
-                .map { it as KClass<*> }
-                .any { isCollection(it) }
+            (type.classifier as KClass<*>).supertypes.any { isCollection(it) }
         }
     }
 
-    private fun isMap(clazz: KClass<*>): Boolean {
+    private fun isMap(type: KType): Boolean {
+        val clazz = type.classifier as KClass<*>
         return if (clazz.qualifiedName == Map::class.qualifiedName) {
             true
         } else {
-            clazz.supertypes
-                .asSequence()
-                .mapNotNull { it.classifier }
-                .map { it as KClass<*> }
-                .any { isMap(it) }
+            clazz.supertypes.any { isMap(it) }
         }
     }
 
@@ -570,6 +625,10 @@ class ReflectionTypeProcessingStep(
 
     private fun determinePropertyVisibility(member: KCallable<*>): Visibility {
         return if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
+    }
+
+    private fun isCollectionUnique(type: KType): Boolean {
+        return type.isSubtypeOf(typeOf<Set<*>>())
     }
 
     private fun unknownPropertyData(name: String, typeData: MutableList<BaseTypeData>): PropertyData {

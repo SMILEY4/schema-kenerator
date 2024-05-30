@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.SchemaTitle
+import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
@@ -8,7 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
 /**
- * Adds a title specified by the [SchemaTitle]-annotation
+ * Adds a title specified by the [Title]-annotation
  */
 class JsonSchemaCoreAnnotationTitleStep {
 
@@ -29,7 +29,7 @@ class JsonSchemaCoreAnnotationTitleStep {
 
     private fun determineTitle(typeData: BaseTypeData): String? {
         return typeData.annotations
-            .filter { it.name == SchemaTitle::class.qualifiedName }
+            .filter { it.name == Title::class.qualifiedName }
             .map { it.values["title"] as String }
             .firstOrNull()
     }

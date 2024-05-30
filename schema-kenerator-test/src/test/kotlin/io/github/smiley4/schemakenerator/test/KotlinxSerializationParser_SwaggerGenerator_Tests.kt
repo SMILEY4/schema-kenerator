@@ -7,6 +7,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleSte
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
@@ -1108,6 +1109,165 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "exampleSetFlag": false
                             }
                         }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithCollections>(),
+                testName = "class with collections",
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "someArray",
+                        "someList",
+                        "someMap",
+                        "someSet"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "someList": {
+                          "type": "array",
+                          "exampleSetFlag": false,
+                          "items": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "someSet": {
+                          "type": "array",
+                          "exampleSetFlag": false,
+                          "items": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "someMap": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32",
+                            "exampleSetFlag": false
+                          },
+                          "exampleSetFlag": false
+                        },
+                        "someArray": {
+                          "type": "array",
+                          "exampleSetFlag": false,
+                          "items": {
+                            "type": "integer",
+                            "format": "int32",
+                            "exampleSetFlag": false
+                          }
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "someArray",
+                          "someList",
+                          "someMap",
+                          "someSet"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "someList": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "someSet": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "someMap": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            },
+                            "exampleSetFlag": false
+                          },
+                          "someArray": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            }
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections": {
+                          "required": [
+                            "someArray",
+                            "someList",
+                            "someMap",
+                            "someSet"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "someList": {
+                              "type": "array",
+                              "exampleSetFlag": false,
+                              "items": {
+                                "type": "string",
+                                "exampleSetFlag": false
+                              }
+                            },
+                            "someSet": {
+                              "type": "array",
+                              "exampleSetFlag": false,
+                              "items": {
+                                "type": "string",
+                                "exampleSetFlag": false
+                              }
+                            },
+                            "someMap": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer",
+                                "format": "int32",
+                                "exampleSetFlag": false
+                              },
+                              "exampleSetFlag": false
+                            },
+                            "someArray": {
+                              "type": "array",
+                              "exampleSetFlag": false,
+                              "items": {
+                                "type": "integer",
+                                "format": "int32",
+                                "exampleSetFlag": false
+                              }
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
                     }
                 """.trimIndent(),
             ),
