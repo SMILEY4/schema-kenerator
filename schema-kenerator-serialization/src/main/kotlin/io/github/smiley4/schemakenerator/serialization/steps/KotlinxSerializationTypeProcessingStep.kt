@@ -155,6 +155,7 @@ class KotlinxSerializationTypeProcessingStep(
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
+                unique = false
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)

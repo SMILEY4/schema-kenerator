@@ -200,6 +200,9 @@ class ReflectionTypeProcessingStep(
             emptyList()
         }
 
+        // check if collection set of unique items
+        val uniqueCollection = isCollectionUnique(type)
+
         // collect member information
         val members = if (classType == TypeCategory.OBJECT) {
             parseProperties(clazz, resolvedTypeParameters, typeData)
@@ -270,7 +273,8 @@ class ReflectionTypeProcessingStep(
                         annotations = mutableListOf()
                     )
                 }
-                ?: unknownPropertyData("item", typeData)
+                ?: unknownPropertyData("item", typeData),
+                unique = uniqueCollection
             )
             TypeCategory.MAP -> MapTypeData(
                 id = id,
@@ -476,7 +480,7 @@ class ReflectionTypeProcessingStep(
 
     // ====== SUPERTYPES ==============================================
 
-    fun parseSupertypes(
+    private fun parseSupertypes(
         clazz: KClass<*>,
         resolvedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
@@ -621,6 +625,10 @@ class ReflectionTypeProcessingStep(
 
     private fun determinePropertyVisibility(member: KCallable<*>): Visibility {
         return if (member.visibility == KVisibility.PUBLIC) Visibility.PUBLIC else Visibility.HIDDEN
+    }
+
+    private fun isCollectionUnique(type: KType): Boolean {
+        return type.isSubtypeOf(typeOf<Set<*>>())
     }
 
     private fun unknownPropertyData(name: String, typeData: MutableList<BaseTypeData>): PropertyData {

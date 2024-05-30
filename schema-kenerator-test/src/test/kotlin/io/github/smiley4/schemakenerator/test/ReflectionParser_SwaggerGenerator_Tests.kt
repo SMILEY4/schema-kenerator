@@ -1391,6 +1391,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           },
                           "someSet": {
                             "type": "array",
+                            "uniqueItems": true,
                             "exampleSetFlag": false,
                             "items": {
                               "type": "string",
@@ -1442,6 +1443,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           },
                           "someSet": {
                             "type": "array",
+                            "uniqueItems": true,
                             "exampleSetFlag": false,
                             "items": {
                               "type": "string",
@@ -1498,6 +1500,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             },
                             "someSet": {
                               "type": "array",
+                              "uniqueItems": true,
                               "exampleSetFlag": false,
                               "items": {
                                 "type": "string",

@@ -137,7 +137,10 @@ class JsonSchemaGenerationStep {
 
     private fun buildCollectionSchema(typeData: CollectionTypeData): JsonSchema {
         return JsonSchema(
-            json = schemaUtils.arraySchema(schemaUtils.referenceSchema(typeData.itemType.type)),
+            json = schemaUtils.arraySchema(
+                schemaUtils.referenceSchema(typeData.itemType.type),
+                typeData.unique
+            ),
             typeData = typeData
         )
     }

@@ -113,7 +113,10 @@ class SwaggerSchemaGenerationStep {
 
     private fun buildCollectionSchema(typeData: CollectionTypeData): SwaggerSchema {
         return SwaggerSchema(
-            swagger = schema.arraySchema(schema.referenceSchema(typeData.itemType.type)),
+            swagger = schema.arraySchema(
+                schema.referenceSchema(typeData.itemType.type),
+                typeData.unique
+            ),
             typeData = typeData
         )
     }

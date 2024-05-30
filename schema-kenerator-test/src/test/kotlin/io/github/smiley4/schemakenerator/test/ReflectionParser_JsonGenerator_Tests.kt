@@ -1084,6 +1084,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         },
                         "someSet": {
                           "type": "array",
+                          "uniqueItems": true,
                           "items": {
                             "type": "string"
                           }
@@ -1125,6 +1126,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         },
                         "someSet": {
                           "type": "array",
+                          "uniqueItems": true,
                           "items": {
                             "type": "string"
                           }
@@ -1169,6 +1171,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             },
                             "someSet": {
                               "type": "array",
+                              "uniqueItems": true,
                               "items": {
                                 "type": "string"
                               }

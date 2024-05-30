@@ -20,6 +20,7 @@ class SwaggerSchemaUtils {
         max?.also { schema.maximum = BigDecimal(it) }
     }
 
+
     /**
      * Schema of a number
      * @param integer whether the number is an integer or a floating-point value
@@ -27,17 +28,18 @@ class SwaggerSchemaUtils {
      * @param max the max value of the number (inclusive)
      */
     fun numericSchema(integer: Boolean, min: BigDecimal, max: BigDecimal) = Schema<Any>().also { schema ->
-        schema.type = if(integer) "integer" else "number"
+        schema.type = if (integer) "integer" else "number"
         schema.minimum = min
         schema.maximum = max
     }
+
 
     /**
      * Schema of any number
      * @param integer whether the number is an integer or a floating-point value
      */
     fun numberSchema(integer: Boolean) = Schema<Any>().also { schema ->
-        schema.type = if(integer) "integer" else "number"
+        schema.type = if (integer) "integer" else "number"
     }
 
 
@@ -49,6 +51,7 @@ class SwaggerSchemaUtils {
         schema.format = "float"
     }
 
+
     /**
      * Schema of a floating-point number with double precision
      */
@@ -56,6 +59,7 @@ class SwaggerSchemaUtils {
         schema.type = "number"
         schema.format = "double"
     }
+
 
     /**
      * Schema of a signed 32-bit integer
@@ -65,6 +69,7 @@ class SwaggerSchemaUtils {
         schema.format = "int32"
     }
 
+
     /**
      * Schema of a signed 64-bit integer
      */
@@ -72,6 +77,7 @@ class SwaggerSchemaUtils {
         schema.type = "integer"
         schema.format = "int64"
     }
+
 
     /**
      * Schema of a boolean
@@ -95,10 +101,13 @@ class SwaggerSchemaUtils {
     //=====  ARRAYS =================================
     // https://cswr.github.io/JsonSchema/spec/arrays/
 
-    fun arraySchema(items: Schema<*>): Schema<*> {
+    fun arraySchema(items: Schema<*>, uniqueItems: Boolean = false): Schema<*> {
         return Schema<Any>().also { schema ->
             schema.type = "array"
             schema.items = items
+            if (uniqueItems) {
+                schema.uniqueItems = true
+            }
         }
     }
 
@@ -163,7 +172,7 @@ class SwaggerSchemaUtils {
 
     fun referenceSchema(id: String, isInComponents: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
-            schema.`raw$ref`(if(isInComponents) "#/components/schemas/$id" else id)
+            schema.`raw$ref`(if (isInComponents) "#/components/schemas/$id" else id)
         }
     }
 
