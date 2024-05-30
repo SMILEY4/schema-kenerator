@@ -9,12 +9,6 @@ todo:
     - JsonTypeInfo
     - JsonGetter, JsonSetter
 
-- support (more) swagger-annotations
-    - @Schema
-    - @ArraySchema
-
-- rethink naming
-
 - process type
     - detect if collection is set and add "unique" flag
 

@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
@@ -1345,6 +1346,168 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "exampleSetFlag": false
                             }
                         }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithCollections>(),
+                testName = "class with collections",
+                expectedResultInlining = """
+                    {
+                      "schema": {
+                        "required": [
+                          "someArray",
+                          "someList",
+                          "someMap",
+                          "someSet"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "someArray": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "someList": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "someMap": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            },
+                            "exampleSetFlag": false
+                          },
+                          "someSet": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "someArray",
+                          "someList",
+                          "someMap",
+                          "someSet"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "someArray": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "someList": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "someMap": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            },
+                            "exampleSetFlag": false
+                          },
+                          "someSet": {
+                            "type": "array",
+                            "exampleSetFlag": false,
+                            "items": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections": {
+                          "required": [
+                            "someArray",
+                            "someList",
+                            "someMap",
+                            "someSet"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "someArray": {
+                              "type": "array",
+                              "exampleSetFlag": false,
+                              "items": {
+                                "type": "integer",
+                                "format": "int32",
+                                "exampleSetFlag": false
+                              }
+                            },
+                            "someList": {
+                              "type": "array",
+                              "exampleSetFlag": false,
+                              "items": {
+                                "type": "string",
+                                "exampleSetFlag": false
+                              }
+                            },
+                            "someMap": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer",
+                                "format": "int32",
+                                "exampleSetFlag": false
+                              },
+                              "exampleSetFlag": false
+                            },
+                            "someSet": {
+                              "type": "array",
+                              "exampleSetFlag": false,
+                              "items": {
+                                "type": "string",
+                                "exampleSetFlag": false
+                              }
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
                     }
                 """.trimIndent(),
             ),

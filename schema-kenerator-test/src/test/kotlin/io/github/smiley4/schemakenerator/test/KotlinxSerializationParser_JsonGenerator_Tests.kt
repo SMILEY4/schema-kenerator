@@ -8,6 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleSte
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
@@ -1014,8 +1015,139 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
+            TestData(
+                type = typeOf<ClassWithCollections>(),
+                testName = "class with collections",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "someList",
+                        "someSet",
+                        "someMap",
+                        "someArray"
+                      ],
+                      "properties": {
+                        "someList": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "someSet": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "someMap": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "someArray": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "someList",
+                        "someSet",
+                        "someMap",
+                        "someArray"
+                      ],
+                      "properties": {
+                        "someList": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "someSet": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "someMap": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        },
+                        "someArray": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections": {
+                          "type": "object",
+                          "required": [
+                            "someList",
+                            "someSet",
+                            "someMap",
+                            "someArray"
+                          ],
+                          "properties": {
+                            "someList": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "someSet": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "someMap": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer",
+                                "minimum": -2147483648,
+                                "maximum": 2147483647
+                              }
+                            },
+                            "someArray": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "minimum": -2147483648,
+                                "maximum": 2147483647
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
         )
-
     }
 
 }

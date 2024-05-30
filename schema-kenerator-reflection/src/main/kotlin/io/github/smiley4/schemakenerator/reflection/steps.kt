@@ -23,7 +23,10 @@ fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<KType> {
 
 
 class ReflectionTypeProcessingStepConfig {
-    internal var customProcessors = mutableMapOf<KClass<*>, () -> BaseTypeData>()
+
+    var customProcessors = mutableMapOf<KClass<*>, () -> BaseTypeData>()
+
+    var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeProcessingStep.DEFAULT_REDIRECTS) }
 
 
     /**
@@ -59,7 +62,7 @@ class ReflectionTypeProcessingStepConfig {
     /**
      * The list of types that are considered "primitive types" and returned as [PrimitiveTypeData]
      */
-    var primitiveTypes: Collection<KClass<*>> = DEFAULT_PRIMITIVE_TYPES
+    var primitiveTypes: MutableSet<KClass<*>> = DEFAULT_PRIMITIVE_TYPES.toMutableSet()
 
 
     /**
@@ -90,6 +93,30 @@ class ReflectionTypeProcessingStepConfig {
     fun customProcessors(processors: Map<KClass<*>, () -> BaseTypeData>) {
         customProcessors.putAll(processors)
     }
+
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    fun redirect(from: KType, to: KType) {
+        typeRedirects[from] = to
+    }
+
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    inline fun <reified FROM, reified TO> redirect() {
+        redirect(typeOf<FROM>(), typeOf<TO>())
+    }
+
+
+    /**
+     * Redirect from the given types to the other given types, i.e. when a type is processed, the associated type is used instead.
+     */
+    fun redirect(redirects: Map<KType, KType>) {
+        typeRedirects.putAll(redirects)
+    }
 }
 
 
@@ -106,7 +133,8 @@ fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
-        enumConstType = config.enumConstType
+        enumConstType = config.enumConstType,
+        typeRedirects = config.typeRedirects
     ).process(this)
 }
 
@@ -124,7 +152,8 @@ fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepCon
         includeStatic = config.includeStatic,
         primitiveTypes = config.primitiveTypes,
         customProcessors = config.customProcessors,
-        enumConstType = config.enumConstType
+        enumConstType = config.enumConstType,
+        typeRedirects = config.typeRedirects
     ).process(this)
 }
 
