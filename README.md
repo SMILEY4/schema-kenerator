@@ -38,7 +38,7 @@ dependencies {
 
 ## Documentation
 
-A wiki with a short documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
+A wiki with documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
 
 
 ## Concept Overview
