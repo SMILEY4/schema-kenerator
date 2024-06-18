@@ -16,7 +16,7 @@ import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializatio
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
 import io.kotest.assertions.json.ArrayOrder
@@ -129,7 +129,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { SwaggerSchemaGenerationStep().generate(it) }
             .let { SwaggerSchemaAnnotationTypeHintStep().process(it) }
             .let { SwaggerSchemaAutoTitleStep(io.github.smiley4.schemakenerator.swagger.data.TitleType.FULL).process(it) }
-            .let { SwaggerSchemaCompileStep().compileInlining(it) }
+            .let { SwaggerSchemaCompileInlineStep().compile(it) }
 
         json.writeValueAsString(result.swagger).shouldEqualJson {
             propertyOrder = PropertyOrder.Lenient
@@ -185,7 +185,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { SwaggerSchemaGenerationStep().generate(it) }
             .let { SwaggerSchemaAnnotationTypeHintStep().process(it) }
             .let { SwaggerSchemaAutoTitleStep(io.github.smiley4.schemakenerator.swagger.data.TitleType.FULL).process(it) }
-            .let { SwaggerSchemaCompileStep().compileInlining(it) }
+            .let { SwaggerSchemaCompileInlineStep().compile(it) }
 
         json.writeValueAsString(result.swagger).shouldEqualJson {
             propertyOrder = PropertyOrder.Lenient

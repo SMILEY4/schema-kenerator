@@ -5,7 +5,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
@@ -63,7 +65,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileStep().compileInlining(it) }
+                .let { SwaggerSchemaCompileInlineStep().compile(it) }
                 .let {
                     Result(
                         schema = it.swagger,
@@ -108,7 +110,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileStep().compileReferencing(it) }
+                .let { SwaggerSchemaCompileReferenceStep().compile(it) }
                 .let {
                     Result(
                         schema = it.swagger,
@@ -153,7 +155,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileStep().compileReferencingRoot(it) }
+                .let { SwaggerSchemaCompileReferenceRootStep().compile(it) }
                 .let {
                     Result(
                         schema = it.swagger,
