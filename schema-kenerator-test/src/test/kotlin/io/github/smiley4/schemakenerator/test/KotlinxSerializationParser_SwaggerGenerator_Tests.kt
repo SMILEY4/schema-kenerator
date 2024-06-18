@@ -9,6 +9,7 @@ import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
@@ -1273,6 +1274,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
+//            todo: fix infinite loop
+//            TestData(
+//                type = typeOf<ClassDirectSelfReferencing>(),
+//                testName = "class with direct self reference",
+//                expectedResultInlining = """
+//                    {
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencing = """
+//                    {
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencingRoot = """
+//                    {
+//                    }
+//                """.trimIndent(),
+//            ),
         )
 
     }

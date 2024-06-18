@@ -48,7 +48,7 @@ class SwaggerSchemaCompileReferenceStep(private val pathType: RefType = RefType.
         components: MutableMap<String, Schema<*>>
     ): Schema<*> {
         val referencedId = TypeId.parse(refObj.`$ref`)
-        val referencedSchema = schemaList.get(referencedId)
+        val referencedSchema = schemaList.find(referencedId)
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
                 val refPath = getRefPath(pathType, referencedSchema.typeData, typeDataMap)
@@ -67,7 +67,7 @@ class SwaggerSchemaCompileReferenceStep(private val pathType: RefType = RefType.
 
     private fun placeholder() = Schema<Any>()
 
-    private fun Collection<SwaggerSchema>.get(id: TypeId): SwaggerSchema? {
+    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? {
         return this.find { it.typeData.id == id }
     }
 

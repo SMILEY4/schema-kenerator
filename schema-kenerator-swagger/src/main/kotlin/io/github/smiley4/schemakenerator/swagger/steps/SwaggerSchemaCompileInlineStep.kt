@@ -20,7 +20,7 @@ class SwaggerSchemaCompileInlineStep {
         val schemaList = bundle.flatten()
         val root = resolveReferences(bundle.data.swagger) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`)
-            val referencedSchema = schemaList.get(referencedId)
+            val referencedSchema = schemaList.find(referencedId)
             if(referencedSchema != null) {
                 merge(refObj, referencedSchema.swagger)
             } else {
@@ -34,7 +34,7 @@ class SwaggerSchemaCompileInlineStep {
         )
     }
 
-    private fun Collection<SwaggerSchema>.get(id: TypeId): SwaggerSchema? {
+    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? {
         return this.find { it.typeData.id == id }
     }
 

@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
@@ -25,7 +25,7 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                     includeHidden = data.includeHidden
                 ).process(it) }
                 .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaCompileStep().compileInlining(it) }
+                .let { JsonSchemaCompileInlineStep().compile(it) }
 
             ((schema.json as JsonObject).properties["properties"] as JsonObject).properties.keys shouldContainExactlyInAnyOrder data.expectedProperties
         }
