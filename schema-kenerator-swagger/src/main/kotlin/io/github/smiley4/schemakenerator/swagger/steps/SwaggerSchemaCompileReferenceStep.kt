@@ -52,7 +52,10 @@ class SwaggerSchemaCompileReferenceStep(private val pathType: RefType = RefType.
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
                 val refPath = getRefPath(pathType, referencedSchema.typeData, typeDataMap)
-                components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components)}
+                if(!components.containsKey(refPath)) {
+                    components[refPath] = placeholder() // break out of infinite loops
+                    components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components)}
+                }
                 schemaUtils.referenceSchema(refPath, true)
             } else {
                 merge(refObj, referencedSchema.swagger)
@@ -61,6 +64,8 @@ class SwaggerSchemaCompileReferenceStep(private val pathType: RefType = RefType.
             refObj
         }
     }
+
+    private fun placeholder() = Schema<Any>()
 
     private fun Collection<SwaggerSchema>.get(id: TypeId): SwaggerSchema? {
         return this.find { it.typeData.id == id }

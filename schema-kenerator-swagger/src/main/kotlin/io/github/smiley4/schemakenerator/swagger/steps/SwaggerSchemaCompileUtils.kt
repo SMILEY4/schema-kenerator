@@ -48,10 +48,15 @@ object SwaggerSchemaCompileUtils {
      */
     fun resolveReferences(node: Schema<*>, depth: Int = 0, resolver: (refObj: Schema<*>) -> Schema<*>): Schema<*> {
         if (depth > MAX_RESOLVE_REFS_DEPTH) {
-            return node;
+            return Schema<Any>()
         }
         if (node.`$ref` != null) {
-            return resolveReferences(resolver(node), depth + 1, resolver)
+            val resolved = resolver(node)
+            return if(resolved == node) {
+                resolved
+            } else {
+                resolveReferences(resolved, depth + 1, resolver)
+            }
         } else {
             node.items = node.items?.let { resolveReferences(it, depth + 1, resolver) }
             node.properties = node.properties?.let { it.mapValues { prop -> resolveReferences(prop.value, depth + 1, resolver) } }

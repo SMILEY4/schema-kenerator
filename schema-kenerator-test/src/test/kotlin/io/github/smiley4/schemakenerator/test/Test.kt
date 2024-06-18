@@ -20,7 +20,7 @@ import kotlin.reflect.typeOf
 
 class Test : StringSpec({
 
-    "infinite loop" {
+    "kotlinx processing infinite loop" {
 
         val result = typeOf<ClassDirectSelfReferencing>()
             .let { KotlinxSerializationTypeProcessingStep().process(it) }
@@ -33,7 +33,7 @@ class Test : StringSpec({
         }
     }
 
-    "schema-kenerator issues 1" {
+    "compile inflinite loop" {
 
         val result = typeOf<ClassDirectSelfReferencing>()
             .collectSubTypes()
