@@ -1,12 +1,15 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
@@ -45,7 +48,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { JsonSchemaCompileStep().compileInlining(it) }
+                .let { JsonSchemaCompileInlineStep().compile(it) }
 
             schema.json.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
@@ -85,7 +88,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { JsonSchemaCompileStep().compileReferencing(it) }
+                .let { JsonSchemaCompileReferenceStep().compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -142,7 +145,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { JsonSchemaCompileStep().compileReferencingRoot(it) }
+                .let { JsonSchemaCompileReferenceRootStep().compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -1147,6 +1150,23 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
+//            todo: fix infinite loop
+//            TestData(
+//                type = typeOf<ClassDirectSelfReferencing>(),
+//                testName = "class with direct self reference",
+//                expectedResultInlining = """
+//                    {
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencing = """
+//                    {
+//                    }
+//                """.trimIndent(),
+//                expectedResultReferencingRoot = """
+//                    {
+//                    }
+//                """.trimIndent(),
+//            ),
         )
     }
 

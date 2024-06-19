@@ -10,7 +10,9 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotat
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
@@ -67,24 +69,24 @@ fun Bundle<SwaggerSchema>.handleSchemaAnnotations(): Bundle<SwaggerSchema> {
 
 
 /**
- * See [SwaggerSchemaCompileStep]
+ * See [SwaggerSchemaCompileInlineStep]
  */
 fun Bundle<SwaggerSchema>.compileInlining(): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileStep().compileInlining(this)
+    return SwaggerSchemaCompileInlineStep().compile(this)
 }
 
 
 /**
- * See [SwaggerSchemaCompileStep]
+ * See [SwaggerSchemaCompileReferenceStep]
  */
 fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileStep(pathType).compileReferencing(this)
+    return SwaggerSchemaCompileReferenceStep(pathType).compile(this)
 }
 
 
 /**
- * See [SwaggerSchemaCompileStep]
+ * See [SwaggerSchemaCompileReferenceRootStep]
  */
 fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileStep(pathType).compileReferencingRoot(this)
+    return SwaggerSchemaCompileReferenceRootStep(pathType).compile(this)
 }

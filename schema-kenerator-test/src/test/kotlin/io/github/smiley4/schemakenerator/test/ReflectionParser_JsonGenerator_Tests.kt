@@ -4,7 +4,9 @@ import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDefaultStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
@@ -12,6 +14,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
@@ -62,7 +65,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { JsonSchemaCompileStep().compileInlining(it) }
+                .let { JsonSchemaCompileInlineStep().compile(it) }
 
             schema.json.prettyPrint().shouldEqualJson {
                 propertyOrder = PropertyOrder.Lenient
@@ -102,7 +105,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { JsonSchemaCompileStep().compileReferencing(it) }
+                .let { JsonSchemaCompileReferenceStep().compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -151,7 +154,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .let { JsonSchemaCompileStep().compileReferencingRoot(it) }
+                .let { JsonSchemaCompileReferenceRootStep().compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -1175,6 +1178,183 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                               "items": {
                                 "type": "string"
                               }
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassDirectSelfReferencing>(),
+                testName = "class with direct self reference",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [],
+                      "properties": {
+                        "self": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "self": {
+                              "type": "object",
+                              "required": [],
+                              "properties": {
+                                "self": {
+                                  "type": "object",
+                                  "required": [],
+                                  "properties": {
+                                    "self": {
+                                      "type": "object",
+                                      "required": [],
+                                      "properties": {
+                                        "self": {
+                                          "type": "object",
+                                          "required": [],
+                                          "properties": {
+                                            "self": {
+                                              "type": "object",
+                                              "required": [],
+                                              "properties": {
+                                                "self": {
+                                                  "type": "object",
+                                                  "required": [],
+                                                  "properties": {
+                                                    "self": {
+                                                      "type": "object",
+                                                      "required": [],
+                                                      "properties": {
+                                                        "self": {
+                                                          "type": "object",
+                                                          "required": [],
+                                                          "properties": {
+                                                            "self": {
+                                                              "type": "object",
+                                                              "required": [],
+                                                              "properties": {
+                                                                "self": {
+                                                                  "type": "object",
+                                                                  "required": [],
+                                                                  "properties": {
+                                                                    "self": {
+                                                                      "type": "object",
+                                                                      "required": [],
+                                                                      "properties": {
+                                                                        "self": {
+                                                                          "type": "object",
+                                                                          "required": [],
+                                                                          "properties": {
+                                                                            "self": {
+                                                                              "type": "object",
+                                                                              "required": [],
+                                                                              "properties": {
+                                                                                "self": {
+                                                                                  "type": "object",
+                                                                                  "required": [],
+                                                                                  "properties": {
+                                                                                    "self": {
+                                                                                      "type": "object",
+                                                                                      "required": [],
+                                                                                      "properties": {
+                                                                                        "self": {
+                                                                                          "type": "object",
+                                                                                          "required": [],
+                                                                                          "properties": {
+                                                                                            "self": {
+                                                                                              "type": "object",
+                                                                                              "required": [],
+                                                                                              "properties": {
+                                                                                                "self": {
+                                                                                                  "type": "object",
+                                                                                                  "required": [],
+                                                                                                  "properties": {
+                                                                                                    "self": {
+                                                                                                      "type": "object",
+                                                                                                      "required": [],
+                                                                                                      "properties": {
+                                                                                                        "self": {
+                                                                                                          "type": "object",
+                                                                                                          "required": [],
+                                                                                                          "properties": {
+                                                                                                            "self": {}
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [],
+                      "properties": {
+                        "self": {
+                          "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
+                        }
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "self": {
+                              "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "self": {
+                              "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
                             }
                           }
                         }
