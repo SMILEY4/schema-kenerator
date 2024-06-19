@@ -8,6 +8,7 @@ import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.data.PlaceholderTypeData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
@@ -60,7 +61,7 @@ class KotlinxSerializationTypeProcessingStep(
     private fun process(type: KType, typeData: MutableList<BaseTypeData>): BaseTypeData {
         if (type.classifier is KClass<*>) {
             return (type.classifier as KClass<*>).serializerOrNull()
-                ?.let { parse(it.descriptor, typeData) }
+                ?.let { parse(it.descriptor, typeData, mutableMapOf()) }
                 ?: parseWildcard(typeData)
         } else {
             throw IllegalArgumentException("Type is not a class.")
@@ -69,19 +70,35 @@ class KotlinxSerializationTypeProcessingStep(
 
 
     @Suppress("CyclomaticComplexMethod")
-    private fun parse(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
+    private fun parse(
+        descriptor: SerialDescriptor,
+        typeData: MutableList<BaseTypeData>,
+        processed: MutableMap<SerialDescriptor, BaseTypeData>
+    ): BaseTypeData {
+
+        // break out of infinite loops
+        if (processed.containsKey(descriptor)) {
+            return processed[descriptor]!!
+        }
+        processed[descriptor] = PlaceholderTypeData(TypeId.wildcard())
 
         // check redirects
-        if(typeRedirects.containsKey(descriptor.cleanSerialName())) {
-            return process(typeRedirects[descriptor.cleanSerialName()]!!, typeData)
+        if (typeRedirects.containsKey(descriptor.cleanSerialName())) {
+            return process(typeRedirects[descriptor.cleanSerialName()]!!, typeData).also {
+                processed[descriptor] = it
+            }
         }
 
         // check custom processors
         if (customProcessors.containsKey(descriptor.cleanSerialName())) {
-            return customProcessors[descriptor.cleanSerialName()]!!.invoke().also { result ->
-                typeData.removeIf { it.id == result.id }
-                typeData.add(result)
-            }
+            return customProcessors[descriptor.cleanSerialName()]!!.invoke()
+                .also { result ->
+                    typeData.removeIf { it.id == result.id }
+                    typeData.add(result)
+                }
+                .also {
+                    processed[descriptor] = it
+                }
         }
 
         // process
@@ -92,12 +109,12 @@ class KotlinxSerializationTypeProcessingStep(
             UInt::class.qualifiedName -> parsePrimitive(descriptor, typeData)
             ULong::class.qualifiedName -> parsePrimitive(descriptor, typeData)
             else -> when (descriptor.kind) {
-                StructureKind.LIST -> parseList(descriptor, typeData)
-                StructureKind.MAP -> parseMap(descriptor, typeData)
-                StructureKind.CLASS -> parseClass(descriptor, typeData)
+                StructureKind.LIST -> parseList(descriptor, typeData, processed)
+                StructureKind.MAP -> parseMap(descriptor, typeData, processed)
+                StructureKind.CLASS -> parseClass(descriptor, typeData, processed)
                 StructureKind.OBJECT -> parseObject(descriptor, typeData)
-                PolymorphicKind.OPEN -> parseSealed(descriptor, typeData)
-                PolymorphicKind.SEALED -> parseSealed(descriptor, typeData)
+                PolymorphicKind.OPEN -> parseSealed(descriptor, typeData, processed)
+                PolymorphicKind.SEALED -> parseSealed(descriptor, typeData, processed)
                 PrimitiveKind.BOOLEAN -> parsePrimitive(descriptor, typeData)
                 PrimitiveKind.BYTE -> parsePrimitive(descriptor, typeData)
                 PrimitiveKind.CHAR -> parsePrimitive(descriptor, typeData)
@@ -108,8 +125,10 @@ class KotlinxSerializationTypeProcessingStep(
                 PrimitiveKind.SHORT -> parsePrimitive(descriptor, typeData)
                 PrimitiveKind.STRING -> parsePrimitive(descriptor, typeData)
                 SerialKind.ENUM -> parseEnum(descriptor, typeData)
-                SerialKind.CONTEXTUAL -> parseClass(descriptor, typeData)
+                SerialKind.CONTEXTUAL -> parseClass(descriptor, typeData, processed)
             }
+        }.also {
+            processed[descriptor] = it
         }
     }
 
@@ -131,10 +150,14 @@ class KotlinxSerializationTypeProcessingStep(
             }
     }
 
-    private fun parseList(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
+    private fun parseList(
+        descriptor: SerialDescriptor,
+        typeData: MutableList<BaseTypeData>,
+        processed: MutableMap<SerialDescriptor, BaseTypeData>
+    ): BaseTypeData {
         val itemDescriptor = descriptor.getElementDescriptor(0)
         val itemName = descriptor.getElementName(0)
-        val itemType = parse(itemDescriptor, typeData)
+        val itemType = parse(itemDescriptor, typeData, processed)
         val id = TypeId.build(descriptor.cleanSerialName(), listOf(itemType.id))
         return typeData.find(id)
             ?: CollectionTypeData(
@@ -162,14 +185,18 @@ class KotlinxSerializationTypeProcessingStep(
             }
     }
 
-    private fun parseMap(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
+    private fun parseMap(
+        descriptor: SerialDescriptor,
+        typeData: MutableList<BaseTypeData>,
+        processed: MutableMap<SerialDescriptor, BaseTypeData>
+    ): BaseTypeData {
         val keyDescriptor = descriptor.getElementDescriptor(0)
         val keyName = descriptor.getElementName(0)
-        val keyType = parse(keyDescriptor, typeData)
+        val keyType = parse(keyDescriptor, typeData, processed)
 
         val valueDescriptor = descriptor.getElementDescriptor(1)
         val valueName = descriptor.getElementName(1)
-        val valueType = parse(valueDescriptor, typeData)
+        val valueType = parse(valueDescriptor, typeData, processed)
 
         val id = TypeId.build(descriptor.cleanSerialName(), listOf(keyType.id, valueType.id))
         return typeData.find(id)
@@ -210,9 +237,12 @@ class KotlinxSerializationTypeProcessingStep(
             }
     }
 
-    private fun parseClass(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id =
-            getUniqueId(descriptor, emptyList(), typeData) // generate unique for each object since generic types cannot be respected in id
+    private fun parseClass(
+        descriptor: SerialDescriptor,
+        typeData: MutableList<BaseTypeData>,
+        processed: MutableMap<SerialDescriptor, BaseTypeData>
+    ): BaseTypeData {
+        val id = getUniqueId(descriptor, emptyList(), typeData) // unique for each object since generic types cannot be respected in id
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -222,7 +252,7 @@ class KotlinxSerializationTypeProcessingStep(
                     for (i in 0..<descriptor.elementsCount) {
                         val fieldDescriptor = descriptor.getElementDescriptor(i)
                         val fieldName = descriptor.getElementName(i)
-                        val fieldType = parse(fieldDescriptor, typeData)
+                        val fieldType = parse(fieldDescriptor, typeData, processed)
                         add(
                             PropertyData(
                                 name = fieldName,
@@ -240,9 +270,12 @@ class KotlinxSerializationTypeProcessingStep(
             }
     }
 
-    private fun parseSealed(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val id =
-            getUniqueId(descriptor, emptyList(), typeData) // generate unique for each object since generic types cannot be respected in id
+    private fun parseSealed(
+        descriptor: SerialDescriptor,
+        typeData: MutableList<BaseTypeData>,
+        processed: MutableMap<SerialDescriptor, BaseTypeData>
+    ): BaseTypeData {
+        val id = getUniqueId(descriptor, emptyList(), typeData) // unique for each object since generic types cannot be respected in id
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -250,7 +283,7 @@ class KotlinxSerializationTypeProcessingStep(
                 qualifiedName = descriptor.qualifiedName(),
                 subtypes = descriptor.elementDescriptors
                     .toList()[1].elementDescriptors
-                    .map { parse(it, typeData).id }
+                    .map { parse(it, typeData, processed).id }
                     .toMutableList(),
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
