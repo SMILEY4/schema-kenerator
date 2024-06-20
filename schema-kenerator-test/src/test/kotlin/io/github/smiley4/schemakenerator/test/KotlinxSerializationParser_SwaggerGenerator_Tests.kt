@@ -3,12 +3,12 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
@@ -1274,23 +1274,259 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            todo: fix infinite loop
-//            TestData(
-//                type = typeOf<ClassDirectSelfReferencing>(),
-//                testName = "class with direct self reference",
-//                expectedResultInlining = """
-//                    {
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = typeOf<ClassDirectSelfReferencing>(),
+                testName = "class with direct self reference",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "self": {
+                          "type": "object",
+                          "properties": {
+                            "self": {
+                              "type": "object",
+                              "properties": {
+                                "self": {
+                                  "type": "object",
+                                  "properties": {
+                                    "self": {
+                                      "type": "object",
+                                      "properties": {
+                                        "self": {
+                                          "type": "object",
+                                          "properties": {
+                                            "self": {
+                                              "type": "object",
+                                              "properties": {
+                                                "self": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "self": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "self": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "self": {
+                                                              "type": "object",
+                                                              "properties": {
+                                                                "self": {
+                                                                  "type": "object",
+                                                                  "properties": {
+                                                                    "self": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "self": {
+                                                                          "type": "object",
+                                                                          "properties": {
+                                                                            "self": {
+                                                                              "type": "object",
+                                                                              "properties": {
+                                                                                "self": {
+                                                                                  "type": "object",
+                                                                                  "properties": {
+                                                                                    "self": {
+                                                                                      "type": "object",
+                                                                                      "properties": {
+                                                                                        "self": {
+                                                                                          "type": "object",
+                                                                                          "properties": {
+                                                                                            "self": {
+                                                                                              "type": "object",
+                                                                                              "properties": {
+                                                                                                "self": {
+                                                                                                  "type": "object",
+                                                                                                  "properties": {
+                                                                                                    "self": {
+                                                                                                      "type": "object",
+                                                                                                      "properties": {
+                                                                                                        "self": {
+                                                                                                          "type": "object",
+                                                                                                          "properties": {
+                                                                                                            "self": {
+                                                                                                              "type": "object",
+                                                                                                              "properties": {
+                                                                                                                "self": {
+                                                                                                                  "type": "object",
+                                                                                                                  "properties": {
+                                                                                                                    "self": {
+                                                                                                                      "type": "object",
+                                                                                                                      "properties": {
+                                                                                                                        "self": {
+                                                                                                                          "type": "object",
+                                                                                                                          "properties": {
+                                                                                                                            "self": {
+                                                                                                                              "type": "object",
+                                                                                                                              "properties": {
+                                                                                                                                "self": {
+                                                                                                                                  "type": "object",
+                                                                                                                                  "properties": {
+                                                                                                                                    "self": {
+                                                                                                                                      "type": "object",
+                                                                                                                                      "properties": {
+                                                                                                                                        "self": {
+                                                                                                                                          "type": "object",
+                                                                                                                                          "properties": {
+                                                                                                                                            "self": {
+                                                                                                                                              "type": "object",
+                                                                                                                                              "properties": {
+                                                                                                                                                "self": {
+                                                                                                                                                  "type": "object",
+                                                                                                                                                  "properties": {
+                                                                                                                                                    "self": {
+                                                                                                                                                      "type": "object",
+                                                                                                                                                      "properties": {
+                                                                                                                                                        "self": {
+                                                                                                                                                          "exampleSetFlag": false
+                                                                                                                                                        }
+                                                                                                                                                      },
+                                                                                                                                                      "exampleSetFlag": false
+                                                                                                                                                    }
+                                                                                                                                                  },
+                                                                                                                                                  "exampleSetFlag": false
+                                                                                                                                                }
+                                                                                                                                              },
+                                                                                                                                              "exampleSetFlag": false
+                                                                                                                                            }
+                                                                                                                                          },
+                                                                                                                                          "exampleSetFlag": false
+                                                                                                                                        }
+                                                                                                                                      },
+                                                                                                                                      "exampleSetFlag": false
+                                                                                                                                    }
+                                                                                                                                  },
+                                                                                                                                  "exampleSetFlag": false
+                                                                                                                                }
+                                                                                                                              },
+                                                                                                                              "exampleSetFlag": false
+                                                                                                                            }
+                                                                                                                          },
+                                                                                                                          "exampleSetFlag": false
+                                                                                                                        }
+                                                                                                                      },
+                                                                                                                      "exampleSetFlag": false
+                                                                                                                    }
+                                                                                                                  },
+                                                                                                                  "exampleSetFlag": false
+                                                                                                                }
+                                                                                                              },
+                                                                                                              "exampleSetFlag": false
+                                                                                                            }
+                                                                                                          },
+                                                                                                          "exampleSetFlag": false
+                                                                                                        }
+                                                                                                      },
+                                                                                                      "exampleSetFlag": false
+                                                                                                    }
+                                                                                                  },
+                                                                                                  "exampleSetFlag": false
+                                                                                                }
+                                                                                              },
+                                                                                              "exampleSetFlag": false
+                                                                                            }
+                                                                                          },
+                                                                                          "exampleSetFlag": false
+                                                                                        }
+                                                                                      },
+                                                                                      "exampleSetFlag": false
+                                                                                    }
+                                                                                  },
+                                                                                  "exampleSetFlag": false
+                                                                                }
+                                                                              },
+                                                                              "exampleSetFlag": false
+                                                                            }
+                                                                          },
+                                                                          "exampleSetFlag": false
+                                                                        }
+                                                                      },
+                                                                      "exampleSetFlag": false
+                                                                    }
+                                                                  },
+                                                                  "exampleSetFlag": false
+                                                                }
+                                                              },
+                                                              "exampleSetFlag": false
+                                                            }
+                                                          },
+                                                          "exampleSetFlag": false
+                                                        }
+                                                      },
+                                                      "exampleSetFlag": false
+                                                    }
+                                                  },
+                                                  "exampleSetFlag": false
+                                                }
+                                              },
+                                              "exampleSetFlag": false
+                                            }
+                                          },
+                                          "exampleSetFlag": false
+                                        }
+                                      },
+                                      "exampleSetFlag": false
+                                    }
+                                  },
+                                  "exampleSetFlag": false
+                                }
+                              },
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "self": {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
+                          "type": "object",
+                          "properties": {
+                            "self": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
+                          "type": "object",
+                          "properties": {
+                            "self": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
         )
 
     }

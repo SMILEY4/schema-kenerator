@@ -1150,23 +1150,183 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            todo: fix infinite loop
-//            TestData(
-//                type = typeOf<ClassDirectSelfReferencing>(),
-//                testName = "class with direct self reference",
-//                expectedResultInlining = """
-//                    {
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = typeOf<ClassDirectSelfReferencing>(),
+                testName = "class with direct self reference",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [],
+                      "properties": {
+                        "self": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "self": {
+                              "type": "object",
+                              "required": [],
+                              "properties": {
+                                "self": {
+                                  "type": "object",
+                                  "required": [],
+                                  "properties": {
+                                    "self": {
+                                      "type": "object",
+                                      "required": [],
+                                      "properties": {
+                                        "self": {
+                                          "type": "object",
+                                          "required": [],
+                                          "properties": {
+                                            "self": {
+                                              "type": "object",
+                                              "required": [],
+                                              "properties": {
+                                                "self": {
+                                                  "type": "object",
+                                                  "required": [],
+                                                  "properties": {
+                                                    "self": {
+                                                      "type": "object",
+                                                      "required": [],
+                                                      "properties": {
+                                                        "self": {
+                                                          "type": "object",
+                                                          "required": [],
+                                                          "properties": {
+                                                            "self": {
+                                                              "type": "object",
+                                                              "required": [],
+                                                              "properties": {
+                                                                "self": {
+                                                                  "type": "object",
+                                                                  "required": [],
+                                                                  "properties": {
+                                                                    "self": {
+                                                                      "type": "object",
+                                                                      "required": [],
+                                                                      "properties": {
+                                                                        "self": {
+                                                                          "type": "object",
+                                                                          "required": [],
+                                                                          "properties": {
+                                                                            "self": {
+                                                                              "type": "object",
+                                                                              "required": [],
+                                                                              "properties": {
+                                                                                "self": {
+                                                                                  "type": "object",
+                                                                                  "required": [],
+                                                                                  "properties": {
+                                                                                    "self": {
+                                                                                      "type": "object",
+                                                                                      "required": [],
+                                                                                      "properties": {
+                                                                                        "self": {
+                                                                                          "type": "object",
+                                                                                          "required": [],
+                                                                                          "properties": {
+                                                                                            "self": {
+                                                                                              "type": "object",
+                                                                                              "required": [],
+                                                                                              "properties": {
+                                                                                                "self": {
+                                                                                                  "type": "object",
+                                                                                                  "required": [],
+                                                                                                  "properties": {
+                                                                                                    "self": {
+                                                                                                      "type": "object",
+                                                                                                      "required": [],
+                                                                                                      "properties": {
+                                                                                                        "self": {
+                                                                                                          "type": "object",
+                                                                                                          "required": [],
+                                                                                                          "properties": {
+                                                                                                            "self": {}
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [],
+                      "properties": {
+                        "self": {
+                          "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
+                        }
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "self": {
+                              "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "self": {
+                              "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
         )
     }
 
