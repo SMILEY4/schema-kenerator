@@ -8,7 +8,9 @@ import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDefaultStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
@@ -56,24 +58,24 @@ fun Bundle<JsonSchema>.handleJsonSchemaAnnotations(): Bundle<JsonSchema> {
 
 
 /**
- * See [JsonSchemaCompileStep]
+ * See [JsonSchemaCompileInlineStep]
  */
 fun Bundle<JsonSchema>.compileInlining(): CompiledJsonSchema {
-    return JsonSchemaCompileStep().compileInlining(this)
+    return JsonSchemaCompileInlineStep().compile(this)
 }
 
 
 /**
- * See [JsonSchemaCompileStep]
+ * See [JsonSchemaCompileReferenceStep]
  */
 fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchema {
-    return JsonSchemaCompileStep(pathType).compileReferencing(this)
+    return JsonSchemaCompileReferenceStep(pathType).compile(this)
 }
 
 
 /**
- * See [JsonSchemaCompileStep]
+ * See [JsonSchemaCompileReferenceRootStep]
  */
 fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchema {
-    return JsonSchemaCompileStep(pathType).compileReferencingRoot(this)
+    return JsonSchemaCompileReferenceRootStep(pathType).compile(this)
 }
