@@ -2,10 +2,12 @@ package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
@@ -16,6 +18,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 
 /**
@@ -78,4 +81,20 @@ fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): Com
  */
 fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchema {
     return JsonSchemaCompileReferenceRootStep(pathType).compile(this)
+}
+
+
+/**
+ * See [JsonSchemaCustomizeStep.customizeTypes]
+ */
+fun Bundle<JsonSchema>.customizeTypes(action: (typeData: BaseTypeData, typeSchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+    return JsonSchemaCustomizeStep().customizeTypes(this, action)
+}
+
+
+/**
+ * See [JsonSchemaCustomizeStep.customizeProperties]
+ */
+fun Bundle<JsonSchema>.customizeProperties(action: (propertyData: PropertyData, propertySchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+    return JsonSchemaCustomizeStep().customizeProperties(this, action)
 }
