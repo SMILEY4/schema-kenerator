@@ -98,7 +98,9 @@ fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.FUL
 /**
  * See [SwaggerSchemaCustomizeStep.customizeTypes]
  */
-fun Bundle<SwaggerSchema>.customizeTypes(action: (typeData: BaseTypeData, typeSchema: Schema<*>) -> Unit): Bundle<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.customizeTypes(
+    action: (typeData: BaseTypeData, typeSchema: Schema<*>) -> Unit
+): Bundle<SwaggerSchema> {
     return SwaggerSchemaCustomizeStep().customizeTypes(this, action)
 }
 
@@ -106,6 +108,8 @@ fun Bundle<SwaggerSchema>.customizeTypes(action: (typeData: BaseTypeData, typeSc
 /**
  * See [SwaggerSchemaCustomizeStep.customizeProperties]
  */
-fun Bundle<SwaggerSchema>.customizeProperties(action: (propertyData: PropertyData, propertySchema: Schema<*>) -> Unit): Bundle<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.customizeProperties(
+    action: (propertyData: PropertyData, propertySchema: Schema<*>) -> Unit
+): Bundle<SwaggerSchema> {
     return SwaggerSchemaCustomizeStep().customizeProperties(this, action)
 }
