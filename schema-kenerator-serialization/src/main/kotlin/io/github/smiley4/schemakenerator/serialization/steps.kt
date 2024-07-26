@@ -14,7 +14,8 @@ import kotlin.reflect.typeOf
 fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
-        customProcessors = config.customProcessors
+        customProcessors = config.customProcessors,
+        typeRedirects = config.typeRedirects
     ).process(this)
 }
 
