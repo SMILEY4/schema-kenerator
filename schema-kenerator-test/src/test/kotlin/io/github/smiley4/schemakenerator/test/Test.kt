@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.dsl.objectType
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.customizeTypes
@@ -70,18 +70,33 @@ class Test : StringSpec({
         val result = typeOf<ClassWithLocalDateTime>()
             .processKotlinxSerialization {
                 customProcessor<LocalDateTime> {
-                    PrimitiveTypeData(
-                        id = TypeId.build(String::class.qualifiedName!!),
-                        simpleName = String::class.simpleName!!,
-                        qualifiedName = String::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = "swagger-format",
-                                values = mutableMapOf("format" to "date-time"),
-                                annotation = null
-                            )
-                        )
-                    )
+
+                    objectType(TypeId.build(LocalDateTime::class.qualifiedName!!)) {
+                        member {
+                            name("myField")
+                            type(TypeId.build(LocalDateTime::class.qualifiedName!!))
+                        }
+                    }
+
+//                    primitiveType(TypeId.build(LocalDateTime::class.qualifiedName!!)) {
+//                        name<LocalDateTime>()
+//                        annotation("") {
+//                            value("format", "date-time")
+//                        }
+//                    }
+
+//                    PrimitiveTypeData(
+//                        id = TypeId.build(String::class.qualifiedName!!),
+//                        simpleName = String::class.simpleName!!,
+//                        qualifiedName = String::class.qualifiedName!!,
+//                        annotations = mutableListOf(
+//                            AnnotationData(
+//                                name = "swagger-format",
+//                                values = mutableMapOf("format" to "date-time"),
+//                                annotation = null
+//                            )
+//                        )
+//                    )
                 }
             }
             .generateSwaggerSchema()
