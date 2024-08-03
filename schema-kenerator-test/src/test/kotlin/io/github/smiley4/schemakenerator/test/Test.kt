@@ -9,17 +9,20 @@ import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationOptionalAndRequiredStep
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.customizeTypes
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.buildTypeDataMap
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime
 import io.kotest.core.spec.style.StringSpec
+import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import kotlin.reflect.typeOf
 
@@ -107,14 +110,15 @@ class Test : StringSpec({
         }
     }
 
-    "optional fields" {
+    "NPE" {
 
-        val result = typeOf<ClassWithOptionals>()
-            .processReflection()
-            .generateJsonSchema {
-                optionalHandling = OptionalHandling.NON_REQUIRED
-            }
-            .compileInlining()
+        @Serializable
+        class LocalClass(val something: String)
+
+        val result = typeOf<LocalClass>()
+            .processKotlinxSerialization()
+            .generateJsonSchema()
+            .compileReferencingRoot()
 
         println(result.json.prettyPrint())
     }
@@ -123,10 +127,6 @@ class Test : StringSpec({
     companion object {
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
-
-        class ClassWithOptionals {
-            val propOptional: String = ""
-        }
 
     }
 }

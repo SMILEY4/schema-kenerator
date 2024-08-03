@@ -50,7 +50,7 @@ class KotlinxSerializationTypeProcessingConfig {
      * Add a custom processor for the given type that overwrites the default behaviour
      */
     fun customProcessor(type: KClass<*>, processor: () -> BaseTypeData) {
-        customProcessors[type.qualifiedName!!] = processor
+        customProcessors[type.qualifiedName ?: type.java.name] = processor
     }
 
 
@@ -77,7 +77,7 @@ class KotlinxSerializationTypeProcessingConfig {
     @JvmName("customProcessors_type")
     fun customProcessors(processors: Map<KClass<*>, () -> BaseTypeData>) {
         processors.forEach { (k, v) ->
-            customProcessors[k.qualifiedName!!] = v
+            customProcessors[k.qualifiedName ?: k.java.name] = v
         }
     }
 
@@ -92,7 +92,8 @@ class KotlinxSerializationTypeProcessingConfig {
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
      */
     fun redirect(from: KType, to: KType) {
-        typeRedirects[(from.classifier!! as KClass<*>).qualifiedName!!] = to
+        val clazz = from.classifier!! as KClass<*>
+        typeRedirects[clazz.qualifiedName ?: clazz.java.name] = to
     }
 
     /**
