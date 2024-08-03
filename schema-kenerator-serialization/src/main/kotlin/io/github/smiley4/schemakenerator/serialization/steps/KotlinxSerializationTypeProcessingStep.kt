@@ -175,6 +175,7 @@ class KotlinxSerializationTypeProcessingStep(
                     name = "item",
                     type = itemType.id,
                     nullable = itemDescriptor.isNullable,
+                    optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
@@ -220,6 +221,7 @@ class KotlinxSerializationTypeProcessingStep(
                     name = "key",
                     type = keyType.id,
                     nullable = keyDescriptor.isNullable,
+                    optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
 
@@ -228,6 +230,7 @@ class KotlinxSerializationTypeProcessingStep(
                     name = "value",
                     type = valueType.id,
                     nullable = valueDescriptor.isNullable,
+                    optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
@@ -258,6 +261,7 @@ class KotlinxSerializationTypeProcessingStep(
                                 name = fieldName,
                                 type = fieldType.id,
                                 nullable = fieldDescriptor.isNullable,
+                                optional = false,
                                 kind = PropertyType.PROPERTY,
                                 visibility = Visibility.PUBLIC,
                             )

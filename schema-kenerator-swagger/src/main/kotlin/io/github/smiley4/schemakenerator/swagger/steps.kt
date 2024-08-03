@@ -23,11 +23,34 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeSte
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.swagger.v3.oas.models.media.Schema
 
+enum class OptionalHandling {
+    REQUIRED,
+    NON_REQUIRED
+}
+
+class SwaggerSchemaGenerationStepConfig {
+    /**
+     * How to handle optional parameters
+     *
+     * Example:
+     * ```
+     * class MyExample(val someValue: String = "hello")
+     * ```
+     * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
+     * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
+     */
+    var optionalHandling = OptionalHandling.REQUIRED
+}
+
+
 /**
  * See [SwaggerSchemaGenerationStep]
  */
-fun Bundle<BaseTypeData>.generateSwaggerSchema(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaGenerationStep().generate(this)
+fun Bundle<BaseTypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): Bundle<SwaggerSchema> {
+    val config = SwaggerSchemaGenerationStepConfig().apply(configBlock)
+    return SwaggerSchemaGenerationStep(
+        optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED
+    ).generate(this)
 }
 
 

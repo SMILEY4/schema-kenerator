@@ -7,6 +7,10 @@ import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.customizeTypes
@@ -18,6 +22,9 @@ import io.kotest.core.spec.style.StringSpec
 import java.time.LocalDateTime
 import kotlin.reflect.typeOf
 
+/**
+ * internal / manual tests only
+ */
 class Test : StringSpec({
 
     "before" {
@@ -99,11 +106,31 @@ class Test : StringSpec({
         }
     }
 
+    "optional fields" {
+
+        val result = typeOf<ClassWithOptionals>()
+            .processReflection()
+            .generateJsonSchema {
+                optionalHandling = OptionalHandling.NON_REQUIRED
+            }
+            .compileInlining()
+
+        println(result.json.prettyPrint())
+    }
+
 }) {
     companion object {
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
+        class ClassWithOptionals(
+            val ctorRequired: String,
+            val ctorOptional: String = "test",
+            val ctorRequiredNullable: String?,
+            val ctorOptionalNullable: String? = null
+        ) {
+            val propOptional: String = "hello"
+        }
 
     }
 }

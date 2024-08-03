@@ -17,7 +17,7 @@ import java.math.BigDecimal
  * Generates swagger-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
  * Result needs to be "compiled" to get the final swagger-schema.
  */
-class SwaggerSchemaGenerationStep {
+class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) {
 
     private val schema = SwaggerSchemaUtils()
 
@@ -144,7 +144,9 @@ class SwaggerSchemaGenerationStep {
 
         collectMembers(typeData, typeDataList).forEach { member ->
             propertySchemas[member.name] = schema.referenceSchema(member.type)
-            if (!member.nullable) {
+            val nullable = member.nullable
+            val optional = member.optional && optionalAsNonRequired
+            if(!nullable && !optional) {
                 requiredProperties.add(member.name)
             }
         }

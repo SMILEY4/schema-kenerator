@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
+import javax.swing.text.html.HTML.Tag.U
 
 /**
  * Merges getters with their matching property;
@@ -35,21 +36,24 @@ class MergeGettersStep {
             .filter { it.kind == PropertyType.GETTER }
             .forEach { getter ->
 
+                // find matching property
                 val propertyName = getterNameToPropertyName(getter.name)
-
                 val property = typeData.members
                     .filter { it.kind == PropertyType.PROPERTY }
                     .find { it.name == propertyName && it.type == getter.type }
 
                 if(property != null) {
+                    // copy some information from getter to property
                     property.annotations.addAll(getter.annotations)
                     property.nullable = getter.nullable
                     property.visibility = getter.visibility
                 } else {
+                    // create new property from getter
                     toAdd.add(PropertyData(
                         name = propertyName,
                         type = getter.type,
                         nullable = getter.nullable,
+                        optional = getter.optional,
                         visibility = getter.visibility,
                         kind = PropertyType.PROPERTY,
                         annotations = getter.annotations
@@ -58,6 +62,7 @@ class MergeGettersStep {
 
             }
 
+        // remove all getters, add created members
         typeData.members.removeIf { it.kind == PropertyType.GETTER }
         typeData.members.addAll(toAdd)
     }

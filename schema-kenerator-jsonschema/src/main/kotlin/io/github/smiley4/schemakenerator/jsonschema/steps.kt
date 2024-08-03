@@ -21,11 +21,34 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 
+enum class OptionalHandling {
+    REQUIRED,
+    NON_REQUIRED
+}
+
+class JsonSchemaGenerationStepConfig {
+    /**
+     * How to handle optional parameters
+     *
+     * Example:
+     * ```
+     * class MyExample(val someValue: String = "hello")
+     * ```
+     * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
+     * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
+     */
+    var optionalHandling = OptionalHandling.REQUIRED
+}
+
+
 /**
  * See [JsonSchemaGenerationStep]
  */
-fun Bundle<BaseTypeData>.generateJsonSchema(): Bundle<JsonSchema> {
-    return JsonSchemaGenerationStep().generate(this)
+fun Bundle<BaseTypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
+    val config = JsonSchemaGenerationStepConfig().apply(configBlock)
+    return JsonSchemaGenerationStep(
+        optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED,
+    ).generate(this)
 }
 
 
