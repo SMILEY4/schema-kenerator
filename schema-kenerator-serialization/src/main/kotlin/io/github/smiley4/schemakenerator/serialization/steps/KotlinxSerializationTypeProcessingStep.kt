@@ -261,7 +261,7 @@ class KotlinxSerializationTypeProcessingStep(
                                 name = fieldName,
                                 type = fieldType.id,
                                 nullable = fieldDescriptor.isNullable,
-                                optional = false,
+                                optional = descriptor.isElementOptional(i),
                                 kind = PropertyType.PROPERTY,
                                 visibility = Visibility.PUBLIC,
                             )
