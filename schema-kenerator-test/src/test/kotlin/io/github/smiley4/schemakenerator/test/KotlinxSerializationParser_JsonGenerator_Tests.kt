@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
+import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
@@ -19,6 +21,7 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFiel
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -39,7 +42,11 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { JsonSchemaGenerationStep().generate(it) }
+                .let {
+                    JsonSchemaGenerationStep(
+                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -79,7 +86,11 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                         }
                     }
                 }
-                .let { JsonSchemaGenerationStep().generate(it) }
+                .let {
+                    JsonSchemaGenerationStep(
+                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -136,7 +147,11 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                         }
                     }
                 }
-                .let { JsonSchemaGenerationStep().generate(it) }
+                .let {
+                    JsonSchemaGenerationStep(
+                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -183,6 +198,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val generatorConfig: JsonSchemaGenerationStepConfig.() -> Unit = {},
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
@@ -1320,6 +1336,168 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                           "properties": {
                             "self": {
                               "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+
+
+
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired",
+                        "ctorOptional"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired",
+                        "ctorOptional"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
+                          "type": "object",
+                          "required": [
+                            "ctorRequired",
+                            "ctorOptional"
+                          ],
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string"
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as non-required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.NON_REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
+                          "type": "object",
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string"
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string"
                             }
                           }
                         }

@@ -3,6 +3,8 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.swagger.OptionalHandling
+import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
@@ -18,6 +20,7 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFiel
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -39,7 +42,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { SwaggerSchemaGenerationStep().generate(it) }
+                .let {
+                    SwaggerSchemaGenerationStep(
+                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -66,7 +73,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { SwaggerSchemaGenerationStep().generate(it) }
+                .let {
+                    SwaggerSchemaGenerationStep(
+                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -99,7 +110,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { SwaggerSchemaGenerationStep().generate(it) }
+                .let {
+                    SwaggerSchemaGenerationStep(
+                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -141,6 +156,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val generatorConfig: SwaggerSchemaGenerationStepConfig.() -> Unit = {},
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
@@ -1518,6 +1534,207 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "properties": {
                             "self": {
                               "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "ctorOptional",
+                        "ctorRequired"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequired": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "ctorOptional",
+                          "ctorRequired"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "ctorOptional": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorOptionalNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequired": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequiredNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
+                          "required": [
+                            "ctorOptional",
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequired": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as non-required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.NON_REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequired": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "ctorRequired"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "ctorOptional": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorOptionalNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequired": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequiredNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequired": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string",
                               "exampleSetFlag": false
                             }
                           },
