@@ -216,15 +216,15 @@ class ReflectionTypeProcessingStep(
         return when (classType) {
             TypeCategory.PRIMITIVE -> PrimitiveTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList()
             )
             TypeCategory.OBJECT -> ObjectTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 subtypes = subtypes.toMutableList(),
                 supertypes = supertypes.toMutableList(),
@@ -233,16 +233,16 @@ class ReflectionTypeProcessingStep(
             )
             TypeCategory.ENUM -> EnumTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 enumConstants = enumValues.toMutableList(),
                 annotations = annotations.toMutableList()
             )
             TypeCategory.COLLECTION -> CollectionTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
                 itemType = resolvedTypeParameters["E"]?.let {
@@ -281,8 +281,8 @@ class ReflectionTypeProcessingStep(
             )
             TypeCategory.MAP -> MapTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
                 keyType = resolvedTypeParameters["K"]?.let {
@@ -660,6 +660,13 @@ class ReflectionTypeProcessingStep(
             annotations = mutableListOf()
         )
     }
+
+    private fun KClass<*>.getSafeSimpleName(): String = this.simpleName ?: this.java.name
+
+    /**
+     * Qualified name might be null, e.g. for local classes
+     */
+    private fun KClass<*>.getSafeQualifiedName(): String = this.qualifiedName ?: this.java.name
 
 
     @Suppress("SwallowedException")
