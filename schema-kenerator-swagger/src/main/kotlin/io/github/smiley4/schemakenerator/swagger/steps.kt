@@ -18,6 +18,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationOptionalAndRequiredStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
@@ -64,10 +65,11 @@ fun Bundle<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundl
 
 /**
  * See [SwaggerSchemaCoreAnnotationDefaultStep], [SwaggerSchemaCoreAnnotationDeprecatedStep], [SwaggerSchemaCoreAnnotationDescriptionStep],
- * [SwaggerSchemaCoreAnnotationExamplesStep], [SwaggerSchemaCoreAnnotationTitleStep]
+ * [SwaggerSchemaCoreAnnotationExamplesStep], [SwaggerSchemaCoreAnnotationTitleStep], [SwaggerSchemaCoreAnnotationOptionalAndRequiredStep]
  */
 fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
     return this
+        .let { SwaggerSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationDefaultStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(this) }

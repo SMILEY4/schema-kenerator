@@ -17,6 +17,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationOptionalAndRequiredStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
@@ -62,10 +63,11 @@ fun Bundle<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<J
 
 /**
  * See [JsonSchemaCoreAnnotationDefaultStep], [JsonSchemaCoreAnnotationDeprecatedStep], [JsonSchemaCoreAnnotationDescriptionStep],
- * [JsonSchemaCoreAnnotationExamplesStep], [JsonSchemaCoreAnnotationTitleStep]
+ * [JsonSchemaCoreAnnotationExamplesStep], [JsonSchemaCoreAnnotationTitleStep], [JsonSchemaCoreAnnotationOptionalAndRequiredStep]
  */
 fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
     return this
+        .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
         .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
         .let { JsonSchemaCoreAnnotationDeprecatedStep().process(this) }
         .let { JsonSchemaCoreAnnotationDescriptionStep().process(this) }
