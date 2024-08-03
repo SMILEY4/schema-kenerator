@@ -18,16 +18,40 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationOptionalAndRequiredStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.swagger.v3.oas.models.media.Schema
 
+enum class OptionalHandling {
+    REQUIRED,
+    NON_REQUIRED
+}
+
+class SwaggerSchemaGenerationStepConfig {
+    /**
+     * How to handle optional parameters
+     *
+     * Example:
+     * ```
+     * class MyExample(val someValue: String = "hello")
+     * ```
+     * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
+     * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
+     */
+    var optionalHandling = OptionalHandling.REQUIRED
+}
+
+
 /**
  * See [SwaggerSchemaGenerationStep]
  */
-fun Bundle<BaseTypeData>.generateSwaggerSchema(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaGenerationStep().generate(this)
+fun Bundle<BaseTypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): Bundle<SwaggerSchema> {
+    val config = SwaggerSchemaGenerationStepConfig().apply(configBlock)
+    return SwaggerSchemaGenerationStep(
+        optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED
+    ).generate(this)
 }
 
 
@@ -41,10 +65,11 @@ fun Bundle<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundl
 
 /**
  * See [SwaggerSchemaCoreAnnotationDefaultStep], [SwaggerSchemaCoreAnnotationDeprecatedStep], [SwaggerSchemaCoreAnnotationDescriptionStep],
- * [SwaggerSchemaCoreAnnotationExamplesStep], [SwaggerSchemaCoreAnnotationTitleStep]
+ * [SwaggerSchemaCoreAnnotationExamplesStep], [SwaggerSchemaCoreAnnotationTitleStep], [SwaggerSchemaCoreAnnotationOptionalAndRequiredStep]
  */
 fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
     return this
+        .let { SwaggerSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationDefaultStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(this) }

@@ -16,7 +16,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
  * Generates json-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
  * Result needs to be "compiled" to get the final json-schema.
  */
-class JsonSchemaGenerationStep {
+class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) {
 
     private val schemaUtils = JsonSchemaUtils()
 
@@ -168,7 +168,9 @@ class JsonSchemaGenerationStep {
 
         collectMembers(typeData, typeDataList).forEach { member ->
             propertySchemas[member.name] = schemaUtils.referenceSchema(member.type)
-            if (!member.nullable) {
+            val nullable = member.nullable
+            val optional = member.optional && optionalAsNonRequired
+            if(!nullable && !optional) {
                 requiredProperties.add(member.name)
             }
         }

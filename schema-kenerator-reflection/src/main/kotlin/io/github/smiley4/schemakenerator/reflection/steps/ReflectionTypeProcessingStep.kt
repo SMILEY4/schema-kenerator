@@ -250,6 +250,7 @@ class ReflectionTypeProcessingStep(
                         name = "item",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -259,6 +260,7 @@ class ReflectionTypeProcessingStep(
                         name = "item",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -268,6 +270,7 @@ class ReflectionTypeProcessingStep(
                         name = "item",
                         type = it.value.type,
                         nullable = it.value.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -287,6 +290,7 @@ class ReflectionTypeProcessingStep(
                         name = "key",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -297,6 +301,7 @@ class ReflectionTypeProcessingStep(
                         name = "value",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -371,7 +376,7 @@ class ReflectionTypeProcessingStep(
             .filter { filterMember(it) }
             .mapNotNull { member ->
                 when (member) {
-                    is KProperty<*> -> parseProperty(member, resolvedTypeParameters, typeData)
+                    is KProperty<*> -> parseProperty(member, resolvedTypeParameters, typeData, clazz)
                     is KFunction<*> -> parseFunction(member, resolvedTypeParameters, typeData)
                     else -> null
                 }
@@ -432,12 +437,21 @@ class ReflectionTypeProcessingStep(
     private fun parseProperty(
         member: KProperty<*>,
         resolvedTypeParameters: Map<String, TypeParameterData>,
-        typeData: MutableList<BaseTypeData>
+        typeData: MutableList<BaseTypeData>,
+        clazz: KClass<*>
     ): PropertyData {
+
+        val isOptional = clazz.constructors.any { constructor ->
+            val ctorParameter = constructor.parameters.find { parameter ->
+                parameter.name == member.name && parameter.type == member.returnType
+            }
+            ctorParameter?.isOptional ?: false
+        }
         return PropertyData(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
+            optional = isOptional,
             annotations = parseAnnotations(member).toMutableList(),
             kind = PropertyType.PROPERTY,
             visibility = determinePropertyVisibility(member)
@@ -453,9 +467,10 @@ class ReflectionTypeProcessingStep(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
+            optional = false,
             annotations = parseAnnotations(member).toMutableList(),
             kind = determineFunctionPropertyType(member),
-            visibility = determinePropertyVisibility(member)
+            visibility = determinePropertyVisibility(member),
         )
     }
 
@@ -639,6 +654,7 @@ class ReflectionTypeProcessingStep(
             name = name,
             type = TypeId.wildcard(),
             nullable = false,
+            optional = false,
             visibility = Visibility.PUBLIC,
             kind = PropertyType.PROPERTY,
             annotations = mutableListOf()
