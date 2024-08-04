@@ -10,8 +10,10 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationOptionalAndRequiredStep
+import io.github.smiley4.schemakenerator.jsonschema.withAutoTitle
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -20,6 +22,7 @@ import io.github.smiley4.schemakenerator.swagger.customizeTypes
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.buildTypeDataMap
+import io.github.smiley4.schemakenerator.swagger.withAutoTitle
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.Serializable
@@ -110,21 +113,28 @@ class Test : StringSpec({
         }
     }
 
-    "NPE" {
+    "value classes" {
 
-        @Serializable
-        class LocalClass(val something: String)
-
-        val result = typeOf<LocalClass>()
+        val result = typeOf<LoginInfo>()
             .processKotlinxSerialization()
-            .generateJsonSchema()
-            .compileReferencingRoot()
+            .generateSwaggerSchema()
+            .withAutoTitle()
+            .compileInlining()
 
-        println(result.json.prettyPrint())
+        println(json.writeValueAsString(result.swagger))
+
+//        println(result.json.prettyPrint())
     }
 
 }) {
     companion object {
+
+        @JvmInline
+        @Serializable
+        value class UserId(val value: Int)
+
+        @Serializable
+        private data class LoginInfo(val email: String? = null, val id: UserId? = null, val password: String)
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 

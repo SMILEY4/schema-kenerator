@@ -16,6 +16,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
@@ -1986,6 +1987,87 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultInlining = """
+                    {
+                      "schema": {
+                        "required": [
+                          "myValue",
+                          "someText"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "myValue": {
+                            "type": "integer",
+                            "format": "int32",
+                            "exampleSetFlag": false
+                          },
+                          "someText": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "myValue",
+                          "someText"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "myValue": {
+                            "type": "integer",
+                            "format": "int32",
+                            "exampleSetFlag": false
+                          },
+                          "someText": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass": {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            },
+                            "someText": {
                               "type": "string",
                               "exampleSetFlag": false
                             }

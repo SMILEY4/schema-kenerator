@@ -22,6 +22,7 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -1497,6 +1498,72 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                               "type": "string"
                             },
                             "ctorRequiredNullable": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647
+                        },
+                        "someText": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647
+                        },
+                        "someText": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass": {
+                          "type": "object",
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "someText": {
                               "type": "string"
                             }
                           }

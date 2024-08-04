@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationSt
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
 import io.github.smiley4.schemakenerator.test.models.reflection.RenamedTestData
@@ -711,6 +712,81 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
                                 "title": "TestData"
                             }
                         }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultFullTitle = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647,
+                          "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ValueClass"
+                        },
+                        "someText": {
+                          "type": "string",
+                          "title": "kotlin.String"
+                        }
+                      },
+                      "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass"
+                    }
+                """.trimIndent(),
+                expectedResultSimpleTitle = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647,
+                          "title": "ValueClass"
+                        },
+                        "someText": {
+                          "type": "string",
+                          "title": "String"
+                        }
+                      },
+                      "title": "ClassWithValueClass"
+                    }
+                """.trimIndent(),
+                expectedResultSimpleTitleReferencing = """
+                    {
+                      "${'$'}ref": "#/definitions/ClassWithValueClass",
+                      "definitions": {
+                        "ClassWithValueClass": {
+                          "type": "object",
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647,
+                              "title": "ValueClass"
+                            },
+                            "someText": {
+                              "type": "string",
+                              "title": "String"
+                            }
+                          },
+                          "title": "ClassWithValueClass"
+                        }
+                      }
                     }
                 """.trimIndent(),
             ),

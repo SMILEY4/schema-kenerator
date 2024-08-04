@@ -219,7 +219,7 @@ class ReflectionTypeProcessingStep(
                 simpleName = clazz.getSafeSimpleName(),
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
-                annotations = annotations.toMutableList()
+                annotations = annotations.toMutableList(),
             )
             TypeCategory.OBJECT -> ObjectTypeData(
                 id = id,
@@ -229,7 +229,8 @@ class ReflectionTypeProcessingStep(
                 subtypes = subtypes.toMutableList(),
                 supertypes = supertypes.toMutableList(),
                 members = members.toMutableList(),
-                annotations = annotations.toMutableList()
+                annotations = annotations.toMutableList(),
+                isInlineValue = clazz.isValue
             )
             TypeCategory.ENUM -> EnumTypeData(
                 id = id,

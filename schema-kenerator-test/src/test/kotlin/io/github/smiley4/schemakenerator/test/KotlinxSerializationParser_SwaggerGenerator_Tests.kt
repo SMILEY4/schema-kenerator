@@ -21,6 +21,7 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -1734,6 +1735,84 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "format": "int32",
+                          "exampleSetFlag": false
+                        },
+                        "someText": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "myValue",
+                          "someText"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "myValue": {
+                            "type": "integer",
+                            "format": "int32",
+                            "exampleSetFlag": false
+                          },
+                          "someText": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass": {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            },
+                            "someText": {
                               "type": "string",
                               "exampleSetFlag": false
                             }

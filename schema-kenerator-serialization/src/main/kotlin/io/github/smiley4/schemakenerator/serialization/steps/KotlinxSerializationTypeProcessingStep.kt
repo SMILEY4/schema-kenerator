@@ -268,6 +268,7 @@ class KotlinxSerializationTypeProcessingStep(
                         )
                     }
                 }.toMutableList(),
+                isInlineValue = descriptor.isInline
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
