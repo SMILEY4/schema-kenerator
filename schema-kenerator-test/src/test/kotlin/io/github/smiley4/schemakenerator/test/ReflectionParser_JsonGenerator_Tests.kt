@@ -16,6 +16,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
@@ -1529,6 +1530,72 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                               "type": "string"
                             },
                             "ctorRequiredNullable": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647
+                        },
+                        "someText": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647
+                        },
+                        "someText": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass": {
+                          "type": "object",
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "someText": {
                               "type": "string"
                             }
                           }

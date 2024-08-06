@@ -8,6 +8,7 @@ import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
@@ -49,6 +50,7 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
     private fun buildAnySchema(): JsonSchema {
         return JsonSchema(schemaUtils.anyObjectSchema(), WildcardTypeData())
     }
+
 
     @Suppress("LongMethod")
     private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): JsonSchema {
@@ -162,6 +164,9 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
     }
 
     private fun buildObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): JsonSchema {
+        if (typeData.isInlineValue) {
+            return buildInlineObjectSchema(typeData, typeDataList)
+        }
 
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, JsonNode>()
@@ -170,13 +175,24 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
             propertySchemas[member.name] = schemaUtils.referenceSchema(member.type)
             val nullable = member.nullable
             val optional = member.optional && optionalAsNonRequired
-            if(!nullable && !optional) {
+            if (!nullable && !optional) {
                 requiredProperties.add(member.name)
             }
         }
 
         return JsonSchema(
             json = schemaUtils.objectSchema(propertySchemas, requiredProperties),
+            typeData = typeData
+        )
+    }
+
+    private fun buildInlineObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): JsonSchema {
+        val inlineType = typeData.members.first { it.kind == PropertyType.PROPERTY }
+        val inlineTypeData = typeDataList.find { it.id == inlineType.type }
+            ?: throw IllegalStateException("Could not find type-data for inline type ${inlineType.type}")
+        val inlineTypeSchema = generate(inlineTypeData, typeDataList)
+        return JsonSchema(
+            json = inlineTypeSchema.json,
             typeData = typeData
         )
     }
