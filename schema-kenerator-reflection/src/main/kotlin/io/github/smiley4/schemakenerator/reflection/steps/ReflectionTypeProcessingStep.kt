@@ -216,33 +216,34 @@ class ReflectionTypeProcessingStep(
         return when (classType) {
             TypeCategory.PRIMITIVE -> PrimitiveTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
-                annotations = annotations.toMutableList()
+                annotations = annotations.toMutableList(),
             )
             TypeCategory.OBJECT -> ObjectTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 subtypes = subtypes.toMutableList(),
                 supertypes = supertypes.toMutableList(),
                 members = members.toMutableList(),
-                annotations = annotations.toMutableList()
+                annotations = annotations.toMutableList(),
+                isInlineValue = clazz.isValue
             )
             TypeCategory.ENUM -> EnumTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 enumConstants = enumValues.toMutableList(),
                 annotations = annotations.toMutableList()
             )
             TypeCategory.COLLECTION -> CollectionTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
                 itemType = resolvedTypeParameters["E"]?.let {
@@ -250,6 +251,7 @@ class ReflectionTypeProcessingStep(
                         name = "item",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -259,6 +261,7 @@ class ReflectionTypeProcessingStep(
                         name = "item",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -268,6 +271,7 @@ class ReflectionTypeProcessingStep(
                         name = "item",
                         type = it.value.type,
                         nullable = it.value.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -278,8 +282,8 @@ class ReflectionTypeProcessingStep(
             )
             TypeCategory.MAP -> MapTypeData(
                 id = id,
-                simpleName = clazz.simpleName!!,
-                qualifiedName = clazz.qualifiedName!!,
+                simpleName = clazz.getSafeSimpleName(),
+                qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
                 keyType = resolvedTypeParameters["K"]?.let {
@@ -287,6 +291,7 @@ class ReflectionTypeProcessingStep(
                         name = "key",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -297,6 +302,7 @@ class ReflectionTypeProcessingStep(
                         name = "value",
                         type = it.type,
                         nullable = it.nullable,
+                        optional = false,
                         visibility = Visibility.PUBLIC,
                         kind = PropertyType.PROPERTY,
                         annotations = mutableListOf()
@@ -371,7 +377,7 @@ class ReflectionTypeProcessingStep(
             .filter { filterMember(it) }
             .mapNotNull { member ->
                 when (member) {
-                    is KProperty<*> -> parseProperty(member, resolvedTypeParameters, typeData)
+                    is KProperty<*> -> parseProperty(member, resolvedTypeParameters, typeData, clazz)
                     is KFunction<*> -> parseFunction(member, resolvedTypeParameters, typeData)
                     else -> null
                 }
@@ -432,12 +438,21 @@ class ReflectionTypeProcessingStep(
     private fun parseProperty(
         member: KProperty<*>,
         resolvedTypeParameters: Map<String, TypeParameterData>,
-        typeData: MutableList<BaseTypeData>
+        typeData: MutableList<BaseTypeData>,
+        clazz: KClass<*>
     ): PropertyData {
+
+        val isOptional = clazz.constructors.any { constructor ->
+            val ctorParameter = constructor.parameters.find { parameter ->
+                parameter.name == member.name && parameter.type == member.returnType
+            }
+            ctorParameter?.isOptional ?: false
+        }
         return PropertyData(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
+            optional = isOptional,
             annotations = parseAnnotations(member).toMutableList(),
             kind = PropertyType.PROPERTY,
             visibility = determinePropertyVisibility(member)
@@ -453,9 +468,10 @@ class ReflectionTypeProcessingStep(
             name = member.name,
             type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
             nullable = member.returnType.isMarkedNullable,
+            optional = false,
             annotations = parseAnnotations(member).toMutableList(),
             kind = determineFunctionPropertyType(member),
-            visibility = determinePropertyVisibility(member)
+            visibility = determinePropertyVisibility(member),
         )
     }
 
@@ -639,11 +655,19 @@ class ReflectionTypeProcessingStep(
             name = name,
             type = TypeId.wildcard(),
             nullable = false,
+            optional = false,
             visibility = Visibility.PUBLIC,
             kind = PropertyType.PROPERTY,
             annotations = mutableListOf()
         )
     }
+
+    private fun KClass<*>.getSafeSimpleName(): String = this.simpleName ?: this.java.name
+
+    /**
+     * Qualified name might be null, e.g. for local classes
+     */
+    private fun KClass<*>.getSafeQualifiedName(): String = this.qualifiedName ?: this.java.name
 
 
     @Suppress("SwallowedException")

@@ -3,11 +3,18 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.swagger.OptionalHandling
+import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
@@ -18,6 +25,9 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFiel
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
+import io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -39,7 +49,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { SwaggerSchemaGenerationStep().generate(it) }
+                .let {
+                    SwaggerSchemaGenerationStep(
+                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -66,7 +92,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { SwaggerSchemaGenerationStep().generate(it) }
+                .let {
+                    SwaggerSchemaGenerationStep(
+                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -99,7 +141,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let { SwaggerSchemaGenerationStep().generate(it) }
+                .let {
+                    SwaggerSchemaGenerationStep(
+                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
+                .let { list ->
+                    if (data.withAnnotations) {
+                        list
+                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                    } else {
+                        list
+                    }
+                }
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
@@ -141,6 +199,8 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val generatorConfig: SwaggerSchemaGenerationStepConfig.() -> Unit = {},
+            val withAnnotations: Boolean = false,
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
             val expectedResultReferencing: String,
@@ -871,71 +931,91 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            TestData(
-//                // annotations not supported with kotlinx-serialization: ignoring annotations
-//                type = typeOf<CoreAnnotatedClass>(),
-//                testName = "annotated class (core)",
-//                generatorModules = listOf(CoreAnnotationsModule()),
-//                expectedResultInlining = """
-//                    {
-//                        "schema": {
-//                            "required": [
-//                                "value"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "value": {
-//                                    "type": "string",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "schema": {
-//                            "required": [
-//                                "value"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "value": {
-//                                    "type": "string",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "schema": {
-//                            "${'$'}ref": "#/definitions/CoreAnnotatedClass",
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {
-//                            "CoreAnnotatedClass": {
-//                                "required": [
-//                                    "value"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "value": {
-//                                        "type": "string",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "exampleSetFlag": false
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
+            TestData(
+                type = typeOf<CoreAnnotatedClass>(),
+                testName = "annotated class (core)",
+                withAnnotations = true,
+                expectedResultInlining = """
+                    {
+                        "title": "Annotated Class",
+                        "required": [
+                            "value"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "exampleSetFlag": false
+                            }
+                        },
+                        "description": "some description",
+                        "deprecated": true,
+                        "exampleSetFlag": false,
+                        "examples": [
+                            "example 1",
+                            "example 2"
+                        ],
+                        "default": "default value"
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                        "schema": {
+                            "title": "Annotated Class",
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "string",
+                                    "exampleSetFlag": false
+                                }
+                            },
+                            "description": "some description",
+                            "deprecated": true,
+                            "exampleSetFlag": false,
+                            "examples": [
+                                "example 1",
+                                "example 2"
+                            ],
+                            "default": "default value"
+                        },
+                        "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                        "schema": {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass",
+                            "exampleSetFlag": false
+                        },
+                        "definitions": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass": {
+                                "title": "Annotated Class",
+                                "required": [
+                                    "value"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "value": {
+                                        "type": "string",
+                                        "exampleSetFlag": false
+                                    }
+                                },
+                                "description": "some description",
+                                "deprecated": true,
+                                "exampleSetFlag": false,
+                                "examples": [
+                                    "example 1",
+                                    "example 2"
+                                ],
+                                "default": "default value"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
 //            TestData(
 //                type = typeOf<ClassWithLocalDateTime>(),
 //                testName = "class with java local-date-time and custom parser",
@@ -1518,6 +1598,285 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "properties": {
                             "self": {
                               "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "ctorOptional",
+                        "ctorRequired"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequired": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "ctorOptional",
+                          "ctorRequired"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "ctorOptional": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorOptionalNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequired": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequiredNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
+                          "required": [
+                            "ctorOptional",
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequired": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as non-required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.NON_REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequired": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "ctorRequired"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "ctorOptional": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorOptionalNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequired": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          },
+                          "ctorRequiredNullable": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequired": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string",
+                              "exampleSetFlag": false
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultInlining = """
+                    {
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "format": "int32",
+                          "exampleSetFlag": false
+                        },
+                        "someText": {
+                          "type": "string",
+                          "exampleSetFlag": false
+                        }
+                      },
+                      "exampleSetFlag": false
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "myValue",
+                          "someText"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "myValue": {
+                            "type": "integer",
+                            "format": "int32",
+                            "exampleSetFlag": false
+                          },
+                          "someText": {
+                            "type": "string",
+                            "exampleSetFlag": false
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass": {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32",
+                              "exampleSetFlag": false
+                            },
+                            "someText": {
+                              "type": "string",
                               "exampleSetFlag": false
                             }
                           },

@@ -89,6 +89,10 @@ open class ObjectTypeData(
      * list of members, e.g. properties, functions
      */
     var members: MutableList<PropertyData> = mutableListOf(),
+    /**
+     * whether the type is an inline value class
+     */
+    var isInlineValue: Boolean = false
 ) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 

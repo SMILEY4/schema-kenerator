@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
+import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
@@ -14,11 +16,13 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
@@ -44,7 +48,11 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { ReflectionTypeProcessingStep().process(it) }
-                .let { JsonSchemaGenerationStep().generate(it) }
+                .let {
+                    JsonSchemaGenerationStep(
+                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -84,7 +92,11 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { ReflectionTypeProcessingStep().process(it) }
-                .let { JsonSchemaGenerationStep().generate(it) }
+                .let {
+                    JsonSchemaGenerationStep(
+                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -133,7 +145,11 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .let { ReflectionTypeProcessingStep().process(it) }
-                .let { JsonSchemaGenerationStep().generate(it) }
+                .let {
+                    JsonSchemaGenerationStep(
+                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
+                    ).generate(it)
+                }
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -183,6 +199,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
+            val generatorConfig: JsonSchemaGenerationStepConfig.() -> Unit = {},
             val withAnnotations: Boolean = false,
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
@@ -1355,6 +1372,231 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                           "properties": {
                             "self": {
                               "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired",
+                        "ctorOptional"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired",
+                        "ctorOptional"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters": {
+                          "type": "object",
+                          "required": [
+                            "ctorRequired",
+                            "ctorOptional"
+                          ],
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string"
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithOptionalParameters>(),
+                testName = "optional parameters as non-required",
+                generatorConfig = {
+                    optionalHandling = OptionalHandling.NON_REQUIRED
+                },
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
+                        },
+                        "ctorOptionalNullable": {
+                          "type": "string"
+                        },
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters": {
+                          "type": "object",
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": "string"
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
+            TestData(
+                type = typeOf<ClassWithValueClass>(),
+                testName = "inline value class",
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647
+                        },
+                        "someText": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "type": "object",
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "minimum": -2147483648,
+                          "maximum": 2147483647
+                        },
+                        "someText": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass": {
+                          "type": "object",
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "someText": {
+                              "type": "string"
                             }
                           }
                         }

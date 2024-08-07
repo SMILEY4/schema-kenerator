@@ -17,6 +17,10 @@ data class PropertyData(
      */
     var nullable: Boolean,
     /**
+     * whether the property is optional (i.e. when a default value is provided)
+     */
+    var optional: Boolean,
+    /**
      * the general visibility of this property
      */
     var visibility: Visibility,

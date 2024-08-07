@@ -8,6 +8,7 @@ import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
@@ -17,7 +18,7 @@ import java.math.BigDecimal
  * Generates swagger-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
  * Result needs to be "compiled" to get the final swagger-schema.
  */
-class SwaggerSchemaGenerationStep {
+class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) {
 
     private val schema = SwaggerSchemaUtils()
 
@@ -138,19 +139,35 @@ class SwaggerSchemaGenerationStep {
     }
 
     private fun buildObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
+        if (typeData.isInlineValue) {
+            return buildInlineObjectSchema(typeData, typeDataList)
+        }
 
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, Schema<*>>()
 
         collectMembers(typeData, typeDataList).forEach { member ->
             propertySchemas[member.name] = schema.referenceSchema(member.type)
-            if (!member.nullable) {
+            val nullable = member.nullable
+            val optional = member.optional && optionalAsNonRequired
+            if(!nullable && !optional) {
                 requiredProperties.add(member.name)
             }
         }
 
         return SwaggerSchema(
             swagger = schema.objectSchema(propertySchemas, requiredProperties),
+            typeData = typeData
+        )
+    }
+
+    private fun buildInlineObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
+        val inlineType = typeData.members.first { it.kind == PropertyType.PROPERTY }
+        val inlineTypeData = typeDataList.find { it.id == inlineType.type }
+            ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
+        val inlineTypeSchema = generate(inlineTypeData, typeDataList)
+        return SwaggerSchema(
+            swagger = inlineTypeSchema.swagger,
             typeData = typeData
         )
     }

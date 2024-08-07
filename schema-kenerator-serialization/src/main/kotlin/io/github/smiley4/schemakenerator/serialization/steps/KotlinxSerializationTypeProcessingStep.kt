@@ -2,6 +2,7 @@
 
 package io.github.smiley4.schemakenerator.serialization.steps
 
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
@@ -23,11 +24,16 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.serializerOrNull
+import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.KProperty
 import kotlin.reflect.KType
+import kotlin.reflect.jvm.javaField
 
 /**
  * Processes the given type and extracts information about it using kotlinx-serialization. Types must be serializable, i.e. annotated with [Serializable]
@@ -40,7 +46,13 @@ class KotlinxSerializationTypeProcessingStep(
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
-    private val typeRedirects: Map<String, KType> = emptyMap()
+    private val typeRedirects: Map<String, KType> = emptyMap(),
+
+    /**
+     * types that are known to not have any type parameters
+     */
+    private val knownNotParameterized: Set<String> = emptySet()
+
 ) {
 
     fun process(type: KType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
@@ -144,6 +156,7 @@ class KotlinxSerializationTypeProcessingStep(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -175,10 +188,12 @@ class KotlinxSerializationTypeProcessingStep(
                     name = "item",
                     type = itemType.id,
                     nullable = itemDescriptor.isNullable,
+                    optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
-                unique = false
+                unique = false,
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -220,6 +235,7 @@ class KotlinxSerializationTypeProcessingStep(
                     name = "key",
                     type = keyType.id,
                     nullable = keyDescriptor.isNullable,
+                    optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
 
@@ -228,9 +244,11 @@ class KotlinxSerializationTypeProcessingStep(
                     name = "value",
                     type = valueType.id,
                     nullable = valueDescriptor.isNullable,
+                    optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
                 ),
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -258,12 +276,15 @@ class KotlinxSerializationTypeProcessingStep(
                                 name = fieldName,
                                 type = fieldType.id,
                                 nullable = fieldDescriptor.isNullable,
+                                optional = descriptor.isElementOptional(i),
                                 kind = PropertyType.PROPERTY,
                                 visibility = Visibility.PUBLIC,
                             )
                         )
                     }
                 }.toMutableList(),
+                isInlineValue = descriptor.isInline,
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -285,6 +306,7 @@ class KotlinxSerializationTypeProcessingStep(
                     .toList()[1].elementDescriptors
                     .map { parse(it, typeData, processed).id }
                     .toMutableList(),
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -299,6 +321,7 @@ class KotlinxSerializationTypeProcessingStep(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -314,18 +337,76 @@ class KotlinxSerializationTypeProcessingStep(
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
                 enumConstants = descriptor.elementNames.toMutableList(),
+                annotations = parseAnnotations(descriptor)
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
             }
     }
 
-    private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {
-        return if (typeData.find(TypeId.build(descriptor.cleanSerialName(), typeParameters)) != null) {
-            TypeId.build(descriptor.cleanSerialName(), typeParameters, true)
-        } else {
-            TypeId.build(descriptor.cleanSerialName(), typeParameters)
+    // ====== ANNOTATION ===============================================
+
+    private fun parseAnnotations(descriptor: SerialDescriptor): MutableList<AnnotationData>{
+        return unwrapAnnotations(descriptor.annotations).map { parseAnnotation(it) }.toMutableList()
+    }
+
+    private fun unwrapAnnotations(annotations: List<Annotation>): List<Annotation> {
+        // "repeatable" annotations are wrapped in a container class and need to be unwrapped
+        return annotations.flatMap { annotation ->
+            if (isAnnotationContainer(annotation)) {
+                unwrapContainer(annotation)
+            } else {
+                listOf(annotation)
+            }
         }
+    }
+
+    private fun isAnnotationContainer(annotation: Annotation): Boolean {
+        return annotation.annotationClass.java.declaredAnnotations
+            .map { it.annotationClass.qualifiedName }
+            .contains("kotlin.jvm.internal.RepeatableContainer")
+    }
+
+
+    @Suppress("SwallowedException")
+    private fun unwrapContainer(annotation: Annotation): List<Annotation> {
+        try {
+            // A repeatable annotation container must have a method "value" returning the array of repeated annotations.
+            val valueMethod = annotation.javaClass.getMethod("value")
+            @Suppress("UNCHECKED_CAST")
+            return (valueMethod(annotation) as Array<Annotation>).asList()
+        } catch (e: Exception) {
+            return emptyList()
+        }
+    }
+
+    private fun parseAnnotation(annotation: Annotation): AnnotationData {
+        return AnnotationData(
+            name = annotation.annotationClass.qualifiedName ?: "",
+            annotation = annotation,
+            values = annotation.annotationClass.members
+                .filterIsInstance<KProperty<*>>()
+                .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }
+                .associate { it.name to it.getter.call(annotation) }
+                .toMutableMap()
+        )
+    }
+
+    // ====== UTILITIES ================================================
+
+    private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {
+        if(knownNotParameterized.contains(descriptor.cleanSerialName())) {
+            return TypeId.build(descriptor.cleanSerialName(), typeParameters)
+        }
+        if(typeData.find(descriptor, typeParameters) != null) {
+            return TypeId.build(descriptor.cleanSerialName(), typeParameters, true)
+        }
+        return TypeId.build(descriptor.cleanSerialName(), typeParameters)
+    }
+
+    private fun Collection<BaseTypeData>.find(descriptor: SerialDescriptor, typeParameters: List<TypeId>): BaseTypeData? {
+        val typeId = TypeId.build(descriptor.cleanSerialName(), typeParameters)
+        return this.find { it.id.full() == typeId.full() }
     }
 
     private fun Collection<BaseTypeData>.find(id: TypeId): BaseTypeData? {
