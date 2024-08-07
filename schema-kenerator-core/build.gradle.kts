@@ -19,6 +19,9 @@ repositories {
 }
 
 dependencies {
+    val versionKotlinxSerializationJson: String by project
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:$versionKotlinxSerializationJson")
+
     val versionKotest: String by project
     val versionKotlinTest: String by project
     testImplementation("io.kotest:kotest-runner-junit5:$versionKotest")
