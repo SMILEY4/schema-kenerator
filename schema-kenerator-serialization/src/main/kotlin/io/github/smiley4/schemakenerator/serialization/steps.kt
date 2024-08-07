@@ -15,7 +15,8 @@ fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProce
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
-        typeRedirects = config.typeRedirects
+        typeRedirects = config.typeRedirects,
+        knownNotParameterized = config.knownNotParameterized
     ).process(this)
 }
 
@@ -27,7 +28,8 @@ fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationT
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
-        typeRedirects = config.typeRedirects
+        typeRedirects = config.typeRedirects,
+        knownNotParameterized = config.knownNotParameterized
     ).process(this)
 }
 
@@ -37,6 +39,7 @@ class KotlinxSerializationTypeProcessingConfig {
 
     var typeRedirects = mutableMapOf<String, KType>()
 
+    var knownNotParameterized = mutableSetOf<String>()
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
@@ -108,6 +111,32 @@ class KotlinxSerializationTypeProcessingConfig {
      */
     fun redirect(redirects: Map<String, KType>) {
         typeRedirects.putAll(redirects)
+    }
+
+    /**
+     * Mark the type with the given full/qualified name as "not parameterized", i.e as not having any generic type parameters.
+     * This helps the type processing step to determine whether two types are truly the same.
+     */
+    fun markNotParameterized(name: String) {
+        knownNotParameterized.add(name)
+    }
+
+    /**
+     * Mark the given type as "not parameterized", i.e as not having any generic type parameters.
+     * This helps the type processing step to determine whether two types are truly the same.
+     */
+    fun  markNotParameterized(type: KType) {
+        val clazz = type.classifier!! as KClass<*>
+        markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
+    }
+
+    /**
+     * Mark the given type as "not parameterized", i.e as not having any generic type parameters.
+     * This helps the type processing step to determine whether two types are truly the same.
+     */
+    inline fun <reified T>  markNotParameterized() {
+        val clazz = typeOf<T>().classifier!! as KClass<*>
+        markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
     }
 
 }

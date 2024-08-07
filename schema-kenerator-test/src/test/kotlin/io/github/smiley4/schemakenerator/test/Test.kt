@@ -1,32 +1,22 @@
+@file:UseSerializers(InstantSerializer::class)
+
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.core.annotations.Optional
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencing
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationOptionalAndRequiredStep
-import io.github.smiley4.schemakenerator.jsonschema.withAutoTitle
-import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
-import io.github.smiley4.schemakenerator.swagger.customizeTypes
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.buildTypeDataMap
-import io.github.smiley4.schemakenerator.swagger.withAutoTitle
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime
 import io.kotest.core.spec.style.StringSpec
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import java.time.Instant
 import kotlin.reflect.typeOf
 
 /**
@@ -34,109 +24,45 @@ import kotlin.reflect.typeOf
  */
 class Test : StringSpec({
 
-    "before" {
+    "test" {
 
-        fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
-            schema.typeData.annotations
-                .find { it.name == "swagger-format" } // find our custom annotation
-                ?.also { annotation ->
-                    schema.swagger.format = annotation.values["format"] as String // set the "format"-property of the swagger-schema
-                }
-        }
-
-        val result = typeOf<ClassWithLocalDateTime>()
+        val result = typeOf<TestRequest>()
             .processKotlinxSerialization {
-                customProcessor<LocalDateTime> {
-                    PrimitiveTypeData(
-                        id = TypeId.build(String::class.qualifiedName!!),
-                        simpleName = String::class.simpleName!!,
-                        qualifiedName = String::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = "swagger-format",
-                                values = mutableMapOf("format" to "date-time"),
-                                annotation = null
-                            )
-                        )
-                    )
-                }
+                markNotParameterized<TestRequest.Item>()
             }
-            .generateSwaggerSchema()
-            .let { bundle ->
-                val typeDataMap = bundle.buildTypeDataMap()
-                bundle.also { schema ->
-                    process(schema.data, typeDataMap)
-                    schema.supporting.forEach { process(it, typeDataMap) }
-                }
-            }
-            .compileInlining()
+            .generateJsonSchema()
+            .compileReferencing()
 
-
-        println(json.writeValueAsString(result.swagger))
-        result.componentSchemas.forEach { (name, schema) ->
-            println("$name: ${json.writeValueAsString(schema)}")
+        println(result.json.prettyPrint())
+        result.definitions.forEach {
+            println("${it.key}:   ${it.value.prettyPrint()}")
         }
-    }
 
-
-    "after" {
-
-        val result = typeOf<ClassWithLocalDateTime>()
-            .processKotlinxSerialization {
-                customProcessor<LocalDateTime> {
-                    PrimitiveTypeData(
-                        id = TypeId.build(String::class.qualifiedName!!),
-                        simpleName = String::class.simpleName!!,
-                        qualifiedName = String::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = "swagger-format",
-                                values = mutableMapOf("format" to "date-time"),
-                                annotation = null
-                            )
-                        )
-                    )
-                }
-            }
-            .generateSwaggerSchema()
-            .customizeTypes { type, schema ->
-                type.annotations.find { it.name == "swagger-format" }?.also { annotation ->
-                    schema.format = annotation.values["format"] as String
-                }
-            }
-            .compileInlining()
-
-
-        println(json.writeValueAsString(result.swagger))
-        result.componentSchemas.forEach { (name, schema) ->
-            println("$name: ${json.writeValueAsString(schema)}")
-        }
-    }
-
-    "value classes" {
-
-        val result = typeOf<LoginInfo>()
-            .processKotlinxSerialization()
-            .generateSwaggerSchema()
-            .withAutoTitle()
-            .compileInlining()
-
-        println(json.writeValueAsString(result.swagger))
-
-//        println(result.json.prettyPrint())
     }
 
 }) {
     companion object {
 
-        @JvmInline
-        @Serializable
-        value class UserId(val value: Int)
 
         @Serializable
-        private data class LoginInfo(val email: String? = null, val id: UserId? = null, val password: String)
+        data class TestRequest(
+            val items: List<Item>? = null,
+            val selectedItem: Item? = null,
+        ) {
+            @Serializable
+            data class Item(
+                val id: Int? = null,
+                val name: String? = null
+            )
+        }
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
     }
+}
+
+object InstantSerializer : KSerializer<Instant> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("java.time.Instant", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
+    override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
 }
