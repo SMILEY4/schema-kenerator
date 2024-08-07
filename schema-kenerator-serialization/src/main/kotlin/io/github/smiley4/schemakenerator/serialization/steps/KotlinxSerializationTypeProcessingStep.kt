@@ -40,7 +40,13 @@ class KotlinxSerializationTypeProcessingStep(
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
-    private val typeRedirects: Map<String, KType> = emptyMap()
+    private val typeRedirects: Map<String, KType> = emptyMap(),
+
+    /**
+     * types that are known to not have any type parameters
+     */
+    private val knownNotParameterized: Set<String> = emptySet()
+
 ) {
 
     fun process(type: KType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
@@ -326,11 +332,18 @@ class KotlinxSerializationTypeProcessingStep(
     }
 
     private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {
-        return if (typeData.find(TypeId.build(descriptor.cleanSerialName(), typeParameters)) != null) {
-            TypeId.build(descriptor.cleanSerialName(), typeParameters, true)
-        } else {
-            TypeId.build(descriptor.cleanSerialName(), typeParameters)
+        if(knownNotParameterized.contains(descriptor.cleanSerialName())) {
+            return TypeId.build(descriptor.cleanSerialName(), typeParameters)
         }
+        if(typeData.find(descriptor, typeParameters) != null) {
+            return TypeId.build(descriptor.cleanSerialName(), typeParameters, true)
+        }
+        return TypeId.build(descriptor.cleanSerialName(), typeParameters)
+    }
+
+    private fun Collection<BaseTypeData>.find(descriptor: SerialDescriptor, typeParameters: List<TypeId>): BaseTypeData? {
+        val typeId = TypeId.build(descriptor.cleanSerialName(), typeParameters)
+        return this.find { it.id.full() == typeId.full() }
     }
 
     private fun Collection<BaseTypeData>.find(id: TypeId): BaseTypeData? {

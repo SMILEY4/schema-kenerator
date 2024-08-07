@@ -164,7 +164,7 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
     private fun buildInlineObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
         val inlineType = typeData.members.first { it.kind == PropertyType.PROPERTY }
         val inlineTypeData = typeDataList.find { it.id == inlineType.type }
-            ?: throw IllegalStateException("Could not find type-data for inline type ${inlineType.type}")
+            ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
         val inlineTypeSchema = generate(inlineTypeData, typeDataList)
         return SwaggerSchema(
             swagger = inlineTypeSchema.swagger,
