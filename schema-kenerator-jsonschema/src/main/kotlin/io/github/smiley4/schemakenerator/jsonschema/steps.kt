@@ -29,7 +29,7 @@ enum class OptionalHandling {
 
 class JsonSchemaGenerationStepConfig {
     /**
-     * How to handle optional parameters
+     * How to handle optional properties
      *
      * Example:
      * ```
