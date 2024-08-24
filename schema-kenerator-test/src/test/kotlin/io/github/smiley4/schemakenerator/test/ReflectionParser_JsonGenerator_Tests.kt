@@ -854,11 +854,25 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "type": "object",
-                        "required": ["value"],
+                        "required": ["stringValue", "intValue"],
                         "properties": {
-                            "value": {
+                            "stringValue": {
                                 "type": "string",
-                                "description": "field description"
+                                "description": "String field description",
+                                "default": "A default String value",
+                                "examples": [
+                                    "An example of a String value"
+                                ]
+                            },
+                            "intValue": {
+                                "type": "integer",
+                                "default": "1111",
+                                "minimum": -2147483648,
+                                "maximum": 2147483647,
+                                "description": "Int field description",
+                                "examples": [
+                                    "2222"
+                                ]
                             }
                         },
                         "title": "Annotated Class",
@@ -874,11 +888,25 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "type": "object",
-                        "required": ["value"],
+                        "required": ["stringValue", "intValue"],
                         "properties": {
-                            "value": {
+                            "stringValue": {
                                 "type": "string",
-                                "description": "field description"
+                                "description": "String field description",
+                                "default": "A default String value",
+                                "examples": [
+                                    "An example of a String value"
+                                ]
+                            },
+                            "intValue": {
+                                "type": "integer",
+                                "default": "1111",
+                                "minimum": -2147483648,
+                                "maximum": 2147483647,
+                                "description": "Int field description",
+                                "examples": [
+                                    "2222"
+                                ]
                             }
                         },
                         "title": "Annotated Class",
@@ -897,13 +925,25 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "definitions": {
                             "io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass": {
                                 "type": "object",
-                                "required": [
-                                    "value"
-                                ],
+                                "required": ["stringValue", "intValue"],
                                 "properties": {
-                                    "value": {
+                                    "stringValue": {
                                         "type": "string",
-                                        "description": "field description"
+                                        "description": "String field description",
+                                        "default": "A default String value",
+                                        "examples": [
+                                            "An example of a String value"
+                                        ]
+                                    },
+                                    "intValue": {
+                                        "type": "integer",
+                                        "default": "1111",
+                                        "minimum": -2147483648,
+                                        "maximum": 2147483647,
+                                        "description": "Int field description",
+                                        "examples": [
+                                            "2222"
+                                        ]
                                     }
                                 },
                                 "title": "Annotated Class",

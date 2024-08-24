@@ -14,6 +14,13 @@ import io.github.smiley4.schemakenerator.core.annotations.Title
 @Example("example 2")
 @Deprecated
 class CoreAnnotatedClass(
-    @Description("field description")
-    val value: String
+    @Description("String field description")
+    @Default("A default String value")
+    @Example("An example of a String value")
+    val stringValue: String,
+
+    @Description("Int field description")
+    @Default("1111")
+    @Example("2222")
+    val intValue: Int,
 )
