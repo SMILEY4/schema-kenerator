@@ -945,6 +945,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "properties": {
                             "value": {
                                 "type": "string",
+                                "description": "field description",
                                 "exampleSetFlag": false
                             }
                         },
@@ -969,6 +970,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "properties": {
                                 "value": {
                                     "type": "string",
+                                    "description": "field description",
                                     "exampleSetFlag": false
                                 }
                             },
@@ -1000,6 +1002,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "properties": {
                                     "value": {
                                         "type": "string",
+                                        "description": "field description",
                                         "exampleSetFlag": false
                                     }
                                 },
