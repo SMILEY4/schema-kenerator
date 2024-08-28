@@ -1105,14 +1105,29 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "schema": {
                             "title": "Annotated Class",
                             "required": [
-                                "value"
+                                "stringValue",
+                                "intValue"
                             ],
                             "type": "object",
                             "properties": {
-                                "value": {
+                                "stringValue": {
                                     "type": "string",
-                                    "description": "field description",
-                                    "exampleSetFlag": false
+                                    "description": "String field description",
+                                    "default": "A default String value",
+                                    "exampleSetFlag": false,
+                                    "examples": [
+                                        "An example of a String value"
+                                    ]
+                                },
+                                "intValue": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "description": "Int field description",
+                                    "default": "1111",
+                                    "exampleSetFlag": false,
+                                    "examples": [
+                                        "2222"
+                                    ]
                                 }
                             },
                             "description": "some description",
@@ -1132,14 +1147,29 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "schema": {
                             "title": "Annotated Class",
                             "required": [
-                                "value"
+                                "stringValue",
+                                "intValue"
                             ],
                             "type": "object",
                             "properties": {
-                                "value": {
+                                "stringValue": {
                                     "type": "string",
-                                    "description": "field description",
-                                    "exampleSetFlag": false
+                                    "description": "String field description",
+                                    "default": "A default String value",
+                                    "exampleSetFlag": false,
+                                    "examples": [
+                                        "An example of a String value"
+                                    ]
+                                },
+                                "intValue": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "description": "Int field description",
+                                    "default": "1111",
+                                    "exampleSetFlag": false,
+                                    "examples": [
+                                        "2222"
+                                    ]
                                 }
                             },
                             "description": "some description",
@@ -1164,14 +1194,29 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass": {
                                 "title": "Annotated Class",
                                 "required": [
-                                    "value"
+                                    "stringValue",
+                                    "intValue"
                                 ],
                                 "type": "object",
                                 "properties": {
-                                    "value": {
+                                    "stringValue": {
                                         "type": "string",
-                                        "description": "field description",
-                                        "exampleSetFlag": false
+                                        "description": "String field description",
+                                        "default": "A default String value",
+                                        "exampleSetFlag": false,
+                                        "examples": [
+                                            "An example of a String value"
+                                        ]
+                                    },
+                                    "intValue": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "description": "Int field description",
+                                        "default": "1111",
+                                        "exampleSetFlag": false,
+                                        "examples": [
+                                            "2222"
+                                        ]
                                     }
                                 },
                                 "description": "some description",
