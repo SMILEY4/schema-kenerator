@@ -3,6 +3,7 @@ package io.github.smiley4.schemakenerator.serialization
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -15,8 +16,9 @@ fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProce
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
+        serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
-        knownNotParameterized = config.knownNotParameterized
+        knownNotParameterized = config.knownNotParameterized,
     ).process(this)
 }
 
@@ -28,8 +30,9 @@ fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationT
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
+        serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
-        knownNotParameterized = config.knownNotParameterized
+        knownNotParameterized = config.knownNotParameterized,
     ).process(this)
 }
 
@@ -40,6 +43,11 @@ class KotlinxSerializationTypeProcessingConfig {
     var typeRedirects = mutableMapOf<String, KType>()
 
     var knownNotParameterized = mutableSetOf<String>()
+
+    /**
+     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
+     */
+    var serializersModule: SerializersModule? = null
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour

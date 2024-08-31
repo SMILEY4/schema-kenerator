@@ -24,13 +24,13 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
-import kotlinx.serialization.descriptors.buildSerialDescriptor
+import kotlinx.serialization.descriptors.capturedKClass
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.javaField
@@ -43,6 +43,10 @@ class KotlinxSerializationTypeProcessingStep(
      * custom processors for given types that overwrite the default behaviour
      */
     private val customProcessors: Map<String, () -> BaseTypeData> = emptyMap(),
+    /**
+     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
+     */
+    private val serializersModule: SerializersModule? = null,
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
@@ -111,6 +115,12 @@ class KotlinxSerializationTypeProcessingStep(
                 .also {
                     processed[descriptor] = it
                 }
+        }
+
+        // check contextual descriptors
+        val contextualByKClass = descriptor.capturedKClass?.let { serializersModule!!.getContextual(it)?.descriptor }
+        if(contextualByKClass != null) {
+            return parse(contextualByKClass, typeData, processed)
         }
 
         // process
