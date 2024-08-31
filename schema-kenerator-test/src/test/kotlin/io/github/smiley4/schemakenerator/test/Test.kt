@@ -4,7 +4,9 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.annotations.Description
+import io.github.smiley4.schemakenerator.core.annotations.Example
 import io.github.smiley4.schemakenerator.core.annotations.Name
 import io.github.smiley4.schemakenerator.core.handleNameAnnotation
 import io.github.smiley4.schemakenerator.reflection.processReflection
@@ -44,8 +46,26 @@ class Test : StringSpec({
 
     }
 
+    "test issue #9" {
+        val swagger = typeOf<MyExampleClass>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .compileInlining()
+            .swagger
+
+        println(swagger)
+    }
+
 }) {
     companion object {
+
+        class MyExampleClass(
+            @Description("Some test value.")
+            @Example("Hello World")
+            @Default("Default value")
+            val value: String,
+        )
 
         @Serializable
         enum class Permission(val id: String) {

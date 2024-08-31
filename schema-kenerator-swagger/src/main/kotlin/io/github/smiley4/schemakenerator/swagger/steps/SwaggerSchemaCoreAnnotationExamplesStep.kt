@@ -33,7 +33,8 @@ class SwaggerSchemaCoreAnnotationExamplesStep {
             determineExamples(data)?.also { examples ->
                 examples.forEach {
                     @Suppress("UNCHECKED_CAST")
-                    (prop as Schema<Any?>).addExample(it)
+                    (prop as Schema<Any?>).example = it
+//                    (prop as Schema<Any?>).addExample(it)
                 }
             }
         }
