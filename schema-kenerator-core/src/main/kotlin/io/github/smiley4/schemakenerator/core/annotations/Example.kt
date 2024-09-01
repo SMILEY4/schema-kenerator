@@ -16,4 +16,5 @@ import kotlinx.serialization.SerialInfo
 )
 @SerialInfo
 @Retention(AnnotationRetention.RUNTIME)
+@Repeatable
 annotation class Example(val example: String)
