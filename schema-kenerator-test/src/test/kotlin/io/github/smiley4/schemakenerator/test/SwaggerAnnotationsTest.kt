@@ -13,6 +13,8 @@ import io.kotest.assertions.json.NumberFormat
 import io.kotest.assertions.json.PropertyOrder
 import io.kotest.assertions.json.TypeCoercion
 import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
@@ -78,6 +80,16 @@ class SwaggerAnnotationsTest : StringSpec({
         }
     }
 
+    "partially specified class" {
+        shouldNotThrowAny {
+            typeOf<PartiallySpecified>()
+                .processReflection()
+                .generateSwaggerSchema()
+                .handleSchemaAnnotations()
+                .compileInlining()
+        }
+    }
+
 }) {
 
     companion object {
@@ -121,5 +133,10 @@ class SwaggerAnnotationsTest : StringSpec({
         )
 
     }
+
+    private class PartiallySpecified(
+        @field:Schema(description = "Mysterious thing")
+        val x: String,
+    )
 
 }

@@ -22,43 +22,31 @@ class SwaggerSchemaCoreAnnotationExamplesStep {
 
     private fun process(schema: SwaggerSchema) {
         if (schema.swagger.examples == null) {
-            determineExamples(schema.typeData)?.also { examples ->
-                examples.forEach {
-                    @Suppress("UNCHECKED_CAST")
-                    (schema.swagger as Schema<Any?>).addExample(it)
-                }
+            determineExamples(schema.typeData)?.also {
+                @Suppress("UNCHECKED_CAST")
+                (schema.swagger as Schema<Any?>).example = it
             }
         }
         iterateProperties(schema) { prop, data ->
-            determineExamples(data)?.also { examples ->
-                examples.forEach {
-                    @Suppress("UNCHECKED_CAST")
-                    (prop as Schema<Any?>).addExample(it)
-                }
+            determineExamples(data)?.also {
+                @Suppress("UNCHECKED_CAST")
+                (prop as Schema<Any?>).example = it
             }
         }
     }
 
-    private fun determineExamples(typeData: PropertyData): List<String>? {
+    private fun determineExamples(typeData: PropertyData): String? {
         return typeData.annotations
             .filter { it.name == Example::class.qualifiedName }
             .map { it.values["example"] as String }
-            .let {
-                it.ifEmpty {
-                    null
-                }
-            }
+            .firstOrNull()
     }
 
-    private fun determineExamples(typeData: BaseTypeData): List<String>? {
+    private fun determineExamples(typeData: BaseTypeData): String? {
         return typeData.annotations
             .filter { it.name == Example::class.qualifiedName }
             .map { it.values["example"] as String }
-            .let {
-                it.ifEmpty {
-                    null
-                }
-            }
+            .firstOrNull()
     }
 
 }

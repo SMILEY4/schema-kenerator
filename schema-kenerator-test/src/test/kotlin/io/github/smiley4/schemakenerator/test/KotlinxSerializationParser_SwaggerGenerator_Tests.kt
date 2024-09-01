@@ -945,16 +945,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "properties": {
                             "value": {
                                 "type": "string",
+                                "description": "field description",
                                 "exampleSetFlag": false
                             }
                         },
                         "description": "some description",
                         "deprecated": true,
-                        "exampleSetFlag": false,
-                        "examples": [
-                            "example 1",
-                            "example 2"
-                        ],
+                        "exampleSetFlag": true,
+                        "example": "example 1",
                         "default": "default value"
                     }
                 """.trimIndent(),
@@ -969,16 +967,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "properties": {
                                 "value": {
                                     "type": "string",
+                                    "description": "field description",
                                     "exampleSetFlag": false
                                 }
                             },
                             "description": "some description",
                             "deprecated": true,
-                            "exampleSetFlag": false,
-                            "examples": [
-                                "example 1",
-                                "example 2"
-                            ],
+                            "exampleSetFlag": true,
+                            "example": "example 1",
                             "default": "default value"
                         },
                         "definitions": {}
@@ -1000,16 +996,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "properties": {
                                     "value": {
                                         "type": "string",
+                                        "description": "field description",
                                         "exampleSetFlag": false
                                     }
                                 },
                                 "description": "some description",
                                 "deprecated": true,
-                                "exampleSetFlag": false,
-                                "examples": [
-                                    "example 1",
-                                    "example 2"
-                                ],
+                                "exampleSetFlag": true,
+                                "example": "example 1",
                                 "default": "default value"
                             }
                         }

@@ -24,13 +24,11 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
-import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.javaField
@@ -279,6 +277,7 @@ class KotlinxSerializationTypeProcessingStep(
                                 optional = descriptor.isElementOptional(i),
                                 kind = PropertyType.PROPERTY,
                                 visibility = Visibility.PUBLIC,
+                                annotations = parseAnnotations(descriptor.getElementAnnotations(i)),
                             )
                         )
                     }
@@ -347,7 +346,11 @@ class KotlinxSerializationTypeProcessingStep(
     // ====== ANNOTATION ===============================================
 
     private fun parseAnnotations(descriptor: SerialDescriptor): MutableList<AnnotationData>{
-        return unwrapAnnotations(descriptor.annotations).map { parseAnnotation(it) }.toMutableList()
+        return parseAnnotations(descriptor.annotations)
+    }
+
+    private fun parseAnnotations(annotations: List<Annotation>): MutableList<AnnotationData>{
+        return unwrapAnnotations(annotations).map { parseAnnotation(it) }.toMutableList()
     }
 
     private fun unwrapAnnotations(annotations: List<Annotation>): List<Annotation> {

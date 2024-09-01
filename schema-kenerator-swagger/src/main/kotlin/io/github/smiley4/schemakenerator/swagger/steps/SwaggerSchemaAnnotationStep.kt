@@ -178,6 +178,7 @@ class SwaggerSchemaAnnotationStep {
         return property.annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["minimum"] as String }
+            .filter { it.isNotBlank() }
             .map { BigDecimal(it) }
             .firstOrNull()
     }
@@ -193,6 +194,7 @@ class SwaggerSchemaAnnotationStep {
         return property.annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["maximum"] as String }
+            .filter { it.isNotBlank() }
             .map { BigDecimal(it) }
             .firstOrNull()
     }
