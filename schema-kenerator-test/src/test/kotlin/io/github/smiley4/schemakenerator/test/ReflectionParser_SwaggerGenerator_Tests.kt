@@ -1114,20 +1114,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "type": "string",
                                     "description": "String field description",
                                     "default": "A default String value",
-                                    "exampleSetFlag": false,
-                                    "examples": [
-                                        "An example of a String value"
-                                    ]
+                                    "exampleSetFlag": true,
+                                    "example": "An example of a String value"
                                 },
                                 "intValue": {
                                     "type": "integer",
                                     "format": "int32",
                                     "description": "Int field description",
                                     "default": "1111",
-                                    "exampleSetFlag": false,
-                                    "examples": [
-                                        "2222"
-                                    ]
+                                    "exampleSetFlag": true,
+                                    "example": "2222"
                                 }
                             },
                             "description": "some description",
@@ -1153,20 +1149,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "type": "string",
                                     "description": "String field description",
                                     "default": "A default String value",
-                                    "exampleSetFlag": false,
-                                    "examples": [
-                                        "An example of a String value"
-                                    ]
+                                    "exampleSetFlag": true,
+                                    "example": "An example of a String value"
                                 },
                                 "intValue": {
                                     "type": "integer",
                                     "format": "int32",
                                     "description": "Int field description",
                                     "default": "1111",
-                                    "exampleSetFlag": false,
-                                    "examples": [
-                                        "2222"
-                                    ]
+                                    "exampleSetFlag": true,
+                                    "example": "2222"
                                 }
                             },
                             "description": "some description",
@@ -1197,20 +1189,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                         "type": "string",
                                         "description": "String field description",
                                         "default": "A default String value",
-                                        "exampleSetFlag": false,
-                                        "examples": [
-                                            "An example of a String value"
-                                        ]
+                                        "exampleSetFlag": true,
+                                        "example": "An example of a String value"
                                     },
                                     "intValue": {
                                         "type": "integer",
                                         "format": "int32",
                                         "description": "Int field description",
                                         "default": "1111",
-                                        "exampleSetFlag": false,
-                                        "examples": [
-                                            "2222"
-                                        ]
+                                        "exampleSetFlag": true,
+                                        "example": "2222"
                                     }
                                 },
                                 "description": "some description",
