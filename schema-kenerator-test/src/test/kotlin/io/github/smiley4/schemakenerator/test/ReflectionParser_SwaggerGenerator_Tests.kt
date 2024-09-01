@@ -1132,11 +1132,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             },
                             "description": "some description",
                             "deprecated": true,
-                            "exampleSetFlag": false,
-                            "examples": [
-                                "example 1",
-                                "example 2"
-                            ],
+                            "exampleSetFlag": true,
+                            "example": "example 1",
                             "default": "default value"
                         },
                         "definitions": {}
@@ -1174,11 +1171,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             },
                             "description": "some description",
                             "deprecated": true,
-                            "exampleSetFlag": false,
-                            "examples": [
-                                "example 1",
-                                "example 2"
-                            ],
+                            "exampleSetFlag": true,
+                            "example": "example 1",
                             "default": "default value"
                         },
                         "definitions": {}
@@ -1221,11 +1215,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 },
                                 "description": "some description",
                                 "deprecated": true,
-                                "exampleSetFlag": false,
-                                "examples": [
-                                    "example 1",
-                                    "example 2"
-                                ],
+                                "exampleSetFlag": true,
+                                "example": "example 1",
                                 "default": "default value"
                             }
                         }

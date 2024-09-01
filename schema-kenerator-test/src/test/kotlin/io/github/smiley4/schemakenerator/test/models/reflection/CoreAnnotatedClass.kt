@@ -11,7 +11,6 @@ import io.github.smiley4.schemakenerator.core.annotations.Title
 @Description("some description")
 @Default("default value")
 @Example("example 1")
-@Example("example 2")
 @Deprecated
 class CoreAnnotatedClass(
     @Description("String field description")

@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializable
 @Description("some description")
 @Default("default value")
 @Example("example 1")
-@Example("example 2")
 @Deprecated
 class CoreAnnotatedClass(
     @Description("field description")
