@@ -865,8 +865,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "description": "some description",
                         "default": "default value",
                         "examples": [
-                            "example 1",
-                            "example 2"
+                            "example 1"
                         ],
                         "deprecated": true
                     }
@@ -885,8 +884,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "description": "some description",
                         "default": "default value",
                         "examples": [
-                            "example 1",
-                            "example 2"
+                            "example 1"
                         ],
                         "deprecated": true
                     }
@@ -910,8 +908,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "description": "some description",
                                 "default": "default value",
                                 "examples": [
-                                    "example 1",
-                                    "example 2"
+                                    "example 1"
                                 ],
                                 "deprecated": true
                             }
