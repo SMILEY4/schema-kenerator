@@ -5,10 +5,11 @@ import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
@@ -50,7 +51,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaAutoTitleStep(TitleType.FULL).process(it) }
+                .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_FULL).process(it) }
                 .let { JsonSchemaCompileInlineStep().compile(it) }
 
             schema.json.prettyPrint()
@@ -91,7 +92,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                 .let { JsonSchemaCompileInlineStep().compile(it) }
 
             schema.json.prettyPrint()
@@ -132,8 +133,8 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                 }
                 .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
-                .let { JsonSchemaCompileReferenceRootStep(RefType.SIMPLE).compile(it) }
+                .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_SIMPLE).compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {

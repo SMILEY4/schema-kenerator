@@ -26,6 +26,7 @@ import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
+import kotlinx.serialization.descriptors.nullable
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -71,7 +72,7 @@ class KotlinxSerializationTypeProcessingStep(
     private fun process(type: KType, typeData: MutableList<BaseTypeData>): BaseTypeData {
         if (type.classifier is KClass<*>) {
             return (type.classifier as KClass<*>).serializerOrNull()
-                ?.let { parse(it.descriptor, typeData, mutableMapOf()) }
+                ?.let { parse(it.descriptor, type.isMarkedNullable, typeData, mutableMapOf()) }
                 ?: parseWildcard(typeData)
         } else {
             throw IllegalArgumentException("Type is not a class.")
@@ -82,6 +83,7 @@ class KotlinxSerializationTypeProcessingStep(
     @Suppress("CyclomaticComplexMethod")
     private fun parse(
         descriptor: SerialDescriptor,
+        nullable: Boolean,
         typeData: MutableList<BaseTypeData>,
         processed: MutableMap<SerialDescriptor, BaseTypeData>
     ): BaseTypeData {
@@ -93,8 +95,8 @@ class KotlinxSerializationTypeProcessingStep(
         processed[descriptor] = PlaceholderTypeData(TypeId.wildcard())
 
         // check redirects
-        if (typeRedirects.containsKey(descriptor.cleanSerialName())) {
-            return process(typeRedirects[descriptor.cleanSerialName()]!!, typeData).also {
+        if (typeRedirects.containsKey(descriptor.redirectKey(nullable))) {
+            return process(typeRedirects[descriptor.redirectKey(nullable)]!!, typeData).also {
                 processed[descriptor] = it
             }
         }
@@ -138,6 +140,7 @@ class KotlinxSerializationTypeProcessingStep(
                 SerialKind.CONTEXTUAL -> parseClass(descriptor, typeData, processed)
             }
         }.also {
+            it.nullable = nullable || descriptor.isNullable
             processed[descriptor] = it
         }
     }
@@ -168,7 +171,7 @@ class KotlinxSerializationTypeProcessingStep(
     ): BaseTypeData {
         val itemDescriptor = descriptor.getElementDescriptor(0)
         val itemName = descriptor.getElementName(0)
-        val itemType = parse(itemDescriptor, typeData, processed)
+        val itemType = parse(itemDescriptor, false, typeData, processed)
         val id = TypeId.build(descriptor.cleanSerialName(), listOf(itemType.id))
         return typeData.find(id)
             ?: CollectionTypeData(
@@ -205,11 +208,11 @@ class KotlinxSerializationTypeProcessingStep(
     ): BaseTypeData {
         val keyDescriptor = descriptor.getElementDescriptor(0)
         val keyName = descriptor.getElementName(0)
-        val keyType = parse(keyDescriptor, typeData, processed)
+        val keyType = parse(keyDescriptor, false, typeData, processed)
 
         val valueDescriptor = descriptor.getElementDescriptor(1)
         val valueName = descriptor.getElementName(1)
-        val valueType = parse(valueDescriptor, typeData, processed)
+        val valueType = parse(valueDescriptor, false, typeData, processed)
 
         val id = TypeId.build(descriptor.cleanSerialName(), listOf(keyType.id, valueType.id))
         return typeData.find(id)
@@ -268,12 +271,12 @@ class KotlinxSerializationTypeProcessingStep(
                     for (i in 0..<descriptor.elementsCount) {
                         val fieldDescriptor = descriptor.getElementDescriptor(i)
                         val fieldName = descriptor.getElementName(i)
-                        val fieldType = parse(fieldDescriptor, typeData, processed)
+                        val fieldType = parse(fieldDescriptor, false, typeData, processed)
                         add(
                             PropertyData(
                                 name = fieldName,
                                 type = fieldType.id,
-                                nullable = fieldDescriptor.isNullable,
+                                nullable = fieldDescriptor.isNullable || fieldType.nullable,
                                 optional = descriptor.isElementOptional(i),
                                 kind = PropertyType.PROPERTY,
                                 visibility = Visibility.PUBLIC,
@@ -303,7 +306,7 @@ class KotlinxSerializationTypeProcessingStep(
                 qualifiedName = descriptor.qualifiedName(),
                 subtypes = descriptor.elementDescriptors
                     .toList()[1].elementDescriptors
-                    .map { parse(it, typeData, processed).id }
+                    .map { parse(it, false, typeData, processed).id }
                     .toMutableList(),
                 annotations = parseAnnotations(descriptor)
             ).also { result ->
@@ -345,11 +348,11 @@ class KotlinxSerializationTypeProcessingStep(
 
     // ====== ANNOTATION ===============================================
 
-    private fun parseAnnotations(descriptor: SerialDescriptor): MutableList<AnnotationData>{
+    private fun parseAnnotations(descriptor: SerialDescriptor): MutableList<AnnotationData> {
         return parseAnnotations(descriptor.annotations)
     }
 
-    private fun parseAnnotations(annotations: List<Annotation>): MutableList<AnnotationData>{
+    private fun parseAnnotations(annotations: List<Annotation>): MutableList<AnnotationData> {
         return unwrapAnnotations(annotations).map { parseAnnotation(it) }.toMutableList()
     }
 
@@ -398,10 +401,10 @@ class KotlinxSerializationTypeProcessingStep(
     // ====== UTILITIES ================================================
 
     private fun getUniqueId(descriptor: SerialDescriptor, typeParameters: List<TypeId>, typeData: MutableList<BaseTypeData>): TypeId {
-        if(knownNotParameterized.contains(descriptor.cleanSerialName())) {
+        if (knownNotParameterized.contains(descriptor.cleanSerialName())) {
             return TypeId.build(descriptor.cleanSerialName(), typeParameters)
         }
-        if(typeData.find(descriptor, typeParameters) != null) {
+        if (typeData.find(descriptor, typeParameters) != null) {
             return TypeId.build(descriptor.cleanSerialName(), typeParameters, true)
         }
         return TypeId.build(descriptor.cleanSerialName(), typeParameters)
@@ -418,6 +421,7 @@ class KotlinxSerializationTypeProcessingStep(
 
     private fun SerialDescriptor.cleanSerialName() = this.serialName.replace("?", "")
 
+    private fun SerialDescriptor.redirectKey(nullable: Boolean) = cleanSerialName() + if(nullable || this.isNullable) "?" else ""
 
     @OptIn(ExperimentalSerializationApi::class)
     fun SerialDescriptor.qualifiedName() = this.serialName.replace("?", "")

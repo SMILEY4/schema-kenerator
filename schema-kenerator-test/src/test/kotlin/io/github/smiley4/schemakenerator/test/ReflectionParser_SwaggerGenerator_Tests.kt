@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessi
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
@@ -16,6 +16,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
@@ -69,7 +70,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
@@ -118,12 +119,12 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileReferenceStep().compile(it) }
+                .let { SwaggerSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
                 .let {
                     Result(
                         schema = it.swagger,
@@ -167,12 +168,12 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { SwaggerSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileReferenceRootStep().compile(it) }
+                .let { SwaggerSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
                 .let {
                     Result(
                         schema = it.swagger,

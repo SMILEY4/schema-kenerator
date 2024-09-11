@@ -1,17 +1,17 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.getRefPath
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.shouldReference
 
 /**
  * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
- * @param pathType how to reference the type, i.e. which name to use
+ * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
  */
-class SwaggerSchemaCompileReferenceRootStep(private val pathType: RefType = RefType.FULL) {
+class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -20,9 +20,9 @@ class SwaggerSchemaCompileReferenceRootStep(private val pathType: RefType = RefT
      * Put referenced schemas into definitions and reference them
      */
     fun compile(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-        val result = SwaggerSchemaCompileReferenceStep(pathType).compile(bundle)
+        val result = SwaggerSchemaCompileReferenceStep(pathBuilder).compile(bundle)
         if (shouldReference(result.swagger)) {
-            val refPath = getRefPath(pathType, result.typeData, bundle.buildTypeDataMap())
+            val refPath = pathBuilder(result.typeData, bundle.buildTypeDataMap())
             return CompiledSwaggerSchema(
                 typeData = result.typeData,
                 swagger = schemaUtils.referenceSchema(refPath, true),

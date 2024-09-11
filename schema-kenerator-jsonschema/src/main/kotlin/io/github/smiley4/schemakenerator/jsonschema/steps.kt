@@ -3,13 +3,13 @@ package io.github.smiley4.schemakenerator.jsonschema
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
@@ -21,6 +21,8 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 
 enum class OptionalHandling {
     REQUIRED,
@@ -54,10 +56,32 @@ fun Bundle<BaseTypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationSte
 
 
 /**
- * See [JsonSchemaAutoTitleStep]
+ * See [JsonSchemaTitleStep]
  */
+@Deprecated("Was renamed", ReplaceWith("withTitle"))
 fun Bundle<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
-    return JsonSchemaAutoTitleStep(type).process(this)
+    return withTitle(type)
+}
+
+
+/**
+ * See [JsonSchemaTitleStep]
+ */
+fun Bundle<JsonSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
+    return withTitle(
+        when (type) {
+            TitleType.FULL -> TitleBuilder.BUILDER_FULL
+            TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+        }
+    )
+}
+
+
+/**
+ * See [JsonSchemaTitleStep]
+ */
+fun Bundle<JsonSchema>.withTitle(builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): Bundle<JsonSchema> {
+    return JsonSchemaTitleStep(builder).process(this)
 }
 
 
@@ -97,7 +121,20 @@ fun Bundle<JsonSchema>.compileInlining(): CompiledJsonSchema {
  * See [JsonSchemaCompileReferenceStep]
  */
 fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchema {
-    return JsonSchemaCompileReferenceStep(pathType).compile(this)
+    return compileReferencing(
+        when (pathType) {
+            RefType.FULL -> TitleBuilder.BUILDER_FULL
+            RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+        }
+    )
+}
+
+
+/**
+ * See [JsonSchemaCompileReferenceStep]
+ */
+fun Bundle<JsonSchema>.compileReferencing(builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): CompiledJsonSchema {
+    return JsonSchemaCompileReferenceStep(builder).compile(this)
 }
 
 
@@ -105,7 +142,22 @@ fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): Com
  * See [JsonSchemaCompileReferenceRootStep]
  */
 fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchema {
-    return JsonSchemaCompileReferenceRootStep(pathType).compile(this)
+    return compileReferencingRoot(
+        when (pathType) {
+            RefType.FULL -> TitleBuilder.BUILDER_FULL
+            RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+        }
+    )
+}
+
+
+/**
+ * See [JsonSchemaCompileReferenceRootStep]
+ */
+fun Bundle<JsonSchema>.compileReferencingRoot(
+    builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String
+): CompiledJsonSchema {
+    return JsonSchemaCompileReferenceRootStep(builder).compile(this)
 }
 
 
