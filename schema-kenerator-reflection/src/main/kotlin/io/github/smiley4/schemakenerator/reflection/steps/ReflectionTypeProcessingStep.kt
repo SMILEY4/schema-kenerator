@@ -220,6 +220,7 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
+                nullable = type.isMarkedNullable,
             )
             TypeCategory.OBJECT -> ObjectTypeData(
                 id = id,
@@ -230,7 +231,8 @@ class ReflectionTypeProcessingStep(
                 supertypes = supertypes.toMutableList(),
                 members = members.toMutableList(),
                 annotations = annotations.toMutableList(),
-                isInlineValue = clazz.isValue
+                nullable = type.isMarkedNullable,
+                isInlineValue = clazz.isValue,
             )
             TypeCategory.ENUM -> EnumTypeData(
                 id = id,
@@ -238,7 +240,8 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 enumConstants = enumValues.toMutableList(),
-                annotations = annotations.toMutableList()
+                annotations = annotations.toMutableList(),
+                nullable = type.isMarkedNullable,
             )
             TypeCategory.COLLECTION -> CollectionTypeData(
                 id = id,
@@ -246,6 +249,7 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
+                nullable = type.isMarkedNullable,
                 itemType = resolvedTypeParameters["E"]?.let {
                     PropertyData(
                         name = "item",
@@ -286,6 +290,7 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
+                nullable = type.isMarkedNullable,
                 keyType = resolvedTypeParameters["K"]?.let {
                     PropertyData(
                         name = "key",
@@ -448,10 +453,11 @@ class ReflectionTypeProcessingStep(
             }
             ctorParameter?.isOptional ?: false
         }
+        val type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData)
         return PropertyData(
             name = member.name,
-            type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
-            nullable = member.returnType.isMarkedNullable,
+            type = type.id,
+            nullable = member.returnType.isMarkedNullable || type.nullable,
             optional = isOptional,
             annotations = parseAnnotations(member).toMutableList(),
             kind = PropertyType.PROPERTY,
