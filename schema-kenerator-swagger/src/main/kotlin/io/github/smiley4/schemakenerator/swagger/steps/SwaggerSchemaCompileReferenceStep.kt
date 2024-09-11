@@ -5,9 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.getRefPath
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.shouldReference
@@ -15,9 +13,9 @@ import io.swagger.v3.oas.models.media.Schema
 
 /**
  * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
- * @param pathType how to reference the type, i.e. which name to use
+ * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
  */
-class SwaggerSchemaCompileReferenceStep(private val pathType: RefType = RefType.FULL) {
+class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -51,10 +49,10 @@ class SwaggerSchemaCompileReferenceStep(private val pathType: RefType = RefType.
         val referencedSchema = schemaList.find(referencedId)
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
-                val refPath = getRefPath(pathType, referencedSchema.typeData, typeDataMap)
-                if(!components.containsKey(refPath)) {
+                val refPath = pathBuilder(referencedSchema.typeData, typeDataMap)
+                if (!components.containsKey(refPath)) {
                     components[refPath] = placeholder() // break out of infinite loops
-                    components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components)}
+                    components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components) }
                 }
                 schemaUtils.referenceSchema(refPath, true)
             } else {

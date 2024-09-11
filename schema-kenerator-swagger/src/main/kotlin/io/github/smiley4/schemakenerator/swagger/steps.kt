@@ -3,6 +3,7 @@ package io.github.smiley4.schemakenerator.swagger
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
@@ -10,7 +11,6 @@ import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAutoTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
@@ -22,6 +22,8 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.swagger.v3.oas.models.media.Schema
 
 enum class OptionalHandling {
@@ -54,12 +56,30 @@ fun Bundle<BaseTypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerat
     ).generate(this)
 }
 
+/**
+ * See [SwaggerSchemaTitleStep]
+ */
+@Deprecated("Was renamed", ReplaceWith("withTitle"))
+fun Bundle<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<SwaggerSchema> {
+    return this.withTitle(type)
+}
 
 /**
- * See [SwaggerSchemaAutoTitleStep]
+ * See [SwaggerSchemaTitleStep]
  */
-fun Bundle<SwaggerSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<SwaggerSchema> {
-    return SwaggerSchemaAutoTitleStep(type).process(this)
+fun Bundle<SwaggerSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<SwaggerSchema> {
+    val builder = when(type) {
+        TitleType.FULL -> TitleBuilder.BUILDER_FULL
+        TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+    }
+    return SwaggerSchemaTitleStep(builder).process(this)
+}
+
+/**
+ * See [SwaggerSchemaTitleStep]
+ */
+fun Bundle<SwaggerSchema>.withTitle(titleBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): Bundle<SwaggerSchema> {
+    return SwaggerSchemaTitleStep(titleBuilder).process(this)
 }
 
 
@@ -108,7 +128,18 @@ fun Bundle<SwaggerSchema>.compileInlining(): CompiledSwaggerSchema {
  * See [SwaggerSchemaCompileReferenceStep]
  */
 fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileReferenceStep(pathType).compile(this)
+    val builder = when(pathType) {
+        RefType.FULL -> TitleBuilder.BUILDER_FULL
+        RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+    }
+    return SwaggerSchemaCompileReferenceStep(builder).compile(this)
+}
+
+/**
+ * See [SwaggerSchemaCompileReferenceStep]
+ */
+fun Bundle<SwaggerSchema>.compileReferencing(pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): CompiledSwaggerSchema {
+    return SwaggerSchemaCompileReferenceStep(pathBuilder).compile(this)
 }
 
 
@@ -116,7 +147,18 @@ fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.FULL): 
  * See [SwaggerSchemaCompileReferenceRootStep]
  */
 fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileReferenceRootStep(pathType).compile(this)
+    val builder = when(pathType) {
+        RefType.FULL -> TitleBuilder.BUILDER_FULL
+        RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+    }
+    return SwaggerSchemaCompileReferenceRootStep(builder).compile(this)
+}
+
+/**
+ * See [SwaggerSchemaCompileReferenceRootStep]
+ */
+fun Bundle<SwaggerSchema>.compileReferencingRoot(pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): CompiledSwaggerSchema {
+    return SwaggerSchemaCompileReferenceRootStep(pathBuilder).compile(this)
 }
 
 
