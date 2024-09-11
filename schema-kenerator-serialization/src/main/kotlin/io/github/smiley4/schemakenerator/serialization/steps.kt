@@ -96,7 +96,10 @@ class KotlinxSerializationTypeProcessingConfig {
      */
     fun redirect(from: KType, to: KType) {
         val clazz = from.classifier!! as KClass<*>
-        typeRedirects[clazz.qualifiedName ?: clazz.java.name] = to
+        val idFrom = (clazz.qualifiedName ?: clazz.java.name).let {
+            it + if(from.isMarkedNullable) "?" else ""
+        }
+        typeRedirects[idFrom] = to
     }
 
     /**

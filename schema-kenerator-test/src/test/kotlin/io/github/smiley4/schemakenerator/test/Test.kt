@@ -7,17 +7,15 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Example
-import io.github.smiley4.schemakenerator.core.annotations.Name
-import io.github.smiley4.schemakenerator.core.handleNameAnnotation
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.swagger.withAutoTitle
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -27,6 +25,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.time.Instant
+import java.util.Optional
 import kotlin.reflect.typeOf
 
 /**
@@ -57,6 +56,20 @@ class Test : StringSpec({
         println(swagger)
     }
 
+    "redirect to nullable" {
+        val result = typeOf<TestType>()
+            .processKotlinxSerialization {
+                redirect<String, String?>()
+                redirect<String, Int?>()
+            }
+            .generateJsonSchema()
+            .compileInlining()
+            .json
+            .prettyPrint()
+
+        println(result)
+    }
+
 }) {
     companion object {
 
@@ -75,8 +88,15 @@ class Test : StringSpec({
         @Serializable
         data class Response(
             val something: Int,
-            val permission: Permission
+            val permission: Permission,
         )
+
+        @Serializable
+        data class TestType(
+            val name: String,
+            val size: Int
+        )
+
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
