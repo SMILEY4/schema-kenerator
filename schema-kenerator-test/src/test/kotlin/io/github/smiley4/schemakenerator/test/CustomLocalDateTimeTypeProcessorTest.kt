@@ -8,7 +8,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
@@ -38,7 +38,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { ReflectionTypeProcessingStep().process(it) }
             .let { JsonSchemaGenerationStep().generate(it) }
             .let { JsonSchemaAnnotationTypeHintStep().process(it) }
-            .let { JsonSchemaAutoTitleStep(TitleType.FULL).process(it) }
+            .let { JsonSchemaTitleStep(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL).process(it) }
             .let { JsonSchemaCompileInlineStep().compile(it) }
 
         result.json.prettyPrint().shouldEqualJson {
@@ -93,7 +93,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             }
             .let { JsonSchemaGenerationStep().generate(it) }
             .let { JsonSchemaAnnotationTypeHintStep().process(it) }
-            .let { JsonSchemaAutoTitleStep(TitleType.FULL).process(it) }
+            .let { JsonSchemaTitleStep(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL).process(it) }
             .let { JsonSchemaCompileInlineStep().compile(it) }
 
         result.json.prettyPrint().shouldEqualJson {

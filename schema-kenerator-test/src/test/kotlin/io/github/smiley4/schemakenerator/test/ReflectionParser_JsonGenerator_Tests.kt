@@ -5,7 +5,7 @@ import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
@@ -15,6 +15,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
@@ -68,7 +69,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
@@ -112,12 +113,12 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceStep().compile(it) }
+                .let { JsonSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -165,12 +166,12 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceRootStep().compile(it) }
+                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
