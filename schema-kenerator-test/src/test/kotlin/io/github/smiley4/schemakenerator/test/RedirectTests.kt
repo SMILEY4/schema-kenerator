@@ -160,7 +160,6 @@ class RedirectTests : FreeSpec({
             val data: NestedClass
         )
 
-
         @Serializable
         class NestedClass(
             val someText: String,
