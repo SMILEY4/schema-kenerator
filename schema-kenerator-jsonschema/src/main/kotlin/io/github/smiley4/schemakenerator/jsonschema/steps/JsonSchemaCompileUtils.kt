@@ -1,8 +1,5 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -76,25 +73,6 @@ object JsonSchemaCompileUtils {
             return node.properties[key] != null
         }
         return false
-    }
-
-
-    fun getRefPath(pathType: RefType, typeData: BaseTypeData, typeDataMap: Map<TypeId, BaseTypeData>): String {
-        return when (pathType) {
-            RefType.FULL -> typeData.qualifiedName
-            RefType.SIMPLE -> typeData.simpleName
-        }.let {
-            if (typeData.typeParameters.isNotEmpty()) {
-                val paramString = typeData.typeParameters
-                    .map { (_, param) -> getRefPath(pathType, typeDataMap[param.type]!!, typeDataMap) }
-                    .joinToString(",")
-                "$it<$paramString>"
-            } else {
-                it
-            }
-        }.let {
-            it + (typeData.id.additionalId?.let { a -> "#$a" } ?: "")
-        }
     }
 
 }

@@ -1,8 +1,5 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.swagger.v3.oas.models.media.Schema
 
 object SwaggerSchemaCompileUtils {
@@ -15,28 +12,6 @@ object SwaggerSchemaCompileUtils {
                 || schema.enum != null
                 || schema.anyOf != null
 
-    }
-
-
-    /**
-     * Create a name or path as key into the schema components for the given type
-     */
-    fun getRefPath(pathType: RefType, typeData: BaseTypeData, typeDataMap: Map<TypeId, BaseTypeData>): String {
-        return when (pathType) {
-            RefType.FULL -> typeData.qualifiedName
-            RefType.SIMPLE -> typeData.simpleName
-        }.let {
-            if (typeData.typeParameters.isNotEmpty()) {
-                val paramString = typeData.typeParameters
-                    .map { (_, param) -> getRefPath(pathType, typeDataMap[param.type]!!, typeDataMap) }
-                    .joinToString(",")
-                "$it<$paramString>"
-            } else {
-                it
-            }
-        }.let {
-            it + (typeData.id.additionalId?.let { a -> "#$a" } ?: "")
-        }
     }
 
     private const val MAX_RESOLVE_REFS_DEPTH = 64;
@@ -52,7 +27,7 @@ object SwaggerSchemaCompileUtils {
         }
         if (node.`$ref` != null) {
             val resolved = resolver(node)
-            return if(resolved == node) {
+            return if (resolved == node) {
                 resolved
             } else {
                 resolveReferences(resolved, depth + 1, resolver)

@@ -1,16 +1,16 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAutoTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
@@ -52,7 +52,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
@@ -96,12 +96,12 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceStep().compile(it) }
+                .let { JsonSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -157,12 +157,12 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAutoTitle) {
                         list
-                            .let { JsonSchemaAutoTitleStep(TitleType.SIMPLE).process(it) }
+                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceRootStep().compile(it) }
+                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
