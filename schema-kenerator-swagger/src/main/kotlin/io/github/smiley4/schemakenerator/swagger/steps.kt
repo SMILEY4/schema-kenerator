@@ -75,7 +75,7 @@ fun Bundle<SwaggerSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<Sw
             TitleType.FULL -> TitleBuilder.BUILDER_FULL
             TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
             TitleType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
-            TitleType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_FULL
+            TitleType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
         }
     )
 }
