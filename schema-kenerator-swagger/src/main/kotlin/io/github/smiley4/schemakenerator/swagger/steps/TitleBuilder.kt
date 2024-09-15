@@ -28,7 +28,7 @@ object TitleBuilder {
      * Example: MyType_MyParam1-MyParam2
      */
     val BUILDER_OPENAPI_SIMPLE: (schema: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String =
-        { type, types -> buildOpenApiFull(type, types) }
+        { type, types -> buildOpenApiSimple(type, types) }
 
 
     /**
@@ -36,7 +36,7 @@ object TitleBuilder {
      * Example: my.path.MyType_my.path.MyParam1-my.path.MyParam2
      */
     val BUILDER_OPENAPI_FULL: (schema: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String =
-        { type, types -> buildOpenApiSimple(type, types) }
+        { type, types -> buildOpenApiFull(type, types) }
 
     private fun buildSimple(type: BaseTypeData, types: Map<TypeId, BaseTypeData>): String {
         return type.simpleName
