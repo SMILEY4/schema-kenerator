@@ -246,7 +246,6 @@ class ReflectionTypeProcessingStep(
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 enumConstants = enumValues.toMutableList(),
                 annotations = annotations.toMutableList(),
-                nullable = type.isMarkedNullable,
             )
             TypeCategory.COLLECTION -> CollectionTypeData(
                 id = id,

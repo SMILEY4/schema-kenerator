@@ -24,7 +24,7 @@ class JsonSchemaCoreAnnotationOptionalAndRequiredStep {
     }
 
     private fun process(schema: JsonSchema) {
-        iterateProperties(schema) { prop, data ->
+        iterateProperties(schema) { _, data ->
             determineRequired(data)?.also { required ->
                 if (required) {
                     addRequired(schema, data.name)

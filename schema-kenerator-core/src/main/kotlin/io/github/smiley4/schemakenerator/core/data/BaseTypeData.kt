@@ -123,7 +123,6 @@ class EnumTypeData(
     supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
-    nullable: Boolean = false,
     /**
      * the possible values of the enum
      */

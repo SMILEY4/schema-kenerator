@@ -90,10 +90,7 @@ class KotlinxSerializationTypeProcessingStep(
 
         // break out of infinite loops
         if (processed.containsKey(descriptor)) {
-            return WrappedTypeData(
-                typeData = processed[descriptor]!!,
-                nullable = nullable
-            )
+            return WrappedTypeData(typeData = processed[descriptor]!!, nullable = nullable)
         }
         processed[descriptor] = PlaceholderTypeData(TypeId.wildcard())
 
@@ -111,14 +108,8 @@ class KotlinxSerializationTypeProcessingStep(
                     typeData.removeIf { it.id == result.id }
                     typeData.add(result)
                 }
-                .also {
-                    processed[descriptor] = it
-                }.let {
-                    WrappedTypeData(
-                        typeData = it,
-                        nullable = false
-                    )
-                }
+                .also { processed[descriptor] = it }
+                .let { WrappedTypeData(typeData = it, nullable = false) }
         }
 
         // process
@@ -147,19 +138,14 @@ class KotlinxSerializationTypeProcessingStep(
                 SerialKind.ENUM -> parseEnum(descriptor, typeData)
                 SerialKind.CONTEXTUAL -> parseClass(descriptor, typeData, processed)
             }
-        }.let {
-            WrappedTypeData(
-                typeData = it,
-                nullable = nullable || descriptor.isNullable
-            )
-        }.also {
-            processed[descriptor] = it.typeData
         }
+            .let { WrappedTypeData(typeData = it, nullable = nullable || descriptor.isNullable) }
+            .also { processed[descriptor] = it.typeData }
     }
 
     private fun parseWildcard(typeData: MutableList<BaseTypeData>): WrappedTypeData {
         val wildcard = WildcardTypeData()
-        val type =  typeData.find(wildcard.id) ?: wildcard.also { typeData.add(it) }
+        val type = typeData.find(wildcard.id) ?: wildcard.also { typeData.add(it) }
         return WrappedTypeData(
             typeData = type,
             nullable = false
@@ -437,7 +423,8 @@ class KotlinxSerializationTypeProcessingStep(
 
     private fun SerialDescriptor.cleanSerialName() = this.serialName.replace("?", "")
 
-    private fun SerialDescriptor.redirectKey(nullable: Boolean) = cleanSerialName() + if(nullable || this.isNullable) "?" else ""
+    private fun SerialDescriptor.redirectKey(nullable: Boolean) = cleanSerialName() + if (nullable || this.isNullable) "?" else ""
+
 
     @OptIn(ExperimentalSerializationApi::class)
     fun SerialDescriptor.qualifiedName() = this.serialName.replace("?", "")
