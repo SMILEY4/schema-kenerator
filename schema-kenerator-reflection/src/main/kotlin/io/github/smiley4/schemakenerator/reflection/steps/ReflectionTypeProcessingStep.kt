@@ -15,6 +15,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
@@ -119,16 +120,16 @@ class ReflectionTypeProcessingStep(
         type.supporting.forEach { process(it, supportingTypeData) }
 
         val typeData = process(type.data, supportingTypeData)
-        supportingTypeData.remove(typeData)
+        supportingTypeData.remove(typeData.typeData)
 
         return Bundle(
-            data = typeData,
+            data = typeData.typeData,
             supporting = supportingTypeData
         )
     }
 
 
-    private fun process(type: KType, typeData: MutableList<BaseTypeData>): BaseTypeData {
+    private fun process(type: KType, typeData: MutableList<BaseTypeData>): WrappedTypeData {
         return if (typeRedirects.containsKey(type)) {
             process(typeRedirects[type]!!, typeData)
         } else if (type.classifier is KClass<*>) {
@@ -146,7 +147,7 @@ class ReflectionTypeProcessingStep(
         clazz: KClass<*>,
         typeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
-    ): BaseTypeData {
+    ): WrappedTypeData {
 
         // check type redirects
         if (typeRedirects.containsKey(type)) {
@@ -155,10 +156,13 @@ class ReflectionTypeProcessingStep(
 
         // check custom type processors
         if (customProcessors.containsKey(clazz)) {
-            return customProcessors[clazz]!!.invoke().also { result ->
-                typeData.removeIf { it.id == result.id }
-                typeData.add(result)
-            }
+            return WrappedTypeData(
+                typeData = customProcessors[clazz]!!.invoke().also { result ->
+                    typeData.removeIf { it.id == result.id }
+                    typeData.add(result)
+                },
+                nullable = false
+            )
         }
 
         // resolve type parameters, i.e. generic types
@@ -170,7 +174,10 @@ class ReflectionTypeProcessingStep(
         // check if type already parsed
         val existing = typeData.find { it.id == id }
         if (existing != null) {
-            return existing
+            return WrappedTypeData(
+                typeData = existing,
+                nullable = type.isMarkedNullable,
+            )
         }
 
         // add placeholder to break out of some infinite recursions
@@ -188,7 +195,7 @@ class ReflectionTypeProcessingStep(
 
         // collect subtypes
         val subtypes = if (classType == TypeCategory.OBJECT) {
-            clazz.sealedSubclasses.map { parseClass(it.starProjectedType, it, typeParameters, typeData).id }
+            clazz.sealedSubclasses.map { parseClass(it.starProjectedType, it, typeParameters, typeData).typeData.id }
         } else {
             emptyList()
         }
@@ -220,7 +227,6 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
-                nullable = type.isMarkedNullable,
             )
             TypeCategory.OBJECT -> ObjectTypeData(
                 id = id,
@@ -231,7 +237,6 @@ class ReflectionTypeProcessingStep(
                 supertypes = supertypes.toMutableList(),
                 members = members.toMutableList(),
                 annotations = annotations.toMutableList(),
-                nullable = type.isMarkedNullable,
                 isInlineValue = clazz.isValue,
             )
             TypeCategory.ENUM -> EnumTypeData(
@@ -249,7 +254,6 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
-                nullable = type.isMarkedNullable,
                 itemType = resolvedTypeParameters["E"]?.let {
                     PropertyData(
                         name = "item",
@@ -290,7 +294,6 @@ class ReflectionTypeProcessingStep(
                 qualifiedName = clazz.getSafeQualifiedName(),
                 typeParameters = resolvedTypeParameters.toMutableMap(),
                 annotations = annotations.toMutableList(),
-                nullable = type.isMarkedNullable,
                 keyType = resolvedTypeParameters["K"]?.let {
                     PropertyData(
                         name = "key",
@@ -317,6 +320,11 @@ class ReflectionTypeProcessingStep(
         }.also { result ->
             typeData.removeIf { it.id == result.id }
             typeData.add(result)
+        }.let {
+            WrappedTypeData(
+                typeData = it,
+                nullable = type.isMarkedNullable,
+            )
         }
     }
 
@@ -333,10 +341,11 @@ class ReflectionTypeProcessingStep(
             for (index in type.arguments.indices) {
                 val name = if (namesProvided) clazz.typeParameters[index].name else "T"
                 val argType = type.arguments[index]
+                val resolvedType = resolveTypeProjection(argType, providedTypeParameters, typeData)
                 this[name] = TypeParameterData(
                     name = name,
-                    type = resolveTypeProjection(argType, providedTypeParameters, typeData).id,
-                    nullable = argType.type?.isMarkedNullable ?: false,
+                    type = resolvedType.typeData.id,
+                    nullable = (argType.type?.isMarkedNullable ?: false) || resolvedType.nullable,
                 )
             }
         }
@@ -346,7 +355,7 @@ class ReflectionTypeProcessingStep(
         typeProjection: KTypeProjection,
         providedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
-    ): BaseTypeData {
+    ): WrappedTypeData {
         if (typeProjection.type == null) {
             return resolveWildcard(typeData)
         }
@@ -355,8 +364,11 @@ class ReflectionTypeProcessingStep(
                 parseClass(typeProjection.type!!, classifier, providedTypeParameters, typeData)
             }
             is KTypeParameter -> {
-                typeData.find { it.id == providedTypeParameters[classifier.name]?.type }
-                    ?: throw IllegalArgumentException("No type parameter provided")
+                WrappedTypeData(
+                    typeData = typeData.find { it.id == providedTypeParameters[classifier.name]?.type }
+                        ?: throw IllegalArgumentException("No type parameter provided"),
+                    nullable = false
+                )
             }
             else -> {
                 throw IllegalArgumentException("Unhandled classifier type")
@@ -364,10 +376,13 @@ class ReflectionTypeProcessingStep(
         }
     }
 
-    private fun resolveWildcard(typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val type = WildcardTypeData()
-        return typeData.find { it.id == type.id }
-            ?: type.also { typeData.add(it) }
+    private fun resolveWildcard(typeData: MutableList<BaseTypeData>): WrappedTypeData {
+        val wildcard = WildcardTypeData()
+        val type = typeData.find { it.id == wildcard.id } ?: wildcard.also { typeData.add(it) }
+        return WrappedTypeData(
+            typeData = type,
+            nullable = false
+        )
     }
 
     // ====== PROPERTIES ===============================================
@@ -456,7 +471,7 @@ class ReflectionTypeProcessingStep(
         val type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData)
         return PropertyData(
             name = member.name,
-            type = type.id,
+            type = type.typeData.id,
             nullable = member.returnType.isMarkedNullable || type.nullable,
             optional = isOptional,
             annotations = parseAnnotations(member).toMutableList(),
@@ -470,10 +485,11 @@ class ReflectionTypeProcessingStep(
         resolvedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
     ): PropertyData {
+        val type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData)
         return PropertyData(
             name = member.name,
-            type = resolveMemberType(member.returnType, resolvedTypeParameters, typeData).id,
-            nullable = member.returnType.isMarkedNullable,
+            type = type.typeData.id,
+            nullable = member.returnType.isMarkedNullable || type.nullable,
             optional = false,
             annotations = parseAnnotations(member).toMutableList(),
             kind = determineFunctionPropertyType(member),
@@ -485,14 +501,17 @@ class ReflectionTypeProcessingStep(
         type: KType,
         providedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
-    ): BaseTypeData {
+    ): WrappedTypeData {
         return when (val classifier = type.classifier) {
             is KClass<*> -> {
                 parseClass(type, classifier, providedTypeParameters, typeData)
             }
             is KTypeParameter -> {
-                typeData.find { it.id == providedTypeParameters[classifier.name]?.type }
-                    ?: throw IllegalArgumentException("No type parameter provided")
+                WrappedTypeData(
+                    typeData = typeData.find { it.id == providedTypeParameters[classifier.name]?.type }
+                        ?: throw IllegalArgumentException("No type parameter provided"),
+                    nullable = false
+                )
             }
             else -> {
                 throw IllegalArgumentException("Unhandled classifier type")
@@ -509,14 +528,14 @@ class ReflectionTypeProcessingStep(
     ): List<BaseTypeData> {
         return clazz.supertypes
             .filter { it.classifier != Any::class }
-            .map { resolveSupertype(it, resolvedTypeParameters, typeData) }
+            .map { resolveSupertype(it, resolvedTypeParameters, typeData).typeData }
     }
 
     private fun resolveSupertype(
         type: KType,
         providedTypeParameters: Map<String, TypeParameterData>,
         typeData: MutableList<BaseTypeData>
-    ): BaseTypeData {
+    ): WrappedTypeData {
         return when (val classifier = type.classifier) {
             is KClass<*> -> {
                 parseClass(type, classifier, providedTypeParameters, typeData)

@@ -24,6 +24,17 @@ sealed class BaseTypeData(
      * list of annotations on this type
      */
     var annotations: MutableList<AnnotationData>,
+)
+
+
+/**
+ * [BaseTypeData] with additional information
+ */
+data class WrappedTypeData(
+    /**
+     * the actual type data
+     */
+    val typeData: BaseTypeData,
     /**
      * Whether the type can be null
      */
@@ -45,7 +56,6 @@ class PlaceholderTypeData(
     qualifiedName = id.full(),
     typeParameters = mutableMapOf(),
     annotations = mutableListOf(),
-    nullable = false
 )
 
 
@@ -58,7 +68,6 @@ class WildcardTypeData : BaseTypeData(
     qualifiedName = "*",
     typeParameters = mutableMapOf(),
     annotations = mutableListOf(),
-    nullable = false
 )
 
 
@@ -71,8 +80,7 @@ class PrimitiveTypeData(
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
-    nullable: Boolean = false
-) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations, nullable)
+) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
 /**
@@ -84,7 +92,6 @@ open class ObjectTypeData(
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
-    nullable: Boolean = false,
     /**
      * the list of subtypes, i.e. types that extend this type
      */
@@ -101,7 +108,7 @@ open class ObjectTypeData(
      * whether the type is an inline value class
      */
     var isInlineValue: Boolean = false
-) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations, nullable)
+) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
 
 
 /**
@@ -121,7 +128,7 @@ class EnumTypeData(
      * the possible values of the enum
      */
     var enumConstants: MutableList<String>,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, nullable, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 
 
 /**
@@ -136,7 +143,6 @@ class MapTypeData(
     supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
-    nullable: Boolean = false,
     /**
      * the type of the key
      */
@@ -145,7 +151,7 @@ class MapTypeData(
      * the type of the values
      */
     var valueType: PropertyData,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, nullable, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 
 
 /**
@@ -160,7 +166,6 @@ class CollectionTypeData(
     supertypes: MutableList<TypeId> = mutableListOf(),
     members: MutableList<PropertyData> = mutableListOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
-    nullable: Boolean = false,
     /**
      * the type of the items
      */
@@ -169,5 +174,5 @@ class CollectionTypeData(
      * whether the items in the collection are unique
      */
     val unique: Boolean
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, nullable, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
 
