@@ -17,6 +17,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.descriptors.PolymorphicKind
@@ -26,7 +27,6 @@ import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
-import kotlinx.serialization.descriptors.nullable
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -61,15 +61,15 @@ class KotlinxSerializationTypeProcessingStep(
         type.supporting.forEach { process(it, supportingTypeData) }
 
         val typeData = process(type.data, supportingTypeData)
-        supportingTypeData.remove(typeData)
+        supportingTypeData.remove(typeData.typeData)
 
         return Bundle(
-            data = typeData,
+            data = typeData.typeData,
             supporting = supportingTypeData
         )
     }
 
-    private fun process(type: KType, typeData: MutableList<BaseTypeData>): BaseTypeData {
+    private fun process(type: KType, typeData: MutableList<BaseTypeData>): WrappedTypeData {
         if (type.classifier is KClass<*>) {
             return (type.classifier as KClass<*>).serializerOrNull()
                 ?.let { parse(it.descriptor, type.isMarkedNullable, typeData, mutableMapOf()) }
@@ -86,18 +86,18 @@ class KotlinxSerializationTypeProcessingStep(
         nullable: Boolean,
         typeData: MutableList<BaseTypeData>,
         processed: MutableMap<SerialDescriptor, BaseTypeData>
-    ): BaseTypeData {
+    ): WrappedTypeData {
 
         // break out of infinite loops
         if (processed.containsKey(descriptor)) {
-            return processed[descriptor]!!
+            return WrappedTypeData(typeData = processed[descriptor]!!, nullable = nullable)
         }
         processed[descriptor] = PlaceholderTypeData(TypeId.wildcard())
 
         // check redirects
         if (typeRedirects.containsKey(descriptor.redirectKey(nullable))) {
             return process(typeRedirects[descriptor.redirectKey(nullable)]!!, typeData).also {
-                processed[descriptor] = it
+                processed[descriptor] = it.typeData
             }
         }
 
@@ -108,9 +108,8 @@ class KotlinxSerializationTypeProcessingStep(
                     typeData.removeIf { it.id == result.id }
                     typeData.add(result)
                 }
-                .also {
-                    processed[descriptor] = it
-                }
+                .also { processed[descriptor] = it }
+                .let { WrappedTypeData(typeData = it, nullable = false) }
         }
 
         // process
@@ -139,15 +138,18 @@ class KotlinxSerializationTypeProcessingStep(
                 SerialKind.ENUM -> parseEnum(descriptor, typeData)
                 SerialKind.CONTEXTUAL -> parseClass(descriptor, typeData, processed)
             }
-        }.also {
-            it.nullable = nullable || descriptor.isNullable
-            processed[descriptor] = it
         }
+            .let { WrappedTypeData(typeData = it, nullable = nullable || descriptor.isNullable) }
+            .also { processed[descriptor] = it.typeData }
     }
 
-    private fun parseWildcard(typeData: MutableList<BaseTypeData>): BaseTypeData {
-        val type = WildcardTypeData()
-        return typeData.find(type.id) ?: type.also { typeData.add(it) }
+    private fun parseWildcard(typeData: MutableList<BaseTypeData>): WrappedTypeData {
+        val wildcard = WildcardTypeData()
+        val type = typeData.find(wildcard.id) ?: wildcard.also { typeData.add(it) }
+        return WrappedTypeData(
+            typeData = type,
+            nullable = false
+        )
     }
 
     private fun parsePrimitive(descriptor: SerialDescriptor, typeData: MutableList<BaseTypeData>): BaseTypeData {
@@ -172,7 +174,7 @@ class KotlinxSerializationTypeProcessingStep(
         val itemDescriptor = descriptor.getElementDescriptor(0)
         val itemName = descriptor.getElementName(0)
         val itemType = parse(itemDescriptor, false, typeData, processed)
-        val id = TypeId.build(descriptor.cleanSerialName(), listOf(itemType.id))
+        val id = TypeId.build(descriptor.cleanSerialName(), listOf(itemType.typeData.id))
         return typeData.find(id)
             ?: CollectionTypeData(
                 id = id,
@@ -181,14 +183,14 @@ class KotlinxSerializationTypeProcessingStep(
                 typeParameters = mutableMapOf(
                     itemName to TypeParameterData(
                         name = itemName,
-                        type = itemType.id,
-                        nullable = itemDescriptor.isNullable,
+                        type = itemType.typeData.id,
+                        nullable = itemDescriptor.isNullable || itemType.nullable,
                     )
                 ),
                 itemType = PropertyData(
                     name = "item",
-                    type = itemType.id,
-                    nullable = itemDescriptor.isNullable,
+                    type = itemType.typeData.id,
+                    nullable = itemDescriptor.isNullable || itemType.nullable,
                     optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
@@ -214,7 +216,7 @@ class KotlinxSerializationTypeProcessingStep(
         val valueName = descriptor.getElementName(1)
         val valueType = parse(valueDescriptor, false, typeData, processed)
 
-        val id = TypeId.build(descriptor.cleanSerialName(), listOf(keyType.id, valueType.id))
+        val id = TypeId.build(descriptor.cleanSerialName(), listOf(keyType.typeData.id, valueType.typeData.id))
         return typeData.find(id)
             ?: MapTypeData(
                 id = id,
@@ -223,19 +225,19 @@ class KotlinxSerializationTypeProcessingStep(
                 typeParameters = mutableMapOf(
                     keyName to TypeParameterData(
                         name = keyName,
-                        type = keyType.id,
-                        nullable = keyDescriptor.isNullable,
+                        type = keyType.typeData.id,
+                        nullable = keyDescriptor.isNullable || keyType.nullable,
                     ),
                     valueName to TypeParameterData(
                         name = valueName,
-                        type = valueType.id,
-                        nullable = valueDescriptor.isNullable,
+                        type = valueType.typeData.id,
+                        nullable = valueDescriptor.isNullable || valueType.nullable,
                     )
                 ),
                 keyType = PropertyData(
                     name = "key",
-                    type = keyType.id,
-                    nullable = keyDescriptor.isNullable,
+                    type = keyType.typeData.id,
+                    nullable = keyDescriptor.isNullable || keyType.nullable,
                     optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
@@ -243,8 +245,8 @@ class KotlinxSerializationTypeProcessingStep(
                     ),
                 valueType = PropertyData(
                     name = "value",
-                    type = valueType.id,
-                    nullable = valueDescriptor.isNullable,
+                    type = valueType.typeData.id,
+                    nullable = valueDescriptor.isNullable || valueType.nullable,
                     optional = false,
                     kind = PropertyType.PROPERTY,
                     visibility = Visibility.PUBLIC,
@@ -275,7 +277,7 @@ class KotlinxSerializationTypeProcessingStep(
                         add(
                             PropertyData(
                                 name = fieldName,
-                                type = fieldType.id,
+                                type = fieldType.typeData.id,
                                 nullable = fieldDescriptor.isNullable || fieldType.nullable,
                                 optional = descriptor.isElementOptional(i),
                                 kind = PropertyType.PROPERTY,
@@ -306,7 +308,7 @@ class KotlinxSerializationTypeProcessingStep(
                 qualifiedName = descriptor.qualifiedName(),
                 subtypes = descriptor.elementDescriptors
                     .toList()[1].elementDescriptors
-                    .map { parse(it, false, typeData, processed).id }
+                    .map { parse(it, false, typeData, processed).typeData.id }
                     .toMutableList(),
                 annotations = parseAnnotations(descriptor)
             ).also { result ->
@@ -421,7 +423,8 @@ class KotlinxSerializationTypeProcessingStep(
 
     private fun SerialDescriptor.cleanSerialName() = this.serialName.replace("?", "")
 
-    private fun SerialDescriptor.redirectKey(nullable: Boolean) = cleanSerialName() + if(nullable || this.isNullable) "?" else ""
+    private fun SerialDescriptor.redirectKey(nullable: Boolean) = cleanSerialName() + if (nullable || this.isNullable) "?" else ""
+
 
     @OptIn(ExperimentalSerializationApi::class)
     fun SerialDescriptor.qualifiedName() = this.serialName.replace("?", "")
