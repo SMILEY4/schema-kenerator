@@ -36,7 +36,7 @@ object SwaggerSchemaAnnotationUtils {
             }
             keysToRemove.forEach {
                 schema.swagger.properties.remove(it)
-                schema.swagger.required.remove(it)
+                schema.swagger.required?.remove(it)
             }
         }
     }
