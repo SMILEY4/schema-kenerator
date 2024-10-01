@@ -13,7 +13,6 @@ import io.kotest.assertions.json.NumberFormat
 import io.kotest.assertions.json.PropertyOrder
 import io.kotest.assertions.json.TypeCoercion
 import io.kotest.assertions.json.shouldEqualJson
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -90,6 +89,16 @@ class SwaggerAnnotationsTest : StringSpec({
         }
     }
 
+    "hidden fields with no required fields" {
+        shouldNotThrowAny {
+            typeOf<AllOptionalFields>()
+                .processReflection()
+                .generateSwaggerSchema()
+                .handleSchemaAnnotations()
+                .compileInlining()
+        }
+    }
+
 }) {
 
     companion object {
@@ -137,6 +146,15 @@ class SwaggerAnnotationsTest : StringSpec({
     private class PartiallySpecified(
         @field:Schema(description = "Mysterious thing")
         val x: String,
+    )
+
+    private class AllOptionalFields(
+        @field:Schema(description = "The first field")
+        val firstField: String?,
+        @field:Schema(hidden = true)
+        val secondField: Int?,
+        @field:Schema(hidden = true)
+        val thirdField: Boolean?
     )
 
 }
