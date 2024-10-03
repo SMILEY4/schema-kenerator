@@ -176,11 +176,11 @@ class MiscTests : FreeSpec({
                   "type": "object",
                   "properties": {
                     "prop1": {
-                      "type": "string",
+                      "types": ["string", "null"],
                       "exampleSetFlag": false
                     },
                     "prop2": {
-                      "type": "string",
+                      "types": ["string", "null"],
                       "exampleSetFlag": false
                     }
                   },

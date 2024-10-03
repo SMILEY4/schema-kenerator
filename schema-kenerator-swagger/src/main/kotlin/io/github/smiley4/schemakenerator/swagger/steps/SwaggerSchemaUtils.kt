@@ -176,4 +176,13 @@ class SwaggerSchemaUtils {
         }
     }
 
+    fun referenceSchemaNullable(id: String, isInComponents: Boolean = false): Schema<*> {
+        return Schema<String>().also { schema ->
+            schema.oneOf = buildList {
+                add(nullSchema())
+                add(referenceSchema(id, isInComponents))
+            }
+        }
+    }
+
 }

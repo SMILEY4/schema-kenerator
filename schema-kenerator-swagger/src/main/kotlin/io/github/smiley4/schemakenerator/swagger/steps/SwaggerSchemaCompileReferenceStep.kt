@@ -54,9 +54,19 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
                     components[refPath] = placeholder() // break out of infinite loops
                     components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components) }
                 }
-                schemaUtils.referenceSchema(refPath, true)
+                if (refObj.nullable == true) {
+                    schemaUtils.referenceSchemaNullable(refPath, true)
+                } else {
+                    schemaUtils.referenceSchema(refPath, true)
+                }
             } else {
-                merge(refObj, referencedSchema.swagger)
+                merge(refObj, referencedSchema.swagger).also {
+                    if (it.nullable == true) {
+                        it.nullable = null
+                        it.types = setOf(it.type, "null")
+                        it.type = null
+                    }
+                }
             }
         } else {
             refObj
