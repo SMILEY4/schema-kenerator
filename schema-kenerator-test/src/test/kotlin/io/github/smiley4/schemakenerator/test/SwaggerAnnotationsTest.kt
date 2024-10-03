@@ -7,6 +7,8 @@ import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.handleSwaggerAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidationAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -17,6 +19,12 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
 
 class SwaggerAnnotationsTest : StringSpec({
@@ -30,12 +38,12 @@ class SwaggerAnnotationsTest : StringSpec({
             .compileInlining()
         jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()
             .writeValueAsString(result.swagger).shouldEqualJson {
-            propertyOrder = PropertyOrder.Lenient
-            arrayOrder = ArrayOrder.Lenient
-            fieldComparison = FieldComparison.Strict
-            numberFormat = NumberFormat.Lenient
-            typeCoercion = TypeCoercion.Disabled
-            """
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
                 {
                   "title": "My Test Class",
                   "required": [
@@ -76,7 +84,7 @@ class SwaggerAnnotationsTest : StringSpec({
                   "exampleSetFlag": false
                 }
             """.trimIndent()
-        }
+            }
     }
 
     "partially specified class" {
@@ -97,6 +105,122 @@ class SwaggerAnnotationsTest : StringSpec({
                 .handleSchemaAnnotations()
                 .compileInlining()
         }
+    }
+
+    "javax validations used to create schema" {
+        val result = typeOf<Validated>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "hasSize",
+                    "minMax",
+                    "mustNotBeBlank",
+                    "mustNotBeEmpty",
+                    "mustNotBeNull"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "hasSize": {
+                      "maxLength": 95,
+                      "minLength": 4,
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "minMax": {
+                      "maximum": 10,
+                      "minimum": 5,
+                      "type": "integer",
+                      "format": "int32",
+                      "exampleSetFlag": false
+                    },
+                    "mustNotBeBlank": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "mustNotBeEmpty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "mustNotBeNull": {
+                      "type": "object",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+    }
+
+    "jakarta validations used to create schema" {
+        val result = typeOf<JakartaValidated>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJakartaValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "hasSize",
+                    "minMax",
+                    "mustNotBeBlank",
+                    "mustNotBeEmpty",
+                    "mustNotBeNull"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "hasSize": {
+                      "maxLength": 95,
+                      "minLength": 4,
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "minMax": {
+                      "maximum": 10,
+                      "minimum": 5,
+                      "type": "integer",
+                      "format": "int32",
+                      "exampleSetFlag": false
+                    },
+                    "mustNotBeBlank": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "mustNotBeEmpty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "mustNotBeNull": {
+                      "type": "object",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
     }
 
 }) {
@@ -155,6 +279,34 @@ class SwaggerAnnotationsTest : StringSpec({
         val secondField: Int?,
         @field:Schema(hidden = true)
         val thirdField: Boolean?
+    )
+
+    private class Validated(
+        @field:Min(5)
+        @field:Max(10)
+        val minMax: Int,
+        @field:NotNull
+        val mustNotBeNull: Any?,
+        @field:NotEmpty
+        val mustNotBeEmpty: String?,
+        @field:NotBlank
+        val mustNotBeBlank: String?,
+        @field:Size(min = 4, max = 95)
+        val hasSize: String
+    )
+
+    private class JakartaValidated(
+        @field:jakarta.validation.constraints.Min(5)
+        @field:jakarta.validation.constraints.Max(10)
+        val minMax: Int,
+        @field:jakarta.validation.constraints.NotNull
+        val mustNotBeNull: Any?,
+        @field:jakarta.validation.constraints.NotEmpty
+        val mustNotBeEmpty: String?,
+        @field:jakarta.validation.constraints.NotBlank
+        val mustNotBeBlank: String?,
+        @field:jakarta.validation.constraints.Size(min = 4, max = 95)
+        val hasSize: String
     )
 
 }
