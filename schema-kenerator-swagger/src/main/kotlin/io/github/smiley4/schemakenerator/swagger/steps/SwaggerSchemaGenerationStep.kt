@@ -148,9 +148,14 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
 
         collectMembers(typeData, typeDataList).forEach { member ->
             propertySchemas[member.name] = schema.referenceSchema(member.type)
+            propertySchemas[member.name]?.also {
+                if (member.nullable) {
+                    it.nullable = member.nullable
+                }
+            }
             val nullable = member.nullable
             val optional = member.optional && optionalAsNonRequired
-            if(!nullable && !optional) {
+            if (!nullable && !optional) {
                 requiredProperties.add(member.name)
             }
         }
