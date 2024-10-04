@@ -1,14 +1,25 @@
 package io.github.smiley4.schemakenerator.test
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.annotations.Description
+import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
+import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidationAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.models.media.Schema
-import kotlinx.serialization.Serializable
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
 
 /**
@@ -18,14 +29,11 @@ class Test : StringSpec({
 
     "test" {
 
-        // https://stackoverflow.com/questions/48111459/how-to-define-a-property-that-can-be-string-or-null-in-openapi-swagger
-        // https://stackoverflow.com/questions/40920441/how-to-specify-a-property-can-be-null-or-a-reference-with-swagger
-
-        val result = typeOf<TestClass>()
+        val result = typeOf<LoginRequest>()
             .processReflection()
-            .generateSwaggerSchema {
-                optionalHandling = OptionalHandling.NON_REQUIRED
-            }
+            .handleJacksonAnnotations()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
             .compileInlining()
             .let {
                 SwaggerResult(
@@ -47,16 +55,19 @@ class Test : StringSpec({
         )
 
 
-        @Serializable
-        data class TestClass(
-            val sthNullable: String?,
-            val sthOptional: Int = 4,
-            val sthOptionalAnNullable: Boolean? = false,
-            val sthNullableNested: NestedTestClass?
-        )
+        @JsonDeserialize
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        data class LoginRequest(
+            @field:NotBlank
+            @field:Size(max = 100)
+            @JsonProperty("usernameRenamed", required = true)
+            val username: String?,
 
-        @Serializable
-        data class NestedTestClass(val value: String)
+            @field:NotBlank
+            @field:Size(max = 100)
+            @JsonProperty("passwordRenamed", required = true)
+            val password: String?
+        )
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
