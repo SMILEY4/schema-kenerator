@@ -28,9 +28,11 @@ class SwaggerJavaxValidationAnnotationStep {
 
     private fun process(schema: SwaggerSchema) {
         SwaggerSchemaAnnotationUtils.iterateProperties(schema) { prop, data ->
-            getNotNull(data)?.also { schema.swagger.addRequiredItem(data.name) }
-            getNotEmpty(data)?.also { schema.swagger.addRequiredItem(data.name) }
-            getNotBlank(data)?.also { schema.swagger.addRequiredItem(data.name) }
+            if(!schema.swagger.required.contains(data.name)) {
+                getNotNull(data)?.also { schema.swagger.addRequiredItem(data.name) }
+                getNotEmpty(data)?.also { schema.swagger.addRequiredItem(data.name) }
+                getNotBlank(data)?.also { schema.swagger.addRequiredItem(data.name) }
+            }
             getSize(data)?.also {
                 val min = it.values["min"] as Int
 
