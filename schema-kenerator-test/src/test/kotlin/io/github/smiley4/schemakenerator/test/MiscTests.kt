@@ -1,8 +1,10 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Required
+import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
@@ -12,10 +14,13 @@ import io.github.smiley4.schemakenerator.serialization.processKotlinxSerializati
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.test.Test.Companion.SwaggerResult
+import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.Serializable
 import java.util.Optional
+import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
 
 class MiscTests : FreeSpec({
@@ -192,6 +197,37 @@ class MiscTests : FreeSpec({
 
     }
 
+    "https://github.com/SMILEY4/schema-kenerator/issues/20 - include annotations from constructor parameters" {
+        val result = typeOf<TestClassIssue20>()
+            .processReflection()
+            .handleJacksonAnnotations()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
+            .compileInlining()
+
+        json.writeValueAsString(result.swagger).shouldEqualJson(
+            """
+                {
+                  "required": [ "passwordRenamed", "usernameRenamed" ],
+                  "type": "object",
+                  "properties": {
+                    "passwordRenamed": {
+                      "maxLength": 200,
+                      "type": "string",
+                      "exampleSetFlag": false
+                    },
+                    "usernameRenamed": {
+                      "maxLength": 100,
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+        )
+    }
+
 }) {
 
     companion object {
@@ -222,6 +258,16 @@ class MiscTests : FreeSpec({
             @Required
             val prop1: String?,
             val prop2: String? = null
+        )
+
+        data class TestClassIssue20(
+            @field:Size(max = 100)
+            @JsonProperty("usernameRenamed", required = true)
+            val username: String?,
+
+            @field:Size(max = 200)
+            @JsonProperty("passwordRenamed", required = true)
+            val password: String?
         )
 
     }

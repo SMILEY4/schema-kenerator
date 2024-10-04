@@ -5,7 +5,12 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils
-import jakarta.validation.constraints.*
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
 /**
@@ -28,9 +33,11 @@ class SwaggerJakartaValidationAnnotationStep {
 
     private fun process(schema: SwaggerSchema) {
         SwaggerSchemaAnnotationUtils.iterateProperties(schema) { prop, data ->
-            getNotNull(data)?.also { schema.swagger.addRequiredItem(data.name) }
-            getNotEmpty(data)?.also { schema.swagger.addRequiredItem(data.name) }
-            getNotBlank(data)?.also { schema.swagger.addRequiredItem(data.name) }
+            if (!schema.swagger.required.contains(data.name)) {
+                getNotNull(data)?.also { schema.swagger.addRequiredItem(data.name) }
+                getNotEmpty(data)?.also { schema.swagger.addRequiredItem(data.name) }
+                getNotBlank(data)?.also { schema.swagger.addRequiredItem(data.name) }
+            }
             getSize(data)?.also {
                 val min = it.values["min"] as Int
 
