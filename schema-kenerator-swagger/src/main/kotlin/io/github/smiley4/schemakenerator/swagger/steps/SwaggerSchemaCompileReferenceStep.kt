@@ -66,6 +66,9 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
                         it.types = setOf(it.type, "null")
                         it.type = null
                     }
+                    if(it.nullable == false) {
+                        it.nullable = null
+                    }
                 }
             }
         } else {

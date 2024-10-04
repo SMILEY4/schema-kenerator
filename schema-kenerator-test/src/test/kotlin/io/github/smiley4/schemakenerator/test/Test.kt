@@ -5,20 +5,17 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.core.annotations.Description
-import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
-import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidationAnnotations
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.models.media.Schema
+import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
 
@@ -28,10 +25,8 @@ import kotlin.reflect.typeOf
 class Test : StringSpec({
 
     "test" {
-
-        val result = typeOf<LoginRequest>()
+        val result = typeOf<Validated>()
             .processReflection()
-            .handleJacksonAnnotations()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
             .compileInlining()
@@ -52,6 +47,20 @@ class Test : StringSpec({
         class SwaggerResult(
             val root: Schema<*>,
             val componentSchemas: Map<String, Schema<*>>
+        )
+
+        private class Validated(
+            @field:Min(5)
+            @field:Max(10)
+            val minMax: Int,
+            @field:NotNull
+            val mustNotBeNull: Any?,
+            @field:NotEmpty
+            val mustNotBeEmpty: String?,
+            @field:NotBlank
+            val mustNotBeBlank: String?,
+            @field:Size(min = 4, max = 95)
+            val hasSize: String
         )
 
 
