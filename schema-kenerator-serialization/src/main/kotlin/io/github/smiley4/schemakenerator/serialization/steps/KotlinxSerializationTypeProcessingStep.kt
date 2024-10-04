@@ -27,6 +27,8 @@ import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
+import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.serializer
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -264,12 +266,14 @@ class KotlinxSerializationTypeProcessingStep(
         processed: MutableMap<SerialDescriptor, BaseTypeData>
     ): BaseTypeData {
         val id = getUniqueId(descriptor, emptyList(), typeData) // unique for each object since generic types cannot be respected in id
+        val annotations = parseAnnotations(descriptor)
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
                 members = buildList {
+                    buildJsonClassDiscriminatorProperty(annotations, typeData, processed)?.also { add(it) }
                     for (i in 0..<descriptor.elementsCount) {
                         val fieldDescriptor = descriptor.getElementDescriptor(i)
                         val fieldName = descriptor.getElementName(i)
@@ -288,7 +292,7 @@ class KotlinxSerializationTypeProcessingStep(
                     }
                 }.toMutableList(),
                 isInlineValue = descriptor.isInline,
-                annotations = parseAnnotations(descriptor)
+                annotations = annotations
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -301,16 +305,20 @@ class KotlinxSerializationTypeProcessingStep(
         processed: MutableMap<SerialDescriptor, BaseTypeData>
     ): BaseTypeData {
         val id = getUniqueId(descriptor, emptyList(), typeData) // unique for each object since generic types cannot be respected in id
+        val annotations = parseAnnotations(descriptor)
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
+                members = buildList {
+                    buildJsonClassDiscriminatorProperty(annotations, typeData, processed)?.also { add(it) }
+                }.toMutableList(),
                 subtypes = descriptor.elementDescriptors
                     .toList()[1].elementDescriptors
                     .map { parse(it, false, typeData, processed).typeData.id }
                     .toMutableList(),
-                annotations = parseAnnotations(descriptor)
+                annotations = annotations
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -397,6 +405,32 @@ class KotlinxSerializationTypeProcessingStep(
                 .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }
                 .associate { it.name to it.getter.call(annotation) }
                 .toMutableMap()
+        )
+    }
+
+    // ====== JsonClassDiscriminator ===================================
+
+    private fun buildJsonClassDiscriminatorProperty(
+        annotations: MutableList<AnnotationData>,
+        typeData: MutableList<BaseTypeData>,
+        processed: MutableMap<SerialDescriptor, BaseTypeData>
+    ): PropertyData? {
+
+        val jsonClassDiscriminatorAnnotation = annotations.find { it.name == JsonClassDiscriminator::class.qualifiedName }
+
+        if(jsonClassDiscriminatorAnnotation == null) {
+            return null
+        }
+
+        val fieldDescriptor = serializer<String>().descriptor
+        val fieldType = parse(fieldDescriptor, false, typeData, processed)
+        return PropertyData(
+            name = jsonClassDiscriminatorAnnotation.values["discriminator"]?.toString() ?: "type",
+            type = fieldType.typeData.id,
+            nullable = false,
+            optional = false,
+            kind = PropertyType.PROPERTY,
+            visibility = Visibility.PUBLIC,
         )
     }
 

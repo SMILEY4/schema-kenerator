@@ -1,22 +1,20 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
+import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.models.media.Schema
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Size
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlin.reflect.typeOf
 
 /**
@@ -25,19 +23,20 @@ import kotlin.reflect.typeOf
 class Test : StringSpec({
 
     "test" {
-        val result = typeOf<Validated>()
-            .processReflection()
-            .generateSwaggerSchema()
-            .handleJavaxValidationAnnotations()
+//        val result = Bundle(
+//            data = typeOf<Parent>(),
+//            supporting = listOf(
+//                typeOf<ChildOne>(),
+//                typeOf<ChildTwo>()
+//            )
+//        )
+        val result = typeOf<Parent>()
+            .processKotlinxSerialization()
+            .connectSubTypes()
+            .generateJsonSchema()
             .compileInlining()
-            .let {
-                SwaggerResult(
-                    root = it.swagger,
-                    componentSchemas = it.componentSchemas
-                )
-            }
 
-        println(json.writeValueAsString(result))
+        println(result.json.prettyPrint())
 
     }
 
@@ -49,34 +48,20 @@ class Test : StringSpec({
             val componentSchemas: Map<String, Schema<*>>
         )
 
-        private class Validated(
-            @field:Min(5)
-            @field:Max(10)
-            val minMax: Int,
-            @field:NotNull
-            val mustNotBeNull: Any?,
-            @field:NotEmpty
-            val mustNotBeEmpty: String?,
-            @field:NotBlank
-            val mustNotBeBlank: String?,
-            @field:Size(min = 4, max = 95)
-            val hasSize: String
-        )
+
+        @Serializable
+        @JsonClassDiscriminator("the_type")
+        sealed class Parent(val common: Boolean)
 
 
-        @JsonDeserialize
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        data class LoginRequest(
-            @field:NotBlank
-            @field:Size(max = 100)
-            @JsonProperty("usernameRenamed", required = true)
-            val username: String?,
+        @Serializable
+        @SerialName("child_one")
+        data class ChildOne(val text: String) : Parent(false)
 
-            @field:NotBlank
-            @field:Size(max = 100)
-            @JsonProperty("passwordRenamed", required = true)
-            val password: String?
-        )
+
+        @Serializable
+        @SerialName("child_two")
+        data class ChildTwo(val number: Int) : Parent(false)
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
