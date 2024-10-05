@@ -957,64 +957,6 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            TestData(
-//                type = typeOf<ClassWithLocalDateTime>(),
-//                testName = "class with java local-date-time and custom parser",
-//                customParsers = mapOf(
-//                    LocalDateTime::class to CustomReflectionTypeParser { typeId, _ ->
-//                        PrimitiveTypeData(
-//                            id = typeId,
-//                            simpleName = String::class.simpleName!!,
-//                            qualifiedName = String::class.qualifiedName!!,
-//                            typeParameters = mutableMapOf()
-//                        )
-//                    }
-//                ),
-//                expectedResultInlining = """
-//                    {
-//                        "type": "object",
-//                        "required": [
-//                            "dateTime"
-//                        ],
-//                        "properties": {
-//                            "dateTime": {
-//                                 "type": "string"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "type": "object",
-//                        "required": [
-//                            "dateTime"
-//                        ],
-//                        "properties": {
-//                            "dateTime": {
-//                                 "type": "string"
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "${'$'}ref": "#/definitions/ClassWithLocalDateTime",
-//                        "definitions": {
-//                            "ClassWithLocalDateTime": {
-//                                "type": "object",
-//                                "required": [
-//                                    "dateTime"
-//                                ],
-//                                "properties": {
-//                                    "dateTime": {
-//                                        "type": "string"
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
             TestData(
                 type = typeOf<ClassWithNestedClass>(),
                 testName = "auto title",
