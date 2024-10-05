@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
 import io.github.smiley4.schemakenerator.core.steps.MergeGettersStep
+import io.github.smiley4.schemakenerator.core.steps.RenamePropertiesStep
 import io.github.smiley4.schemakenerator.core.steps.RenameTypesStep
 
 /**
@@ -29,6 +30,13 @@ fun Bundle<BaseTypeData>.mergeGetters(): Bundle<BaseTypeData> {
     return MergeGettersStep().process(this)
 }
 
+
+/**
+ * See [RenamePropertiesStep]
+ */
+fun Bundle<BaseTypeData>.renameProperties(rename: (name: String) -> String): Bundle<BaseTypeData> {
+    return RenamePropertiesStep(rename).process(this)
+}
 
 /**
  * See [AddDiscriminatorStep]
