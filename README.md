@@ -12,8 +12,8 @@ Kotlin library to extract information from classes using reflection or kotlinx-s
 - extract information from classes using reflection or kotlinx-serialization
 - supports nested types, inheritance, generics, annotations
 - generate json-schema or [swagger](https://github.com/swagger-api/swagger-parser)-schema
-- add metadata using additional annotations (subtypes, title, description, deprecation, ...)
-- supports Jackson and Swagger-annotations
+- add metadata using additional annotations (title, description, deprecation, subtypes, ...)
+- supports annotations from Jackson, Swagger, Javax-Validations and Jakarta-Validations
 - customizable and extendable
 
 
@@ -32,6 +32,8 @@ dependencies {
     implementation("io.github.smiley4:schema-kenerator-swagger:<VERSION>")
     // only for support of Jackson-annotations
     implementation("io.github.smiley4:schema-kenerator-jackson:<VERSION>")
+   // only for support of javax and jakarta validation-annotations for swagger-schemas
+   implementation("io.github.smiley4:schema-kenerator-validations-swagger:<VERSION>")
 }
 ```
 
@@ -71,7 +73,7 @@ class MyExampleClass(
 val jsonSchema = typeOf<MyExampleClass>()
     .processReflection()
     .generateJsonSchema()
-    .withAutoTitle(TitleType.SIMPLE)
+    .withTitle(TitleType.SIMPLE)
     .compileInlining()
     .json
     .prettyPrint()
@@ -130,7 +132,7 @@ class MyExampleClass(
 val swaggerSchema: Schema<*> = typeOf<ClassWithSimpleFields>()
     .processKotlinxSerialization()
     .generateSwaggerSchema()
-    .withAutoTitle(TitleType.SIMPLE)
+    .withTitle(TitleType.SIMPLE)
     .compileInlining()
     .swagger
 ```
