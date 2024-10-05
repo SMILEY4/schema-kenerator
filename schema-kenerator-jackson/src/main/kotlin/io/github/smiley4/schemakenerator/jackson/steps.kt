@@ -2,7 +2,6 @@ package io.github.smiley4.schemakenerator.jackson
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnorePropertiesStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnoreStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnoreTypeStep
