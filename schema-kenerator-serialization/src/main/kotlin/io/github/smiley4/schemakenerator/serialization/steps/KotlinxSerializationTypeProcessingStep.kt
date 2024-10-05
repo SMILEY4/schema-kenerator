@@ -264,6 +264,7 @@ class KotlinxSerializationTypeProcessingStep(
         processed: MutableMap<SerialDescriptor, BaseTypeData>
     ): BaseTypeData {
         val id = getUniqueId(descriptor, emptyList(), typeData) // unique for each object since generic types cannot be respected in id
+        val annotations = parseAnnotations(descriptor)
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -288,7 +289,7 @@ class KotlinxSerializationTypeProcessingStep(
                     }
                 }.toMutableList(),
                 isInlineValue = descriptor.isInline,
-                annotations = parseAnnotations(descriptor)
+                annotations = annotations
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)
@@ -301,6 +302,7 @@ class KotlinxSerializationTypeProcessingStep(
         processed: MutableMap<SerialDescriptor, BaseTypeData>
     ): BaseTypeData {
         val id = getUniqueId(descriptor, emptyList(), typeData) // unique for each object since generic types cannot be respected in id
+        val annotations = parseAnnotations(descriptor)
         return typeData.find(id)
             ?: ObjectTypeData(
                 id = id,
@@ -310,7 +312,7 @@ class KotlinxSerializationTypeProcessingStep(
                     .toList()[1].elementDescriptors
                     .map { parse(it, false, typeData, processed).typeData.id }
                     .toMutableList(),
-                annotations = parseAnnotations(descriptor)
+                annotations = annotations
             ).also { result ->
                 typeData.removeIf { it.id == result.id }
                 typeData.add(result)

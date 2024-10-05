@@ -12,6 +12,8 @@ include("schema-kenerator-jackson")
 include("schema-kenerator-jackson-jsonschema")
 include("schema-kenerator-jackson-swagger")
 
+include("schema-kenerator-validation-swagger")
+
 include("schema-kenerator-test")
 
 

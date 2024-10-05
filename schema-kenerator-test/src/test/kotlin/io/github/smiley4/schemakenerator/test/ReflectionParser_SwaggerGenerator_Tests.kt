@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
@@ -525,7 +524,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     }
                                 },
                                 "someNullableInt": {
-                                    "type": "integer",
+                                    "types": ["integer", "null"],
                                     "format": "int32",
                                     "exampleSetFlag": false
                                 },
@@ -557,7 +556,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     }
                                 },
                                 "someNullableInt": {
-                                    "type": "integer",
+                                    "types": ["integer", "null"],
                                     "format": "int32",
                                     "exampleSetFlag": false
                                 },
@@ -594,7 +593,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                         }
                                     },
                                     "someNullableInt": {
-                                        "type": "integer",
+                                        "types": ["integer", "null"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
@@ -1212,79 +1211,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            TestData(
-//                type = typeOf<ClassWithLocalDateTime>(),
-//                testName = "class with java local-date-time and custom parser",
-//                customParsers = mapOf(
-//                    LocalDateTime::class to CustomReflectionTypeParser { typeId, _ ->
-//                        PrimitiveTypeData(
-//                            id = typeId,
-//                            simpleName = String::class.simpleName!!,
-//                            qualifiedName = String::class.qualifiedName!!,
-//                            typeParameters = mutableMapOf()
-//                        )
-//                    }
-//                ),
-//                expectedResultInlining = """
-//                    {
-//                        "schema": {
-//                            "required": [
-//                                "dateTime"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "dateTime": {
-//                                    "type": "string",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "schema": {
-//                            "required": [
-//                                "dateTime"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "dateTime": {
-//                                    "type": "string",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "schema": {
-//                            "${'$'}ref": "#/definitions/ClassWithLocalDateTime",
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {
-//                            "ClassWithLocalDateTime": {
-//                                "required": [
-//                                    "dateTime"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "dateTime": {
-//                                        "type": "string",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "exampleSetFlag": false
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
             TestData(
                 type = typeOf<ClassWithNestedClass>(),
                 testName = "auto title",
@@ -1568,100 +1494,100 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "type": "object",
                         "properties": {
                           "self": {
-                            "type": "object",
+                            "types": ["object", "null"],
                             "properties": {
                               "self": {
-                                "type": "object",
+                                "types": ["object", "null"],
                                 "properties": {
                                   "self": {
-                                    "type": "object",
+                                    "types": ["object", "null"],
                                     "properties": {
                                       "self": {
-                                        "type": "object",
+                                        "types": ["object", "null"],
                                         "properties": {
                                           "self": {
-                                            "type": "object",
+                                            "types": ["object", "null"],
                                             "properties": {
                                               "self": {
-                                                "type": "object",
+                                                "types": ["object", "null"],
                                                 "properties": {
                                                   "self": {
-                                                    "type": "object",
+                                                    "types": ["object", "null"],
                                                     "properties": {
                                                       "self": {
-                                                        "type": "object",
+                                                        "types": ["object", "null"],
                                                         "properties": {
                                                           "self": {
-                                                            "type": "object",
+                                                            "types": ["object", "null"],
                                                             "properties": {
                                                               "self": {
-                                                                "type": "object",
+                                                                "types": ["object", "null"],
                                                                 "properties": {
                                                                   "self": {
-                                                                    "type": "object",
+                                                                    "types": ["object", "null"],
                                                                     "properties": {
                                                                       "self": {
-                                                                        "type": "object",
+                                                                        "types": ["object", "null"],
                                                                         "properties": {
                                                                           "self": {
-                                                                            "type": "object",
+                                                                            "types": ["object", "null"],
                                                                             "properties": {
                                                                               "self": {
-                                                                                "type": "object",
+                                                                                "types": ["object", "null"],
                                                                                 "properties": {
                                                                                   "self": {
-                                                                                    "type": "object",
+                                                                                    "types": ["object", "null"],
                                                                                     "properties": {
                                                                                       "self": {
-                                                                                        "type": "object",
+                                                                                        "types": ["object", "null"],
                                                                                         "properties": {
                                                                                           "self": {
-                                                                                            "type": "object",
+                                                                                            "types": ["object", "null"],
                                                                                             "properties": {
                                                                                               "self": {
-                                                                                                "type": "object",
+                                                                                                "types": ["object", "null"],
                                                                                                 "properties": {
                                                                                                   "self": {
-                                                                                                    "type": "object",
+                                                                                                    "types": ["object", "null"],
                                                                                                     "properties": {
                                                                                                       "self": {
-                                                                                                        "type": "object",
+                                                                                                        "types": ["object", "null"],
                                                                                                         "properties": {
                                                                                                           "self": {
-                                                                                                            "type": "object",
+                                                                                                            "types": ["object", "null"],
                                                                                                             "properties": {
                                                                                                               "self": {
-                                                                                                                "type": "object",
+                                                                                                                "types": ["object", "null"],
                                                                                                                 "properties": {
                                                                                                                   "self": {
-                                                                                                                    "type": "object",
+                                                                                                                    "types": ["object", "null"],
                                                                                                                     "properties": {
                                                                                                                       "self": {
-                                                                                                                        "type": "object",
+                                                                                                                        "types": ["object", "null"],
                                                                                                                         "properties": {
                                                                                                                           "self": {
-                                                                                                                            "type": "object",
+                                                                                                                            "types": ["object", "null"],
                                                                                                                             "properties": {
                                                                                                                               "self": {
-                                                                                                                                "type": "object",
+                                                                                                                                "types": ["object", "null"],
                                                                                                                                 "properties": {
                                                                                                                                   "self": {
-                                                                                                                                    "type": "object",
+                                                                                                                                    "types": ["object", "null"],
                                                                                                                                     "properties": {
                                                                                                                                       "self": {
-                                                                                                                                        "type": "object",
+                                                                                                                                        "types": ["object", "null"],
                                                                                                                                         "properties": {
                                                                                                                                           "self": {
-                                                                                                                                            "type": "object",
+                                                                                                                                            "types": ["object", "null"],
                                                                                                                                             "properties": {
                                                                                                                                               "self": {
-                                                                                                                                                "type": "object",
+                                                                                                                                                "types": ["object", "null"],
                                                                                                                                                 "properties": {
                                                                                                                                                   "self": {
-                                                                                                                                                    "type": "object",
+                                                                                                                                                    "types": ["object", "null"],
                                                                                                                                                     "properties": {
                                                                                                                                                       "self": {
-                                                                                                                                                        "type": "object",
+                                                                                                                                                        "types": ["object", "null"],
                                                                                                                                                         "properties": {
                                                                                                                                                           "self": {
                                                                                                                                                             "exampleSetFlag": false
@@ -1774,7 +1700,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "type": "object",
                         "properties": {
                           "self": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                            "oneOf": [
+                              {
+                                "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                                "exampleSetFlag": false
+                              },
+                              {
+                                "type": "null",
+                                "exampleSetFlag": false
+                              }
+                            ],
                             "exampleSetFlag": false
                           }
                         },
@@ -1785,7 +1720,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "type": "object",
                           "properties": {
                             "self": {
-                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                              "oneOf": [
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                                  "exampleSetFlag": false
+                                },
+                                {
+                                  "type": "null",
+                                  "exampleSetFlag": false
+                                }
+                              ],
                               "exampleSetFlag": false
                             }
                           },
@@ -1805,7 +1749,16 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "type": "object",
                           "properties": {
                             "self": {
-                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                              "oneOf": [
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
+                                  "exampleSetFlag": false
+                                },
+                                {
+                                  "type": "null",
+                                  "exampleSetFlag": false
+                                }
+                              ],
                               "exampleSetFlag": false
                             }
                           },
@@ -1835,7 +1788,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
@@ -1843,7 +1796,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           }
                         },
@@ -1866,7 +1819,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
@@ -1874,7 +1827,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           }
                         },
@@ -1902,7 +1855,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
@@ -1910,7 +1863,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             }
                           },
@@ -1939,7 +1892,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
@@ -1947,7 +1900,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           }
                         },
@@ -1969,7 +1922,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
@@ -1977,7 +1930,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           }
                         },
@@ -2004,7 +1957,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
@@ -2012,7 +1965,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             }
                           },

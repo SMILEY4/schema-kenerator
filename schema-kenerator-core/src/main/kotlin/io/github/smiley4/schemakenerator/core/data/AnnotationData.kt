@@ -15,5 +15,5 @@ data class AnnotationData(
     /**
      * the annotation itself, if available
      */
-    val annotation: Annotation?,
+    val annotation: Annotation? = null,
 )

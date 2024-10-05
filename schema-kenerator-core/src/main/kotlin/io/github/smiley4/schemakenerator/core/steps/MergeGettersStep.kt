@@ -5,7 +5,6 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
-import javax.swing.text.html.HTML.Tag.U
 
 /**
  * Merges getters with their matching property;

@@ -45,16 +45,22 @@ class SwaggerSchemaCoreAnnotationOptionalAndRequiredStep {
         return schema.swagger.required ?: mutableListOf()
     }
 
+    private fun setRequiredList(schema: SwaggerSchema, required: List<String>) {
+        schema.swagger.required = required
+    }
+
     private fun addRequired(schema: SwaggerSchema, propertyName: String) {
         val list = getRequiredList(schema)
         if (list.none { it == propertyName }) {
             list.add(propertyName)
         }
+        setRequiredList(schema, list)
     }
 
     private fun removeRequired(schema: SwaggerSchema, propertyName: String) {
         val list = getRequiredList(schema)
         list.removeIf { it == propertyName }
+        setRequiredList(schema, list)
     }
 
 }

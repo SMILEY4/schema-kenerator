@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
@@ -485,7 +484,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 }
                             },
                             "someNullableInt": {
-                                "type": "integer",
+                                "types": ["integer", "null"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                             },
@@ -515,7 +514,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     }
                                 },
                                 "someNullableInt": {
-                                    "type": "integer",
+                                    "types": ["integer", "null"],
                                     "format": "int32",
                                     "exampleSetFlag": false
                                 },
@@ -552,7 +551,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                         }
                                     },
                                     "someNullableInt": {
-                                        "type": "integer",
+                                        "types": ["integer", "null"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
@@ -1011,79 +1010,6 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-//            TestData(
-//                type = typeOf<ClassWithLocalDateTime>(),
-//                testName = "class with java local-date-time and custom parser",
-//                customParsers = mapOf(
-//                    LocalDateTime::class to CustomKotlinxSerializationTypeParser { typeId, _ ->
-//                        PrimitiveTypeData(
-//                            id = typeId,
-//                            simpleName = String::class.simpleName!!,
-//                            qualifiedName = String::class.qualifiedName!!,
-//                            typeParameters = mutableMapOf()
-//                        )
-//                    }
-//                ),
-//                expectedResultInlining = """
-//                    {
-//                        "schema": {
-//                            "required": [
-//                                "dateTime"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "dateTime": {
-//                                    "type": "string",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencing = """
-//                    {
-//                        "schema": {
-//                            "required": [
-//                                "dateTime"
-//                            ],
-//                            "type": "object",
-//                            "properties": {
-//                                "dateTime": {
-//                                    "type": "string",
-//                                    "exampleSetFlag": false
-//                                }
-//                            },
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {}
-//                    }
-//                """.trimIndent(),
-//                expectedResultReferencingRoot = """
-//                    {
-//                        "schema": {
-//                            "${'$'}ref": "#/definitions/ClassWithLocalDateTime",
-//                            "exampleSetFlag": false
-//                        },
-//                        "definitions": {
-//                            "ClassWithLocalDateTime": {
-//                                "required": [
-//                                    "dateTime"
-//                                ],
-//                                "type": "object",
-//                                "properties": {
-//                                    "dateTime": {
-//                                        "type": "string",
-//                                        "exampleSetFlag": false
-//                                    }
-//                                },
-//                                "exampleSetFlag": false
-//                            }
-//                        }
-//                    }
-//                """.trimIndent(),
-//            ),
             TestData(
                 type = typeOf<ClassWithNestedClass>(),
                 testName = "auto title",
@@ -1357,100 +1283,100 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                       "type": "object",
                       "properties": {
                         "self": {
-                          "type": "object",
+                          "types": ["object", "null"],
                           "properties": {
                             "self": {
-                              "type": "object",
+                              "types": ["object", "null"],
                               "properties": {
                                 "self": {
-                                  "type": "object",
+                                  "types": ["object", "null"],
                                   "properties": {
                                     "self": {
-                                      "type": "object",
+                                      "types": ["object", "null"],
                                       "properties": {
                                         "self": {
-                                          "type": "object",
+                                          "types": ["object", "null"],
                                           "properties": {
                                             "self": {
-                                              "type": "object",
+                                              "types": ["object", "null"],
                                               "properties": {
                                                 "self": {
-                                                  "type": "object",
+                                                  "types": ["object", "null"],
                                                   "properties": {
                                                     "self": {
-                                                      "type": "object",
+                                                      "types": ["object", "null"],
                                                       "properties": {
                                                         "self": {
-                                                          "type": "object",
+                                                          "types": ["object", "null"],
                                                           "properties": {
                                                             "self": {
-                                                              "type": "object",
+                                                              "types": ["object", "null"],
                                                               "properties": {
                                                                 "self": {
-                                                                  "type": "object",
+                                                                  "types": ["object", "null"],
                                                                   "properties": {
                                                                     "self": {
-                                                                      "type": "object",
+                                                                      "types": ["object", "null"],
                                                                       "properties": {
                                                                         "self": {
-                                                                          "type": "object",
+                                                                          "types": ["object", "null"],
                                                                           "properties": {
                                                                             "self": {
-                                                                              "type": "object",
+                                                                              "types": ["object", "null"],
                                                                               "properties": {
                                                                                 "self": {
-                                                                                  "type": "object",
+                                                                                  "types": ["object", "null"],
                                                                                   "properties": {
                                                                                     "self": {
-                                                                                      "type": "object",
+                                                                                      "types": ["object", "null"],
                                                                                       "properties": {
                                                                                         "self": {
-                                                                                          "type": "object",
+                                                                                          "types": ["object", "null"],
                                                                                           "properties": {
                                                                                             "self": {
-                                                                                              "type": "object",
+                                                                                              "types": ["object", "null"],
                                                                                               "properties": {
                                                                                                 "self": {
-                                                                                                  "type": "object",
+                                                                                                  "types": ["object", "null"],
                                                                                                   "properties": {
                                                                                                     "self": {
-                                                                                                      "type": "object",
+                                                                                                      "types": ["object", "null"],
                                                                                                       "properties": {
                                                                                                         "self": {
-                                                                                                          "type": "object",
+                                                                                                          "types": ["object", "null"],
                                                                                                           "properties": {
                                                                                                             "self": {
-                                                                                                              "type": "object",
+                                                                                                              "types": ["object", "null"],
                                                                                                               "properties": {
                                                                                                                 "self": {
-                                                                                                                  "type": "object",
+                                                                                                                  "types": ["object", "null"],
                                                                                                                   "properties": {
                                                                                                                     "self": {
-                                                                                                                      "type": "object",
+                                                                                                                      "types": ["object", "null"],
                                                                                                                       "properties": {
                                                                                                                         "self": {
-                                                                                                                          "type": "object",
+                                                                                                                          "types": ["object", "null"],
                                                                                                                           "properties": {
                                                                                                                             "self": {
-                                                                                                                              "type": "object",
+                                                                                                                              "types": ["object", "null"],
                                                                                                                               "properties": {
                                                                                                                                 "self": {
-                                                                                                                                  "type": "object",
+                                                                                                                                  "types": ["object", "null"],
                                                                                                                                   "properties": {
                                                                                                                                     "self": {
-                                                                                                                                      "type": "object",
+                                                                                                                                      "types": ["object", "null"],
                                                                                                                                       "properties": {
                                                                                                                                         "self": {
-                                                                                                                                          "type": "object",
+                                                                                                                                          "types": ["object", "null"],
                                                                                                                                           "properties": {
                                                                                                                                             "self": {
-                                                                                                                                              "type": "object",
+                                                                                                                                              "types": ["object", "null"],
                                                                                                                                               "properties": {
                                                                                                                                                 "self": {
-                                                                                                                                                  "type": "object",
+                                                                                                                                                  "types": ["object", "null"],
                                                                                                                                                   "properties": {
                                                                                                                                                     "self": {
-                                                                                                                                                      "type": "object",
+                                                                                                                                                      "types": ["object", "null"],
                                                                                                                                                       "properties": {
                                                                                                                                                         "self": {
                                                                                                                                                           "exampleSetFlag": false
@@ -1561,8 +1487,17 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "type": "object",
                         "properties": {
                           "self": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                            "exampleSetFlag": false
+                            "exampleSetFlag": false,
+                            "oneOf": [
+                              {
+                                "type": "null",
+                                "exampleSetFlag": false
+                              },
+                              {
+                                "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                                "exampleSetFlag": false
+                              }
+                            ]
                           }
                         },
                         "exampleSetFlag": false
@@ -1572,8 +1507,17 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "type": "object",
                           "properties": {
                             "self": {
-                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                              "exampleSetFlag": false
+                              "exampleSetFlag": false,
+                              "oneOf": [
+                                {
+                                  "type": "null",
+                                  "exampleSetFlag": false
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                                  "exampleSetFlag": false
+                                }
+                              ]
                             }
                           },
                           "exampleSetFlag": false
@@ -1592,8 +1536,17 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "type": "object",
                           "properties": {
                             "self": {
-                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                              "exampleSetFlag": false
+                              "exampleSetFlag": false,
+                              "oneOf": [
+                                {
+                                  "type": "null",
+                                  "exampleSetFlag": false
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
+                                  "exampleSetFlag": false
+                                }
+                              ]
                             }
                           },
                           "exampleSetFlag": false
@@ -1621,7 +1574,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "exampleSetFlag": false
                         },
                         "ctorOptionalNullable": {
-                          "type": "string",
+                          "types": ["string", "null"],
                           "exampleSetFlag": false
                         },
                         "ctorRequired": {
@@ -1629,7 +1582,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "exampleSetFlag": false
                         },
                         "ctorRequiredNullable": {
-                          "type": "string",
+                          "types": ["string", "null"],
                           "exampleSetFlag": false
                         }
                       },
@@ -1650,7 +1603,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
@@ -1658,7 +1611,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           }
                         },
@@ -1686,7 +1639,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
@@ -1694,7 +1647,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             }
                           },
@@ -1722,7 +1675,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "exampleSetFlag": false
                         },
                         "ctorOptionalNullable": {
-                          "type": "string",
+                          "types": ["string", "null"],
                           "exampleSetFlag": false
                         },
                         "ctorRequired": {
@@ -1730,7 +1683,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "exampleSetFlag": false
                         },
                         "ctorRequiredNullable": {
-                          "type": "string",
+                          "types": ["string", "null"],
                           "exampleSetFlag": false
                         }
                       },
@@ -1750,7 +1703,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
@@ -1758,7 +1711,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
-                            "type": "string",
+                            "types": ["string", "null"],
                             "exampleSetFlag": false
                           }
                         },
@@ -1785,7 +1738,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
@@ -1793,7 +1746,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
-                              "type": "string",
+                              "types": ["string", "null"],
                               "exampleSetFlag": false
                             }
                           },

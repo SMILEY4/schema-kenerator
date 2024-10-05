@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.swagger.v3.oas.models.media.Discriminator
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
@@ -150,9 +151,14 @@ class SwaggerSchemaUtils {
 
     //=====  OBJECTS ================================
 
-    fun subtypesSchema(subtypes: List<Schema<*>>): Schema<*> {
+    fun subtypesSchema(subtypes: List<Schema<*>>, discriminator: String? = null): Schema<*> {
         return Schema<Any>().also { schema ->
             schema.anyOf = subtypes
+            if (discriminator != null) {
+                schema.discriminator = Discriminator().also {
+                    it.propertyName = discriminator
+                }
+            }
         }
     }
 
@@ -173,6 +179,15 @@ class SwaggerSchemaUtils {
     fun referenceSchema(id: String, isInComponents: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
             schema.`raw$ref`(if (isInComponents) "#/components/schemas/$id" else id)
+        }
+    }
+
+    fun referenceSchemaNullable(id: String, isInComponents: Boolean = false): Schema<*> {
+        return Schema<String>().also { schema ->
+            schema.oneOf = buildList {
+                add(nullSchema())
+                add(referenceSchema(id, isInComponents))
+            }
         }
     }
 

@@ -27,6 +27,7 @@ import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
@@ -473,7 +474,7 @@ class ReflectionTypeProcessingStep(
             type = type.typeData.id,
             nullable = member.returnType.isMarkedNullable || type.nullable,
             optional = isOptional,
-            annotations = parseAnnotations(member).toMutableList(),
+            annotations = parseAnnotations(member, clazz).toMutableList(),
             kind = PropertyType.PROPERTY,
             visibility = determinePropertyVisibility(member)
         )
@@ -564,10 +565,13 @@ class ReflectionTypeProcessingStep(
         return unwrapAnnotations(clazz.annotations).map { parseAnnotation(it) }
     }
 
-    private fun parseAnnotations(property: KProperty<*>): List<AnnotationData> {
+    private fun parseAnnotations(property: KProperty<*>, clazz: KClass<*>): List<AnnotationData> {
         return buildList {
             addAll(unwrapAnnotations(property.javaField?.annotations?.toList() ?: emptyList()).map { parseAnnotation(it) })
             addAll(unwrapAnnotations(property.annotations).map { parseAnnotation(it) })
+            clazz.primaryConstructor?.parameters
+                ?.find { it.name == property.name && it.type == property.returnType }?.annotations
+                ?.also { annotations -> addAll(unwrapAnnotations(annotations).map { parseAnnotation(it) }) }
         }
     }
 

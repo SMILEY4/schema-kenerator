@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnorePropertiesStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnoreStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnoreTypeStep
+import io.github.smiley4.schemakenerator.jackson.steps.JacksonJsonTypeInfoDiscriminatorStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonPropertyStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
 import kotlin.reflect.KType
@@ -30,4 +31,13 @@ fun Bundle<BaseTypeData>.handleJacksonAnnotations(): Bundle<BaseTypeData> {
         .let { JacksonIgnoreTypeStep().process(this) }
         .let { JacksonIgnorePropertiesStep().process(this) }
         .let { JacksonPropertyStep().process(this) }
+}
+
+
+
+/**
+ * See [JacksonJsonTypeInfoDiscriminatorStep]
+ */
+fun Bundle<BaseTypeData>.addJacksonTypeInfoDiscriminatorProperty(): Bundle<BaseTypeData> {
+    return JacksonJsonTypeInfoDiscriminatorStep().process(this)
 }

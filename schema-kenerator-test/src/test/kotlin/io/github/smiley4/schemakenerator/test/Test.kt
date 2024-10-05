@@ -1,14 +1,27 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
+import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
+import io.github.smiley4.schemakenerator.reflection.data.SubType
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.OptionalHandling
-import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.models.media.Schema
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlin.reflect.typeOf
 
 /**
@@ -16,27 +29,36 @@ import kotlin.reflect.typeOf
  */
 class Test : StringSpec({
 
-    "test" {
-        val result = typeOf<CreateProduct>()
+    "test json" {
+        val result = typeOf<KotlinxParent>()
             .processKotlinxSerialization()
-            .generateSwaggerSchema {
-                optionalHandling = OptionalHandling.NON_REQUIRED
-            }
+            .connectSubTypes()
+            .generateJsonSchema()
             .compileInlining()
+
+        println(result.json.prettyPrint())
+
+    }
+
+    "test swagger" {
+        val result = typeOf<JacksonParent>()
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .addJacksonTypeInfoDiscriminatorProperty()
+//            .addJsonClassDiscriminatorProperty()
+//            .addDiscriminatorProperty("_my_test_discriminator")
+            .generateSwaggerSchema {
+                discriminatorFromMarkerAnnotation = true
+            }
+            .withTitle()
+            .compileReferencing()
             .let {
                 SwaggerResult(
                     root = it.swagger,
                     componentSchemas = it.componentSchemas
                 )
             }
-
-        /*
-        * BUG: https://github.com/SMILEY4/schema-kenerator/issues/16
-        * - "name" is marked as not required (nullable)
-        * - "description" processed first, registered with id "String" and nullable = true
-        * - "name" processed after -> reuses type with id "String" -> type is nullable even though name isnt
-        * */
-
 
         println(json.writeValueAsString(result))
 
@@ -50,11 +72,34 @@ class Test : StringSpec({
             val componentSchemas: Map<String, Schema<*>>
         )
 
+
         @Serializable
-        data class CreateProduct(
-            val name: String,
-            val description: String? = null
+        @JsonClassDiscriminator("the_type")
+        sealed class KotlinxParent(val common: Boolean) {
+
+            @Serializable
+            data class ChildOne(val text: Byte) : KotlinxParent(false)
+
+
+            @Serializable
+            data class ChildTwo(val number: Int) : KotlinxParent(false)
+
+        }
+
+
+        @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.PROPERTY,
+            property = "the_type"
         )
+        @SubType(JacksonParent.ChildOne::class)
+        @SubType(JacksonParent.ChildTwo::class)
+        sealed class JacksonParent(val common: Boolean) {
+
+            data class ChildOne(val text: Byte) : JacksonParent(false)
+
+            data class ChildTwo(val number: Int) : JacksonParent(false)
+        }
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
