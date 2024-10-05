@@ -14,10 +14,10 @@ import io.github.smiley4.schemakenerator.serialization.processKotlinxSerializati
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.test.Test.Companion.SwaggerResult
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FreeSpec
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import java.util.Optional
 import javax.validation.constraints.Size

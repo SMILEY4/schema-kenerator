@@ -1,22 +1,27 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
+import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
+import io.github.smiley4.schemakenerator.reflection.data.SubType
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.oas.models.media.Schema
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Size
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlin.reflect.typeOf
 
 /**
@@ -24,12 +29,30 @@ import kotlin.reflect.typeOf
  */
 class Test : StringSpec({
 
-    "test" {
-        val result = typeOf<Validated>()
-            .processReflection()
-            .generateSwaggerSchema()
-            .handleJavaxValidationAnnotations()
+    "test json" {
+        val result = typeOf<KotlinxParent>()
+            .processKotlinxSerialization()
+            .connectSubTypes()
+            .generateJsonSchema()
             .compileInlining()
+
+        println(result.json.prettyPrint())
+
+    }
+
+    "test swagger" {
+        val result = typeOf<JacksonParent>()
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .addJacksonTypeInfoDiscriminatorProperty()
+//            .addJsonClassDiscriminatorProperty()
+//            .addDiscriminatorProperty("_my_test_discriminator")
+            .generateSwaggerSchema {
+                discriminatorFromMarkerAnnotation = true
+            }
+            .withTitle()
+            .compileReferencing()
             .let {
                 SwaggerResult(
                     root = it.swagger,
@@ -49,34 +72,34 @@ class Test : StringSpec({
             val componentSchemas: Map<String, Schema<*>>
         )
 
-        private class Validated(
-            @field:Min(5)
-            @field:Max(10)
-            val minMax: Int,
-            @field:NotNull
-            val mustNotBeNull: Any?,
-            @field:NotEmpty
-            val mustNotBeEmpty: String?,
-            @field:NotBlank
-            val mustNotBeBlank: String?,
-            @field:Size(min = 4, max = 95)
-            val hasSize: String
+
+        @Serializable
+        @JsonClassDiscriminator("the_type")
+        sealed class KotlinxParent(val common: Boolean) {
+
+            @Serializable
+            data class ChildOne(val text: Byte) : KotlinxParent(false)
+
+
+            @Serializable
+            data class ChildTwo(val number: Int) : KotlinxParent(false)
+
+        }
+
+
+        @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.PROPERTY,
+            property = "the_type"
         )
+        @SubType(JacksonParent.ChildOne::class)
+        @SubType(JacksonParent.ChildTwo::class)
+        sealed class JacksonParent(val common: Boolean) {
 
+            data class ChildOne(val text: Byte) : JacksonParent(false)
 
-        @JsonDeserialize
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        data class LoginRequest(
-            @field:NotBlank
-            @field:Size(max = 100)
-            @JsonProperty("usernameRenamed", required = true)
-            val username: String?,
-
-            @field:NotBlank
-            @field:Size(max = 100)
-            @JsonProperty("passwordRenamed", required = true)
-            val password: String?
-        )
+            data class ChildTwo(val number: Int) : JacksonParent(false)
+        }
 
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
