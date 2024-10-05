@@ -10,6 +10,7 @@ import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
@@ -17,6 +18,7 @@ import java.math.BigDecimal
 /**
  * Generates swagger-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
  * Result needs to be "compiled" to get the final swagger-schema.
+ * @param optionalAsNonRequired whether to treat optional (non-nullable) properties as required
  */
 class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) {
 
@@ -132,11 +134,20 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
     private fun buildWithSubtypes(typeData: ObjectTypeData): SwaggerSchema {
         return SwaggerSchema(
             swagger = schema.subtypesSchema(
-                typeData.subtypes.map { schema.referenceSchema(it.full()) }
+                typeData.subtypes.map { schema.referenceSchema(it.full()) },
+                getDiscriminatorName(typeData)
             ),
             typeData = typeData
         )
     }
+
+    private fun getDiscriminatorName(typeData: ObjectTypeData): String? {
+        val property = typeData.members.find { member ->
+            member.annotations.any { it.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }
+        }
+        return property?.name
+    }
+
 
     private fun buildObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
         if (typeData.isInlineValue) {

@@ -2,11 +2,21 @@ package io.github.smiley4.schemakenerator.serialization
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
+import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
+
+
+/**
+ * See [HandleJsonClassDiscriminatorStep]
+ */
+fun Bundle<BaseTypeData>.addJsonClassDiscriminatorProperty(): Bundle<BaseTypeData> {
+    return HandleJsonClassDiscriminatorStep().process(this)
+}
 
 /**
  * See [KotlinxSerializationTypeProcessingStep]

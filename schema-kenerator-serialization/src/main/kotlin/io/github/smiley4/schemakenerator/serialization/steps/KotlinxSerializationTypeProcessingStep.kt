@@ -273,7 +273,6 @@ class KotlinxSerializationTypeProcessingStep(
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
                 members = buildList {
-                    buildJsonClassDiscriminatorProperty(annotations, typeData, processed)?.also { add(it) }
                     for (i in 0..<descriptor.elementsCount) {
                         val fieldDescriptor = descriptor.getElementDescriptor(i)
                         val fieldName = descriptor.getElementName(i)
@@ -311,9 +310,6 @@ class KotlinxSerializationTypeProcessingStep(
                 id = id,
                 simpleName = descriptor.simpleName(),
                 qualifiedName = descriptor.qualifiedName(),
-                members = buildList {
-                    buildJsonClassDiscriminatorProperty(annotations, typeData, processed)?.also { add(it) }
-                }.toMutableList(),
                 subtypes = descriptor.elementDescriptors
                     .toList()[1].elementDescriptors
                     .map { parse(it, false, typeData, processed).typeData.id }
@@ -405,32 +401,6 @@ class KotlinxSerializationTypeProcessingStep(
                 .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }
                 .associate { it.name to it.getter.call(annotation) }
                 .toMutableMap()
-        )
-    }
-
-    // ====== JsonClassDiscriminator ===================================
-
-    private fun buildJsonClassDiscriminatorProperty(
-        annotations: MutableList<AnnotationData>,
-        typeData: MutableList<BaseTypeData>,
-        processed: MutableMap<SerialDescriptor, BaseTypeData>
-    ): PropertyData? {
-
-        val jsonClassDiscriminatorAnnotation = annotations.find { it.name == JsonClassDiscriminator::class.qualifiedName }
-
-        if(jsonClassDiscriminatorAnnotation == null) {
-            return null
-        }
-
-        val fieldDescriptor = serializer<String>().descriptor
-        val fieldType = parse(fieldDescriptor, false, typeData, processed)
-        return PropertyData(
-            name = jsonClassDiscriminatorAnnotation.values["discriminator"]?.toString() ?: "type",
-            type = fieldType.typeData.id,
-            nullable = false,
-            optional = false,
-            kind = PropertyType.PROPERTY,
-            visibility = Visibility.PUBLIC,
         )
     }
 
