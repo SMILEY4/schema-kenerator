@@ -49,7 +49,6 @@ class Test : StringSpec({
 //            .addJsonClassDiscriminatorProperty()
 //            .addDiscriminatorProperty("_my_test_discriminator")
             .generateSwaggerSchema {
-                discriminatorFromMarkerAnnotation = true
             }
             .withTitle()
             .compileReferencing()
