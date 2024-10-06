@@ -58,7 +58,7 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: BaseTypeDat
                 }
                 schemaUtils.referenceSchema(refPath, true)
             } else {
-                referencedSchema.json.also {
+                referencedSchema.json.copyNode().also {
                     if (it is JsonObject) {
                         it.properties.putAll(buildMap {
                             this.putAll(refObj.properties)
