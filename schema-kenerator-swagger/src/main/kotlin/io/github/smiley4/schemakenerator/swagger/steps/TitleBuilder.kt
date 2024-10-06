@@ -75,7 +75,7 @@ object TitleBuilder {
             .let {
                 if (type.typeParameters.isNotEmpty()) {
                     val paramString = type.typeParameters
-                        .map { (_, param) -> buildFull(types[param.type]!!, types) }
+                        .map { (_, param) -> buildOpenApiFull(types[param.type]!!, types) }
                         .joinToString("-")
                     "${it}_$paramString"
                 } else {
@@ -91,7 +91,7 @@ object TitleBuilder {
             .let {
                 if (type.typeParameters.isNotEmpty()) {
                     val paramString = type.typeParameters
-                        .map { (_, param) -> buildSimple(types[param.type]!!, types) }
+                        .map { (_, param) -> buildOpenApiSimple(types[param.type]!!, types) }
                         .joinToString("-")
                     "${it}_$paramString"
                 } else {
