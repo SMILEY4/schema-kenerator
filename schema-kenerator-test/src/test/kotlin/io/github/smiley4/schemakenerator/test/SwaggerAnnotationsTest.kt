@@ -223,6 +223,249 @@ class SwaggerAnnotationsTest : StringSpec({
             }
     }
 
+    "javax and jakarta required annotations for all null properties" {
+        var result = typeOf<NotNullWithAllNullProperties>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<NotEmptyWithAllNullProperties>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<NotBlankWithAllNullProperties>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<JakartaNotNullWithAllNullProperties>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJakartaValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<JakartaNotEmptyWithAllNullProperties>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJakartaValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<JakartaNotBlankWithAllNullProperties>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJakartaValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<AllRequiredValidations>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJavaxValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+        result = typeOf<JakartaAllRequiredValidations>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleJakartaValidationAnnotations()
+            .compileInlining()
+        jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(result.swagger)
+            .shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                """
+                {
+                  "required": [
+                    "requiredProperty"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "requiredProperty": {
+                      "type": "string",
+                      "exampleSetFlag": false
+                    }
+                  },
+                  "exampleSetFlag": false
+                }
+            """.trimIndent()
+            }
+    }
+
 }) {
 
     companion object {
@@ -307,6 +550,50 @@ class SwaggerAnnotationsTest : StringSpec({
         val mustNotBeBlank: String?,
         @field:jakarta.validation.constraints.Size(min = 4, max = 95)
         val hasSize: String
+    )
+
+    private class NotNullWithAllNullProperties(
+        @field:NotNull
+        val requiredProperty: String?
+    )
+
+    private class NotEmptyWithAllNullProperties(
+        @field:NotEmpty
+        val requiredProperty: String?
+    )
+
+    private class NotBlankWithAllNullProperties(
+        @field:NotBlank
+        val requiredProperty: String?
+    )
+
+    private class JakartaNotNullWithAllNullProperties(
+        @field:jakarta.validation.constraints.NotNull
+        val requiredProperty: String?
+    )
+
+    private class JakartaNotEmptyWithAllNullProperties(
+        @field:jakarta.validation.constraints.NotEmpty
+        val requiredProperty: String?
+    )
+
+    private class JakartaNotBlankWithAllNullProperties(
+        @field:jakarta.validation.constraints.NotBlank
+        val requiredProperty: String?
+    )
+
+    private class AllRequiredValidations(
+        @field:NotNull
+        @field:NotEmpty
+        @field:NotBlank
+        val requiredProperty: String?
+    )
+
+    private class JakartaAllRequiredValidations(
+        @field:jakarta.validation.constraints.NotNull
+        @field:jakarta.validation.constraints.NotEmpty
+        @field:jakarta.validation.constraints.NotBlank
+        val requiredProperty: String?
     )
 
 }
