@@ -70,10 +70,8 @@ class SwaggerSchemaAnnotationStep {
                     }
                 }
             }
-            if (schema.swagger.type == "string") {
-                getMinLength(data)?.also { prop.minLength = it }
-                getMaxLength(data)?.also { prop.maxLength = it }
-            }
+            getMinLength(data)?.also { prop.minLength = it }
+            getMaxLength(data)?.also { prop.maxLength = it }
             getFormat(data)?.also { prop.format = it }
             getMinimum(data)?.also { prop.minimum = it }
             getMaximum(data)?.also { prop.maximum = it }
