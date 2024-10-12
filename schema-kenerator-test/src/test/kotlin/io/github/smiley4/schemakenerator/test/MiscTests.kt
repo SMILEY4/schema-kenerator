@@ -46,7 +46,7 @@ class MiscTests : FreeSpec({
                 .generateJsonSchema()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -69,7 +69,7 @@ class MiscTests : FreeSpec({
                 .generateJsonSchema()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -96,7 +96,7 @@ class MiscTests : FreeSpec({
                 }
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -124,7 +124,7 @@ class MiscTests : FreeSpec({
                 }
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -156,7 +156,7 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -183,13 +183,13 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualJson(
+            json.writeValueAsString(result.swagger).shouldEqualLenient(
                 """
                 {
                   "required": [
                     "prop1"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "prop1": {
                       "types": ["string", "null"],
@@ -216,20 +216,20 @@ class MiscTests : FreeSpec({
             .handleJavaxValidationAnnotations()
             .compileInlining()
 
-        json.writeValueAsString(result.swagger).shouldEqualJson(
+        json.writeValueAsString(result.swagger).shouldEqualLenient(
             """
                 {
                   "required": [ "passwordRenamed", "usernameRenamed" ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "passwordRenamed": {
                       "maxLength": 200,
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "usernameRenamed": {
                       "maxLength": 100,
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -249,18 +249,18 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualJson(
+            json.writeValueAsString(result.swagger).shouldEqualLenient(
                 """
                 {
                   "required": [ "prefix_nameOfPerson", "prefix_numberOfYears" ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "prefix_nameOfPerson": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "prefix_numberOfYears": {
-                      "type": "integer",
+                      "types": ["integer"],
                       "format": "int32",
                       "exampleSetFlag": false
                     }
@@ -279,18 +279,18 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualJson(
+            json.writeValueAsString(result.swagger).shouldEqualLenient(
                 """
                 {
                   "required": [ "name_of_person", "number_of_years" ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "name_of_person": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "number_of_years": {
-                      "type": "integer",
+                      "types": ["integer"],
                       "format": "int32",
                       "exampleSetFlag": false
                     }

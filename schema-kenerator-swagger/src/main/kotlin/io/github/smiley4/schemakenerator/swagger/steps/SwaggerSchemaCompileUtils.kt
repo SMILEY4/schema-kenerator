@@ -8,7 +8,7 @@ object SwaggerSchemaCompileUtils {
      * Whether the given schema should be referenced or inlined
      */
     fun shouldReference(schema: Schema<*>): Boolean {
-        return (schema.types.contains("object") && schema.properties != null)
+        return (schema.types?.contains("object") == true && schema.properties != null)
                 || schema.enum != null
                 || schema.anyOf != null
 

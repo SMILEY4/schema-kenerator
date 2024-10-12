@@ -6,7 +6,6 @@ import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
@@ -144,10 +143,10 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     "required": [
                         "dateTime"
                     ],
-                    "type": "object",
+                    "types": ["object"],
                     "properties": {
                         "dateTime": {
-                            "type": "object",
+                            "types": ["object"],
                             "title": "java.time.LocalDateTime",
                             "properties": {},
                             "exampleSetFlag": false
@@ -200,10 +199,10 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     "required": [
                         "dateTime"
                     ],
-                    "type": "object",
+                    "types": ["object"],
                     "properties": {
                         "dateTime": {
-                            "type": "date",
+                            "types": ["date"],
                             "title": "java.time.LocalDateTime",
                             "exampleSetFlag": false
                         }
