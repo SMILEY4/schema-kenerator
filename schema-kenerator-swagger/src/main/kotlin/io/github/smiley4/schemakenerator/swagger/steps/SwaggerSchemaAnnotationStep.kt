@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.removePropertyIf
@@ -30,36 +30,28 @@ import java.math.BigDecimal
  *      - exclusiveMaximum
  *      - exclusiveMinimum
  */
-class SwaggerSchemaAnnotationStep {
-
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
+class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
 
     @Suppress("CyclomaticComplexMethod")
-    private fun process(schema: SwaggerSchema) {
-        getTitle(schema.typeData)?.also { schema.swagger.title = it }
-        getDescription(schema.typeData)?.also { schema.swagger.description = it }
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+        getTitle(schema.typeData.annotations)?.also { schema.swagger.title = it }
+        getDescription(schema.typeData.annotations)?.also { schema.swagger.description = it }
 
         removePropertyIf(schema) { _, data ->
-            getHidden(data) ?: false
+            getHidden(data.annotations) ?: false
         }
 
-        iterateProperties(schema) { prop, data ->
-            getTitle(data)?.also { prop.title = it }
-            getDescription(data)?.also { prop.description = it }
-            getName(data)?.also { prop.name = it }
-            getAllowableValues(data)?.also {
-                it.forEach { entry ->
-                    @Suppress("UNCHECKED_CAST")
-                    (prop as io.swagger.v3.oas.models.media.Schema<Any>).addEnumItemObject(entry)
-                }
+        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
+            val mergedAnnotations = propData.annotations + propTypeData.annotations
+            getTitle(mergedAnnotations)?.also { prop.title = it }
+            getDescription(mergedAnnotations)?.also { prop.description = it }
+            getName(mergedAnnotations)?.also { prop.name = it }
+            getAllowableValues(mergedAnnotations)?.onEach { entry ->
+                @Suppress("UNCHECKED_CAST")
+                (prop as io.swagger.v3.oas.models.media.Schema<Any>).addEnumItemObject(entry)
             }
-            getDefaultValue(data)?.also { prop.setDefault(it) }
-            getAccessMode(data)?.also {
+            getDefaultValue(mergedAnnotations)?.also { prop.setDefault(it) }
+            getAccessMode(mergedAnnotations)?.also {
                 when(it) {
                     Schema.AccessMode.AUTO -> Unit
                     Schema.AccessMode.READ_ONLY -> prop.readOnly = true
@@ -70,65 +62,48 @@ class SwaggerSchemaAnnotationStep {
                     }
                 }
             }
-            getMinLength(data)?.also { prop.minLength = it }
-            getMaxLength(data)?.also { prop.maxLength = it }
-            getFormat(data)?.also { prop.format = it }
-            getMinimum(data)?.also { prop.minimum = it }
-            getMaximum(data)?.also { prop.maximum = it }
-            isExclusiveMinimum(data)?.also { prop.exclusiveMinimum = it }
-            isExclusiveMaximum(data)?.also { prop.exclusiveMaximum = it }
+            getMinLength(mergedAnnotations)?.also { prop.minLength = it }
+            getMaxLength(mergedAnnotations)?.also { prop.maxLength = it }
+            getFormat(mergedAnnotations)?.also { prop.format = it }
+            getMinimum(mergedAnnotations)?.also { prop.minimum = it }
+            getMaximum(mergedAnnotations)?.also { prop.maximum = it }
+            isExclusiveMinimum(mergedAnnotations)?.also { prop.exclusiveMinimum = it }
+            isExclusiveMaximum(mergedAnnotations)?.also { prop.exclusiveMaximum = it }
         }
     }
 
-    private fun getTitle(typeData: BaseTypeData): String? {
-        return typeData.annotations
+    private fun getTitle(annotations: Collection<AnnotationData>): String? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["title"] as String }
             .map { it.ifBlank { null } }
             .firstOrNull()
     }
-
-    private fun getTitle(property: PropertyData): String? {
-        return property.annotations
-            .filter { it.name == Schema::class.qualifiedName }
-            .map { it.values["title"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
-    }
-
-    private fun getDescription(typeData: BaseTypeData): String? {
-        return typeData.annotations
+    private fun getDescription(annotations: Collection<AnnotationData>): String? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["description"] as String }
             .map { it.ifBlank { null } }
             .firstOrNull()
     }
 
-    private fun getDescription(property: PropertyData): String? {
-        return property.annotations
-            .filter { it.name == Schema::class.qualifiedName }
-            .map { it.values["description"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
-    }
-
-    private fun getHidden(property: PropertyData): Boolean? {
-        return property.annotations
+    private fun getHidden(annotations: Collection<AnnotationData>): Boolean? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["hidden"] as Boolean }
             .firstOrNull()
     }
 
-    private fun getName(property: PropertyData): String? {
-        return property.annotations
+    private fun getName(annotations: Collection<AnnotationData>): String? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["name"] as String }
             .map { it.ifBlank { null } }
             .firstOrNull()
     }
 
-    private fun getAllowableValues(property: PropertyData): List<String>? {
-        return property.annotations
+    private fun getAllowableValues(annotations: Collection<AnnotationData>): List<String>? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map {
                 @Suppress("UNCHECKED_CAST")
@@ -138,44 +113,44 @@ class SwaggerSchemaAnnotationStep {
             .firstOrNull()
     }
 
-    private fun getDefaultValue(property: PropertyData): String? {
-        return property.annotations
+    private fun getDefaultValue(annotations: Collection<AnnotationData>): String? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["defaultValue"] as String }
             .map { it.ifBlank { null } }
             .firstOrNull()
     }
 
-    private fun getAccessMode(property: PropertyData): Schema.AccessMode? {
-        return property.annotations
+    private fun getAccessMode(annotations: Collection<AnnotationData>): Schema.AccessMode? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["accessMode"] as Schema.AccessMode }
             .firstOrNull()
     }
 
-    private fun getMinLength(property: PropertyData): Int? {
-        return property.annotations
+    private fun getMinLength(annotations: Collection<AnnotationData>): Int? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["minLength"] as Int }
             .firstOrNull()
     }
 
-    private fun getMaxLength(property: PropertyData): Int? {
-        return property.annotations
+    private fun getMaxLength(annotations: Collection<AnnotationData>): Int? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["maxLength"] as Int }
             .firstOrNull()
     }
 
-    private fun getFormat(property: PropertyData): String? {
-        return property.annotations
+    private fun getFormat(annotations: Collection<AnnotationData>): String? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["format"] as String }
             .firstOrNull()
     }
 
-    private fun getMinimum(property: PropertyData): BigDecimal? {
-        return property.annotations
+    private fun getMinimum(annotations: Collection<AnnotationData>): BigDecimal? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["minimum"] as String }
             .filter { it.isNotBlank() }
@@ -183,15 +158,15 @@ class SwaggerSchemaAnnotationStep {
             .firstOrNull()
     }
 
-    private fun isExclusiveMinimum(property: PropertyData): Boolean? {
-        return property.annotations
+    private fun isExclusiveMinimum(annotations: Collection<AnnotationData>): Boolean? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["exclusiveMinimum"] as Boolean }
             .firstOrNull()
     }
 
-    private fun getMaximum(property: PropertyData): BigDecimal? {
-        return property.annotations
+    private fun getMaximum(annotations: Collection<AnnotationData>): BigDecimal? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["maximum"] as String }
             .filter { it.isNotBlank() }
@@ -199,8 +174,8 @@ class SwaggerSchemaAnnotationStep {
             .firstOrNull()
     }
 
-    private fun isExclusiveMaximum(property: PropertyData): Boolean? {
-        return property.annotations
+    private fun isExclusiveMaximum(annotations: Collection<AnnotationData>): Boolean? {
+        return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["exclusiveMaximum"] as Boolean }
             .firstOrNull()

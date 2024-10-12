@@ -6,13 +6,11 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Required
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
-import io.github.smiley4.schemakenerator.jsonschema.customizeTypes
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -26,7 +24,6 @@ import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.should
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNamingStrategy

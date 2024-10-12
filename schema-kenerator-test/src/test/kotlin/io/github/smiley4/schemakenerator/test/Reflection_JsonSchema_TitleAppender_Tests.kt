@@ -1,14 +1,12 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.steps.RenameTypesStep
-import io.github.smiley4.schemakenerator.jsonschema.data.RefType
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics

@@ -2,8 +2,8 @@ package io.github.smiley4.schemakenerator.serialization
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.steps.RenamePropertiesStep
+import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -12,7 +12,6 @@ import kotlinx.serialization.json.JsonNamingStrategy
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
-
 
 
 /**
