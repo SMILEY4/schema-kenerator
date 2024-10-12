@@ -30,7 +30,7 @@ class SwaggerJavaxValidationAnnotationStep {
     private fun process(schema: SwaggerSchema) {
         SwaggerSchemaAnnotationUtils.iterateProperties(schema) { prop, data ->
             getNotNull(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
-            getNotEmpty(data)?.also  { setRequiredNotNull(schema.swagger, data.name) }
+            getNotEmpty(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
             getNotBlank(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
             getSize(data)?.also {
                 val min = it.values["min"] as Int
@@ -79,16 +79,16 @@ class SwaggerJavaxValidationAnnotationStep {
     }
 
     private fun setRequiredNotNull(swagger: Schema<*>, name: String) {
-        if(!swagger.required.contains(name)) {
+        if (swagger.required?.contains(name) != true) {
             swagger.addRequiredItem(name)
         }
         swagger.properties[name]?.also { prop ->
-            if(prop.nullable == true) {
+            if (prop.nullable == true) {
                 prop.nullable = false
             }
-            if(prop.types != null && prop.types.contains("null")) {
+            if (prop.types != null && prop.types.contains("null")) {
                 prop.types.remove("null")
-                if(prop.types.size == 1) {
+                if (prop.types.size == 1) {
                     prop.type = prop.types.first()
                     prop.types.clear()
                 }

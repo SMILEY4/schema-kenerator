@@ -6,12 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils
 import io.swagger.v3.oas.models.media.Schema
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotEmpty
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Size
+import jakarta.validation.constraints.*
 import java.math.BigDecimal
 
 /**
@@ -35,7 +30,7 @@ class SwaggerJakartaValidationAnnotationStep {
     private fun process(schema: SwaggerSchema) {
         SwaggerSchemaAnnotationUtils.iterateProperties(schema) { prop, data ->
             getNotNull(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
-            getNotEmpty(data)?.also  { setRequiredNotNull(schema.swagger, data.name) }
+            getNotEmpty(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
             getNotBlank(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
             getSize(data)?.also {
                 val min = it.values["min"] as Int
@@ -84,16 +79,16 @@ class SwaggerJakartaValidationAnnotationStep {
     }
 
     private fun setRequiredNotNull(swagger: Schema<*>, name: String) {
-        if(!swagger.required.contains(name)) {
+        if (swagger.required?.contains(name) != true) {
             swagger.addRequiredItem(name)
         }
         swagger.properties[name]?.also { prop ->
-            if(prop.nullable == true) {
+            if (prop.nullable == true) {
                 prop.nullable = false
             }
-            if(prop.types != null && prop.types.contains("null")) {
+            if (prop.types != null && prop.types.contains("null")) {
                 prop.types.remove("null")
-                if(prop.types.size == 1) {
+                if (prop.types.size == 1) {
                     prop.type = prop.types.first()
                     prop.types.clear()
                 }
