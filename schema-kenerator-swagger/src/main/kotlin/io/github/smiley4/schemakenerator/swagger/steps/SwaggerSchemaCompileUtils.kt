@@ -8,7 +8,7 @@ object SwaggerSchemaCompileUtils {
      * Whether the given schema should be referenced or inlined
      */
     fun shouldReference(schema: Schema<*>): Boolean {
-        return (schema.type == "object" && schema.properties != null)
+        return (schema.types.contains("object") && schema.properties != null)
                 || schema.enum != null
                 || schema.anyOf != null
 
@@ -105,6 +105,7 @@ object SwaggerSchemaCompileUtils {
         source.specVersion?.also { target.specVersion = it }
         source.title?.also { target.title = it }
         source.type?.also { target.type = it }
+        source.types?.also { target.types.addAll(it) }
         source.uniqueItems?.also { target.uniqueItems = it }
         source.writeOnly?.also { target.writeOnly = it }
         source.xml?.also { target.xml = it }
@@ -159,6 +160,7 @@ object SwaggerSchemaCompileUtils {
             copy.specVersion = source.specVersion
             copy.title = source.title
             copy.type = source.type
+            copy.types = source.types
             copy.uniqueItems = source.uniqueItems
             copy.writeOnly = source.writeOnly
             copy.xml = source.xml

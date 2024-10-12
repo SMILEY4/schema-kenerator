@@ -20,7 +20,7 @@ class SwaggerSchemaAnnotationTypeHintStep {
 
     private fun process(schema: SwaggerSchema) {
         determineType(schema.typeData)?.also { type ->
-            schema.swagger.type = type
+            schema.swagger.types = setOf(type)
         }
     }
 

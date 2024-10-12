@@ -16,7 +16,7 @@ class SwaggerSchemaUtils {
      * @param max the max length of the string (inclusive)
      */
     fun stringSchema(min: Int?, max: Int?) = Schema<Any>().also { schema ->
-        schema.type = "string"
+        schema.types = setOf("string")
         min?.also { schema.minimum = BigDecimal(it) }
         max?.also { schema.maximum = BigDecimal(it) }
     }
@@ -29,7 +29,7 @@ class SwaggerSchemaUtils {
      * @param max the max value of the number (inclusive)
      */
     fun numericSchema(integer: Boolean, min: BigDecimal, max: BigDecimal) = Schema<Any>().also { schema ->
-        schema.type = if (integer) "integer" else "number"
+        schema.types = setOf(if (integer) "integer" else "number")
         schema.minimum = min
         schema.maximum = max
     }
@@ -40,7 +40,7 @@ class SwaggerSchemaUtils {
      * @param integer whether the number is an integer or a floating-point value
      */
     fun numberSchema(integer: Boolean) = Schema<Any>().also { schema ->
-        schema.type = if (integer) "integer" else "number"
+        schema.types = setOf(if (integer) "integer" else "number")
     }
 
 
@@ -48,7 +48,7 @@ class SwaggerSchemaUtils {
      * Schema of a floating-point number
      */
     fun floatSchema() = Schema<Any>().also { schema ->
-        schema.type = "number"
+        schema.types = setOf("number")
         schema.format = "float"
     }
 
@@ -57,7 +57,7 @@ class SwaggerSchemaUtils {
      * Schema of a floating-point number with double precision
      */
     fun doubleSchema() = Schema<Any>().also { schema ->
-        schema.type = "number"
+        schema.types = setOf("number")
         schema.format = "double"
     }
 
@@ -66,7 +66,7 @@ class SwaggerSchemaUtils {
      * Schema of a signed 32-bit integer
      */
     fun int32Schema() = Schema<Any>().also { schema ->
-        schema.type = "integer"
+        schema.types = setOf("integer")
         schema.format = "int32"
     }
 
@@ -75,7 +75,7 @@ class SwaggerSchemaUtils {
      * Schema of a signed 64-bit integer
      */
     fun int64Schema() = Schema<Any>().also { schema ->
-        schema.type = "integer"
+        schema.types = setOf("integer")
         schema.format = "int64"
     }
 
@@ -85,7 +85,7 @@ class SwaggerSchemaUtils {
      */
     fun booleanSchema(): Schema<*> {
         return Schema<Any>().also { schema ->
-            schema.type = "boolean"
+            schema.types = setOf("boolean")
         }
     }
 
@@ -95,7 +95,7 @@ class SwaggerSchemaUtils {
      */
     fun nullSchema(): Schema<*> {
         return Schema<Any>().also { schema ->
-            schema.type = "null"
+            schema.types = setOf("null")
         }
     }
 
@@ -104,7 +104,7 @@ class SwaggerSchemaUtils {
 
     fun arraySchema(items: Schema<*>, uniqueItems: Boolean = false): Schema<*> {
         return Schema<Any>().also { schema ->
-            schema.type = "array"
+            schema.types = setOf("array")
             schema.items = items
             if (uniqueItems) {
                 schema.uniqueItems = true
@@ -121,7 +121,7 @@ class SwaggerSchemaUtils {
      */
     fun objectSchema(properties: Map<String, Schema<*>>, required: Collection<String>): Schema<*> {
         return Schema<Any>().also { schema ->
-            schema.type = "object"
+            schema.types = setOf("object")
             schema.required = required.toMutableList()
             schema.properties = properties
         }
@@ -134,7 +134,7 @@ class SwaggerSchemaUtils {
      */
     fun mapObjectSchema(valueSchema: Schema<*>): Schema<*> {
         return Schema<Any>().also { schema ->
-            schema.type = "object"
+            schema.types = setOf("object")
             schema.additionalProperties = valueSchema
         }
     }
@@ -145,7 +145,7 @@ class SwaggerSchemaUtils {
      */
     fun anyObjectSchema(): Schema<*> {
         return Schema<Any>().also { schema ->
-            schema.type = "object"
+            schema.types = setOf("object")
         }
     }
 

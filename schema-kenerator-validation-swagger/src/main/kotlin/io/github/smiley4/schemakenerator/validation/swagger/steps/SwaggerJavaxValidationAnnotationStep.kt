@@ -89,7 +89,6 @@ class SwaggerJavaxValidationAnnotationStep {
             if (prop.types != null && prop.types.contains("null")) {
                 prop.types.remove("null")
                 if (prop.types.size == 1) {
-                    prop.type = prop.types.first()
                     prop.types.clear()
                 }
             }
