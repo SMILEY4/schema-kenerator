@@ -157,21 +157,21 @@ class SwaggerSchemaAnnotationStep {
         return property.annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["minLength"] as Int }
-            .firstOrNull()
+            .firstOrNull { it >= 0 }
     }
 
     private fun getMaxLength(property: PropertyData): Int? {
         return property.annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["maxLength"] as Int }
-            .firstOrNull()
+            .firstOrNull { it >= 0 }
     }
 
     private fun getFormat(property: PropertyData): String? {
         return property.annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["format"] as String }
-            .firstOrNull()
+            .firstOrNull { it.isNotBlank() }
     }
 
     private fun getMinimum(property: PropertyData): BigDecimal? {
