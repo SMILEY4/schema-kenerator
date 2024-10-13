@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUt
 class SwaggerSchemaCoreAnnotationOptionalAndRequiredStep : AbstractSwaggerSchemaStep() {
 
     override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
-        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
+        iterateProperties(schema, typeDataMap) { _, propData, _ ->
             determineRequired(propData)?.also { required ->
                 if (required) {
                     addRequired(schema, propData.name)
