@@ -63,8 +63,7 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
                 merge(refObj, referencedSchema.swagger).also {
                     if (it.nullable == true) {
                         it.nullable = null
-                        it.types = setOf(it.type, "null")
-                        it.type = null
+                        it.types = setOf("null") + it.types
                     }
                     if(it.nullable == false) {
                         it.nullable = null

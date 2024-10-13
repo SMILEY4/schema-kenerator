@@ -143,10 +143,10 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     "required": [
                         "dateTime"
                     ],
-                    "type": "object",
+                    "types": ["object"],
                     "properties": {
                         "dateTime": {
-                            "type": "object",
+                            "types": ["object"],
                             "title": "java.time.LocalDateTime",
                             "properties": {},
                             "exampleSetFlag": false
@@ -199,10 +199,10 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     "required": [
                         "dateTime"
                     ],
-                    "type": "object",
+                    "types": ["object"],
                     "properties": {
                         "dateTime": {
-                            "type": "date",
+                            "types": ["date"],
                             "title": "java.time.LocalDateTime",
                             "exampleSetFlag": false
                         }

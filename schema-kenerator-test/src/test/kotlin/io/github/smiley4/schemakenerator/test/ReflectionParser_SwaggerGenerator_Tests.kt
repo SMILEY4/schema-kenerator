@@ -231,7 +231,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -240,7 +240,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -249,7 +249,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -262,7 +262,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "maximum": 255,
                             "minimum": 0,
                             "exampleSetFlag": false
@@ -273,7 +273,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "maximum": 255,
                             "minimum": 0,
                             "exampleSetFlag": false
@@ -284,7 +284,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "maximum": 255,
                             "minimum": 0,
                             "exampleSetFlag": false
@@ -299,7 +299,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                         },
@@ -309,7 +309,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                         },
@@ -319,7 +319,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                         },
@@ -333,7 +333,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "number",
+                            "types": ["number"],
                             "format": "float",
                             "exampleSetFlag": false
                         },
@@ -343,7 +343,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "number",
+                            "types": ["number"],
                             "format": "float",
                             "exampleSetFlag": false
                         },
@@ -353,7 +353,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "number",
+                            "types": ["number"],
                             "format": "float",
                             "exampleSetFlag": false
                         },
@@ -367,7 +367,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "boolean",
+                            "types": ["boolean"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -376,7 +376,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "boolean",
+                            "types": ["boolean"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -385,7 +385,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "boolean",
+                            "types": ["boolean"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -398,7 +398,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -407,7 +407,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -416,7 +416,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -429,10 +429,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                             }
                         },
@@ -442,10 +442,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                             }
                         },
@@ -455,10 +455,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                             }
                         },
@@ -472,9 +472,9 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "additionalProperties": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                             },
@@ -486,9 +486,9 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "additionalProperties": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                             },
@@ -500,9 +500,9 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "additionalProperties": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                             },
@@ -522,13 +522,13 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "someBoolList",
                                 "someString"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "someBoolList": {
-                                    "type": "array",
+                                    "types": ["array"],
                                     "exampleSetFlag": false,
                                     "items": {
-                                      "type": "boolean",
+                                      "types": ["boolean"],
                                       "exampleSetFlag": false
                                     }
                                 },
@@ -538,7 +538,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "exampleSetFlag": false
                                 },
                                 "someString": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -554,13 +554,13 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "someBoolList",
                                 "someString"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "someBoolList": {
-                                    "type": "array",
+                                    "types": ["array"],
                                     "exampleSetFlag": false,
                                     "items": {
-                                      "type": "boolean",
+                                      "types": ["boolean"],
                                       "exampleSetFlag": false
                                     }
                                 },
@@ -570,7 +570,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "exampleSetFlag": false
                                 },
                                 "someString": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -591,13 +591,13 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "someBoolList",
                                     "someString"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "someBoolList": {
-                                        "type": "array",
+                                        "types": ["array"],
                                         "exampleSetFlag": false,
                                         "items": {
-                                            "type": "boolean",
+                                            "types": ["boolean"],
                                             "exampleSetFlag": false
                                         }
                                     },
@@ -607,7 +607,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                         "exampleSetFlag": false
                                     },
                                     "someString": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -662,10 +662,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -680,10 +680,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -703,10 +703,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "value"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "value": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -725,10 +725,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "object",
+                                    "types": ["object"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -743,10 +743,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "object",
+                                    "types": ["object"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -766,10 +766,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "value"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "value": {
-                                        "type": "object",
+                                        "types": ["object"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -788,13 +788,13 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "array",
+                                    "types": ["array"],
                                     "exampleSetFlag": false,
                                     "items": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 }
@@ -810,13 +810,13 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "array",
+                                    "types": ["array"],
                                     "exampleSetFlag": false,
                                     "items": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 }
@@ -837,13 +837,13 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "value"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "value": {
-                                        "type": "array",
+                                        "types": ["array"],
                                         "exampleSetFlag": false,
                                         "items": {
-                                            "type": "string",
+                                            "types": ["string"],
                                             "exampleSetFlag": false
                                         }
                                     }
@@ -867,15 +867,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                         "a",
                                         "sealedValue"
                                     ],
-                                    "type": "object",
+                                    "types": ["object"],
                                     "properties": {
                                         "a": {
-                                              "type": "integer",
+                                              "types": ["integer"],
                                               "format": "int32",
                                               "exampleSetFlag": false
                                             },
                                         "sealedValue": {
-                                            "type": "string",
+                                            "types": ["string"],
                                             "exampleSetFlag": false
                                         }
                                     },
@@ -886,15 +886,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                         "b",
                                         "sealedValue"
                                     ],
-                                    "type": "object",
+                                    "types": ["object"],
                                     "properties": {
                                         "b": {
-                                            "type": "integer",
+                                            "types": ["integer"],
                                             "format": "int32",
                                             "exampleSetFlag": false
                                         },
                                         "sealedValue": {
-                                            "type": "string",
+                                            "types": ["string"],
                                             "exampleSetFlag": false
                                         }
                                     },
@@ -926,15 +926,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -945,15 +945,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "b",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "b": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -987,15 +987,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1006,15 +1006,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "b",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "b": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1034,15 +1034,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "a",
                                 "sealedValue"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "a": {
-                                    "type": "integer",
+                                    "types": ["integer"],
                                     "format": "int32",
                                     "exampleSetFlag": false
                                 },
                                 "sealedValue": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -1058,15 +1058,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "a",
                                 "sealedValue"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "a": {
-                                    "type": "integer",
+                                    "types": ["integer"],
                                     "format": "int32",
                                     "exampleSetFlag": false
                                 },
                                 "sealedValue": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -1087,15 +1087,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1117,17 +1117,17 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "stringValue",
                                 "intValue"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "stringValue": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "description": "String field description",
                                     "default": "A default String value",
                                     "exampleSetFlag": true,
                                     "example": "An example of a String value"
                                 },
                                 "intValue": {
-                                    "type": "integer",
+                                    "types": ["integer"],
                                     "format": "int32",
                                     "description": "Int field description",
                                     "default": "1111",
@@ -1152,17 +1152,17 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "stringValue",
                                 "intValue"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "stringValue": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "description": "String field description",
                                     "default": "A default String value",
                                     "exampleSetFlag": true,
                                     "example": "An example of a String value"
                                 },
                                 "intValue": {
-                                    "type": "integer",
+                                    "types": ["integer"],
                                     "format": "int32",
                                     "description": "Int field description",
                                     "default": "1111",
@@ -1192,17 +1192,17 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "stringValue",
                                     "intValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "stringValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "description": "String field description",
                                         "default": "A default String value",
                                         "exampleSetFlag": true,
                                         "example": "An example of a String value"
                                     },
                                     "intValue": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "description": "Int field description",
                                         "default": "1111",
@@ -1231,18 +1231,18 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "nested"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "nested": {
                                     "title": "NestedClass",
                                     "required": [
                                         "text"
                                     ],
-                                    "type": "object",
+                                    "types": ["object"],
                                     "properties": {
                                         "text": {
                                             "title": "String",
-                                            "type": "string",
+                                            "types": ["string"],
                                             "exampleSetFlag": false
                                         }
                                     },
@@ -1261,7 +1261,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "nested"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "nested": {
                                     "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass",
@@ -1276,11 +1276,11 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "text"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1301,11 +1301,11 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "text"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1316,7 +1316,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "nested"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "nested": {
                                         "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass",
@@ -1341,40 +1341,40 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "someMap",
                           "someSet"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "someArray": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             }
                           },
                           "someList": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           },
                           "someMap": {
-                            "type": "object",
+                            "types": ["object"],
                             "additionalProperties": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             },
                             "exampleSetFlag": false
                           },
                           "someSet": {
-                            "type": "array",
+                            "types": ["array"],
                             "uniqueItems": true,
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           }
@@ -1393,40 +1393,40 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "someMap",
                           "someSet"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "someArray": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             }
                           },
                           "someList": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           },
                           "someMap": {
-                            "type": "object",
+                            "types": ["object"],
                             "additionalProperties": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             },
                             "exampleSetFlag": false
                           },
                           "someSet": {
-                            "type": "array",
+                            "types": ["array"],
                             "uniqueItems": true,
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           }
@@ -1450,40 +1450,40 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "someMap",
                             "someSet"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "someArray": {
-                              "type": "array",
+                              "types": ["array"],
                               "exampleSetFlag": false,
                               "items": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                               }
                             },
                             "someList": {
-                              "type": "array",
+                              "types": ["array"],
                               "exampleSetFlag": false,
                               "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                               }
                             },
                             "someMap": {
-                              "type": "object",
+                              "types": ["object"],
                               "additionalProperties": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                               },
                               "exampleSetFlag": false
                             },
                             "someSet": {
-                              "type": "array",
+                              "types": ["array"],
                               "uniqueItems": true,
                               "exampleSetFlag": false,
                               "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                               }
                             }
@@ -1500,7 +1500,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                       "schema": {
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "self": {
                             "types": ["object", "null"],
@@ -1706,7 +1706,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                       "schema": {
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "self": {
                             "oneOf": [
@@ -1715,7 +1715,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "exampleSetFlag": false
                               },
                               {
-                                "type": "null",
+                                "types": ["null"],
                                 "exampleSetFlag": false
                               }
                             ],
@@ -1726,7 +1726,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                       },
                       "definitions": {
                         "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing": {
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "self": {
                               "oneOf": [
@@ -1735,7 +1735,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                   "exampleSetFlag": false
                                 },
                                 {
-                                  "type": "null",
+                                  "types": ["null"],
                                   "exampleSetFlag": false
                                 }
                               ],
@@ -1755,7 +1755,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                       },
                       "definitions": {
                         "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing": {
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "self": {
                               "oneOf": [
@@ -1764,7 +1764,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                   "exampleSetFlag": false
                                 },
                                 {
-                                  "type": "null",
+                                  "types": ["null"],
                                   "exampleSetFlag": false
                                 }
                               ],
@@ -1790,10 +1790,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "ctorOptional",
                           "ctorRequired"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "ctorOptional": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
@@ -1801,7 +1801,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
@@ -1821,10 +1821,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "ctorOptional",
                           "ctorRequired"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "ctorOptional": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
@@ -1832,7 +1832,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
@@ -1857,10 +1857,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "ctorOptional",
                             "ctorRequired"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "ctorOptional": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
@@ -1868,7 +1868,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
@@ -1894,10 +1894,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "required": [
                           "ctorRequired"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "ctorOptional": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
@@ -1905,7 +1905,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
@@ -1924,10 +1924,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "required": [
                           "ctorRequired"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "ctorOptional": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
@@ -1935,7 +1935,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
@@ -1959,10 +1959,10 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "required": [
                             "ctorRequired"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "ctorOptional": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
@@ -1970,7 +1970,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
@@ -1994,15 +1994,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "myValue",
                           "someText"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "myValue": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                           },
                           "someText": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           }
                         },
@@ -2018,15 +2018,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                           "myValue",
                           "someText"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "myValue": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                           },
                           "someText": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           }
                         },
@@ -2047,15 +2047,15 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "myValue",
                             "someText"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "myValue": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             },
                             "someText": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           },

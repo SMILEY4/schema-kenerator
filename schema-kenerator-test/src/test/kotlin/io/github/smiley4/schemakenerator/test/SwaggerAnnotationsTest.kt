@@ -50,7 +50,7 @@ class SwaggerAnnotationsTest : StringSpec({
                     "myValue",
                     "someTags"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "myValue": {
                       "title": "Some Value",
@@ -60,7 +60,7 @@ class SwaggerAnnotationsTest : StringSpec({
                       "exclusiveMinimum": false,
                       "maxLength": 10,
                       "minLength": 1,
-                      "type": "integer",
+                      "types": ["integer"],
                       "description": "some value",
                       "format": "single-digit",
                       "readOnly": true,
@@ -72,10 +72,10 @@ class SwaggerAnnotationsTest : StringSpec({
                       "maxItems": 10,
                       "minItems": 0,
                       "uniqueItems": true,
-                      "type": "array",
+                      "types": ["array"],
                       "exampleSetFlag": false,
                       "items": {
-                        "type": "string",
+                        "types": ["string"],
                         "exampleSetFlag": false
                       }
                     }
@@ -131,31 +131,31 @@ class SwaggerAnnotationsTest : StringSpec({
                     "mustNotBeEmpty",
                     "mustNotBeNull"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "hasSize": {
                       "maxLength": 95,
                       "minLength": 4,
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "minMax": {
                       "maximum": 10,
                       "minimum": 5,
-                      "type": "integer",
+                      "types": ["integer"],
                       "format": "int32",
                       "exampleSetFlag": false
                     },
                     "mustNotBeBlank": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "mustNotBeEmpty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "mustNotBeNull": {
-                      "type": "object",
+                      "types": ["object"],
                       "exampleSetFlag": false
                     }
                   },
@@ -189,31 +189,31 @@ class SwaggerAnnotationsTest : StringSpec({
                     "mustNotBeEmpty",
                     "mustNotBeNull"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "hasSize": {
                       "maxLength": 95,
                       "minLength": 4,
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "minMax": {
                       "maximum": 10,
                       "minimum": 5,
-                      "type": "integer",
+                      "types": ["integer"],
                       "format": "int32",
                       "exampleSetFlag": false
                     },
                     "mustNotBeBlank": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "mustNotBeEmpty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "mustNotBeNull": {
-                      "type": "object",
+                      "types": ["object"],
                       "exampleSetFlag": false
                     }
                   },
@@ -243,10 +243,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -273,10 +273,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -303,10 +303,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -333,10 +333,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -363,10 +363,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -393,10 +393,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -423,10 +423,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -453,10 +453,10 @@ class SwaggerAnnotationsTest : StringSpec({
                   "required": [
                     "requiredProperty"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "requiredProperty": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },

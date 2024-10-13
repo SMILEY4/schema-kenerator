@@ -210,7 +210,7 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "_type"
             subtype.properties.keys shouldContain "_type"
-            subtype.properties["_type"]?.type shouldBe "string"
+            subtype.properties["_type"]?.types shouldContainExactlyInAnyOrder setOf("string")
         }
     }
 
@@ -232,7 +232,7 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "kotlinx_type"
             subtype.properties.keys shouldContain "kotlinx_type"
-            subtype.properties["kotlinx_type"]?.type shouldBe "string"
+            subtype.properties["kotlinx_type"]?.types shouldContainExactlyInAnyOrder  setOf("string")
         }
     }
 
@@ -255,7 +255,7 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "jackson_type"
             subtype.properties.keys shouldContain "jackson_type"
-            subtype.properties["jackson_type"]?.type shouldBe "string"
+            subtype.properties["jackson_type"]?.types shouldContainExactlyInAnyOrder setOf("string")
         }
     }
 
@@ -314,6 +314,7 @@ class SubAndSuperTypesTest : StringSpec({
             data class ChildTwo(val number: Int) : KotlinxParent(false)
 
         }
+
 
         @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,

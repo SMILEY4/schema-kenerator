@@ -12,7 +12,7 @@ class SwaggerSchemaAnnotationTypeHintStep : AbstractSwaggerSchemaStep() {
 
     override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
         determineType(schema.typeData)?.also { type ->
-            schema.swagger.type = type
+            schema.swagger.types = setOf(type)
         }
     }
 
