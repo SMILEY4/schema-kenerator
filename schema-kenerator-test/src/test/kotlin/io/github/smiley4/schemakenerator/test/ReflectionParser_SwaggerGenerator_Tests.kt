@@ -5,7 +5,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
@@ -15,15 +16,17 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
-import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SubClassA
@@ -62,6 +65,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaAnnotationStep().process(it) }
+                            .let { SwaggerArraySchemaAnnotationStep().process(it) }
                     } else {
                         list
                     }
@@ -111,6 +116,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaAnnotationStep().process(it) }
+                            .let { SwaggerArraySchemaAnnotationStep().process(it) }
                     } else {
                         list
                     }
@@ -160,6 +167,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaAnnotationStep().process(it) }
+                            .let { SwaggerArraySchemaAnnotationStep().process(it) }
                     } else {
                         list
                     }
@@ -2056,7 +2065,97 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
+            TestData(
+                type = typeOf<ClassWithAnnotatedValueClass>(),
+                testName = "inline annotated value class",
+                withAnnotations = true,
+                expectedResultInlining = """
+                    {
+                      "schema": {
+                        "required": [
+                          "myValue"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "myValue": {
+                            "maximum": 15,
+                            "exclusiveMaximum": false,
+                            "minimum": 5,
+                            "exclusiveMinimum": false,
+                            "maxLength": 2147483647,
+                            "minLength": 0,
+                            "type": "string",
+                            "description": "annotated value class for testing.",
+                            "format": "",
+                            "exampleSetFlag": false,
+                            "default": "default on property"
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = """
+                    {
+                      "schema": {
+                        "required": [
+                          "myValue"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "myValue": {
+                            "maximum": 15,
+                            "exclusiveMaximum": false,
+                            "minimum": 5,
+                            "exclusiveMinimum": false,
+                            "maxLength": 2147483647,
+                            "minLength": 0,
+                            "type": "string",
+                            "description": "annotated value class for testing.",
+                            "format": "",
+                            "exampleSetFlag": false,
+                            "default": "default on property"
+                          }
+                        },
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {}
+                    }
+                """.trimIndent(),
+                expectedResultReferencingRoot = """
+                    {
+                      "schema": {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass",
+                        "exampleSetFlag": false
+                      },
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass": {
+                          "required": [
+                            "myValue"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "maximum": 15,
+                              "exclusiveMaximum": false,
+                              "minimum": 5,
+                              "exclusiveMinimum": false,
+                              "maxLength": 2147483647,
+                              "minLength": 0,
+                              "type": "string",
+                              "description": "annotated value class for testing.",
+                              "format": "",
+                              "exampleSetFlag": false,
+                              "default": "default on property"
+                            }
+                          },
+                          "exampleSetFlag": false
+                        }
+                      }
+                    }
+                """.trimIndent(),
+            ),
         )
     }
-
 }

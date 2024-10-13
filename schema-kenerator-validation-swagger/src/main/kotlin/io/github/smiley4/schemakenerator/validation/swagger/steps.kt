@@ -2,8 +2,8 @@ package io.github.smiley4.schemakenerator.validation.swagger
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.validation.swagger.steps.SwaggerJavaxValidationAnnotationStep
 import io.github.smiley4.schemakenerator.validation.swagger.steps.SwaggerJakartaValidationAnnotationStep
+import io.github.smiley4.schemakenerator.validation.swagger.steps.SwaggerJavaxValidationAnnotationStep
 
 
 /**

@@ -1,12 +1,18 @@
 package io.github.smiley4.schemakenerator.validation.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils
+import io.github.smiley4.schemakenerator.swagger.steps.AbstractSwaggerSchemaStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 import io.swagger.v3.oas.models.media.Schema
-import jakarta.validation.constraints.*
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
 /**
@@ -18,21 +24,15 @@ import java.math.BigDecimal
  * - [Min]
  * - [Max]
  */
-class SwaggerJakartaValidationAnnotationStep {
+class SwaggerJakartaValidationAnnotationStep : AbstractSwaggerSchemaStep() {
 
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(schema: SwaggerSchema) {
-        SwaggerSchemaAnnotationUtils.iterateProperties(schema) { prop, data ->
-            getNotNull(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
-            getNotEmpty(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
-            getNotBlank(data)?.also { setRequiredNotNull(schema.swagger, data.name) }
-            getSize(data)?.also {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
+            val mergedAnnotations = propData.annotations + propTypeData.annotations
+            getNotNull(mergedAnnotations)?.also { setRequiredNotNull(schema.swagger, propData.name) }
+            getNotEmpty(mergedAnnotations)?.also { setRequiredNotNull(schema.swagger, propData.name) }
+            getNotBlank(mergedAnnotations)?.also { setRequiredNotNull(schema.swagger, propData.name) }
+            getSize(mergedAnnotations)?.also {
                 val min = it.values["min"] as Int
 
                 if (min > 0) {
@@ -45,37 +45,37 @@ class SwaggerJakartaValidationAnnotationStep {
                     prop.maxLength = max
                 }
             }
-            getMin(data)?.also { prop.minimum = BigDecimal(it.values["value"] as Long) }
-            getMax(data)?.also { prop.maximum = BigDecimal(it.values["value"] as Long) }
+            getMin(mergedAnnotations)?.also { prop.minimum = BigDecimal(it.values["value"] as Long) }
+            getMax(mergedAnnotations)?.also { prop.maximum = BigDecimal(it.values["value"] as Long) }
         }
     }
 
-    private fun getNotNull(property: PropertyData): AnnotationData? {
-        return property.findAnnotation<NotNull>()
+    private fun getNotNull(annotations: Collection<AnnotationData>): AnnotationData? {
+        return annotations.findAnnotation<NotNull>()
     }
 
-    private fun getNotEmpty(property: PropertyData): AnnotationData? {
-        return property.findAnnotation<NotEmpty>()
+    private fun getNotEmpty(annotations: Collection<AnnotationData>): AnnotationData? {
+        return annotations.findAnnotation<NotEmpty>()
     }
 
-    private fun getNotBlank(property: PropertyData): AnnotationData? {
-        return property.findAnnotation<NotBlank>()
+    private fun getNotBlank(annotations: Collection<AnnotationData>): AnnotationData? {
+        return annotations.findAnnotation<NotBlank>()
     }
 
-    private fun getSize(property: PropertyData): AnnotationData? {
-        return property.findAnnotation<Size>()
+    private fun getSize(annotations: Collection<AnnotationData>): AnnotationData? {
+        return annotations.findAnnotation<Size>()
     }
 
-    private fun getMin(property: PropertyData): AnnotationData? {
-        return property.findAnnotation<Min>()
+    private fun getMin(annotations: Collection<AnnotationData>): AnnotationData? {
+        return annotations.findAnnotation<Min>()
     }
 
-    private fun getMax(property: PropertyData): AnnotationData? {
-        return property.findAnnotation<Max>()
+    private fun getMax(annotations: Collection<AnnotationData>): AnnotationData? {
+        return annotations.findAnnotation<Max>()
     }
 
-    private inline fun <reified T : Annotation> PropertyData.findAnnotation(): AnnotationData? {
-        return annotations.firstOrNull { it.name == T::class.qualifiedName }
+    private inline fun <reified T : Annotation> Collection<AnnotationData>.findAnnotation(): AnnotationData? {
+        return this.firstOrNull { it.name == T::class.qualifiedName }
     }
 
     private fun setRequiredNotNull(swagger: Schema<*>, name: String) {

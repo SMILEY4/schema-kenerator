@@ -1,5 +1,5 @@
-import io.gitlab.arturbosch.detekt.Detekt
 import com.vanniktech.maven.publish.SonatypeHost
+import io.gitlab.arturbosch.detekt.Detekt
 
 val projectGroupId: String by project
 val projectVersion: String by project
