@@ -572,6 +572,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "exampleSetFlag": false,
+                        "types": ["string"],
                         "enum": [ "ONE", "TWO", "THREE" ]
                     }
                 """.trimIndent(),
@@ -579,6 +580,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     {
                         "schema": {
                             "exampleSetFlag": false,
+                            "types": ["string"],
                             "enum": [ "ONE", "TWO", "THREE" ]
                         },
                         "definitions": {}
@@ -593,6 +595,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "definitions": {
                             "io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum": {
                                 "exampleSetFlag": false,
+                                "types": ["string"],
                                 "enum": [ "ONE", "TWO", "THREE" ]
                             }
                         }
