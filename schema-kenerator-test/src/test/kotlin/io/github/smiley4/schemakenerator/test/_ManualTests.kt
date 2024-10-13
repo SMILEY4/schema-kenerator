@@ -6,11 +6,13 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.kotest.core.spec.style.StringSpec
+import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.annotations.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -36,28 +38,26 @@ class _ManualTests : StringSpec({
         val result = typeOf<TestClass>()
             .processReflection()
             .generateSwaggerSchema()
-            .handleSchemaAnnotations()
-            .compileReferencing()
+            .compileInlining()
             .asPrintable()
 
         println(json.writeValueAsString(result))
+
+        println("===========")
+
+        println(Json31.prettyPrint(result))
+
     }
 
 }) {
     companion object {
 
-        @JvmInline
-        @Serializable
-        @Schema(
-            format = "hex",
-            description = "Represents a hexadecimal string."
-        )
-        value class HexString private constructor(
-            val value: String
-        )
+        enum class ColorEnum {
+            RED, GREEN, BLUE
+        }
 
         class TestClass(
-            val myHex: HexString
+            val someColor: ColorEnum?
         )
 
         class SwaggerResult(
