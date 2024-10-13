@@ -120,10 +120,10 @@ class JacksonTests : StringSpec({
                       "required": [
                         "someValue"
                       ],
-                      "type": "object",
+                      "types": ["object"],
                       "properties": {
                         "someValue": {
-                          "type": "string",
+                          "types": ["string"],
                           "description": "Jackson property description",
                           "exampleSetFlag": false
                         }

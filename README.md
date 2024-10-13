@@ -40,6 +40,8 @@ dependencies {
 
 ## Documentation
 
+Examples showcasing and explaining the functionalities and use cases of this project can be found [here](https://github.com/SMILEY4/schema-kenerator/tree/develop/schema-kenerator-examples/src/test/kotlin/io/github/smiley4/schemakenerator/examples).
+
 A wiki with documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
 
 

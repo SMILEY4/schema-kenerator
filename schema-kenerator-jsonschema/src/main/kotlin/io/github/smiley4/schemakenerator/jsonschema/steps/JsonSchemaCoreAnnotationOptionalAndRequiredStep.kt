@@ -2,8 +2,9 @@ package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Optional
 import io.github.smiley4.schemakenerator.core.annotations.Required
-import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
@@ -14,17 +15,10 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUt
 /**
  * Sets properties as optional/required from core [Optional] and [Required]-annotation.
  */
-class JsonSchemaCoreAnnotationOptionalAndRequiredStep {
+class JsonSchemaCoreAnnotationOptionalAndRequiredStep : AbstractJsonSchemaStep() {
 
-    fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(schema: JsonSchema) {
-        iterateProperties(schema) { _, data ->
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+        iterateProperties(schema, typeDataMap) { _, data, _ ->
             determineRequired(data)?.also { required ->
                 if (required) {
                     addRequired(schema, data.name)

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
@@ -15,19 +14,20 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
+import io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
-import io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat
@@ -215,14 +215,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "any",
                 expectedResultInlining = """
                     {
-                        "type": "object",
+                        "types": ["object"],
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -231,7 +231,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -243,7 +243,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "ubyte",
                 expectedResultInlining = """
                     {
-                        "type": "integer",
+                        "types": ["integer"],
                         "maximum": 255,
                         "minimum": 0,
                         "exampleSetFlag": false
@@ -252,7 +252,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "maximum": 255,
                             "minimum": 0,
                             "exampleSetFlag": false
@@ -263,7 +263,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "maximum": 255,
                             "minimum": 0,
                             "exampleSetFlag": false
@@ -277,7 +277,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "int",
                 expectedResultInlining = """
                     {
-                        "type": "integer",
+                        "types": ["integer"],
                         "format": "int32",
                         "exampleSetFlag": false
                     }
@@ -285,7 +285,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                         },
@@ -295,7 +295,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                         },
@@ -308,7 +308,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "float",
                 expectedResultInlining = """
                     {
-                        "type": "number",
+                        "types": ["number"],
                         "format": "float",
                         "exampleSetFlag": false
                     }
@@ -316,7 +316,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                        "type": "number",
+                        "types": ["number"],
                         "format": "float",
                         "exampleSetFlag": false
                         },
@@ -326,7 +326,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "number",
+                            "types": ["number"],
                             "format": "float",
                             "exampleSetFlag": false
                         },
@@ -339,14 +339,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "boolean",
                 expectedResultInlining = """
                     {
-                         "type": "boolean",
+                         "types": ["boolean"],
                          "exampleSetFlag": false
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "boolean",
+                            "types": ["boolean"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -355,7 +355,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "boolean",
+                            "types": ["boolean"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -367,14 +367,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "string",
                 expectedResultInlining = """
                     {
-                        "type": "string",
+                        "types": ["string"],
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -383,7 +383,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -396,7 +396,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {},
                         "exampleSetFlag": false
                     }
@@ -404,7 +404,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {},
                             "exampleSetFlag": false
                         },
@@ -419,7 +419,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         },
                         "definitions": {
                             "kotlinx.serialization.Polymorphic<List>": {
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {},
                                 "exampleSetFlag": false
                             }
@@ -433,7 +433,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {},
                         "exampleSetFlag": false
                     }
@@ -441,7 +441,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {},
                             "exampleSetFlag": false
                         },
@@ -456,7 +456,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         },
                         "definitions": {
                             "kotlinx.serialization.Polymorphic<Map>": {
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {},
                                 "exampleSetFlag": false
                             }
@@ -473,13 +473,13 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "someBoolList",
                             "someString"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                             "someBoolList": {
-                                "type": "array",
+                                "types": ["array"],
                                 "exampleSetFlag": false,
                                 "items": {
-                                  "type": "boolean",
+                                  "types": ["boolean"],
                                   "exampleSetFlag": false
                                 }
                             },
@@ -489,7 +489,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "exampleSetFlag": false
                             },
                             "someString": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                             }
                         },
@@ -503,13 +503,13 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "someBoolList",
                                 "someString"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "someBoolList": {
-                                    "type": "array",
+                                    "types": ["array"],
                                     "exampleSetFlag": false,
                                     "items": {
-                                      "type": "boolean",
+                                      "types": ["boolean"],
                                       "exampleSetFlag": false
                                     }
                                 },
@@ -519,7 +519,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "exampleSetFlag": false
                                 },
                                 "someString": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -540,13 +540,13 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "someBoolList",
                                     "someString"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "someBoolList": {
-                                        "type": "array",
+                                        "types": ["array"],
                                         "exampleSetFlag": false,
                                         "items": {
-                                            "type": "boolean",
+                                            "types": ["boolean"],
                                             "exampleSetFlag": false
                                         }
                                     },
@@ -556,7 +556,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                         "exampleSetFlag": false
                                     },
                                     "someString": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -605,14 +605,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
-                        "type": "object",
+                        "types": ["object"],
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -621,7 +621,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -634,14 +634,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
                     {
-                        "type": "object",
+                        "types": ["object"],
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -650,7 +650,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -663,14 +663,14 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
-                        "type": "object",
+                        "types": ["object"],
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -679,7 +679,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "type": "object",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -698,15 +698,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                          "type": "integer",
+                                          "types": ["integer"],
                                           "format": "int32",
                                           "exampleSetFlag": false
                                         },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -717,15 +717,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "b",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "b": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -755,15 +755,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -774,15 +774,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "b",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "b": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -816,15 +816,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -835,15 +835,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "b",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "b": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -862,15 +862,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "a",
                             "sealedValue"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                             "a": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                             },
                             "sealedValue": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                             }
                         },
@@ -884,15 +884,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "a",
                                 "sealedValue"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "a": {
-                                    "type": "integer",
+                                    "types": ["integer"],
                                     "format": "int32",
                                     "exampleSetFlag": false
                                 },
                                 "sealedValue": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "exampleSetFlag": false
                                 }
                             },
@@ -913,15 +913,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "a",
                                     "sealedValue"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "a": {
-                                        "type": "integer",
+                                        "types": ["integer"],
                                         "format": "int32",
                                         "exampleSetFlag": false
                                     },
                                     "sealedValue": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -941,10 +941,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "required": [
                             "value"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                             "value": {
-                                "type": "string",
+                                "types": ["string"],
                                 "description": "field description",
                                 "exampleSetFlag": false
                             }
@@ -963,10 +963,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "value"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "type": "string",
+                                    "types": ["string"],
                                     "description": "field description",
                                     "exampleSetFlag": false
                                 }
@@ -992,10 +992,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "value"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "value": {
-                                        "type": "string",
+                                        "types": ["string"],
                                         "description": "field description",
                                         "exampleSetFlag": false
                                     }
@@ -1020,18 +1020,18 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "required": [
                             "nested"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                             "nested": {
                                 "title": "NestedClass",
                                 "required": [
                                     "text"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1048,7 +1048,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "required": [
                                 "nested"
                             ],
-                            "type": "object",
+                            "types": ["object"],
                             "properties": {
                                 "nested": {
                                     "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass",
@@ -1063,11 +1063,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "text"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1088,11 +1088,11 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "text"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "type": "string",
+                                        "types": ["string"],
                                         "exampleSetFlag": false
                                     }
                                 },
@@ -1103,7 +1103,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "required": [
                                     "nested"
                                 ],
-                                "type": "object",
+                                "types": ["object"],
                                 "properties": {
                                     "nested": {
                                         "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass",
@@ -1127,38 +1127,38 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "someMap",
                         "someSet"
                       ],
-                      "type": "object",
+                      "types": ["object"],
                       "properties": {
                         "someList": {
-                          "type": "array",
+                          "types": ["array"],
                           "exampleSetFlag": false,
                           "items": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           }
                         },
                         "someSet": {
-                          "type": "array",
+                          "types": ["array"],
                           "exampleSetFlag": false,
                           "items": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           }
                         },
                         "someMap": {
-                          "type": "object",
+                          "types": ["object"],
                           "additionalProperties": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                           },
                           "exampleSetFlag": false
                         },
                         "someArray": {
-                          "type": "array",
+                          "types": ["array"],
                           "exampleSetFlag": false,
                           "items": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                           }
@@ -1176,38 +1176,38 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "someMap",
                           "someSet"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "someList": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           },
                           "someSet": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           },
                           "someMap": {
-                            "type": "object",
+                            "types": ["object"],
                             "additionalProperties": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             },
                             "exampleSetFlag": false
                           },
                           "someArray": {
-                            "type": "array",
+                            "types": ["array"],
                             "exampleSetFlag": false,
                             "items": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             }
@@ -1232,38 +1232,38 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "someMap",
                             "someSet"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "someList": {
-                              "type": "array",
+                              "types": ["array"],
                               "exampleSetFlag": false,
                               "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                               }
                             },
                             "someSet": {
-                              "type": "array",
+                              "types": ["array"],
                               "exampleSetFlag": false,
                               "items": {
-                                "type": "string",
+                                "types": ["string"],
                                 "exampleSetFlag": false
                               }
                             },
                             "someMap": {
-                              "type": "object",
+                              "types": ["object"],
                               "additionalProperties": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                               },
                               "exampleSetFlag": false
                             },
                             "someArray": {
-                              "type": "array",
+                              "types": ["array"],
                               "exampleSetFlag": false,
                               "items": {
-                                "type": "integer",
+                                "types": ["integer"],
                                 "format": "int32",
                                 "exampleSetFlag": false
                               }
@@ -1280,7 +1280,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with direct self reference",
                 expectedResultInlining = """
                     {
-                      "type": "object",
+                      "types": ["object"],
                       "properties": {
                         "self": {
                           "types": ["object", "null"],
@@ -1484,13 +1484,13 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencing = """
                     {
                       "schema": {
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "self": {
                             "exampleSetFlag": false,
                             "oneOf": [
                               {
-                                "type": "null",
+                                "types": ["null"],
                                 "exampleSetFlag": false
                               },
                               {
@@ -1504,13 +1504,13 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                       },
                       "definitions": {
                         "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "self": {
                               "exampleSetFlag": false,
                               "oneOf": [
                                 {
-                                  "type": "null",
+                                  "types": ["null"],
                                   "exampleSetFlag": false
                                 },
                                 {
@@ -1533,13 +1533,13 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                       },
                       "definitions": {
                         "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "self": {
                               "exampleSetFlag": false,
                               "oneOf": [
                                 {
-                                  "type": "null",
+                                  "types": ["null"],
                                   "exampleSetFlag": false
                                 },
                                 {
@@ -1567,10 +1567,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "ctorOptional",
                         "ctorRequired"
                       ],
-                      "type": "object",
+                      "types": ["object"],
                       "properties": {
                         "ctorOptional": {
-                          "type": "string",
+                          "types": ["string"],
                           "exampleSetFlag": false
                         },
                         "ctorOptionalNullable": {
@@ -1578,7 +1578,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "exampleSetFlag": false
                         },
                         "ctorRequired": {
-                          "type": "string",
+                          "types": ["string"],
                           "exampleSetFlag": false
                         },
                         "ctorRequiredNullable": {
@@ -1596,10 +1596,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "ctorOptional",
                           "ctorRequired"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "ctorOptional": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
@@ -1607,7 +1607,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
@@ -1632,10 +1632,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "ctorOptional",
                             "ctorRequired"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "ctorOptional": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
@@ -1643,7 +1643,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
@@ -1668,10 +1668,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                       "required": [
                         "ctorRequired"
                       ],
-                      "type": "object",
+                      "types": ["object"],
                       "properties": {
                         "ctorOptional": {
-                          "type": "string",
+                          "types": ["string"],
                           "exampleSetFlag": false
                         },
                         "ctorOptionalNullable": {
@@ -1679,7 +1679,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "exampleSetFlag": false
                         },
                         "ctorRequired": {
-                          "type": "string",
+                          "types": ["string"],
                           "exampleSetFlag": false
                         },
                         "ctorRequiredNullable": {
@@ -1696,10 +1696,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "required": [
                           "ctorRequired"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "ctorOptional": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorOptionalNullable": {
@@ -1707,7 +1707,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "exampleSetFlag": false
                           },
                           "ctorRequired": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           },
                           "ctorRequiredNullable": {
@@ -1731,10 +1731,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "required": [
                             "ctorRequired"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "ctorOptional": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorOptionalNullable": {
@@ -1742,7 +1742,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                               "exampleSetFlag": false
                             },
                             "ctorRequired": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             },
                             "ctorRequiredNullable": {
@@ -1765,15 +1765,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "myValue",
                         "someText"
                       ],
-                      "type": "object",
+                      "types": ["object"],
                       "properties": {
                         "myValue": {
-                          "type": "integer",
+                          "types": ["integer"],
                           "format": "int32",
                           "exampleSetFlag": false
                         },
                         "someText": {
-                          "type": "string",
+                          "types": ["string"],
                           "exampleSetFlag": false
                         }
                       },
@@ -1787,15 +1787,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                           "myValue",
                           "someText"
                         ],
-                        "type": "object",
+                        "types": ["object"],
                         "properties": {
                           "myValue": {
-                            "type": "integer",
+                            "types": ["integer"],
                             "format": "int32",
                             "exampleSetFlag": false
                           },
                           "someText": {
-                            "type": "string",
+                            "types": ["string"],
                             "exampleSetFlag": false
                           }
                         },
@@ -1816,15 +1816,15 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "myValue",
                             "someText"
                           ],
-                          "type": "object",
+                          "types": ["object"],
                           "properties": {
                             "myValue": {
-                              "type": "integer",
+                              "types": ["integer"],
                               "format": "int32",
                               "exampleSetFlag": false
                             },
                             "someText": {
-                              "type": "string",
+                              "types": ["string"],
                               "exampleSetFlag": false
                             }
                           },

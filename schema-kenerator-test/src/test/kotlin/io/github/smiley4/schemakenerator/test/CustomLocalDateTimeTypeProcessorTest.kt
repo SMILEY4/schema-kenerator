@@ -6,18 +6,17 @@ import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
 import io.kotest.assertions.json.ArrayOrder
@@ -144,10 +143,10 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     "required": [
                         "dateTime"
                     ],
-                    "type": "object",
+                    "types": ["object"],
                     "properties": {
                         "dateTime": {
-                            "type": "object",
+                            "types": ["object"],
                             "title": "java.time.LocalDateTime",
                             "properties": {},
                             "exampleSetFlag": false
@@ -200,10 +199,10 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     "required": [
                         "dateTime"
                     ],
-                    "type": "object",
+                    "types": ["object"],
                     "properties": {
                         "dateTime": {
-                            "type": "date",
+                            "types": ["date"],
                             "title": "java.time.LocalDateTime",
                             "exampleSetFlag": false
                         }

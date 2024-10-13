@@ -2,30 +2,24 @@ package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Optional
 import io.github.smiley4.schemakenerator.core.annotations.Required
-import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
 /**
  * Sets properties as optional/required from core [Optional] and [Required]-annotation.
  */
-class SwaggerSchemaCoreAnnotationOptionalAndRequiredStep {
+class SwaggerSchemaCoreAnnotationOptionalAndRequiredStep : AbstractSwaggerSchemaStep() {
 
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(schema: SwaggerSchema) {
-        iterateProperties(schema) { prop, data ->
-            determineRequired(data)?.also { required ->
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+        iterateProperties(schema, typeDataMap) { _, propData, _ ->
+            determineRequired(propData)?.also { required ->
                 if (required) {
-                    addRequired(schema, data.name)
+                    addRequired(schema, propData.name)
                 } else {
-                    removeRequired(schema, data.name)
+                    removeRequired(schema, propData.name)
                 }
             }
         }

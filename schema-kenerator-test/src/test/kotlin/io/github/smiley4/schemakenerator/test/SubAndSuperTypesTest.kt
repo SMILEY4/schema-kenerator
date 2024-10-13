@@ -9,7 +9,6 @@ import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonJsonTypeInfoDiscriminatorStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
-import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.SubType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
@@ -211,7 +210,7 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "_type"
             subtype.properties.keys shouldContain "_type"
-            subtype.properties["_type"]?.type shouldBe "string"
+            subtype.properties["_type"]?.types shouldContainExactlyInAnyOrder setOf("string")
         }
     }
 
@@ -233,7 +232,7 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "kotlinx_type"
             subtype.properties.keys shouldContain "kotlinx_type"
-            subtype.properties["kotlinx_type"]?.type shouldBe "string"
+            subtype.properties["kotlinx_type"]?.types shouldContainExactlyInAnyOrder  setOf("string")
         }
     }
 
@@ -256,7 +255,7 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "jackson_type"
             subtype.properties.keys shouldContain "jackson_type"
-            subtype.properties["jackson_type"]?.type shouldBe "string"
+            subtype.properties["jackson_type"]?.types shouldContainExactlyInAnyOrder setOf("string")
         }
     }
 
@@ -315,6 +314,7 @@ class SubAndSuperTypesTest : StringSpec({
             data class ChildTwo(val number: Int) : KotlinxParent(false)
 
         }
+
 
         @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,

@@ -2,14 +2,13 @@ package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
@@ -18,12 +17,12 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollection
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
+import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat

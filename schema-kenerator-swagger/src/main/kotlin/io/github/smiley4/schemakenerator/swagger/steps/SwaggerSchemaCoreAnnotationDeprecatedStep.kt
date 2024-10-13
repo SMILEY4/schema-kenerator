@@ -3,42 +3,30 @@ package io.github.smiley4.schemakenerator.swagger.steps
 import io.github.smiley4.schemakenerator.core.annotations.Deprecated
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.PropertyData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
 /**
  * Sets deprecated-flag from [Deprecated] or kotlin's [Deprecated]-annotation.
  */
-class SwaggerSchemaCoreAnnotationDeprecatedStep {
+class SwaggerSchemaCoreAnnotationDeprecatedStep : AbstractSwaggerSchemaStep() {
 
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(schema: SwaggerSchema) {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
         if (schema.swagger.deprecated == null) {
-            determineDeprecated(schema.typeData)?.also { deprecated ->
+            determineDeprecated(schema.typeData.annotations)?.also { deprecated ->
                 schema.swagger.deprecated = deprecated
             }
         }
-        iterateProperties(schema) { prop, data ->
-            determineDeprecated(data)?.also { deprecated ->
+        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
+            determineDeprecated(propData.annotations + propTypeData.annotations)?.also { deprecated ->
                 prop.deprecated = deprecated
             }
         }
     }
 
-    private fun determineDeprecated(typeData: BaseTypeData): Boolean? {
-        return determineDeprecatedCore(typeData.annotations) ?: determineDeprecatedStd(typeData.annotations)
-    }
-
-    private fun determineDeprecated(typeData: PropertyData): Boolean? {
-        return determineDeprecatedCore(typeData.annotations) ?: determineDeprecatedStd(typeData.annotations)
+    private fun determineDeprecated(annotations: Collection<AnnotationData>): Boolean? {
+        return determineDeprecatedCore(annotations) ?: determineDeprecatedStd(annotations)
     }
 
     private fun determineDeprecatedCore(annotations: Collection<AnnotationData>): Boolean? {

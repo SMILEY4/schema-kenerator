@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -10,16 +10,9 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 /**
  * Modifies type of json-objects with the [JsonTypeHint]-annotation.
  */
-class JsonSchemaAnnotationTypeHintStep {
+class JsonSchemaAnnotationTypeHintStep : AbstractJsonSchemaStep() {
 
-    fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(schema: JsonSchema) {
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
         if (schema.json is JsonObject) {
             determineType(schema.typeData)?.also { type ->
                 schema.json.properties["type"] = JsonTextValue(type)

@@ -2,36 +2,30 @@ package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
 /**
  * Adds default values from [Default]-annotation
  */
-class SwaggerSchemaCoreAnnotationDefaultStep {
+class SwaggerSchemaCoreAnnotationDefaultStep : AbstractSwaggerSchemaStep() {
 
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(schema: SwaggerSchema) {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
         if (schema.swagger.default == null) {
             determineDefaults(schema.typeData.annotations)?.also { default ->
                 schema.swagger.setDefault(default)
             }
         }
-        iterateProperties(schema) { prop, data ->
-            determineDefaults(data.annotations)?.also { default ->
+        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
+            determineDefaults(propData.annotations + propTypeData.annotations)?.also { default ->
                 prop.setDefault(default)
             }
         }
     }
 
-    private fun determineDefaults(annotations: List<AnnotationData>): String? {
+    private fun determineDefaults(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Default::class.qualifiedName }
             .map { it.values["default"] as String }

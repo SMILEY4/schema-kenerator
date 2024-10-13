@@ -23,7 +23,7 @@ class JsonSchemaCompileInlineStep {
             val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
             val referencedSchema = schemaList.find(referencedId)
             if (referencedSchema != null) {
-                referencedSchema.json.also {
+                referencedSchema.json.copyNode().also {
                     if (it is JsonObject) {
                         it.properties.putAll(buildMap {
                             this.putAll(refObj.properties)

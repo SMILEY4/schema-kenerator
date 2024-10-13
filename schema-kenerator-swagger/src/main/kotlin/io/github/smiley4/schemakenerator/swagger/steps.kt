@@ -43,12 +43,6 @@ class SwaggerSchemaGenerationStepConfig {
      * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
      */
     var optionalHandling: OptionalHandling = OptionalHandling.REQUIRED
-
-
-    /**
-     * Whether to include the discriminator property from the marker annotation e.g. [io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME]
-     */
-    var discriminatorFromMarkerAnnotation: Boolean = true
 }
 
 

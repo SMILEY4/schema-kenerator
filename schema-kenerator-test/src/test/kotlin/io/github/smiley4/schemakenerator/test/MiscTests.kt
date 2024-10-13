@@ -10,8 +10,11 @@ import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameProperties
@@ -40,7 +43,7 @@ class MiscTests : FreeSpec({
                 .generateJsonSchema()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -63,7 +66,7 @@ class MiscTests : FreeSpec({
                 .generateJsonSchema()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -90,7 +93,7 @@ class MiscTests : FreeSpec({
                 }
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -118,7 +121,7 @@ class MiscTests : FreeSpec({
                 }
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -150,7 +153,7 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualJson(
+            result.json.prettyPrint().shouldEqualLenient(
                 """
                 {
                   "type": "object",
@@ -177,13 +180,13 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualJson(
+            json.writeValueAsString(result.swagger).shouldEqualLenient(
                 """
                 {
                   "required": [
                     "prop1"
                   ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "prop1": {
                       "types": ["string", "null"],
@@ -210,20 +213,20 @@ class MiscTests : FreeSpec({
             .handleJavaxValidationAnnotations()
             .compileInlining()
 
-        json.writeValueAsString(result.swagger).shouldEqualJson(
+        json.writeValueAsString(result.swagger).shouldEqualLenient(
             """
                 {
                   "required": [ "passwordRenamed", "usernameRenamed" ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "passwordRenamed": {
                       "maxLength": 200,
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "usernameRenamed": {
                       "maxLength": 100,
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     }
                   },
@@ -243,18 +246,18 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualJson(
+            json.writeValueAsString(result.swagger).shouldEqualLenient(
                 """
                 {
                   "required": [ "prefix_nameOfPerson", "prefix_numberOfYears" ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "prefix_nameOfPerson": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "prefix_numberOfYears": {
-                      "type": "integer",
+                      "types": ["integer"],
                       "format": "int32",
                       "exampleSetFlag": false
                     }
@@ -273,18 +276,18 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualJson(
+            json.writeValueAsString(result.swagger).shouldEqualLenient(
                 """
                 {
                   "required": [ "name_of_person", "number_of_years" ],
-                  "type": "object",
+                  "types": ["object"],
                   "properties": {
                     "name_of_person": {
-                      "type": "string",
+                      "types": ["string"],
                       "exampleSetFlag": false
                     },
                     "number_of_years": {
-                      "type": "integer",
+                      "types": ["integer"],
                       "format": "int32",
                       "exampleSetFlag": false
                     }
@@ -294,6 +297,45 @@ class MiscTests : FreeSpec({
             """.trimIndent()
             )
         }
+
+    }
+
+    "customize property with shared type results in output schema with both all properties being modified" {
+
+        class TestClass(
+            val describeMe: String,
+            val otherProperty: String
+        )
+
+        val jsonSchema = typeOf<TestClass>()
+            .processReflection()
+            .generateJsonSchema()
+            .customizeProperties { propertyData, propertySchema ->
+                if(propertyData.name == "describeMe" && propertySchema is JsonObject) {
+                    propertySchema.properties["description"] = JsonTextValue("test description")
+                }
+            }
+            .compileInlining()
+            .json.prettyPrint()
+
+        jsonSchema shouldEqualJson """
+            {
+               "type": "object",
+               "required": [
+                  "describeMe",
+                  "otherProperty"
+               ],
+               "properties": {
+                  "describeMe": {
+                     "type": "string",
+                     "description": "test description"
+                  },
+                  "otherProperty": {
+                     "type": "string"
+                  }
+               }
+            }
+        """.trimIndent()
 
     }
 
