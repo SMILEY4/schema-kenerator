@@ -624,6 +624,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     {
                         "schema": {
                             "exampleSetFlag": false,
+                            "types": ["string"],
                             "enum": [ "ONE", "TWO", "THREE" ]
                         },
                         "definitions": {}
@@ -633,6 +634,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     {
                         "schema": {
                             "exampleSetFlag": false,
+                            "types": ["string"],
                             "enum": [ "ONE", "TWO", "THREE" ]
                         },
                         "definitions": {}
@@ -647,6 +649,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "definitions": {
                             "io.github.smiley4.schemakenerator.test.models.reflection.TestEnum": {
                                 "exampleSetFlag": false,
+                                "types": ["string"],
                                 "enum": [ "ONE", "TWO", "THREE" ]
                             }
                         }

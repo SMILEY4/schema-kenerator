@@ -166,6 +166,7 @@ class SwaggerSchemaUtils {
 
     fun enumSchema(values: Collection<String>): Schema<*> {
         return Schema<String>().also { schema ->
+            schema.types = setOf("string")
             schema.enum = values.toMutableList()
         }
     }
