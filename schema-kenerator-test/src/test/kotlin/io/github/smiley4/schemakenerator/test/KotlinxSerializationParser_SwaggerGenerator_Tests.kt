@@ -397,7 +397,6 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "types": ["object"],
-                        "properties": {},
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
@@ -405,7 +404,6 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     {
                         "schema": {
                             "types": ["object"],
-                            "properties": {},
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -414,16 +412,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<List>",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
-                        "definitions": {
-                            "kotlinx.serialization.Polymorphic<List>": {
-                                "types": ["object"],
-                                "properties": {},
-                                "exampleSetFlag": false
-                            }
-                        }
+                        "definitions": {}
                     }
                 """.trimIndent(),
             ),
@@ -434,7 +426,6 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "types": ["object"],
-                        "properties": {},
                         "exampleSetFlag": false
                     }
                 """.trimIndent(),
@@ -442,7 +433,6 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     {
                         "schema": {
                             "types": ["object"],
-                            "properties": {},
                             "exampleSetFlag": false
                         },
                         "definitions": {}
@@ -451,16 +441,10 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultReferencingRoot = """
                     {
                         "schema": {
-                            "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<Map>",
+                            "types": ["object"],
                             "exampleSetFlag": false
                         },
-                        "definitions": {
-                            "kotlinx.serialization.Polymorphic<Map>": {
-                                "types": ["object"],
-                                "properties": {},
-                                "exampleSetFlag": false
-                            }
-                        }
+                        "definitions": {}
                     }
                 """.trimIndent(),
             ),

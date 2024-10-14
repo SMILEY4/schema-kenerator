@@ -5,9 +5,14 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
+import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
@@ -24,21 +29,20 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test json" {
-//        val result = typeOf<KotlinxParent>()
-//            .processKotlinxSerialization()
-//            .connectSubTypes()
-//            .generateJsonSchema()
-//            .compileInlining()
-//
-//        println(result.json.prettyPrint())
+        val result = typeOf<List<String>>()
+            .processKotlinxSerialization()
+            .generateJsonSchema()
+            .compileInlining()
+
+        println(result.json.prettyPrint())
 
     }
 
     "test swagger" {
-        val result = typeOf<TestClass>()
-            .processReflection()
+        val result = typeOf<List<String>>()
+            .processKotlinxSerialization()
             .generateSwaggerSchema()
-            .compileInlining()
+            .compileReferencingRoot()
             .asPrintable()
 
         println(json.writeValueAsString(result))
