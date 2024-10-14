@@ -30,7 +30,7 @@ class JsonSchemaCoreAnnotationDefaultStep : AbstractJsonSchemaStep() {
     private fun determineDefault(annotations: List<AnnotationData>): String? {
         return annotations
             .filter { it.name == Default::class.qualifiedName }
-            .map { it.values["default"] as String }
+            .map { it.values["value"] as String }
             .firstOrNull()
     }
 }
