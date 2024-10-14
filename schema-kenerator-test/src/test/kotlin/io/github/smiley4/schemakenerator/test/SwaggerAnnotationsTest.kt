@@ -62,9 +62,10 @@ class SwaggerAnnotationsTest : StringSpec({
                       "minLength": 1,
                       "types": ["integer"],
                       "description": "some value",
+                      "example": "5",
                       "format": "single-digit",
                       "readOnly": true,
-                      "exampleSetFlag": false,
+                      "exampleSetFlag": true,
                       "enum": ["1","2","3","4"],
                       "default": "1"
                     },
@@ -479,6 +480,7 @@ class SwaggerAnnotationsTest : StringSpec({
 
             @field:Schema(
                 description = "some value",
+                example = "5",
                 title = "Some Value",
                 name = "someValue",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED,

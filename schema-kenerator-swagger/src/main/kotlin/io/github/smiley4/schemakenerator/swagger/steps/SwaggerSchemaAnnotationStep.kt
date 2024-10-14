@@ -18,6 +18,7 @@ import java.math.BigDecimal
  *      - name
  *      - title
  *      - description
+ *      - example
  *      - hidden
  *      - allowableValues
  *      - defaultValue
@@ -45,6 +46,7 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
             val mergedAnnotations = propData.annotations + propTypeData.annotations
             getTitle(mergedAnnotations)?.also { prop.title = it }
             getDescription(mergedAnnotations)?.also { prop.description = it }
+            getExample(mergedAnnotations)?.also { prop.example = it }
             getName(mergedAnnotations)?.also { prop.name = it }
             getAllowableValues(mergedAnnotations)?.onEach { entry ->
                 @Suppress("UNCHECKED_CAST")
@@ -79,10 +81,19 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
             .map { it.ifBlank { null } }
             .firstOrNull()
     }
+
     private fun getDescription(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["description"] as String }
+            .map { it.ifBlank { null } }
+            .firstOrNull()
+    }
+
+    private fun getExample(annotations: Collection<AnnotationData>): String? {
+        return annotations
+            .filter { it.name == Schema::class.qualifiedName }
+            .map { it.values["example"] as String }
             .map { it.ifBlank { null } }
             .firstOrNull()
     }
