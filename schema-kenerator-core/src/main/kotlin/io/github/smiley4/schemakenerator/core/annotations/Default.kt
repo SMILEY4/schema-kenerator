@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialInfo
 
 /**
  * Specifies a default value for the annotated object.
+ * @param value The default value for the annotated object.
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Target(
@@ -15,4 +16,4 @@ import kotlinx.serialization.SerialInfo
 )
 @SerialInfo
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Default(val default: String)
+annotation class Default(val value: String)

@@ -14,21 +14,21 @@ class SwaggerSchemaCoreAnnotationDefaultStep : AbstractSwaggerSchemaStep() {
 
     override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
         if (schema.swagger.default == null) {
-            determineDefaults(schema.typeData.annotations)?.also { default ->
+            determineDefault(schema.typeData.annotations)?.also { default ->
                 schema.swagger.setDefault(default)
             }
         }
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
-            determineDefaults(propData.annotations + propTypeData.annotations)?.also { default ->
+            determineDefault(propData.annotations + propTypeData.annotations)?.also { default ->
                 prop.setDefault(default)
             }
         }
     }
 
-    private fun determineDefaults(annotations: Collection<AnnotationData>): String? {
+    private fun determineDefault(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Default::class.qualifiedName }
-            .map { it.values["default"] as String }
+            .map { it.values["value"] as String }
             .firstOrNull()
     }
 
