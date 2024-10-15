@@ -4,6 +4,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.annotations.Deprecated
 import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Example
+import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import kotlinx.serialization.Serializable
 
@@ -12,8 +13,10 @@ import kotlinx.serialization.Serializable
 @Description("some description")
 @Default("default value")
 @Example("example 1")
+@Format("object")
 @Deprecated
 class CoreAnnotatedClass(
     @Description("field description")
+    @Format("string")
     val value: String
 )

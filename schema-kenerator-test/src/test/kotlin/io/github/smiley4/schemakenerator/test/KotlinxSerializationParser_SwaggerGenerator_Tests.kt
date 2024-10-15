@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
@@ -62,6 +63,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -105,6 +107,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -154,6 +157,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -949,14 +953,16 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                             "value": {
                                 "types": ["string"],
                                 "description": "field description",
-                                "exampleSetFlag": false
+                                "exampleSetFlag": false,
+                                "format": "string"
                             }
                         },
                         "description": "some description",
                         "deprecated": true,
                         "exampleSetFlag": true,
                         "example": "example 1",
-                        "default": "default value"
+                        "default": "default value",
+                        "format": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
@@ -971,14 +977,16 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                 "value": {
                                     "types": ["string"],
                                     "description": "field description",
-                                    "exampleSetFlag": false
+                                    "exampleSetFlag": false,
+                                    "format": "string"
                                 }
                             },
                             "description": "some description",
                             "deprecated": true,
                             "exampleSetFlag": true,
                             "example": "example 1",
-                            "default": "default value"
+                            "default": "default value",
+                            "format": "object"
                         },
                         "definitions": {}
                     }
@@ -1000,14 +1008,16 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                                     "value": {
                                         "types": ["string"],
                                         "description": "field description",
-                                        "exampleSetFlag": false
+                                        "exampleSetFlag": false,
+                                        "format": "string"
                                     }
                                 },
                                 "description": "some description",
                                 "deprecated": true,
                                 "exampleSetFlag": true,
                                 "example": "example 1",
-                                "default": "default value"
+                                "default": "default value",
+                                "format": "object"
                             }
                         }
                     }
