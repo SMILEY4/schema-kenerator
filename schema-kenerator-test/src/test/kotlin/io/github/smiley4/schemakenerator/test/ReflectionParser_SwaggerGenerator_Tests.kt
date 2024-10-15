@@ -14,6 +14,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
@@ -65,6 +66,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
                             .let { SwaggerSchemaAnnotationStep().process(it) }
                             .let { SwaggerArraySchemaAnnotationStep().process(it) }
                     } else {
@@ -116,6 +118,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
                             .let { SwaggerSchemaAnnotationStep().process(it) }
                             .let { SwaggerArraySchemaAnnotationStep().process(it) }
                     } else {
@@ -167,6 +170,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
                             .let { SwaggerSchemaAnnotationStep().process(it) }
                             .let { SwaggerArraySchemaAnnotationStep().process(it) }
                     } else {
@@ -1127,7 +1131,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "description": "String field description",
                                     "default": "A default String value",
                                     "exampleSetFlag": true,
-                                    "example": "An example of a String value"
+                                    "example": "An example of a String value",
+                                    "format": "text"
                                 },
                                 "intValue": {
                                     "types": ["integer"],
@@ -1142,7 +1147,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "deprecated": true,
                             "exampleSetFlag": true,
                             "example": "example 1",
-                            "default": "default value"
+                            "default": "default value",
+                            "format": "pair"
                         },
                         "definitions": {}
                     }
@@ -1162,7 +1168,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                     "description": "String field description",
                                     "default": "A default String value",
                                     "exampleSetFlag": true,
-                                    "example": "An example of a String value"
+                                    "example": "An example of a String value",
+                                    "format": "text"
                                 },
                                 "intValue": {
                                     "types": ["integer"],
@@ -1177,7 +1184,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "deprecated": true,
                             "exampleSetFlag": true,
                             "example": "example 1",
-                            "default": "default value"
+                            "default": "default value",
+                            "format": "pair"
                         },
                         "definitions": {}
                     }
@@ -1202,7 +1210,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                         "description": "String field description",
                                         "default": "A default String value",
                                         "exampleSetFlag": true,
-                                        "example": "An example of a String value"
+                                        "example": "An example of a String value",
+                                        "format": "text"
                                     },
                                     "intValue": {
                                         "types": ["integer"],
@@ -1217,7 +1226,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                                 "deprecated": true,
                                 "exampleSetFlag": true,
                                 "example": "example 1",
-                                "default": "default value"
+                                "default": "default value",
+                                "format": "pair"
                             }
                         }
                     }

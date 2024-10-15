@@ -11,6 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
@@ -61,6 +62,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -105,6 +107,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -158,6 +161,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -862,7 +866,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "default": "A default String value",
                                 "examples": [
                                     "An example of a String value"
-                                ]
+                                ],
+                                "format": "text"
                             },
                             "intValue": {
                                 "type": "integer",
@@ -872,7 +877,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "description": "Int field description",
                                 "examples": [
                                     "2222"
-                                ]
+                                ],
+                                "format": "int32"
                             }
                         },
                         "title": "Annotated Class",
@@ -881,7 +887,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "examples": [
                             "example 1"
                         ],
-                        "deprecated": true
+                        "deprecated": true,
+                        "format": "pair"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
@@ -895,7 +902,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "default": "A default String value",
                                 "examples": [
                                     "An example of a String value"
-                                ]
+                                ],
+                                "format": "text"
                             },
                             "intValue": {
                                 "type": "integer",
@@ -905,7 +913,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "description": "Int field description",
                                 "examples": [
                                     "2222"
-                                ]
+                                ],
+                                "format": "int32"
                             }
                         },
                         "title": "Annotated Class",
@@ -914,7 +923,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "examples": [
                             "example 1"
                         ],
-                        "deprecated": true
+                        "deprecated": true,
+                        "format": "pair"
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
@@ -931,7 +941,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                         "default": "A default String value",
                                         "examples": [
                                             "An example of a String value"
-                                        ]
+                                        ],
+                                        "format": "text"
                                     },
                                     "intValue": {
                                         "type": "integer",
@@ -941,7 +952,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                         "description": "Int field description",
                                         "examples": [
                                             "2222"
-                                        ]
+                                        ],
+                                        "format": "int32"
                                     }
                                 },
                                 "title": "Annotated Class",
@@ -950,7 +962,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "examples": [
                                     "example 1"
                                 ],
-                                "deprecated": true
+                                "deprecated": true,
+                                "format": "pair"
                             }
                         }
                     }

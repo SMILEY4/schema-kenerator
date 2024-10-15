@@ -20,6 +20,9 @@ dependencies {
 | `@Deprecated`  | Specify whether the annotated type or property should be marked as deprecated. | `handleCoreAnnotations` (jsonschema, swagger) |
 | `@Example`     | Provide example values for the annotated type or property                      | `handleCoreAnnotations` (jsonschema, swagger) |
 | `@Default`     | Specify a default value for the annotated type or property                     | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Optional`    | Specify that the annotated type or property is optional.                       | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Required`    | Specify that the annotated type or property is required.                       | `handleCoreAnnotations` (jsonschema, swagger) |
+| `@Format`      | Specify the schema format of the annotated type or property.                   | `handleCoreAnnotations` (jsonschema, swagger) |
 
 ## Steps
 
