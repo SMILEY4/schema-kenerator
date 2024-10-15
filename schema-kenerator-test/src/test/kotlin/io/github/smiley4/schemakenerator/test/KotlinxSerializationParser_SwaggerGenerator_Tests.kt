@@ -29,12 +29,6 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -78,14 +72,8 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 }
                 .let { SwaggerSchemaCompileInlineStep().compile(it) }
 
-            json.writeValueAsString(schema.swagger).shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultInlining
-            }
+
+            schema.swagger.shouldEqualJson(data.expectedResultInlining)
         }
     }
 
@@ -128,14 +116,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     )
                 }
 
-            json.writeValueAsString(schema).shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencing
-            }
+            (schema.schema to schema.definitions).shouldEqualJson(data.expectedResultReferencing)
         }
     }
 
@@ -178,14 +159,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     )
                 }
 
-            json.writeValueAsString(schema).shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencingRoot
-            }
+            (schema.schema to schema.definitions).shouldEqualJson(data.expectedResultReferencingRoot)
         }
     }
 
@@ -207,8 +181,8 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
             val withAnnotations: Boolean = false,
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
-            val expectedResultReferencing: String,
-            val expectedResultReferencingRoot: String,
+            val expectedResultReferencing: Map<String, String>,
+            val expectedResultReferencingRoot: Map<String, String>,
         ) : WithDataTestName {
             override fun dataTestName() = testName
         }
@@ -219,180 +193,150 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "any",
                 expectedResultInlining = """
                     {
-                        "types": ["object"],
-                        "exampleSetFlag": false
+                        "type": "object"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<UByte>(),
                 testName = "ubyte",
                 expectedResultInlining = """
                     {
-                        "types": ["integer"],
+                        "type": "integer",
                         "maximum": 255,
-                        "minimum": 0,
-                        "exampleSetFlag": false
+                        "minimum": 0
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
                             "maximum": 255,
-                            "minimum": 0,
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
+                            "minimum": 0
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
                             "maximum": 255,
-                            "minimum": 0,
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                            "minimum": 0
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<Int>(),
                 testName = "int",
                 expectedResultInlining = """
                     {
-                        "types": ["integer"],
-                        "format": "int32",
-                        "exampleSetFlag": false
+                        "type": "integer",
+                        "format": "int32"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent()
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<Float>(),
                 testName = "float",
                 expectedResultInlining = """
                     {
-                        "types": ["number"],
-                        "format": "float",
-                        "exampleSetFlag": false
+                        "type": "number",
+                        "format": "float"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                        "types": ["number"],
-                        "format": "float",
-                        "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["number"],
-                            "format": "float",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<Boolean>(),
                 testName = "boolean",
                 expectedResultInlining = """
                     {
-                         "types": ["boolean"],
-                         "exampleSetFlag": false
+                         "type": "boolean"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["boolean"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["boolean"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                             "type": "boolean"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                             "type": "boolean"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<String>(),
                 testName = "string",
                 expectedResultInlining = """
                     {
-                        "types": ["string"],
-                        "exampleSetFlag": false
+                        "type": "string"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "string"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "string"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 // top-level lists not directly supported: weird result
@@ -400,36 +344,31 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "types": ["object"],
-                        "properties": {},
-                        "exampleSetFlag": false
+                        "type": "object",
+                        "properties": {}
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "properties": {},
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<List>",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "kotlinx.serialization.Polymorphic<List>": {
-                                "types": ["object"],
-                                "properties": {},
-                                "exampleSetFlag": false
-                            }
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object",
+                            "properties": {}
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<List>"
+                        }
+                    """.trimIndent(),
+                    "kotlinx.serialization.Polymorphic<List>" to """
+                        {
+                          "type": "object",
+                          "properties": {}
+                        }
+                    """.trimIndent()
+                )
             ),
             // top-level maps not directly supported: weird result
             TestData(
@@ -437,174 +376,147 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "types": ["object"],
-                        "properties": {},
-                        "exampleSetFlag": false
+                        "type": "object",
+                        "properties": {}
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "properties": {},
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<Map>",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "kotlinx.serialization.Polymorphic<Map>": {
-                                "types": ["object"],
-                                "properties": {},
-                                "exampleSetFlag": false
-                            }
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object",
+                            "properties": {}
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<Map>"
+                        }
+                    """.trimIndent(),
+                    "kotlinx.serialization.Polymorphic<Map>" to """
+                        {
+                          "type": "object",
+                          "properties": {}
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithSimpleFields>(),
                 testName = "class with simple fields",
                 expectedResultInlining = """
                     {
+                        "type": "object",
                         "required": [
                             "someBoolList",
                             "someString"
                         ],
-                        "types": ["object"],
                         "properties": {
                             "someBoolList": {
-                                "types": ["array"],
-                                "exampleSetFlag": false,
+                                "type": "array",
                                 "items": {
-                                  "types": ["boolean"],
-                                  "exampleSetFlag": false
+                                  "type": "boolean"
                                 }
                             },
                             "someNullableInt": {
-                                "types": ["integer", "null"],
-                                "format": "int32",
-                                "exampleSetFlag": false
+                                "type": ["integer", "null"],
+                                "format": "int32"
                             },
                             "someString": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
-                            }
-                        },
-                        "exampleSetFlag": false
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "someBoolList",
-                                "someString"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "someBoolList": {
-                                    "types": ["array"],
-                                    "exampleSetFlag": false,
-                                    "items": {
-                                      "types": ["boolean"],
-                                      "exampleSetFlag": false
-                                    }
-                                },
-                                "someNullableInt": {
-                                    "types": ["integer", "null"],
-                                    "format": "int32",
-                                    "exampleSetFlag": false
-                                },
-                                "someString": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields": {
-                                "required": [
-                                    "someBoolList",
-                                    "someString"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "someBoolList": {
-                                        "types": ["array"],
-                                        "exampleSetFlag": false,
-                                        "items": {
-                                            "types": ["boolean"],
-                                            "exampleSetFlag": false
-                                        }
-                                    },
-                                    "someNullableInt": {
-                                        "types": ["integer", "null"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "someString": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                                "type": "string"
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "required": [
+                                "someBoolList",
+                                "someString"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "someBoolList": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "boolean"
+                                    }
+                                },
+                                "someNullableInt": {
+                                    "type": ["integer", "null"],
+                                    "format": "int32"
+                                },
+                                "someString": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields" to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "someBoolList",
+                                "someString"
+                            ],
+                            "properties": {
+                                "someBoolList": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "boolean"
+                                    }
+                                },
+                                "someNullableInt": {
+                                    "type": ["integer", "null"],
+                                    "format": "int32"
+                                },
+                                "someString": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<TestEnum>(),
                 testName = "enum",
                 expectedResultInlining = """
                     {
-                        "exampleSetFlag": false,
-                        "types": ["string"],
+                        "type": "string",
                         "enum": [ "ONE", "TWO", "THREE" ]
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "exampleSetFlag": false,
-                            "types": ["string"],
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "string",
                             "enum": [ "ONE", "TWO", "THREE" ]
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum": {
-                                "exampleSetFlag": false,
-                                "types": ["string"],
-                                "enum": [ "ONE", "TWO", "THREE" ]
-                            }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum" to """
+                        {
+                            "type": "string",
+                            "enum": [ "ONE", "TWO", "THREE" ]
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 // generics not supported with kotlinx-serialization -> fallback to "any"-schema
@@ -612,28 +524,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
-                        "types": ["object"],
-                        "exampleSetFlag": false
+                        "type": "object"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 // generics not supported with kotlinx-serialization -> fallback to "any"-schema
@@ -641,28 +548,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
                     {
-                        "types": ["object"],
-                        "exampleSetFlag": false
+                        "type": "object"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 // generics not supported with kotlinx-serialization -> fallback to "any"-schema
@@ -670,273 +572,237 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
-                        "types": ["object"],
-                        "exampleSetFlag": false
+                        "type": "object"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "object"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<SealedClass>(),
                 testName = "sealed class with subtypes",
                 expectedResultInlining = """
                     {
-                        "exampleSetFlag": false,
                         "anyOf": [
                             {
                                 "required": [
                                     "a",
                                     "sealedValue"
                                 ],
-                                "types": ["object"],
+                                "type": "object",
                                 "properties": {
                                     "a": {
-                                          "types": ["integer"],
-                                          "format": "int32",
-                                          "exampleSetFlag": false
-                                        },
+                                      "type": "integer",
+                                      "format": "int32"
+                                    },
                                     "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
+                                        "type": "string"
                                     }
-                                },
-                                "exampleSetFlag": false
+                                }
                             },
                             {
                                 "required": [
                                     "b",
                                     "sealedValue"
                                 ],
-                                "types": ["object"],
+                                "type": "object",
                                 "properties": {
                                     "b": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
+                                        "type": "integer",
+                                        "format": "int32"
                                     },
                                     "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
+                                        "type": "string"
                                     }
-                                },
-                                "exampleSetFlag": false
+                                }
                             }
                         ]
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "exampleSetFlag": false,
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
                             "anyOf": [
                                 {
-                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
-                                    "exampleSetFlag": false
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA"
                                 },
                                 {
-                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB",
-                                    "exampleSetFlag": false
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB"
                                 }
                             ]
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA": {
-                                "required": [
-                                    "a",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "a": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA" to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
                                 },
-                                "exampleSetFlag": false
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB": {
-                                "required": [
-                                    "b",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "b": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                                "sealedValue": {
+                                    "type": "string"
+                                }
                             }
                         }
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass": {
-                                "exampleSetFlag": false,
-                                "anyOf": [
-                                    {
-                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
-                                        "exampleSetFlag": false
-                                    },
-                                    {
-                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB",
-                                        "exampleSetFlag": false
-                                    }
-                                ]
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA": {
-                                "required": [
-                                    "a",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "a": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB" to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "b",
+                                "sealedValue"
+                            ],
+                            "properties": {
+                                "b": {
+                                    "type": "integer",
+                                    "format": "int32"
                                 },
-                                "exampleSetFlag": false
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB": {
-                                "required": [
-                                    "b",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "b": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                                "sealedValue": {
+                                    "type": "string"
+                                }
                             }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass" to """
+                        {
+                            "anyOf": [
+                                {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA"
+                                },
+                                {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB"
+                                }
+                            ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA" to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassB" to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "b",
+                                "sealedValue"
+                            ],
+                            "properties": {
+                                "b": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<SubClassA>(),
                 testName = "sub class",
                 expectedResultInlining = """
                     {
+                        "type": "object",
                         "required": [
                             "a",
                             "sealedValue"
                         ],
-                        "types": ["object"],
                         "properties": {
                             "a": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
+                                "type": "integer",
+                                "format": "int32"
                             },
                             "sealedValue": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
-                            }
-                        },
-                        "exampleSetFlag": false
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "a",
-                                "sealedValue"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "a": {
-                                    "types": ["integer"],
-                                    "format": "int32",
-                                    "exampleSetFlag": false
-                                },
-                                "sealedValue": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA": {
-                                "required": [
-                                    "a",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "a": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                                "type": "string"
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA" to """
+                        {
+                            "type": "object",
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<CoreAnnotatedClass>(),
@@ -945,83 +811,75 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 expectedResultInlining = """
                     {
                         "title": "Annotated Class",
+                        "type": "object",
                         "required": [
                             "value"
                         ],
-                        "types": ["object"],
                         "properties": {
                             "value": {
-                                "types": ["string"],
+                                "type": "string",
                                 "description": "field description",
-                                "exampleSetFlag": false,
                                 "format": "string"
                             }
                         },
                         "description": "some description",
                         "deprecated": true,
-                        "exampleSetFlag": true,
                         "example": "example 1",
                         "default": "default value",
                         "format": "object"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
                             "title": "Annotated Class",
+                            "type": "object",
                             "required": [
                                 "value"
                             ],
-                            "types": ["object"],
                             "properties": {
                                 "value": {
-                                    "types": ["string"],
+                                    "type": "string",
                                     "description": "field description",
-                                    "exampleSetFlag": false,
                                     "format": "string"
                                 }
                             },
                             "description": "some description",
                             "deprecated": true,
-                            "exampleSetFlag": true,
                             "example": "example 1",
                             "default": "default value",
                             "format": "object"
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass": {
-                                "title": "Annotated Class",
-                                "required": [
-                                    "value"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "value": {
-                                        "types": ["string"],
-                                        "description": "field description",
-                                        "exampleSetFlag": false,
-                                        "format": "string"
-                                    }
-                                },
-                                "description": "some description",
-                                "deprecated": true,
-                                "exampleSetFlag": true,
-                                "example": "example 1",
-                                "default": "default value",
-                                "format": "object"
-                            }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass" to """
+                        {
+                            "title": "Annotated Class",
+                            "type": "object",
+                            "required": [
+                                "value"
+                            ],
+                            "properties": {
+                                "value": {
+                                    "type": "string",
+                                    "description": "field description",
+                                    "format": "string"
+                                }
+                            },
+                            "description": "some description",
+                            "deprecated": true,
+                            "example": "example 1",
+                            "default": "default value",
+                            "format": "object"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithNestedClass>(),
@@ -1033,101 +891,91 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "required": [
                             "nested"
                         ],
-                        "types": ["object"],
+                        "type": "object",
                         "properties": {
                             "nested": {
                                 "title": "NestedClass",
+                                "type": "object",
                                 "required": [
                                     "text"
                                 ],
-                                "types": ["object"],
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
+                                        "type": "string"
                                     }
-                                },
-                                "exampleSetFlag": false
+                                }
                             }
-                        },
-                        "exampleSetFlag": false
+                        }
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
                             "title": "ClassWithNestedClass",
                             "required": [
                                 "nested"
                             ],
-                            "types": ["object"],
+                            "type": "object",
                             "properties": {
                                 "nested": {
-                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass",
-                                    "exampleSetFlag": false
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass"
                                 }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass": {
-                                "title": "NestedClass",
-                                "required": [
-                                    "text"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "text": {
-                                        "title": "String",
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
                             }
                         }
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass": {
-                                "title": "NestedClass",
-                                "required": [
-                                    "text"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "text": {
-                                        "title": "String",
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass": {
-                                "title": "ClassWithNestedClass",
-                                "required": [
-                                    "nested"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "nested": {
-                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass",
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass" to """
+                        {
+                            "title": "NestedClass",
+                            "required": [
+                                "text"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "text": {
+                                    "title": "String",
+                                    "type": "string"
+                                }
                             }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass" to """
+                        {
+                            "title": "NestedClass",
+                            "required": [
+                                "text"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "text": {
+                                    "title": "String",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass" to """
+                        {
+                            "title": "ClassWithNestedClass",
+                            "required": [
+                                "nested"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "nested": {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NestedClass"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithCollections>(),
@@ -1140,433 +988,357 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "someMap",
                         "someSet"
                       ],
-                      "types": ["object"],
+                      "type": "object",
                       "properties": {
                         "someList": {
-                          "types": ["array"],
-                          "exampleSetFlag": false,
+                          "type": "array",
                           "items": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
+                            "type": "string"
                           }
                         },
                         "someSet": {
-                          "types": ["array"],
-                          "exampleSetFlag": false,
+                          "type": "array",
                           "items": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
+                            "type": "string"
                           }
                         },
                         "someMap": {
-                          "types": ["object"],
+                          "type": "object",
                           "additionalProperties": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                          },
-                          "exampleSetFlag": false
+                            "type": "integer",
+                            "format": "int32"
+                          }
                         },
                         "someArray": {
-                          "types": ["array"],
-                          "exampleSetFlag": false,
+                          "type": "array",
                           "items": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
+                            "type": "integer",
+                            "format": "int32"
                           }
                         }
-                      },
-                      "exampleSetFlag": false
+                      }
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "someArray",
-                          "someList",
-                          "someMap",
-                          "someSet"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "someList": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "someSet": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "someMap": {
-                            "types": ["object"],
-                            "additionalProperties": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            },
-                            "exampleSetFlag": false
-                          },
-                          "someArray": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            }
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections": {
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
                           "required": [
                             "someArray",
                             "someList",
                             "someMap",
                             "someSet"
                           ],
-                          "types": ["object"],
+                          "type": "object",
                           "properties": {
                             "someList": {
-                              "types": ["array"],
-                              "exampleSetFlag": false,
+                              "type": "array",
                               "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
+                                "type": "string"
                               }
                             },
                             "someSet": {
-                              "types": ["array"],
-                              "exampleSetFlag": false,
+                              "type": "array",
                               "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
+                                "type": "string"
                               }
                             },
                             "someMap": {
-                              "types": ["object"],
+                              "type": "object",
                               "additionalProperties": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
-                              },
-                              "exampleSetFlag": false
+                                "type": "integer",
+                                "format": "int32"
+                              }
                             },
                             "someArray": {
-                              "types": ["array"],
-                              "exampleSetFlag": false,
+                              "type": "array",
                               "items": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
+                                "type": "integer",
+                                "format": "int32"
                               }
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections"
                       }
-                    }
-                """.trimIndent(),
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections" to """
+                        {
+                          "required": [
+                            "someArray",
+                            "someList",
+                            "someMap",
+                            "someSet"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "someList": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "someSet": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "someMap": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer",
+                                "format": "int32"
+                              }
+                            },
+                            "someArray": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "format": "int32"
+                              }
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassDirectSelfReferencing>(),
                 testName = "class with direct self reference",
                 expectedResultInlining = """
                     {
-                      "types": ["object"],
+                      "type": "object",
                       "properties": {
                         "self": {
-                          "types": ["object", "null"],
+                          "type": ["object", "null"],
                           "properties": {
                             "self": {
-                              "types": ["object", "null"],
+                              "type": ["object", "null"],
                               "properties": {
                                 "self": {
-                                  "types": ["object", "null"],
+                                  "type": ["object", "null"],
                                   "properties": {
                                     "self": {
-                                      "types": ["object", "null"],
+                                      "type": ["object", "null"],
                                       "properties": {
                                         "self": {
-                                          "types": ["object", "null"],
+                                          "type": ["object", "null"],
                                           "properties": {
                                             "self": {
-                                              "types": ["object", "null"],
+                                              "type": ["object", "null"],
                                               "properties": {
                                                 "self": {
-                                                  "types": ["object", "null"],
+                                                  "type": ["object", "null"],
                                                   "properties": {
                                                     "self": {
-                                                      "types": ["object", "null"],
+                                                      "type": ["object", "null"],
                                                       "properties": {
                                                         "self": {
-                                                          "types": ["object", "null"],
+                                                          "type": ["object", "null"],
                                                           "properties": {
                                                             "self": {
-                                                              "types": ["object", "null"],
+                                                              "type": ["object", "null"],
                                                               "properties": {
                                                                 "self": {
-                                                                  "types": ["object", "null"],
+                                                                  "type": ["object", "null"],
                                                                   "properties": {
                                                                     "self": {
-                                                                      "types": ["object", "null"],
+                                                                      "type": ["object", "null"],
                                                                       "properties": {
                                                                         "self": {
-                                                                          "types": ["object", "null"],
+                                                                          "type": ["object", "null"],
                                                                           "properties": {
                                                                             "self": {
-                                                                              "types": ["object", "null"],
+                                                                              "type": ["object", "null"],
                                                                               "properties": {
                                                                                 "self": {
-                                                                                  "types": ["object", "null"],
+                                                                                  "type": ["object", "null"],
                                                                                   "properties": {
                                                                                     "self": {
-                                                                                      "types": ["object", "null"],
+                                                                                      "type": ["object", "null"],
                                                                                       "properties": {
                                                                                         "self": {
-                                                                                          "types": ["object", "null"],
+                                                                                          "type": ["object", "null"],
                                                                                           "properties": {
                                                                                             "self": {
-                                                                                              "types": ["object", "null"],
+                                                                                              "type": ["object", "null"],
                                                                                               "properties": {
                                                                                                 "self": {
-                                                                                                  "types": ["object", "null"],
+                                                                                                  "type": ["object", "null"],
                                                                                                   "properties": {
                                                                                                     "self": {
-                                                                                                      "types": ["object", "null"],
+                                                                                                      "type": ["object", "null"],
                                                                                                       "properties": {
                                                                                                         "self": {
-                                                                                                          "types": ["object", "null"],
+                                                                                                          "type": ["object", "null"],
                                                                                                           "properties": {
                                                                                                             "self": {
-                                                                                                              "types": ["object", "null"],
+                                                                                                              "type": ["object", "null"],
                                                                                                               "properties": {
                                                                                                                 "self": {
-                                                                                                                  "types": ["object", "null"],
+                                                                                                                  "type": ["object", "null"],
                                                                                                                   "properties": {
                                                                                                                     "self": {
-                                                                                                                      "types": ["object", "null"],
+                                                                                                                      "type": ["object", "null"],
                                                                                                                       "properties": {
                                                                                                                         "self": {
-                                                                                                                          "types": ["object", "null"],
+                                                                                                                          "type": ["object", "null"],
                                                                                                                           "properties": {
                                                                                                                             "self": {
-                                                                                                                              "types": ["object", "null"],
+                                                                                                                              "type": ["object", "null"],
                                                                                                                               "properties": {
                                                                                                                                 "self": {
-                                                                                                                                  "types": ["object", "null"],
+                                                                                                                                  "type": ["object", "null"],
                                                                                                                                   "properties": {
                                                                                                                                     "self": {
-                                                                                                                                      "types": ["object", "null"],
+                                                                                                                                      "type": ["object", "null"],
                                                                                                                                       "properties": {
                                                                                                                                         "self": {
-                                                                                                                                          "types": ["object", "null"],
+                                                                                                                                          "type": ["object", "null"],
                                                                                                                                           "properties": {
                                                                                                                                             "self": {
-                                                                                                                                              "types": ["object", "null"],
+                                                                                                                                              "type": ["object", "null"],
                                                                                                                                               "properties": {
                                                                                                                                                 "self": {
-                                                                                                                                                  "types": ["object", "null"],
+                                                                                                                                                  "type": ["object", "null"],
                                                                                                                                                   "properties": {
                                                                                                                                                     "self": {
-                                                                                                                                                      "types": ["object", "null"],
+                                                                                                                                                      "type": ["object", "null"],
                                                                                                                                                       "properties": {
                                                                                                                                                         "self": {
-                                                                                                                                                          "exampleSetFlag": false
                                                                                                                                                         }
-                                                                                                                                                      },
-                                                                                                                                                      "exampleSetFlag": false
+                                                                                                                                                      }
                                                                                                                                                     }
-                                                                                                                                                  },
-                                                                                                                                                  "exampleSetFlag": false
+                                                                                                                                                  }
                                                                                                                                                 }
-                                                                                                                                              },
-                                                                                                                                              "exampleSetFlag": false
+                                                                                                                                              }
                                                                                                                                             }
-                                                                                                                                          },
-                                                                                                                                          "exampleSetFlag": false
+                                                                                                                                          }
                                                                                                                                         }
-                                                                                                                                      },
-                                                                                                                                      "exampleSetFlag": false
+                                                                                                                                      }
                                                                                                                                     }
-                                                                                                                                  },
-                                                                                                                                  "exampleSetFlag": false
+                                                                                                                                  }
                                                                                                                                 }
-                                                                                                                              },
-                                                                                                                              "exampleSetFlag": false
+                                                                                                                              }
                                                                                                                             }
-                                                                                                                          },
-                                                                                                                          "exampleSetFlag": false
+                                                                                                                          }
                                                                                                                         }
-                                                                                                                      },
-                                                                                                                      "exampleSetFlag": false
+                                                                                                                      }
                                                                                                                     }
-                                                                                                                  },
-                                                                                                                  "exampleSetFlag": false
+                                                                                                                  }
                                                                                                                 }
-                                                                                                              },
-                                                                                                              "exampleSetFlag": false
+                                                                                                              }
                                                                                                             }
-                                                                                                          },
-                                                                                                          "exampleSetFlag": false
+                                                                                                          }
                                                                                                         }
-                                                                                                      },
-                                                                                                      "exampleSetFlag": false
+                                                                                                      }
                                                                                                     }
-                                                                                                  },
-                                                                                                  "exampleSetFlag": false
+                                                                                                  }
                                                                                                 }
-                                                                                              },
-                                                                                              "exampleSetFlag": false
+                                                                                              }
                                                                                             }
-                                                                                          },
-                                                                                          "exampleSetFlag": false
+                                                                                          }
                                                                                         }
-                                                                                      },
-                                                                                      "exampleSetFlag": false
+                                                                                      }
                                                                                     }
-                                                                                  },
-                                                                                  "exampleSetFlag": false
+                                                                                  }
                                                                                 }
-                                                                              },
-                                                                              "exampleSetFlag": false
+                                                                              }
                                                                             }
-                                                                          },
-                                                                          "exampleSetFlag": false
+                                                                          }
                                                                         }
-                                                                      },
-                                                                      "exampleSetFlag": false
+                                                                      }
                                                                     }
-                                                                  },
-                                                                  "exampleSetFlag": false
+                                                                  }
                                                                 }
-                                                              },
-                                                              "exampleSetFlag": false
+                                                              }
                                                             }
-                                                          },
-                                                          "exampleSetFlag": false
+                                                          }
                                                         }
-                                                      },
-                                                      "exampleSetFlag": false
+                                                      }
                                                     }
-                                                  },
-                                                  "exampleSetFlag": false
+                                                  }
                                                 }
-                                              },
-                                              "exampleSetFlag": false
+                                              }
                                             }
-                                          },
-                                          "exampleSetFlag": false
+                                          }
                                         }
-                                      },
-                                      "exampleSetFlag": false
+                                      }
                                     }
-                                  },
-                                  "exampleSetFlag": false
+                                  }
                                 }
-                              },
-                              "exampleSetFlag": false
+                              }
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
-                      },
-                      "exampleSetFlag": false
+                      }
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "types": ["object"],
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                        "type": "object",
                         "properties": {
                           "self": {
-                            "exampleSetFlag": false,
                             "oneOf": [
                               {
-                                "types": ["null"],
-                                "exampleSetFlag": false
+                                "type": "null"
                               },
                               {
-                                "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                                "exampleSetFlag": false
+                                "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
                               }
                             ]
                           }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
-                          "types": ["object"],
+                        }
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing" to """
+                        {
+                          "type": "object",
                           "properties": {
                             "self": {
-                              "exampleSetFlag": false,
                               "oneOf": [
                                 {
-                                  "types": ["null"],
-                                  "exampleSetFlag": false
+                                  "type": "null"
                                 },
                                 {
-                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                                  "exampleSetFlag": false
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
                                 }
                               ]
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
                       }
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing": {
-                          "types": ["object"],
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing" to """
+                        {
+                          "type": "object",
                           "properties": {
                             "self": {
-                              "exampleSetFlag": false,
                               "oneOf": [
                                 {
-                                  "types": ["null"],
-                                  "exampleSetFlag": false
+                                  "type": "null"
                                 },
                                 {
-                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing",
-                                  "exampleSetFlag": false
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing"
                                 }
                               ]
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
-                      }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithOptionalParameters>(),
@@ -1580,95 +1352,78 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "ctorOptional",
                         "ctorRequired"
                       ],
-                      "types": ["object"],
+                      "type": "object",
                       "properties": {
                         "ctorOptional": {
-                          "types": ["string"],
-                          "exampleSetFlag": false
+                          "type": "string"
                         },
                         "ctorOptionalNullable": {
-                          "types": ["string", "null"],
-                          "exampleSetFlag": false
+                          "type": ["string", "null"]
                         },
                         "ctorRequired": {
-                          "types": ["string"],
-                          "exampleSetFlag": false
+                          "type": "string"
                         },
                         "ctorRequiredNullable": {
-                          "types": ["string", "null"],
-                          "exampleSetFlag": false
-                        }
-                      },
-                      "exampleSetFlag": false
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "ctorOptional",
-                          "ctorRequired"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "ctorOptional": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorOptionalNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequired": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequiredNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
-                          "required": [
-                            "ctorOptional",
-                            "ctorRequired"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "ctorOptional": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorOptionalNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequired": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequiredNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "exampleSetFlag": false
+                          "type": ["string", "null"]
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "ctorOptional",
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters"
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters" to """
+                        {
+                          "required": [
+                            "ctorOptional",
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithOptionalParameters>(),
@@ -1681,93 +1436,76 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                       "required": [
                         "ctorRequired"
                       ],
-                      "types": ["object"],
+                      "type": "object",
                       "properties": {
                         "ctorOptional": {
-                          "types": ["string"],
-                          "exampleSetFlag": false
+                          "type": "string"
                         },
                         "ctorOptionalNullable": {
-                          "types": ["string", "null"],
-                          "exampleSetFlag": false
+                          "type": ["string", "null"]
                         },
                         "ctorRequired": {
-                          "types": ["string"],
-                          "exampleSetFlag": false
+                          "type": "string"
                         },
                         "ctorRequiredNullable": {
-                          "types": ["string", "null"],
-                          "exampleSetFlag": false
-                        }
-                      },
-                      "exampleSetFlag": false
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "ctorRequired"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "ctorOptional": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorOptionalNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequired": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequiredNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters": {
-                          "required": [
-                            "ctorRequired"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "ctorOptional": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorOptionalNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequired": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequiredNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "exampleSetFlag": false
+                          "type": ["string", "null"]
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters"
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters" to """
+                        {
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithValueClass>(),
@@ -1778,74 +1516,63 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         "myValue",
                         "someText"
                       ],
-                      "types": ["object"],
+                      "type": "object",
                       "properties": {
                         "myValue": {
-                          "types": ["integer"],
-                          "format": "int32",
-                          "exampleSetFlag": false
+                          "type": "integer",
+                          "format": "int32"
                         },
                         "someText": {
-                          "types": ["string"],
-                          "exampleSetFlag": false
-                        }
-                      },
-                      "exampleSetFlag": false
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "myValue",
-                          "someText"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "myValue": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                          },
-                          "someText": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass": {
-                          "required": [
-                            "myValue",
-                            "someText"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "myValue": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            },
-                            "someText": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "exampleSetFlag": false
+                          "type": "string"
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "someText": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass"
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass" to """
+                        {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "someText": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                )
             ),
         )
 

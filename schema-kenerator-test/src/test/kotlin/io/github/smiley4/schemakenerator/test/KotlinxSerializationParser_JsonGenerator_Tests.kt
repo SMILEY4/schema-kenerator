@@ -23,12 +23,6 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -58,15 +52,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 }
                 .let { JsonSchemaCompileInlineStep().compile(it) }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultInlining
-            }
-
+            schema.json.shouldEqualJson(data.expectedResultInlining)
         }
     }
 
@@ -119,14 +105,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultReferencing
-                }
+                .shouldEqualLenient(data.expectedResultReferencing)
 
         }
     }
@@ -180,14 +159,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultReferencingRoot
-                }
+                .shouldEqualLenient(data.expectedResultReferencingRoot)
 
         }
     }
@@ -361,14 +333,14 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<List>",
-                        "definitions": {
-                            "kotlinx.serialization.Polymorphic<List>": {
-                                "type": "object",
-                                "required": [],
-                                "properties": {}
-                            }
+                      "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<List>",
+                      "definitions": {
+                        "kotlinx.serialization.Polymorphic<List>": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {}
                         }
+                      }
                     }
                 """.trimIndent(),
             ),
@@ -392,14 +364,14 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<Map>",
-                        "definitions": {
-                            "kotlinx.serialization.Polymorphic<Map>": {
-                                "type": "object",
-                                "required": [],
-                                "properties": {}
-                            }
+                      "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<Map>",
+                      "definitions": {
+                        "kotlinx.serialization.Polymorphic<Map>": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {}
                         }
+                      }
                     }
                 """.trimIndent(),
             ),
@@ -1286,8 +1258,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                     }
                 """.trimIndent(),
             ),
-
-
 
             TestData(
                 type = typeOf<ClassWithOptionalParameters>(),

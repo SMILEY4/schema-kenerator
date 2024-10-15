@@ -21,24 +21,24 @@ class RedirectTests : FreeSpec({
                 }
                 .generateJsonSchema()
                 .compileInlining()
-                .json
-                .prettyPrint()
 
-            result.shouldEqualJson("""
-                {
-                   "type": "object",
-                   "required": [
-                      "data"
-                   ],
-                   "properties": {
-                      "data": {
-                         "type": "integer",
-                         "minimum": -2147483648,
-                         "maximum": 2147483647
-                      }
-                   }
-                }
-            """.trimIndent())
+            result.json.shouldEqualJson {
+                """
+                    {
+                       "type": "object",
+                       "required": [
+                          "data"
+                       ],
+                       "properties": {
+                          "data": {
+                             "type": "integer",
+                             "minimum": -2147483648,
+                             "maximum": 2147483647
+                          }
+                       }
+                    }
+                """.trimIndent()
+            }
         }
 
         "kotlinx-serialization" {
@@ -49,24 +49,24 @@ class RedirectTests : FreeSpec({
                 }
                 .generateJsonSchema()
                 .compileInlining()
-                .json
-                .prettyPrint()
 
-            result.shouldEqualJson("""
-                {
-                   "type": "object",
-                   "required": [
-                      "data"
-                   ],
-                   "properties": {
-                      "data": {
-                         "type": "integer",
-                         "minimum": -2147483648,
-                         "maximum": 2147483647
-                      }
-                   }
-                }
-            """.trimIndent())
+            result.json.shouldEqualJson {
+                """
+                    {
+                       "type": "object",
+                       "required": [
+                          "data"
+                       ],
+                       "properties": {
+                          "data": {
+                             "type": "integer",
+                             "minimum": -2147483648,
+                             "maximum": 2147483647
+                          }
+                       }
+                    }
+                """.trimIndent()
+            }
         }
 
     }
@@ -80,35 +80,35 @@ class RedirectTests : FreeSpec({
                 }
                 .generateJsonSchema()
                 .compileInlining()
-                .json
-                .prettyPrint()
 
-            result.shouldEqualJson("""
-                {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
+            result.json.shouldEqualJson {
+                """
+                    {
                       "type": "object",
                       "required": [
-                        "someNumber"
+                        "data"
                       ],
                       "properties": {
-                        "someNumber": {
-                          "type": "integer",
-                          "minimum": -2147483648,
-                          "maximum": 2147483647
-                        },
-                        "someText": {
-                          "type": "string"
+                        "data": {
+                          "type": "object",
+                          "required": [
+                            "someNumber"
+                          ],
+                          "properties": {
+                            "someNumber": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "someText": {
+                              "type": "string"
+                            }
+                          }
                         }
                       }
                     }
-                  }
-                }
-            """.trimIndent())
+                """.trimIndent()
+            }
         }
 
         "kotlinx-serialization" {
@@ -118,35 +118,35 @@ class RedirectTests : FreeSpec({
                 }
                 .generateJsonSchema()
                 .compileInlining()
-                .json
-                .prettyPrint()
 
-            result.shouldEqualJson("""
-                {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
+            result.json.shouldEqualJson {
+                """
+                    {
                       "type": "object",
                       "required": [
-                        "someNumber"
+                        "data"
                       ],
                       "properties": {
-                        "someNumber": {
-                          "type": "integer",
-                          "minimum": -2147483648,
-                          "maximum": 2147483647
-                        },
-                        "someText": {
-                          "type": "string"
+                        "data": {
+                          "type": "object",
+                          "required": [
+                            "someNumber"
+                          ],
+                          "properties": {
+                            "someNumber": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "someText": {
+                              "type": "string"
+                            }
+                          }
                         }
                       }
                     }
-                  }
-                }
-            """.trimIndent())
+                """.trimIndent()
+            }
         }
 
     }
