@@ -32,12 +32,6 @@ import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedCla
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SubClassA
 import io.github.smiley4.schemakenerator.test.models.reflection.TestEnum
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -89,14 +83,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     )
                 }
 
-            json.writeValueAsString(schema).shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultInlining
-            }
+            schema.schema.shouldEqualJson(data.expectedResultInlining)
         }
     }
 
@@ -141,14 +128,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     )
                 }
 
-            json.writeValueAsString(schema).shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencing
-            }
+            (schema.schema to schema.definitions).shouldEqualJson(data.expectedResultReferencing)
         }
     }
 
@@ -193,14 +173,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                     )
                 }
 
-            json.writeValueAsString(schema).shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencingRoot
-            }
+            (schema.schema to schema.definitions).shouldEqualJson(data.expectedResultReferencingRoot)
         }
     }
 
@@ -222,8 +195,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
             val withAnnotations: Boolean = false,
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
-            val expectedResultReferencing: String,
-            val expectedResultReferencingRoot: String,
+            val expectedResultReferencing: Map<String, String>,
+            val expectedResultReferencingRoot: Map<String, String>,
         ) : WithDataTestName {
             override fun dataTestName() = testName
         }
@@ -234,883 +207,712 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "any",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
+                expectedResultReferencing = mapOf(
+                    "." to """
                     {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "object"
                     }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
                     {
-                        "schema": {
-                            "types": ["object"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "object"
                     }
-                """.trimIndent(),
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<UByte>(),
                 testName = "ubyte",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["integer"],
-                            "maximum": 255,
-                            "minimum": 0,
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "integer",
+                        "maximum": 255,
+                        "minimum": 0
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
                             "maximum": 255,
-                            "minimum": 0,
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
+                            "minimum": 0
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
                             "maximum": 255,
-                            "minimum": 0,
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                            "minimum": 0
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<Int>(),
                 testName = "int",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "integer",
+                        "format": "int32"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent()
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<Float>(),
                 testName = "float",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["number"],
-                            "format": "float",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "number",
+                        "format": "float"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["number"],
-                            "format": "float",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["number"],
-                            "format": "float",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<Boolean>(),
                 testName = "boolean",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["boolean"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "boolean"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["boolean"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["boolean"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "boolean"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "boolean"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<String>(),
                 testName = "string",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "string"
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "string"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "string"
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<List<String>>(),
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
-                            }
-                        },
-                        "definitions": {}
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "array",
                             "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
+                                "type": "string"
                             }
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "type": "array",
                             "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
+                                "type": "string"
                             }
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<Map<String, Int>>(),
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "types": ["object"],
-                            "additionalProperties": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
                     {
-                        "schema": {
-                            "types": ["object"],
-                            "additionalProperties": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
                     }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "types": ["object"],
-                            "additionalProperties": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<ClassWithSimpleFields>(),
                 testName = "class with simple fields",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "required": [
-                                "someBoolList",
-                                "someString"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "someBoolList": {
-                                    "types": ["array"],
-                                    "exampleSetFlag": false,
-                                    "items": {
-                                      "types": ["boolean"],
-                                      "exampleSetFlag": false
-                                    }
-                                },
-                                "someNullableInt": {
-                                    "types": ["integer", "null"],
-                                    "format": "int32",
-                                    "exampleSetFlag": false
-                                },
-                                "someString": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
+                        "required": [
+                            "someBoolList",
+                            "someString"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "someBoolList": {
+                                "type": "array",
+                                "items": {
+                                  "type": "boolean"
                                 }
                             },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "someBoolList",
-                                "someString"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "someBoolList": {
-                                    "types": ["array"],
-                                    "exampleSetFlag": false,
-                                    "items": {
-                                      "types": ["boolean"],
-                                      "exampleSetFlag": false
-                                    }
-                                },
-                                "someNullableInt": {
-                                    "types": ["integer", "null"],
-                                    "format": "int32",
-                                    "exampleSetFlag": false
-                                },
-                                "someString": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
+                            "someNullableInt": {
+                                "type": ["integer", "null"],
+                                "format": "int32"
                             },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields": {
-                                "required": [
-                                    "someBoolList",
-                                    "someString"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "someBoolList": {
-                                        "types": ["array"],
-                                        "exampleSetFlag": false,
-                                        "items": {
-                                            "types": ["boolean"],
-                                            "exampleSetFlag": false
-                                        }
-                                    },
-                                    "someNullableInt": {
-                                        "types": ["integer", "null"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "someString": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                            "someString": {
+                                "type": "string"
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "required": [
+                                "someBoolList",
+                                "someString"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "someBoolList": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "boolean"
+                                    }
+                                },
+                                "someNullableInt": {
+                                    "type": ["integer", "null"],
+                                    "format": "int32"
+                                },
+                                "someString": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithSimpleFields" to """
+                        {
+                            "required": [
+                                "someBoolList",
+                                "someString"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "someBoolList": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "boolean"
+                                    }
+                                },
+                                "someNullableInt": {
+                                    "type": ["integer", "null"],
+                                    "format": "int32"
+                                },
+                                "someString": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<TestEnum>(),
                 testName = "enum",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "exampleSetFlag": false,
-                            "types": ["string"],
-                            "enum": [ "ONE", "TWO", "THREE" ]
-                        },
-                        "definitions": {}
+                        "type": "string",
+                        "enum": [ "ONE", "TWO", "THREE" ]
                     }
                 """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "exampleSetFlag": false,
-                            "types": ["string"],
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "type": "string",
                             "enum": [ "ONE", "TWO", "THREE" ]
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.TestEnum",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.TestEnum": {
-                                "exampleSetFlag": false,
-                                "types": ["string"],
-                                "enum": [ "ONE", "TWO", "THREE" ]
-                            }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.TestEnum"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.TestEnum" to """
+                        {
+                            "type": "string",
+                            "enum": [ "ONE", "TWO", "THREE" ]
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithGenericField<String>>(),
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "required": [
-                                "value"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "value": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "value"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "value": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<kotlin.String>",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<kotlin.String>": {
-                                "required": [
-                                    "value"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "value": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                        "required": [
+                            "value"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "type": "string"
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<kotlin.String>"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<kotlin.String>" to """
+                        {
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithGenericField<*>>(),
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "required": [
-                                "value"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "value": {
-                                    "types": ["object"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "value"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "value": {
-                                    "types": ["object"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<*>",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<*>": {
-                                "required": [
-                                    "value"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "value": {
-                                        "types": ["object"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                        "required": [
+                            "value"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "type": "object"
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<*>"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithGenericField<*>" to """
+                        {
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithDeepGeneric<String>>(),
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "required": [
-                                "value"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "value": {
-                                    "types": ["array"],
-                                    "exampleSetFlag": false,
-                                    "items": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
+                        "required": [
+                            "value"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
                                 }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "value"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "value": {
-                                    "types": ["array"],
-                                    "exampleSetFlag": false,
-                                    "items": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric<kotlin.String>",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric<kotlin.String>": {
-                                "required": [
-                                    "value"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "value": {
-                                        "types": ["array"],
-                                        "exampleSetFlag": false,
-                                        "items": {
-                                            "types": ["string"],
-                                            "exampleSetFlag": false
-                                        }
-                                    }
-                                },
-                                "exampleSetFlag": false
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "required": [
+                                "value"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric<kotlin.String>"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric<kotlin.String>" to """
+                       {
+                          "required": [
+                              "value"
+                          ],
+                          "type": "object",
+                          "properties": {
+                              "value": {
+                                  "type": "array",
+                                  "items": {
+                                      "type": "string"
+                                  }
+                              }
+                          }
+                       }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<SealedClass>(),
                 testName = "sealed class with subtypes",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "exampleSetFlag": false,
-                            "anyOf": [
-                                {
-                                    "required": [
-                                        "a",
-                                        "sealedValue"
-                                    ],
-                                    "types": ["object"],
-                                    "properties": {
-                                        "a": {
-                                              "types": ["integer"],
-                                              "format": "int32",
-                                              "exampleSetFlag": false
-                                            },
-                                        "sealedValue": {
-                                            "types": ["string"],
-                                            "exampleSetFlag": false
-                                        }
-                                    },
-                                    "exampleSetFlag": false
-                                },
-                                {
-                                    "required": [
-                                        "b",
-                                        "sealedValue"
-                                    ],
-                                    "types": ["object"],
-                                    "properties": {
-                                        "b": {
-                                            "types": ["integer"],
-                                            "format": "int32",
-                                            "exampleSetFlag": false
-                                        },
-                                        "sealedValue": {
-                                            "types": ["string"],
-                                            "exampleSetFlag": false
-                                        }
-                                    },
-                                    "exampleSetFlag": false
-                                }
-                            ]
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "exampleSetFlag": false,
-                            "anyOf": [
-                                {
-                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassA",
-                                    "exampleSetFlag": false
-                                },
-                                {
-                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassB",
-                                    "exampleSetFlag": false
-                                }
-                            ]
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.SubClassA": {
+                        "anyOf": [
+                            {
                                 "required": [
                                     "a",
                                     "sealedValue"
                                 ],
-                                "types": ["object"],
+                                "type": "object",
                                 "properties": {
                                     "a": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
+                                      "type": "integer",
+                                      "format": "int32"
                                     },
                                     "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
+                                        "type": "string"
                                     }
-                                },
-                                "exampleSetFlag": false
+                                }
                             },
-                            "io.github.smiley4.schemakenerator.test.models.reflection.SubClassB": {
+                            {
                                 "required": [
                                     "b",
                                     "sealedValue"
                                 ],
-                                "types": ["object"],
+                                "type": "object",
                                 "properties": {
                                     "b": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
+                                        "type": "integer",
+                                        "format": "int32"
                                     },
                                     "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
+                                        "type": "string"
                                     }
-                                },
-                                "exampleSetFlag": false
+                                }
                             }
-                        }
+                        ]
                     }
                 """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SealedClass",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.SealedClass": {
-                                "exampleSetFlag": false,
-                                "anyOf": [
-                                    {
-                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassA",
-                                        "exampleSetFlag": false
-                                    },
-                                    {
-                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassB",
-                                        "exampleSetFlag": false
-                                    }
-                                ]
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.reflection.SubClassA": {
-                                "required": [
-                                    "a",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "a": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "anyOf": [
+                                {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassA"
                                 },
-                                "exampleSetFlag": false
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.reflection.SubClassB": {
-                                "required": [
-                                    "b",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "b": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
+                                {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassB"
+                                }
+                            ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.SubClassA" to """
+                        {
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
                                 },
-                                "exampleSetFlag": false
+                                "sealedValue": {
+                                    "type": "string"
+                                }
                             }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.SubClassB" to """
+                        {
+                            "required": [
+                                "b",
+                                "sealedValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "b": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SealedClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.SealedClass" to """
+                        {
+                            "anyOf": [
+                                {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassA"
+                                },
+                                {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassB"
+                                }
+                            ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.SubClassA" to """
+                        {
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.SubClassB" to """
+                        {
+                            "required": [
+                                "b",
+                                "sealedValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "b": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<SubClassA>(),
                 testName = "sub class",
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "required": [
-                                "a",
-                                "sealedValue"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "a": {
-                                    "types": ["integer"],
-                                    "format": "int32",
-                                    "exampleSetFlag": false
-                                },
-                                "sealedValue": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
+                        "required": [
+                            "a",
+                            "sealedValue"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "a": {
+                                "type": "integer",
+                                "format": "int32"
                             },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "required": [
-                                "a",
-                                "sealedValue"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "a": {
-                                    "types": ["integer"],
-                                    "format": "int32",
-                                    "exampleSetFlag": false
-                                },
-                                "sealedValue": {
-                                    "types": ["string"],
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassA",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.SubClassA": {
-                                "required": [
-                                    "a",
-                                    "sealedValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "a": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "exampleSetFlag": false
-                                    },
-                                    "sealedValue": {
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                            "sealedValue": {
+                                "type": "string"
                             }
                         }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.SubClassA"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.SubClassA" to """
+                        {
+                            "required": [
+                                "a",
+                                "sealedValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "a": {
+                                    "type": "integer",
+                                    "format": "int32"
+                                },
+                                "sealedValue": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<CoreAnnotatedClass>(),
@@ -1118,120 +920,106 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 withAnnotations = true,
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "title": "Annotated Class",
-                            "required": [
-                                "stringValue",
-                                "intValue"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "stringValue": {
-                                    "types": ["string"],
-                                    "description": "String field description",
-                                    "default": "A default String value",
-                                    "exampleSetFlag": true,
-                                    "example": "An example of a String value",
-                                    "format": "text"
-                                },
-                                "intValue": {
-                                    "types": ["integer"],
-                                    "format": "int32",
-                                    "description": "Int field description",
-                                    "default": "1111",
-                                    "exampleSetFlag": true,
-                                    "example": "2222"
-                                }
+                        "title": "Annotated Class",
+                        "required": [
+                            "stringValue",
+                            "intValue"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "stringValue": {
+                                "type": "string",
+                                "description": "String field description",
+                                "default": "A default String value",
+                                "example": "An example of a String value",
+                                "format": "text"
                             },
-                            "description": "some description",
-                            "deprecated": true,
-                            "exampleSetFlag": true,
-                            "example": "example 1",
-                            "default": "default value",
-                            "format": "pair"
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "title": "Annotated Class",
-                            "required": [
-                                "stringValue",
-                                "intValue"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "stringValue": {
-                                    "types": ["string"],
-                                    "description": "String field description",
-                                    "default": "A default String value",
-                                    "exampleSetFlag": true,
-                                    "example": "An example of a String value",
-                                    "format": "text"
-                                },
-                                "intValue": {
-                                    "types": ["integer"],
-                                    "format": "int32",
-                                    "description": "Int field description",
-                                    "default": "1111",
-                                    "exampleSetFlag": true,
-                                    "example": "2222"
-                                }
-                            },
-                            "description": "some description",
-                            "deprecated": true,
-                            "exampleSetFlag": true,
-                            "example": "example 1",
-                            "default": "default value",
-                            "format": "pair"
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass": {
-                                "title": "Annotated Class",
-                                "required": [
-                                    "stringValue",
-                                    "intValue"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "stringValue": {
-                                        "types": ["string"],
-                                        "description": "String field description",
-                                        "default": "A default String value",
-                                        "exampleSetFlag": true,
-                                        "example": "An example of a String value",
-                                        "format": "text"
-                                    },
-                                    "intValue": {
-                                        "types": ["integer"],
-                                        "format": "int32",
-                                        "description": "Int field description",
-                                        "default": "1111",
-                                        "exampleSetFlag": true,
-                                        "example": "2222"
-                                    }
-                                },
-                                "description": "some description",
-                                "deprecated": true,
-                                "exampleSetFlag": true,
-                                "example": "example 1",
-                                "default": "default value",
-                                "format": "pair"
+                            "intValue": {
+                                "type": "integer",
+                                "format": "int32",
+                                "description": "Int field description",
+                                "default": "1111",
+                                "example": "2222"
                             }
-                        }
+                        },
+                        "description": "some description",
+                        "deprecated": true,
+                        "example": "example 1",
+                        "default": "default value",
+                        "format": "pair"
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "title": "Annotated Class",
+                            "required": [
+                                "stringValue",
+                                "intValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "stringValue": {
+                                    "type": "string",
+                                    "description": "String field description",
+                                    "default": "A default String value",
+                                    "example": "An example of a String value",
+                                    "format": "text"
+                                },
+                                "intValue": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "description": "Int field description",
+                                    "default": "1111",
+                                    "example": "2222"
+                                }
+                            },
+                            "description": "some description",
+                            "deprecated": true,
+                            "example": "example 1",
+                            "default": "default value",
+                            "format": "pair"
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedClass" to """
+                        {
+                            "title": "Annotated Class",
+                            "required": [
+                                "stringValue",
+                                "intValue"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "stringValue": {
+                                    "type": "string",
+                                    "description": "String field description",
+                                    "default": "A default String value",
+                                    "example": "An example of a String value",
+                                    "format": "text"
+                                },
+                                "intValue": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "description": "Int field description",
+                                    "default": "1111",
+                                    "example": "2222"
+                                }
+                            },
+                            "description": "some description",
+                            "deprecated": true,
+                            "example": "example 1",
+                            "default": "default value",
+                            "format": "pair"
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<ClassWithNestedClass>(),
@@ -1239,556 +1027,461 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 withAutoTitle = true,
                 expectedResultInlining = """
                     {
-                        "schema": {
-                            "title": "ClassWithNestedClass",
-                            "required": [
-                                "nested"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "nested": {
-                                    "title": "NestedClass",
-                                    "required": [
-                                        "text"
-                                    ],
-                                    "types": ["object"],
-                                    "properties": {
-                                        "text": {
-                                            "title": "String",
-                                            "types": ["string"],
-                                            "exampleSetFlag": false
-                                        }
-                                    },
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                        "schema": {
-                            "title": "ClassWithNestedClass",
-                            "required": [
-                                "nested"
-                            ],
-                            "types": ["object"],
-                            "properties": {
-                                "nested": {
-                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass",
-                                    "exampleSetFlag": false
-                                }
-                            },
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass": {
+                        "title": "ClassWithNestedClass",
+                        "required": [
+                            "nested"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "nested": {
                                 "title": "NestedClass",
                                 "required": [
                                     "text"
                                 ],
-                                "types": ["object"],
+                                "type": "object",
                                 "properties": {
                                     "text": {
                                         "title": "String",
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
+                                        "type": "string"
                                     }
-                                },
-                                "exampleSetFlag": false
+                                }
                             }
                         }
                     }
                 """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                        "schema": {
-                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass",
-                            "exampleSetFlag": false
-                        },
-                        "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass": {
-                                "title": "NestedClass",
-                                "required": [
-                                    "text"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "text": {
-                                        "title": "String",
-                                        "types": ["string"],
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
-                            },
-                            "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass": {
-                                "title": "ClassWithNestedClass",
-                                "required": [
-                                    "nested"
-                                ],
-                                "types": ["object"],
-                                "properties": {
-                                    "nested": {
-                                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass",
-                                        "exampleSetFlag": false
-                                    }
-                                },
-                                "exampleSetFlag": false
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                            "title": "ClassWithNestedClass",
+                            "required": [
+                                "nested"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "nested": {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass"
+                                }
                             }
                         }
-                    }
-                """.trimIndent(),
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass" to """
+                        {
+                            "title": "NestedClass",
+                            "required": [
+                                "text"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "text": {
+                                    "title": "String",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                            "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithNestedClass" to """
+                        {
+                            "title": "ClassWithNestedClass",
+                            "required": [
+                                "nested"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "nested": {
+                                    "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.NestedClass"
+                                }
+                            }
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.NestedClass" to """
+                        {
+                            "title": "NestedClass",
+                            "required": [
+                                "text"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "text": {
+                                    "title": "String",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<ClassWithCollections>(),
                 testName = "class with collections",
                 expectedResultInlining = """
                     {
-                      "schema": {
-                        "required": [
-                          "someArray",
-                          "someList",
-                          "someMap",
-                          "someSet"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "someArray": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "someList": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "someMap": {
-                            "types": ["object"],
-                            "additionalProperties": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            },
-                            "exampleSetFlag": false
-                          },
-                          "someSet": {
-                            "types": ["array"],
-                            "uniqueItems": true,
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
+                      "required": [
+                        "someArray",
+                        "someList",
+                        "someMap",
+                        "someSet"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "someArray": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer",
+                            "format": "int32"
                           }
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "someArray",
-                          "someList",
-                          "someMap",
-                          "someSet"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "someArray": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "someList": {
-                            "types": ["array"],
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "someMap": {
-                            "types": ["object"],
-                            "additionalProperties": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            },
-                            "exampleSetFlag": false
-                          },
-                          "someSet": {
-                            "types": ["array"],
-                            "uniqueItems": true,
-                            "exampleSetFlag": false,
-                            "items": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
+                        "someList": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
                           }
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
+                        "someMap": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32"
+                          }
+                        },
+                        "someSet": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
                     }
                 """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections": {
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
                           "required": [
                             "someArray",
                             "someList",
                             "someMap",
                             "someSet"
                           ],
-                          "types": ["object"],
+                          "type": "object",
                           "properties": {
                             "someArray": {
-                              "types": ["array"],
-                              "exampleSetFlag": false,
+                              "type": "array",
                               "items": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
+                                "type": "integer",
+                                "format": "int32"
                               }
                             },
                             "someList": {
-                              "types": ["array"],
-                              "exampleSetFlag": false,
+                              "type": "array",
                               "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
+                                "type": "string"
                               }
                             },
                             "someMap": {
-                              "types": ["object"],
+                              "type": "object",
                               "additionalProperties": {
-                                "types": ["integer"],
-                                "format": "int32",
-                                "exampleSetFlag": false
-                              },
-                              "exampleSetFlag": false
+                                "type": "integer",
+                                "format": "int32"
+                              }
                             },
                             "someSet": {
-                              "types": ["array"],
+                              "type": "array",
                               "uniqueItems": true,
-                              "exampleSetFlag": false,
                               "items": {
-                                "types": ["string"],
-                                "exampleSetFlag": false
+                                "type": "string"
                               }
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections"
                       }
-                    }
-                """.trimIndent(),
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections" to """
+                        {
+                          "required": [
+                            "someArray",
+                            "someList",
+                            "someMap",
+                            "someSet"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "someArray": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "format": "int32"
+                              }
+                            },
+                            "someList": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "someMap": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "integer",
+                                "format": "int32"
+                              }
+                            },
+                            "someSet": {
+                              "type": "array",
+                              "uniqueItems": true,
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<ClassDirectSelfReferencing>(),
                 testName = "class with direct self reference",
                 expectedResultInlining = """
                     {
-                      "schema": {
-                        "types": ["object"],
-                        "properties": {
-                          "self": {
-                            "types": ["object", "null"],
-                            "properties": {
-                              "self": {
-                                "types": ["object", "null"],
-                                "properties": {
-                                  "self": {
-                                    "types": ["object", "null"],
-                                    "properties": {
-                                      "self": {
-                                        "types": ["object", "null"],
-                                        "properties": {
-                                          "self": {
-                                            "types": ["object", "null"],
-                                            "properties": {
-                                              "self": {
-                                                "types": ["object", "null"],
-                                                "properties": {
-                                                  "self": {
-                                                    "types": ["object", "null"],
-                                                    "properties": {
-                                                      "self": {
-                                                        "types": ["object", "null"],
-                                                        "properties": {
-                                                          "self": {
-                                                            "types": ["object", "null"],
-                                                            "properties": {
-                                                              "self": {
-                                                                "types": ["object", "null"],
-                                                                "properties": {
-                                                                  "self": {
-                                                                    "types": ["object", "null"],
-                                                                    "properties": {
-                                                                      "self": {
-                                                                        "types": ["object", "null"],
-                                                                        "properties": {
-                                                                          "self": {
-                                                                            "types": ["object", "null"],
-                                                                            "properties": {
-                                                                              "self": {
-                                                                                "types": ["object", "null"],
-                                                                                "properties": {
-                                                                                  "self": {
-                                                                                    "types": ["object", "null"],
-                                                                                    "properties": {
-                                                                                      "self": {
-                                                                                        "types": ["object", "null"],
-                                                                                        "properties": {
-                                                                                          "self": {
-                                                                                            "types": ["object", "null"],
-                                                                                            "properties": {
-                                                                                              "self": {
-                                                                                                "types": ["object", "null"],
-                                                                                                "properties": {
-                                                                                                  "self": {
-                                                                                                    "types": ["object", "null"],
-                                                                                                    "properties": {
-                                                                                                      "self": {
-                                                                                                        "types": ["object", "null"],
-                                                                                                        "properties": {
-                                                                                                          "self": {
-                                                                                                            "types": ["object", "null"],
-                                                                                                            "properties": {
-                                                                                                              "self": {
-                                                                                                                "types": ["object", "null"],
-                                                                                                                "properties": {
-                                                                                                                  "self": {
-                                                                                                                    "types": ["object", "null"],
-                                                                                                                    "properties": {
-                                                                                                                      "self": {
-                                                                                                                        "types": ["object", "null"],
-                                                                                                                        "properties": {
-                                                                                                                          "self": {
-                                                                                                                            "types": ["object", "null"],
-                                                                                                                            "properties": {
-                                                                                                                              "self": {
-                                                                                                                                "types": ["object", "null"],
-                                                                                                                                "properties": {
-                                                                                                                                  "self": {
-                                                                                                                                    "types": ["object", "null"],
-                                                                                                                                    "properties": {
-                                                                                                                                      "self": {
-                                                                                                                                        "types": ["object", "null"],
-                                                                                                                                        "properties": {
-                                                                                                                                          "self": {
-                                                                                                                                            "types": ["object", "null"],
-                                                                                                                                            "properties": {
-                                                                                                                                              "self": {
-                                                                                                                                                "types": ["object", "null"],
-                                                                                                                                                "properties": {
-                                                                                                                                                  "self": {
-                                                                                                                                                    "types": ["object", "null"],
-                                                                                                                                                    "properties": {
-                                                                                                                                                      "self": {
-                                                                                                                                                        "types": ["object", "null"],
-                                                                                                                                                        "properties": {
-                                                                                                                                                          "self": {
-                                                                                                                                                            "exampleSetFlag": false
-                                                                                                                                                          }
-                                                                                                                                                        },
-                                                                                                                                                        "exampleSetFlag": false
+                      "type": "object",
+                      "properties": {
+                        "self": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "self": {
+                              "type": ["object", "null"],
+                              "properties": {
+                                "self": {
+                                  "type": ["object", "null"],
+                                  "properties": {
+                                    "self": {
+                                      "type": ["object", "null"],
+                                      "properties": {
+                                        "self": {
+                                          "type": ["object", "null"],
+                                          "properties": {
+                                            "self": {
+                                              "type": ["object", "null"],
+                                              "properties": {
+                                                "self": {
+                                                  "type": ["object", "null"],
+                                                  "properties": {
+                                                    "self": {
+                                                      "type": ["object", "null"],
+                                                      "properties": {
+                                                        "self": {
+                                                          "type": ["object", "null"],
+                                                          "properties": {
+                                                            "self": {
+                                                              "type": ["object", "null"],
+                                                              "properties": {
+                                                                "self": {
+                                                                  "type": ["object", "null"],
+                                                                  "properties": {
+                                                                    "self": {
+                                                                      "type": ["object", "null"],
+                                                                      "properties": {
+                                                                        "self": {
+                                                                          "type": ["object", "null"],
+                                                                          "properties": {
+                                                                            "self": {
+                                                                              "type": ["object", "null"],
+                                                                              "properties": {
+                                                                                "self": {
+                                                                                  "type": ["object", "null"],
+                                                                                  "properties": {
+                                                                                    "self": {
+                                                                                      "type": ["object", "null"],
+                                                                                      "properties": {
+                                                                                        "self": {
+                                                                                          "type": ["object", "null"],
+                                                                                          "properties": {
+                                                                                            "self": {
+                                                                                              "type": ["object", "null"],
+                                                                                              "properties": {
+                                                                                                "self": {
+                                                                                                  "type": ["object", "null"],
+                                                                                                  "properties": {
+                                                                                                    "self": {
+                                                                                                      "type": ["object", "null"],
+                                                                                                      "properties": {
+                                                                                                        "self": {
+                                                                                                          "type": ["object", "null"],
+                                                                                                          "properties": {
+                                                                                                            "self": {
+                                                                                                              "type": ["object", "null"],
+                                                                                                              "properties": {
+                                                                                                                "self": {
+                                                                                                                  "type": ["object", "null"],
+                                                                                                                  "properties": {
+                                                                                                                    "self": {
+                                                                                                                      "type": ["object", "null"],
+                                                                                                                      "properties": {
+                                                                                                                        "self": {
+                                                                                                                          "type": ["object", "null"],
+                                                                                                                          "properties": {
+                                                                                                                            "self": {
+                                                                                                                              "type": ["object", "null"],
+                                                                                                                              "properties": {
+                                                                                                                                "self": {
+                                                                                                                                  "type": ["object", "null"],
+                                                                                                                                  "properties": {
+                                                                                                                                    "self": {
+                                                                                                                                      "type": ["object", "null"],
+                                                                                                                                      "properties": {
+                                                                                                                                        "self": {
+                                                                                                                                          "type": ["object", "null"],
+                                                                                                                                          "properties": {
+                                                                                                                                            "self": {
+                                                                                                                                              "type": ["object", "null"],
+                                                                                                                                              "properties": {
+                                                                                                                                                "self": {
+                                                                                                                                                  "type": ["object", "null"],
+                                                                                                                                                  "properties": {
+                                                                                                                                                    "self": {
+                                                                                                                                                      "type": ["object", "null"],
+                                                                                                                                                      "properties": {
+                                                                                                                                                        "self": {
+                                                                                                                                                        }
                                                                                                                                                       }
-                                                                                                                                                    },
-                                                                                                                                                    "exampleSetFlag": false
+                                                                                                                                                    }
                                                                                                                                                   }
-                                                                                                                                                },
-                                                                                                                                                "exampleSetFlag": false
+                                                                                                                                                }
                                                                                                                                               }
-                                                                                                                                            },
-                                                                                                                                            "exampleSetFlag": false
+                                                                                                                                            }
                                                                                                                                           }
-                                                                                                                                        },
-                                                                                                                                        "exampleSetFlag": false
+                                                                                                                                        }
                                                                                                                                       }
-                                                                                                                                    },
-                                                                                                                                    "exampleSetFlag": false
+                                                                                                                                    }
                                                                                                                                   }
-                                                                                                                                },
-                                                                                                                                "exampleSetFlag": false
+                                                                                                                                }
                                                                                                                               }
-                                                                                                                            },
-                                                                                                                            "exampleSetFlag": false
+                                                                                                                            }
                                                                                                                           }
-                                                                                                                        },
-                                                                                                                        "exampleSetFlag": false
+                                                                                                                        }
                                                                                                                       }
-                                                                                                                    },
-                                                                                                                    "exampleSetFlag": false
+                                                                                                                    }
                                                                                                                   }
-                                                                                                                },
-                                                                                                                "exampleSetFlag": false
+                                                                                                                }
                                                                                                               }
-                                                                                                            },
-                                                                                                            "exampleSetFlag": false
+                                                                                                            }
                                                                                                           }
-                                                                                                        },
-                                                                                                        "exampleSetFlag": false
+                                                                                                        }
                                                                                                       }
-                                                                                                    },
-                                                                                                    "exampleSetFlag": false
+                                                                                                    }
                                                                                                   }
-                                                                                                },
-                                                                                                "exampleSetFlag": false
+                                                                                                }
                                                                                               }
-                                                                                            },
-                                                                                            "exampleSetFlag": false
+                                                                                            }
                                                                                           }
-                                                                                        },
-                                                                                        "exampleSetFlag": false
+                                                                                        }
                                                                                       }
-                                                                                    },
-                                                                                    "exampleSetFlag": false
+                                                                                    }
                                                                                   }
-                                                                                },
-                                                                                "exampleSetFlag": false
+                                                                                }
                                                                               }
-                                                                            },
-                                                                            "exampleSetFlag": false
+                                                                            }
                                                                           }
-                                                                        },
-                                                                        "exampleSetFlag": false
+                                                                        }
                                                                       }
-                                                                    },
-                                                                    "exampleSetFlag": false
+                                                                    }
                                                                   }
-                                                                },
-                                                                "exampleSetFlag": false
+                                                                }
                                                               }
-                                                            },
-                                                            "exampleSetFlag": false
+                                                            }
                                                           }
-                                                        },
-                                                        "exampleSetFlag": false
+                                                        }
                                                       }
-                                                    },
-                                                    "exampleSetFlag": false
+                                                    }
                                                   }
-                                                },
-                                                "exampleSetFlag": false
+                                                }
                                               }
-                                            },
-                                            "exampleSetFlag": false
+                                            }
                                           }
-                                        },
-                                        "exampleSetFlag": false
+                                        }
                                       }
-                                    },
-                                    "exampleSetFlag": false
+                                    }
                                   }
-                                },
-                                "exampleSetFlag": false
-                              }
-                            },
-                            "exampleSetFlag": false
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "types": ["object"],
-                        "properties": {
-                          "self": {
-                            "oneOf": [
-                              {
-                                "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
-                                "exampleSetFlag": false
-                              },
-                              {
-                                "types": ["null"],
-                                "exampleSetFlag": false
-                              }
-                            ],
-                            "exampleSetFlag": false
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing": {
-                          "types": ["object"],
-                          "properties": {
-                            "self": {
-                              "oneOf": [
-                                {
-                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
-                                  "exampleSetFlag": false
-                                },
-                                {
-                                  "types": ["null"],
-                                  "exampleSetFlag": false
                                 }
-                              ],
-                              "exampleSetFlag": false
+                              }
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
                       }
                     }
                 """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing": {
-                          "types": ["object"],
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "type": "object",
                           "properties": {
                             "self": {
                               "oneOf": [
                                 {
-                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing",
-                                  "exampleSetFlag": false
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
                                 },
                                 {
-                                  "types": ["null"],
-                                  "exampleSetFlag": false
+                                  "type": "null"
                                 }
-                              ],
-                              "exampleSetFlag": false
+                              ]
                             }
-                          },
-                          "exampleSetFlag": false
+                          }
                         }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "self": {
+                              "oneOf": [
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
                       }
-                    }
-                """.trimIndent(),
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "self": {
+                              "oneOf": [
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithOptionalParameters>(),
@@ -1798,102 +1491,82 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 },
                 expectedResultInlining = """
                     {
-                      "schema": {
-                        "required": [
-                          "ctorOptional",
-                          "ctorRequired"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "ctorOptional": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorOptionalNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequired": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequiredNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          }
+                      "required": [
+                        "ctorOptional",
+                        "ctorRequired"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "ctorOptional",
-                          "ctorRequired"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "ctorOptional": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorOptionalNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequired": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequiredNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          }
+                        "ctorOptionalNullable": {
+                          "type": ["string", "null"]
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters": {
-                          "required": [
-                            "ctorOptional",
-                            "ctorRequired"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "ctorOptional": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorOptionalNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequired": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequiredNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "exampleSetFlag": false
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": ["string", "null"]
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "ctorOptional",
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters" to """
+                        {
+                          "required": [
+                            "ctorOptional",
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<ClassWithOptionalParameters>(),
@@ -1903,180 +1576,146 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 },
                 expectedResultInlining = """
                     {
-                      "schema": {
-                        "required": [
-                          "ctorRequired"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "ctorOptional": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorOptionalNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequired": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequiredNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          }
+                      "required": [
+                        "ctorRequired"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "ctorOptional": {
+                          "type": "string"
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "ctorRequired"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "ctorOptional": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorOptionalNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequired": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          },
-                          "ctorRequiredNullable": {
-                            "types": ["string", "null"],
-                            "exampleSetFlag": false
-                          }
+                        "ctorOptionalNullable": {
+                          "type": ["string", "null"]
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters": {
-                          "required": [
-                            "ctorRequired"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "ctorOptional": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorOptionalNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequired": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            },
-                            "ctorRequiredNullable": {
-                              "types": ["string", "null"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "exampleSetFlag": false
+                        "ctorRequired": {
+                          "type": "string"
+                        },
+                        "ctorRequiredNullable": {
+                          "type": ["string", "null"]
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithOptionalParameters" to """
+                        {
+                          "required": [
+                            "ctorRequired"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "ctorOptional": {
+                              "type": "string"
+                            },
+                            "ctorOptionalNullable": {
+                              "type": ["string", "null"]
+                            },
+                            "ctorRequired": {
+                              "type": "string"
+                            },
+                            "ctorRequiredNullable": {
+                              "type": ["string", "null"]
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                )
             ),
             TestData(
                 type = typeOf<ClassWithValueClass>(),
                 testName = "inline value class",
                 expectedResultInlining = """
                     {
-                      "schema": {
-                        "required": [
-                          "myValue",
-                          "someText"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "myValue": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                          },
-                          "someText": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          }
+                      "required": [
+                        "myValue",
+                        "someText"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "myValue": {
+                          "type": "integer",
+                          "format": "int32"
                         },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "myValue",
-                          "someText"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "myValue": {
-                            "types": ["integer"],
-                            "format": "int32",
-                            "exampleSetFlag": false
-                          },
-                          "someText": {
-                            "types": ["string"],
-                            "exampleSetFlag": false
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass": {
-                          "required": [
-                            "myValue",
-                            "someText"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "myValue": {
-                              "types": ["integer"],
-                              "format": "int32",
-                              "exampleSetFlag": false
-                            },
-                            "someText": {
-                              "types": ["string"],
-                              "exampleSetFlag": false
-                            }
-                          },
-                          "exampleSetFlag": false
+                        "someText": {
+                          "type": "string"
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "someText": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithValueClass" to """
+                        {
+                          "required": [
+                            "myValue",
+                            "someText"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "someText": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
             ),
             TestData(
                 type = typeOf<ClassWithAnnotatedValueClass>(),
@@ -2084,87 +1723,70 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 withAnnotations = true,
                 expectedResultInlining = """
                     {
-                      "schema": {
-                        "required": [
-                          "myValue"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "myValue": {
-                            "maximum": 15,
-                            "exclusiveMaximum": false,
-                            "minimum": 5,
-                            "exclusiveMinimum": false,
-                            "maxLength": 2147483647,
-                            "minLength": 0,
-                            "types": ["string"],
-                            "description": "annotated value class for testing.",
-                            "exampleSetFlag": false,
-                            "default": "default on property"
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencing = """
-                    {
-                      "schema": {
-                        "required": [
-                          "myValue"
-                        ],
-                        "types": ["object"],
-                        "properties": {
-                          "myValue": {
-                            "maximum": 15,
-                            "exclusiveMaximum": false,
-                            "minimum": 5,
-                            "exclusiveMinimum": false,
-                            "maxLength": 2147483647,
-                            "minLength": 0,
-                            "types": ["string"],
-                            "description": "annotated value class for testing.",
-                            "exampleSetFlag": false,
-                            "default": "default on property"
-                          }
-                        },
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {}
-                    }
-                """.trimIndent(),
-                expectedResultReferencingRoot = """
-                    {
-                      "schema": {
-                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass",
-                        "exampleSetFlag": false
-                      },
-                      "definitions": {
-                        "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass": {
-                          "required": [
-                            "myValue"
-                          ],
-                          "types": ["object"],
-                          "properties": {
-                            "myValue": {
-                              "maximum": 15,
-                              "exclusiveMaximum": false,
-                              "minimum": 5,
-                              "exclusiveMinimum": false,
-                              "maxLength": 2147483647,
-                              "minLength": 0,
-                              "types": ["string"],
-                              "description": "annotated value class for testing.",
-                              "exampleSetFlag": false,
-                              "default": "default on property"
-                            }
-                          },
-                          "exampleSetFlag": false
+                      "required": [
+                        "myValue"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "myValue": {
+                          "maximum": 15,
+                          "minimum": 5,
+                          "maxLength": 2147483647,
+                          "minLength": 0,
+                          "type": "string",
+                          "description": "annotated value class for testing.",
+                          "default": "default on property"
                         }
                       }
                     }
                 """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "required": [
+                            "myValue"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "maximum": 15,
+                              "minimum": 5,
+                              "maxLength": 2147483647,
+                              "minLength": 0,
+                              "type": "string",
+                              "description": "annotated value class for testing.",
+                              "default": "default on property"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass"
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass" to """
+                        {
+                          "required": [
+                            "myValue"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "myValue": {
+                              "maximum": 15,
+                              "minimum": 5,
+                              "maxLength": 2147483647,
+                              "minLength": 0,
+                              "type": "string",
+                              "description": "annotated value class for testing.",
+                              "default": "default on property"
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                ),
             ),
         )
     }

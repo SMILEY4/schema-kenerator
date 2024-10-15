@@ -77,15 +77,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 }
                 .let { JsonSchemaCompileInlineStep().compile(it) }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultInlining
-            }
-
+            schema.json.shouldEqualJson(data.expectedResultInlining)
         }
     }
 
@@ -131,14 +123,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencing
-            }
+            schema.json.shouldEqualJson(data.expectedResultReferencing)
 
         }
     }
@@ -185,14 +170,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencingRoot
-            }
+            schema.json.shouldEqualJson(data.expectedResultReferencingRoot)
         }
     }
 

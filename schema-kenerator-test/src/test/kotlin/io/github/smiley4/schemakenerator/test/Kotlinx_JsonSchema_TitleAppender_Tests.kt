@@ -57,14 +57,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultFullTitle
-                }
+                .shouldEqualLenient(data.expectedResultFullTitle)
         }
     }
 
@@ -97,14 +90,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultSimpleTitle
-                }
+                .shouldEqualLenient(data.expectedResultSimpleTitle)
         }
     }
 
@@ -146,14 +132,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultSimpleTitleReferencing
-                }
+                .shouldEqualLenient(data.expectedResultSimpleTitleReferencing)
         }
     }
 

@@ -43,19 +43,19 @@ class MiscTests : FreeSpec({
                 .generateJsonSchema()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualLenient(
+            result.json.shouldEqualJson {
                 """
-                {
-                  "type": "object",
-                  "required": [],
-                  "properties": {
-                    "name": {
-                      "type": "string"
+                    {
+                      "type": "object",
+                      "required": [],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  }
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
         "kotlinx-serialization" {
@@ -66,19 +66,19 @@ class MiscTests : FreeSpec({
                 .generateJsonSchema()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualLenient(
+            result.json.shouldEqualJson {
                 """
-                {
-                  "type": "object",
-                  "required": [],
-                  "properties": {
-                    "name": {
-                      "type": "string"
+                    {
+                      "type": "object",
+                      "required": [],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  }
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
     }
@@ -93,24 +93,24 @@ class MiscTests : FreeSpec({
                 }
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualLenient(
+            result.json.shouldEqualJson {
                 """
-                {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "description": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
+                    {
+                      "type": "object",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "description": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  }
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
         "kotlinx-serialization" {
@@ -121,24 +121,24 @@ class MiscTests : FreeSpec({
                 }
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualLenient(
+            result.json.shouldEqualJson {
                 """
-                {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
+                    {
+                      "type": "object",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  }
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
     }
@@ -153,24 +153,24 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            result.json.prettyPrint().shouldEqualLenient(
+            result.json.shouldEqualJson {
                 """
-                {
-                  "type": "object",
-                  "required": [
-                    "prop1"
-                  ],
-                  "properties": {
-                    "prop1": {
-                      "type": "string"
-                    },
-                    "prop2": {
-                      "type": "string"
+                    {
+                      "type": "object",
+                      "required": [
+                        "prop1"
+                      ],
+                      "properties": {
+                        "prop1": {
+                          "type": "string"
+                        },
+                        "prop2": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  }
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
         "swagger" {
@@ -180,27 +180,24 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualLenient(
+            result.swagger.shouldEqualJson {
                 """
-                {
-                  "required": [
-                    "prop1"
-                  ],
-                  "types": ["object"],
-                  "properties": {
-                    "prop1": {
-                      "types": ["string", "null"],
-                      "exampleSetFlag": false
-                    },
-                    "prop2": {
-                      "types": ["string", "null"],
-                      "exampleSetFlag": false
+                    {
+                      "required": [
+                        "prop1"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "prop1": {
+                          "type": ["string", "null"]
+                        },
+                        "prop2": {
+                          "type": ["string", "null"]
+                        }
+                      }
                     }
-                  },
-                  "exampleSetFlag": false
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
     }
@@ -213,27 +210,24 @@ class MiscTests : FreeSpec({
             .handleJavaxValidationAnnotations()
             .compileInlining()
 
-        json.writeValueAsString(result.swagger).shouldEqualLenient(
+        result.swagger.shouldEqualJson {
             """
                 {
                   "required": [ "passwordRenamed", "usernameRenamed" ],
-                  "types": ["object"],
+                  "type": "object",
                   "properties": {
                     "passwordRenamed": {
                       "maxLength": 200,
-                      "types": ["string"],
-                      "exampleSetFlag": false
+                      "type": "string"
                     },
                     "usernameRenamed": {
                       "maxLength": 100,
-                      "types": ["string"],
-                      "exampleSetFlag": false
+                      "type": "string"
                     }
-                  },
-                  "exampleSetFlag": false
+                  }
                 }
             """.trimIndent()
-        )
+        }
     }
 
     "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties"- {
@@ -246,26 +240,23 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualLenient(
+            result.swagger.shouldEqualJson {
                 """
-                {
-                  "required": [ "prefix_nameOfPerson", "prefix_numberOfYears" ],
-                  "types": ["object"],
-                  "properties": {
-                    "prefix_nameOfPerson": {
-                      "types": ["string"],
-                      "exampleSetFlag": false
-                    },
-                    "prefix_numberOfYears": {
-                      "types": ["integer"],
-                      "format": "int32",
-                      "exampleSetFlag": false
+                    {
+                      "required": [ "prefix_nameOfPerson", "prefix_numberOfYears" ],
+                      "type": "object",
+                      "properties": {
+                        "prefix_nameOfPerson": {
+                          "type": "string"
+                        },
+                        "prefix_numberOfYears": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      }
                     }
-                  },
-                  "exampleSetFlag": false
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
         "kotlinx naming strategy (snake case)" {
@@ -276,26 +267,25 @@ class MiscTests : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            json.writeValueAsString(result.swagger).shouldEqualLenient(
+
+
+            result.swagger.shouldEqualJson {
                 """
-                {
-                  "required": [ "name_of_person", "number_of_years" ],
-                  "types": ["object"],
-                  "properties": {
-                    "name_of_person": {
-                      "types": ["string"],
-                      "exampleSetFlag": false
-                    },
-                    "number_of_years": {
-                      "types": ["integer"],
-                      "format": "int32",
-                      "exampleSetFlag": false
+                    {
+                      "required": [ "name_of_person", "number_of_years" ],
+                      "type": "object",
+                      "properties": {
+                        "name_of_person": {
+                          "type": "string"
+                        },
+                        "number_of_years": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      }
                     }
-                  },
-                  "exampleSetFlag": false
-                }
-            """.trimIndent()
-            )
+                """.trimIndent()
+            }
         }
 
     }
@@ -307,7 +297,7 @@ class MiscTests : FreeSpec({
             val otherProperty: String
         )
 
-        val jsonSchema = typeOf<TestClass>()
+        val result = typeOf<TestClass>()
             .processReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
@@ -316,27 +306,27 @@ class MiscTests : FreeSpec({
                 }
             }
             .compileInlining()
-            .json.prettyPrint()
 
-        jsonSchema shouldEqualJson """
-            {
-               "type": "object",
-               "required": [
-                  "describeMe",
-                  "otherProperty"
-               ],
-               "properties": {
-                  "describeMe": {
-                     "type": "string",
-                     "description": "test description"
-                  },
-                  "otherProperty": {
-                     "type": "string"
-                  }
-               }
-            }
-        """.trimIndent()
-
+        result.json.shouldEqualJson {
+            """
+                {
+                   "type": "object",
+                   "required": [
+                      "describeMe",
+                      "otherProperty"
+                   ],
+                   "properties": {
+                      "describeMe": {
+                         "type": "string",
+                         "description": "test description"
+                      },
+                      "otherProperty": {
+                         "type": "string"
+                      }
+                   }
+                }
+            """.trimIndent()
+        }
     }
 
 }) {
