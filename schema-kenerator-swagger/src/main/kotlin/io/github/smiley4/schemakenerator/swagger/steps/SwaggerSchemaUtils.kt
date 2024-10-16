@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.swagger.v3.oas.models.media.Discriminator
 import io.swagger.v3.oas.models.media.Schema
@@ -151,12 +152,18 @@ class SwaggerSchemaUtils {
 
     //=====  OBJECTS ================================
 
-    fun subtypesSchema(subtypes: List<Schema<*>>, discriminator: String? = null): Schema<*> {
+    fun subtypesSchema(subtypes: List<Schema<*>>, discriminator: String?, discriminatorMapping: Map<TypeId, String>): Schema<*> {
         return Schema<Any>().also { schema ->
             schema.anyOf = subtypes
             if (discriminator != null) {
                 schema.discriminator = Discriminator().also {
                     it.propertyName = discriminator
+                    it.mapping = buildMap {
+                        discriminatorMapping.forEach { (typeId, name) ->
+                            val target = "#/components/schemas/${typeId.full()}" // TODO: replace when inlining? TODO: handle different ref path types, i.e. handle when replacing references when compiling
+                            this[name] = target
+                        }
+                    }
                 }
             }
         }
