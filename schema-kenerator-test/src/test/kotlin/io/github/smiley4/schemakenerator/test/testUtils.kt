@@ -23,13 +23,15 @@ fun JsonNode.shouldEqualJson(expected: String) {
     this.prettyPrint().shouldEqualLenient(expected)
 }
 
-fun Pair<Schema<*>, Map<String,Schema<*>>>.shouldEqualJson(expected: () -> Map<String,String>) = this.shouldEqualJson(expected())
+fun Pair<Schema<*>, Map<String, Schema<*>>>.shouldEqualJson(expected: () -> Map<String, String>) = this.shouldEqualJson(expected())
 
-fun Pair<Schema<*>, Map<String,Schema<*>>>.shouldEqualJson(expected: Map<String,String>) {
+fun Pair<Schema<*>, Map<String, Schema<*>>>.shouldEqualJson(expected: Map<String, String>) {
     Json31.pretty(this.first).shouldEqualLenient(expected["."]!!)
     this.second.keys shouldContainExactlyInAnyOrder expected.keys.minus(".")
     this.second.forEach { (key, value) ->
-        Json31.pretty(value).shouldEqualLenient(expected[key]!!)
+        if (expected[key]!! != "...") {
+            Json31.pretty(value).shouldEqualLenient(expected[key]!!)
+        }
     }
 }
 

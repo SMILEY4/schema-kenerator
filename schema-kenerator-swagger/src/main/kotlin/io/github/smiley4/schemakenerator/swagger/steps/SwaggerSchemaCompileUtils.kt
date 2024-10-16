@@ -46,6 +46,30 @@ object SwaggerSchemaCompileUtils {
 
 
     /**
+     * Iterate the schema tree starting with the given root schema. Calls the given visitor-function on each encountered schema.
+     */
+    fun iterate(root: Schema<*>, visitor: (schema: Schema<*>) -> Unit) {
+        visitor(root)
+        root.not?.also { iterate(it, visitor) }
+        root.properties?.forEach { (_, prop) -> iterate(prop, visitor) }
+        root.prefixItems?.forEach { iterate(it, visitor) }
+        root.allOf?.forEach { iterate(it, visitor) }
+        root.anyOf?.forEach { iterate(it, visitor) }
+        root.oneOf?.forEach { iterate(it, visitor) }
+        root.items?.also { iterate(it, visitor) }
+        root.patternProperties?.forEach { (_, prop) -> iterate(prop, visitor) }
+        root.contains?.also { iterate(it, visitor) }
+        root.contentSchema?.also { iterate(it, visitor) }
+        root.propertyNames?.also { iterate(it, visitor) }
+        root.additionalItems?.also { iterate(it, visitor) }
+        root.unevaluatedItems?.also { iterate(it, visitor) }
+        root.`if`?.also { iterate(it, visitor) }
+        root.`else`?.also { iterate(it, visitor) }
+        root.then?.also { iterate(it, visitor) }
+        root.dependentSchemas?.forEach { (_, prop) -> iterate(prop, visitor) }
+    }
+
+    /**
      * Merges the present properties of "source" with the properties of "target" and returns the result as a new schema.
      */
     fun merge(source: Schema<*>, target: Schema<*>): Schema<*> {
