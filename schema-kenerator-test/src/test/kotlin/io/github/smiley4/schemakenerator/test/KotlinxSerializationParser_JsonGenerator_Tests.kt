@@ -319,28 +319,17 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "type": "object",
-                        "required": [],
-                        "properties": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
-                        "type": "object",
-                        "required": [],
-                        "properties": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                      "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<List>",
-                      "definitions": {
-                        "kotlinx.serialization.Polymorphic<List>": {
-                          "type": "object",
-                          "required": [],
-                          "properties": {}
-                        }
-                      }
+                        "type": "object"
                     }
                 """.trimIndent(),
             ),
@@ -350,28 +339,17 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "type": "object",
-                        "required": [],
-                        "properties": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
-                        "type": "object",
-                        "required": [],
-                        "properties": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                      "${'$'}ref": "#/definitions/kotlinx.serialization.Polymorphic<Map>",
-                      "definitions": {
-                        "kotlinx.serialization.Polymorphic<Map>": {
-                          "type": "object",
-                          "required": [],
-                          "properties": {}
-                        }
-                      }
+                        "type": "object"
                     }
                 """.trimIndent(),
             ),

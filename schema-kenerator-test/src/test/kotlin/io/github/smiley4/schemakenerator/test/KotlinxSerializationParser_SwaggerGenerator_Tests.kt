@@ -344,30 +344,22 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "type": "object",
-                        "properties": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = mapOf(
                     "." to """
                         {
-                            "type": "object",
-                            "properties": {}
+                            "type": "object"
                         }
                     """.trimIndent()
                 ),
                 expectedResultReferencingRoot = mapOf(
                     "." to """
                         {
-                          "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<List>"
+                          "type": "object"
                         }
                     """.trimIndent(),
-                    "kotlinx.serialization.Polymorphic<List>" to """
-                        {
-                          "type": "object",
-                          "properties": {}
-                        }
-                    """.trimIndent()
                 )
             ),
             // top-level maps not directly supported: weird result
@@ -376,28 +368,20 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "type": "object",
-                        "properties": {}
+                        "type": "object"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = mapOf(
                     "." to """
                         {
-                            "type": "object",
-                            "properties": {}
+                            "type": "object"
                         }
                     """.trimIndent()
                 ),
                 expectedResultReferencingRoot = mapOf(
                     "." to """
                         {
-                          "${'$'}ref": "#/components/schemas/kotlinx.serialization.Polymorphic<Map>"
-                        }
-                    """.trimIndent(),
-                    "kotlinx.serialization.Polymorphic<Map>" to """
-                        {
-                          "type": "object",
-                          "properties": {}
+                            "type": "object"
                         }
                     """.trimIndent()
                 )

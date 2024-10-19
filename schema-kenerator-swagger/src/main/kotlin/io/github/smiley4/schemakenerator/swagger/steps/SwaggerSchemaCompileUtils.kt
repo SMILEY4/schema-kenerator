@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.swagger.v3.oas.models.media.Schema
+import org.checkerframework.checker.units.qual.t
 
 object SwaggerSchemaCompileUtils {
 
@@ -92,13 +93,13 @@ object SwaggerSchemaCompileUtils {
         source.description?.also { target.description = it }
         source.discriminator?.also { target.discriminator = it }
         source.enum?.also {
-            @Suppress("TYPE_MISMATCH_WARNING")
-            target.enum = it
+            @Suppress("UNCHECKED_CAST", "TYPE_MISMATCH_WARNING")
+            target.enum = it as List<Nothing>?
         }
         source.example?.also { target.example = it }
         source.examples?.also {
             @Suppress("UNCHECKED_CAST")
-            (target as Schema<Any?>).examples = it
+            (target as Schema<Any?>).examples = it as MutableList<Nothing>? as List<Any?>?
         }
         source.exclusiveMaximum?.also { target.exclusiveMaximum = it }
         source.exclusiveMaximumValue?.also { target.exclusiveMaximumValue = it }
