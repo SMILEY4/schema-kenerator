@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.annotations.Default
+import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
@@ -10,27 +10,27 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
 
 /**
- * Adds default values from [Default]-annotation
+ * Adds format values from [Format]-annotation
  */
-class JsonSchemaCoreAnnotationDefaultStep : AbstractJsonSchemaStep() {
+class JsonSchemaCoreAnnotationFormatStep : AbstractJsonSchemaStep() {
 
     override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
-        if (schema.json is JsonObject && schema.json.properties["default"] == null) {
-            determineDefault(schema.typeData.annotations)?.also { default ->
-                schema.json.properties["default"] = JsonTextValue(default)
+        if (schema.json is JsonObject && schema.json.properties["format"] == null) {
+            determineFormat(schema.typeData.annotations)?.also { format ->
+                schema.json.properties["format"] = JsonTextValue(format)
             }
         }
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
-            determineDefault(propData.annotations + propTypeData.annotations)?.also { default ->
-                prop.properties["default"] = JsonTextValue(default)
+            determineFormat(propData.annotations + propTypeData.annotations)?.also { format ->
+                prop.properties["format"] = JsonTextValue(format)
             }
         }
     }
 
-    private fun determineDefault(annotations: List<AnnotationData>): String? {
+    private fun determineFormat(annotations: List<AnnotationData>): String? {
         return annotations
-            .filter { it.name == Default::class.qualifiedName }
-            .map { it.values["value"] as String }
+            .filter { it.name == Format::class.qualifiedName }
+            .map { it.values["format"] as String }
             .firstOrNull()
     }
 }

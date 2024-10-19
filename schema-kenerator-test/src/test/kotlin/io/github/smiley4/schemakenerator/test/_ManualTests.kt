@@ -4,18 +4,18 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.core.util.Json31
-import io.swagger.v3.oas.annotations.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 /**
@@ -35,15 +35,12 @@ class _ManualTests : StringSpec({
     }
 
     "test swagger" {
-        val result = typeOf<TestClass>()
+        val result = typeOf<Vehicle>()
             .processReflection()
+            .addJacksonTypeInfoDiscriminatorProperty()
             .generateSwaggerSchema()
-            .compileInlining()
+            .compileReferencing(RefType.OPENAPI_FULL)
             .asPrintable()
-
-        println(json.writeValueAsString(result))
-
-        println("===========")
 
         println(Json31.prettyPrint(result))
 
@@ -52,13 +49,20 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        enum class ColorEnum {
-            RED, GREEN, BLUE
-        }
-
-        class TestClass(
-            val someColor: ColorEnum?
+        @JsonTypeInfo(
+            property = "_myType",
+            include = JsonTypeInfo.As.PROPERTY,
+            use = JsonTypeInfo.Id.NAME,
         )
+        @JsonSubTypes(
+            JsonSubTypes.Type(value = Car::class, name = "myCar"),
+            JsonSubTypes.Type(value = Train::class, name = "myTrain"),
+        )
+        sealed class Vehicle
+
+        class Car : Vehicle()
+
+        class Train : Vehicle()
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

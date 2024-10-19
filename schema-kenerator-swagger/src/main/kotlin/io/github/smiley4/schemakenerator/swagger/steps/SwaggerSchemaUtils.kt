@@ -151,12 +151,18 @@ class SwaggerSchemaUtils {
 
     //=====  OBJECTS ================================
 
-    fun subtypesSchema(subtypes: List<Schema<*>>, discriminator: String? = null): Schema<*> {
+    fun subtypesSchema(subtypes: List<Schema<*>>, discriminator: String?, discriminatorMapping: Map<TypeId, String>): Schema<*> {
         return Schema<Any>().also { schema ->
             schema.anyOf = subtypes
             if (discriminator != null) {
                 schema.discriminator = Discriminator().also {
                     it.propertyName = discriminator
+                    it.mapping = buildMap {
+                        discriminatorMapping.forEach { (typeId, name) ->
+                            val target = typeId.full()
+                            this[name] = target
+                        }
+                    }
                 }
             }
         }
@@ -173,13 +179,15 @@ class SwaggerSchemaUtils {
 
     //=====  REFERENCE ==============================
 
+    fun componentReference(id: String) = "#/components/schemas/$id"
+
     fun referenceSchema(id: TypeId, isInComponents: Boolean = false): Schema<*> {
         return referenceSchema(id.full(), isInComponents)
     }
 
     fun referenceSchema(id: String, isInComponents: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
-            schema.`raw$ref`(if (isInComponents) "#/components/schemas/$id" else id)
+            schema.`raw$ref`(if (isInComponents) componentReference(id) else id)
         }
     }
 

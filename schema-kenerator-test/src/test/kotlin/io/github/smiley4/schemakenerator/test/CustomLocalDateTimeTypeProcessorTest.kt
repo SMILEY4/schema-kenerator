@@ -1,7 +1,5 @@
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
@@ -19,12 +17,6 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationSt
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import java.time.LocalDateTime
 import kotlin.reflect.typeOf
@@ -40,12 +32,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { JsonSchemaTitleStep(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL).process(it) }
             .let { JsonSchemaCompileInlineStep().compile(it) }
 
-        result.json.prettyPrint().shouldEqualJson {
-            propertyOrder = PropertyOrder.Lenient
-            arrayOrder = ArrayOrder.Lenient
-            fieldComparison = FieldComparison.Strict
-            numberFormat = NumberFormat.Lenient
-            typeCoercion = TypeCoercion.Disabled
+        result.json.shouldEqualJson {
             """
                 {
                     "type": "object",
@@ -64,7 +51,6 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                 }
             """.trimIndent()
         }
-
     }
 
     "reflection & jsonschema: localdatetime with custom processor" {
@@ -95,12 +81,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { JsonSchemaTitleStep(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL).process(it) }
             .let { JsonSchemaCompileInlineStep().compile(it) }
 
-        result.json.prettyPrint().shouldEqualJson {
-            propertyOrder = PropertyOrder.Lenient
-            arrayOrder = ArrayOrder.Lenient
-            fieldComparison = FieldComparison.Strict
-            numberFormat = NumberFormat.Lenient
-            typeCoercion = TypeCoercion.Disabled
+        result.json.shouldEqualJson {
             """
                 {
                     "type": "object",
@@ -131,32 +112,24 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_FULL).process(it) }
             .let { SwaggerSchemaCompileInlineStep().compile(it) }
 
-        json.writeValueAsString(result.swagger).shouldEqualJson {
-            propertyOrder = PropertyOrder.Lenient
-            arrayOrder = ArrayOrder.Lenient
-            fieldComparison = FieldComparison.Strict
-            numberFormat = NumberFormat.Lenient
-            typeCoercion = TypeCoercion.Disabled
+        result.swagger.shouldEqualJson {
             """
                 {
-                    "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime",
-                    "required": [
-                        "dateTime"
-                    ],
-                    "types": ["object"],
-                    "properties": {
-                        "dateTime": {
-                            "types": ["object"],
-                            "title": "java.time.LocalDateTime",
-                            "properties": {},
-                            "exampleSetFlag": false
-                        }
-                    },
-                    "exampleSetFlag": false
+                  "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime",
+                  "type": "object",
+                  "properties": {
+                    "dateTime": {
+                      "type": "object",
+                      "properties": {},
+                      "title": "java.time.LocalDateTime"
+                    }
+                  },
+                  "required": [
+                    "dateTime"
+                  ]
                 }
             """.trimIndent()
-        }
-
+    }
     }
 
     "kotlinx-serialization & swagger: localdatetime with custom processor" {
@@ -187,35 +160,23 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_FULL).process(it) }
             .let { SwaggerSchemaCompileInlineStep().compile(it) }
 
-        json.writeValueAsString(result.swagger).shouldEqualJson {
-            propertyOrder = PropertyOrder.Lenient
-            arrayOrder = ArrayOrder.Lenient
-            fieldComparison = FieldComparison.Strict
-            numberFormat = NumberFormat.Lenient
-            typeCoercion = TypeCoercion.Disabled
+        result.swagger.shouldEqualJson {
             """
                 {
-                    "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime",
-                    "required": [
-                        "dateTime"
-                    ],
-                    "types": ["object"],
-                    "properties": {
-                        "dateTime": {
-                            "types": ["date"],
-                            "title": "java.time.LocalDateTime",
-                            "exampleSetFlag": false
-                        }
-                    },
-                    "exampleSetFlag": false
+                  "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime",
+                  "type": "object",
+                  "properties": {
+                    "dateTime": {
+                      "type": "date",
+                      "title": "java.time.LocalDateTime"
+                    }
+                  },
+                  "required": [
+                    "dateTime"
+                  ]
                 }
             """.trimIndent()
         }
 
     }
-
-}) {
-    companion object {
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
-    }
-}
+})

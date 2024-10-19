@@ -5,8 +5,10 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.iterate
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.resolveReferences
+import io.swagger.v3.oas.models.media.Schema
 
 /**
  * Resolves references in prepared swagger-schemas by inlining them.
@@ -35,11 +37,21 @@ class SwaggerSchemaCompileInlineStep {
                 refObj
             }
         }
+        handleDiscriminatorMappings(root)
         return CompiledSwaggerSchema(
             swagger = root,
             typeData = bundle.data.typeData,
             componentSchemas = emptyMap()
         )
+    }
+
+    private fun handleDiscriminatorMappings(root: Schema<*>) {
+        iterate(root) {
+            if(root.discriminator != null) {
+                // hint: "inline" does not support mapping
+                root.discriminator.mapping = null
+            }
+        }
     }
 
     private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? {

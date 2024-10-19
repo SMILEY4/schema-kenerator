@@ -23,6 +23,7 @@ dependencies {
 |--------------------------------------------------|-----------------------------------------------------|-----------------------------|
 | `@Schema(title=...)` on types & properties       | Sets the `title`-property of the schema.            | `handleSchemaAnnotations()` |
 | `@Schema(description=...)` on types & properties | Sets the `description`-property of the schema.      | `handleSchemaAnnotations()` |
+| `@Schema(example=...)` on types & properties     | Sets the `example`-property of the schema.          | `handleSchemaAnnotations()` |
 | `@Schema(name=...)` on properties                | Sets the `name`-property of the schema.             | `handleSchemaAnnotations()` |
 | `@Schema(hidden=...)` on properties              | Sets the `hidden`-property of the schema.           | `handleSchemaAnnotations()` |
 | `@Schema(allowableValues=...)` on properties     | Sets the `allowableValues`-property of the schema.  | `handleSchemaAnnotations()` |

@@ -4,8 +4,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialInfo
 
 /**
- * Specifies a default value for the annotated object.
- * @param value The default value for the annotated object.
+ * Specifies the format of a schema for the annotated object.
+ * @param format the schema's format
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Target(
@@ -16,4 +16,4 @@ import kotlinx.serialization.SerialInfo
 )
 @SerialInfo
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Default(val value: String)
+annotation class Format(val format: String)

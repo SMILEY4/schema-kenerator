@@ -46,6 +46,30 @@ object SwaggerSchemaCompileUtils {
 
 
     /**
+     * Iterate the schema tree starting with the given root schema. Calls the given visitor-function on each encountered schema.
+     */
+    fun iterate(root: Schema<*>, visitor: (schema: Schema<*>) -> Unit) {
+        visitor(root)
+        root.not?.also { iterate(it, visitor) }
+        root.properties?.forEach { (_, prop) -> iterate(prop, visitor) }
+        root.prefixItems?.forEach { iterate(it, visitor) }
+        root.allOf?.forEach { iterate(it, visitor) }
+        root.anyOf?.forEach { iterate(it, visitor) }
+        root.oneOf?.forEach { iterate(it, visitor) }
+        root.items?.also { iterate(it, visitor) }
+        root.patternProperties?.forEach { (_, prop) -> iterate(prop, visitor) }
+        root.contains?.also { iterate(it, visitor) }
+        root.contentSchema?.also { iterate(it, visitor) }
+        root.propertyNames?.also { iterate(it, visitor) }
+        root.additionalItems?.also { iterate(it, visitor) }
+        root.unevaluatedItems?.also { iterate(it, visitor) }
+        root.`if`?.also { iterate(it, visitor) }
+        root.`else`?.also { iterate(it, visitor) }
+        root.then?.also { iterate(it, visitor) }
+        root.dependentSchemas?.forEach { (_, prop) -> iterate(prop, visitor) }
+    }
+
+    /**
      * Merges the present properties of "source" with the properties of "target" and returns the result as a new schema.
      */
     fun merge(source: Schema<*>, target: Schema<*>): Schema<*> {
@@ -68,13 +92,13 @@ object SwaggerSchemaCompileUtils {
         source.description?.also { target.description = it }
         source.discriminator?.also { target.discriminator = it }
         source.enum?.also {
-            @Suppress("TYPE_MISMATCH_WARNING")
-            target.enum = it
+            @Suppress("UNCHECKED_CAST", "TYPE_MISMATCH_WARNING")
+            target.enum = it as List<Nothing>?
         }
         source.example?.also { target.example = it }
         source.examples?.also {
             @Suppress("UNCHECKED_CAST")
-            (target as Schema<Any?>).examples = it
+            (target as Schema<Any?>).examples = it as MutableList<Nothing>? as List<Any?>?
         }
         source.exclusiveMaximum?.also { target.exclusiveMaximum = it }
         source.exclusiveMaximumValue?.also { target.exclusiveMaximumValue = it }

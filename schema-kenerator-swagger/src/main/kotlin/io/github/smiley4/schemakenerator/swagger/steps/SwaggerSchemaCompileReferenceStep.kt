@@ -32,6 +32,8 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
             resolve(refObj, schemaList, typeDataMap, components)
         }
 
+        handleDiscriminatorMappings(root, components, typeDataMap)
+
         return CompiledSwaggerSchema(
             typeData = bundle.data.typeData,
             swagger = root,
@@ -65,13 +67,33 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
                         it.nullable = null
                         it.types = setOf("null") + it.types
                     }
-                    if(it.nullable == false) {
+                    if (it.nullable == false) {
                         it.nullable = null
                     }
                 }
             }
         } else {
             refObj
+        }
+    }
+
+    private fun handleDiscriminatorMappings(
+        root: Schema<*>,
+        components: MutableMap<String, Schema<*>>,
+        typeDataMap: Map<TypeId, BaseTypeData>
+    ) {
+        handleDiscriminatorMappings(root, typeDataMap)
+        components.forEach { (_, schema) -> handleDiscriminatorMappings(schema, typeDataMap) }
+    }
+
+    private fun handleDiscriminatorMappings(swaggerSchema: Schema<*>, typeDataMap: Map<TypeId, BaseTypeData>) {
+        if (swaggerSchema.discriminator?.mapping == null) {
+            return
+        }
+        swaggerSchema.discriminator.mapping = swaggerSchema.discriminator.mapping.mapValues { (_, target) ->
+            val referencedId = TypeId.parse(target)
+            val referencedType = typeDataMap[referencedId]!!
+            schemaUtils.componentReference(pathBuilder(referencedType, typeDataMap))
         }
     }
 

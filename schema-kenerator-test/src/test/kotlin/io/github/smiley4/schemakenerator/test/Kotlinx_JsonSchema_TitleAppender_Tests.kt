@@ -13,12 +13,6 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFiel
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -57,14 +51,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultFullTitle
-                }
+                .shouldEqualLenient(data.expectedResultFullTitle)
         }
     }
 
@@ -97,14 +84,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultSimpleTitle
-                }
+                .shouldEqualLenient(data.expectedResultSimpleTitle)
         }
     }
 
@@ -146,14 +126,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                     }
                     jsonStr
                 }
-                .shouldEqualJson {
-                    propertyOrder = PropertyOrder.Lenient
-                    arrayOrder = ArrayOrder.Lenient
-                    fieldComparison = FieldComparison.Strict
-                    numberFormat = NumberFormat.Lenient
-                    typeCoercion = TypeCoercion.Disabled
-                    data.expectedResultSimpleTitleReferencing
-                }
+                .shouldEqualLenient(data.expectedResultSimpleTitleReferencing)
         }
     }
 

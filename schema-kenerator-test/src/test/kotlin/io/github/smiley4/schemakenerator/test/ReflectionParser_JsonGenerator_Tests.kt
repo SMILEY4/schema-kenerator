@@ -11,6 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
@@ -28,12 +29,6 @@ import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedCla
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SubClassA
 import io.github.smiley4.schemakenerator.test.models.reflection.TestEnum
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -61,6 +56,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -75,15 +71,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 }
                 .let { JsonSchemaCompileInlineStep().compile(it) }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultInlining
-            }
-
+            schema.json.shouldEqualJson(data.expectedResultInlining)
         }
     }
 
@@ -105,6 +93,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -128,14 +117,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencing
-            }
+            schema.json.shouldEqualJson(data.expectedResultReferencing)
 
         }
     }
@@ -158,6 +140,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
                             .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
                             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
                     } else {
                         list
                     }
@@ -181,14 +164,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                     }
                 }
 
-            schema.json.prettyPrint().shouldEqualJson {
-                propertyOrder = PropertyOrder.Lenient
-                arrayOrder = ArrayOrder.Lenient
-                fieldComparison = FieldComparison.Strict
-                numberFormat = NumberFormat.Lenient
-                typeCoercion = TypeCoercion.Disabled
-                data.expectedResultReferencingRoot
-            }
+            schema.json.shouldEqualJson(data.expectedResultReferencingRoot)
         }
     }
 
@@ -862,7 +838,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "default": "A default String value",
                                 "examples": [
                                     "An example of a String value"
-                                ]
+                                ],
+                                "format": "text"
                             },
                             "intValue": {
                                 "type": "integer",
@@ -872,7 +849,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "description": "Int field description",
                                 "examples": [
                                     "2222"
-                                ]
+                                ],
+                                "format": "int32"
                             }
                         },
                         "title": "Annotated Class",
@@ -881,7 +859,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "examples": [
                             "example 1"
                         ],
-                        "deprecated": true
+                        "deprecated": true,
+                        "format": "pair"
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
@@ -895,7 +874,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "default": "A default String value",
                                 "examples": [
                                     "An example of a String value"
-                                ]
+                                ],
+                                "format": "text"
                             },
                             "intValue": {
                                 "type": "integer",
@@ -905,7 +885,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "description": "Int field description",
                                 "examples": [
                                     "2222"
-                                ]
+                                ],
+                                "format": "int32"
                             }
                         },
                         "title": "Annotated Class",
@@ -914,7 +895,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                         "examples": [
                             "example 1"
                         ],
-                        "deprecated": true
+                        "deprecated": true,
+                        "format": "pair"
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
@@ -931,7 +913,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                         "default": "A default String value",
                                         "examples": [
                                             "An example of a String value"
-                                        ]
+                                        ],
+                                        "format": "text"
                                     },
                                     "intValue": {
                                         "type": "integer",
@@ -941,7 +924,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                         "description": "Int field description",
                                         "examples": [
                                             "2222"
-                                        ]
+                                        ],
+                                        "format": "int32"
                                     }
                                 },
                                 "title": "Annotated Class",
@@ -950,7 +934,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                                 "examples": [
                                     "example 1"
                                 ],
-                                "deprecated": true
+                                "deprecated": true,
+                                "format": "pair"
                             }
                         }
                     }

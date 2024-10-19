@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
@@ -9,6 +11,7 @@ import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
@@ -34,7 +37,7 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
 
     private fun generate(typeData: BaseTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
         if (typeData is ObjectTypeData && typeData.subtypes.isNotEmpty()) {
-            return buildWithSubtypes(typeData)
+            return buildWithSubtypes(typeData, typeDataList)
         }
         return when (typeData) {
             is PrimitiveTypeData -> buildPrimitiveSchema(typeData)
@@ -131,14 +134,43 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         )
     }
 
-    private fun buildWithSubtypes(typeData: ObjectTypeData): SwaggerSchema {
+    private fun buildWithSubtypes(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
         return SwaggerSchema(
             swagger = schema.subtypesSchema(
                 typeData.subtypes.map { schema.referenceSchema(it.full()) },
-                getDiscriminatorName(typeData)
+                getDiscriminatorName(typeData),
+                discriminatorMapping(typeData, typeDataList)
             ),
             typeData = typeData
         )
+    }
+
+    private fun discriminatorMapping(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): Map<TypeId,String> {
+        return buildMap {
+            typeData.subtypes.forEach { subtypeId ->
+                val subtype = typeDataList.find { it.id == subtypeId }!!
+                var name = subtype.qualifiedName // hint: default = qualified name (or from @SerialName) -> already covers kotlinx behaviour
+                val jsonTypeInfo = typeData.annotations.find { it.name == JsonTypeInfo::class.qualifiedName }
+                val jsonSubTypes = typeData.annotations.find { it.name == JsonSubTypes::class.qualifiedName }
+                if(jsonTypeInfo != null) {
+                    val mode = jsonTypeInfo.values["use"].toString()
+                    when(mode) {
+                        "CLASS" -> name = subtype.qualifiedName
+                        "MINIMAL_CLASS" -> Unit
+                        "NAME" -> jsonSubTypes?.also {
+                            @Suppress("UNCHECKED_CAST")
+                            val subtypeInfo = it.values["value"] as Array<JsonSubTypes.Type>
+                            name = subtypeInfo.find { i -> i.value.qualifiedName == subtype.qualifiedName }?.name ?: ""
+                        }
+                        "SIMPLE_NAME" -> name = subtype.simpleName
+                        "NONE" -> Unit
+                        "DEDUCTION" -> Unit
+                        "CUSTOM" -> Unit
+                    }
+                }
+                this[subtypeId] = name
+            }
+        }
     }
 
     private fun getDiscriminatorName(typeData: ObjectTypeData): String? {
