@@ -29,12 +29,6 @@ import io.github.smiley4.schemakenerator.test.models.reflection.CoreAnnotatedCla
 import io.github.smiley4.schemakenerator.test.models.reflection.SealedClass
 import io.github.smiley4.schemakenerator.test.models.reflection.SubClassA
 import io.github.smiley4.schemakenerator.test.models.reflection.TestEnum
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData

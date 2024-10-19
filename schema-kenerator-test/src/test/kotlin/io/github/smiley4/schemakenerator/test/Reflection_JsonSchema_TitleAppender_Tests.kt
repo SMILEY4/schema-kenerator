@@ -15,12 +15,6 @@ import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
 import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
 import io.github.smiley4.schemakenerator.test.models.reflection.RenamedTestData
-import io.kotest.assertions.json.ArrayOrder
-import io.kotest.assertions.json.FieldComparison
-import io.kotest.assertions.json.NumberFormat
-import io.kotest.assertions.json.PropertyOrder
-import io.kotest.assertions.json.TypeCoercion
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData

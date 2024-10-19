@@ -7,24 +7,15 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.core.util.Json31
-import io.swagger.v3.oas.annotations.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlin.reflect.typeOf
 
 /**

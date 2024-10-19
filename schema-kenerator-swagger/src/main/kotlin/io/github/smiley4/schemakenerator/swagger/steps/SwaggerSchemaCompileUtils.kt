@@ -1,7 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.swagger.v3.oas.models.media.Schema
-import org.checkerframework.checker.units.qual.t
 
 object SwaggerSchemaCompileUtils {
 
