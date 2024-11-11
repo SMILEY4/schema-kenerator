@@ -20,6 +20,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationOptionalAndRequiredStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTypeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
@@ -89,7 +90,7 @@ fun Bundle<JsonSchema>.withTitle(builder: (type: BaseTypeData, types: Map<TypeId
 /**
  * See [JsonSchemaCoreAnnotationDefaultStep], [JsonSchemaCoreAnnotationDeprecatedStep], [JsonSchemaCoreAnnotationDescriptionStep],
  * [JsonSchemaCoreAnnotationExamplesStep], [JsonSchemaCoreAnnotationTitleStep], [JsonSchemaCoreAnnotationOptionalAndRequiredStep],
- * [JsonSchemaCoreAnnotationFormatStep]
+ * [JsonSchemaCoreAnnotationFormatStep], [JsonSchemaCoreAnnotationTypeStep]
  */
 fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
     return this
@@ -100,6 +101,7 @@ fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
         .let { JsonSchemaCoreAnnotationExamplesStep().process(this) }
         .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
         .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
+        .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
 }
 
 
