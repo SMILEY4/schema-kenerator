@@ -15,6 +15,8 @@ import io.swagger.v3.oas.models.media.Schema
  */
 class SwaggerSchemaCompileInlineStep {
 
+    private val schemaUtils = SwaggerSchemaUtils()
+
     /**
      * Inline all referenced schema
      */
@@ -27,7 +29,7 @@ class SwaggerSchemaCompileInlineStep {
                 merge(refObj, referencedSchema.swagger).also {
                     if(it.nullable == true) {
                         it.nullable = null
-                        it.types = setOf("null") + it.types
+                        setNullable(it)
                     }
                     if(it.nullable == false) {
                         it.nullable = null
@@ -43,6 +45,18 @@ class SwaggerSchemaCompileInlineStep {
             typeData = bundle.data.typeData,
             componentSchemas = emptyMap()
         )
+    }
+
+    private fun setNullable(schema: Schema<*>) {
+        if(schema.types != null) {
+            schema.types = setOf("null") + schema.types
+        }
+        if(schema.anyOf != null && schema.anyOf.isNotEmpty()) {
+            schema.anyOf = schema.anyOf + schemaUtils.nullSchema()
+        }
+        if(schema.oneOf != null && schema.oneOf.isNotEmpty()) {
+            schema.oneOf = schema.oneOf + schemaUtils.nullSchema()
+        }
     }
 
     private fun handleDiscriminatorMappings(root: Schema<*>) {

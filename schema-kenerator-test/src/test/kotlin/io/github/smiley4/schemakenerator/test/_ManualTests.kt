@@ -11,7 +11,10 @@ import io.github.smiley4.schemakenerator.core.connectSubTypes
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
@@ -38,23 +41,30 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test" {
-        val result = typeOf<RegisterMetadataResponse>()
-            .processKotlinxSerialization {}
-            .connectSubTypes()
+        val result = typeOf<B>()
+            .processReflection()
             .generateSwaggerSchema()
             .withTitle(TitleType.SIMPLE)
-            .handleSwaggerAnnotations()
-            .handleCoreAnnotations()
-            .handleSchemaAnnotations()
-            .compileReferencingRoot()
-            .asPrintable()
+            .compileReferencing() // error here
 
-        println(Json31.prettyPrint(result))
+        println(Json31.prettyPrint(result.asPrintable()))
 
     }
 
 }) {
     companion object {
+
+
+        // any sealed class
+        sealed class SealedClass
+
+        // any class that extends the sealed class
+        class A: SealedClass()
+
+        // any class that has a nullable field of the sealed class
+        // must be a nullable field
+        class B(val a: SealedClass?)
+
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,
@@ -73,46 +83,3 @@ class _ManualTests : StringSpec({
     }
 }
 
-
-// Instant Serializer
-object InstantSerializer : KSerializer<Instant> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-
-    override fun deserialize(decoder: Decoder): Instant {
-        return Instant.parse(decoder.decodeString())
-    }
-
-    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: Instant) {
-        encoder.encodeString(value.toString())
-    }
-
-}
-
-
-// Class to be serialized and shown in the schemas
-@Serializable
-data class RegisterMetadataResponse(
-    @Type("string")
-    @Format("date-time")
-    @Serializable(with = InstantSerializer::class)
-    val registreringstidspunkt: Instant,
-    val registrertAv: String,
-)
-
-private inline fun <reified T> createDefaultPrimitiveTypeData(type: String, format: String): PrimitiveTypeData {
-    return PrimitiveTypeData(
-        id = TypeId.build(T::class.qualifiedName!!),
-        simpleName = T::class.simpleName!!,
-        qualifiedName = T::class.qualifiedName!!,
-        annotations = mutableListOf(
-            AnnotationData(
-                name = "type_format_annotation",
-                values = mutableMapOf(
-                    "type" to type,
-                    "format" to format,
-                ),
-                annotation = null,
-            ),
-        ),
-    )
-}
