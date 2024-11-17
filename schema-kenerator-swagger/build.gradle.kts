@@ -23,7 +23,7 @@ repositories {
 dependencies {
     val versionSwaggerParser: String by project
     implementation(project(":schema-kenerator-core"))
-    implementation("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
+    api("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
 }
 
 kotlin {
