@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 
 object SwaggerSchemaCompileUtils {
@@ -197,6 +198,15 @@ object SwaggerSchemaCompileUtils {
             copy.uniqueItems = source.uniqueItems
             copy.writeOnly = source.writeOnly
             copy.xml = source.xml
+        }
+    }
+
+
+    fun copyTypeToTypes(schemas: List<SwaggerSchema>) {
+        schemas.forEach { schema ->
+            if(schema.swagger.type != null) {
+                schema.swagger.types = (schema.swagger.types ?: emptySet()) + setOf(schema.swagger.type)
+            }
         }
     }
 
