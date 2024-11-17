@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.copyTypeToTypes
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.iterate
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.resolveReferences
@@ -22,6 +23,7 @@ class SwaggerSchemaCompileInlineStep {
      */
     fun compile(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
         val schemaList = bundle.flatten()
+        copyTypeToTypes(schemaList)
         val root = resolveReferences(bundle.data.swagger) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`)
             val referencedSchema = schemaList.find(referencedId)

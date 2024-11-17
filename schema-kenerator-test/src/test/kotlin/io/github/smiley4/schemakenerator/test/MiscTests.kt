@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Required
+import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
@@ -20,12 +22,14 @@ import io.github.smiley4.schemakenerator.serialization.processKotlinxSerializati
 import io.github.smiley4.schemakenerator.serialization.renameProperties
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
+import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNamingStrategy
@@ -361,7 +365,7 @@ class MiscTests : FreeSpec({
                   },
                   "title": "BIssue39"
                 }
-            """.trimIndent()
+                """.trimIndent()
             }
         }
 
@@ -420,12 +424,56 @@ class MiscTests : FreeSpec({
 
     }
 
+    "copy swagger field 'type' to 'types'"- {
+
+        "inlining" {
+
+            val result = Bundle(
+                data = SwaggerSchema(
+                    swagger = Schema<Any>().also {
+                        it.type = "myType"
+                    },
+                    typeData = WildcardTypeData()
+                ),
+                supporting = emptyList()
+            ).compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                {
+                  "type": "myType"
+                }
+                """.trimIndent()
+            }
+        }
+
+        "referencing" {
+            val result = Bundle(
+                data = SwaggerSchema(
+                    swagger = Schema<Any>().also {
+                        it.type = "myType"
+                    },
+                    typeData = WildcardTypeData()
+                ),
+                supporting = emptyList()
+            ).compileReferencingRoot()
+
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                            "type": "myType"
+                        }
+                    """.trimIndent(),
+                )
+            }
+        }
+
+    }
+
 }) {
 
     companion object {
-
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
-
 
         class TestClassIssue14a(
             val name: Optional<String?>
