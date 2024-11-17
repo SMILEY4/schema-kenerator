@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 
 object SwaggerSchemaCompileUtils {
@@ -69,6 +70,7 @@ object SwaggerSchemaCompileUtils {
         root.dependentSchemas?.forEach { (_, prop) -> iterate(prop, visitor) }
     }
 
+
     /**
      * Merges the present properties of "source" with the properties of "target" and returns the result as a new schema.
      */
@@ -80,7 +82,7 @@ object SwaggerSchemaCompileUtils {
     /**
      * Merges the given schemas by modifying the given target schema. Copies all present values from the source to the target.
      */
-    @Suppress("CyclomaticComplexMethod")
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     fun mergeInto(source: Schema<*>, target: Schema<*>) {
         source.additionalProperties?.also { target.additionalProperties = it }
         source.allOf?.also { target.allOf = it }
@@ -129,7 +131,15 @@ object SwaggerSchemaCompileUtils {
         source.specVersion?.also { target.specVersion = it }
         source.title?.also { target.title = it }
         source.type?.also { target.type = it }
-        source.types?.also { target.types.addAll(it) }
+        source.types?.also {
+            if (it.size == 1 && it.contains("null")) {
+                target.types = target.types
+            } else if (target.types.size == 1 && target.types.contains("null")) {
+                target.types = it
+            } else {
+                target.types = target.types + it
+            }
+        }
         source.uniqueItems?.also { target.uniqueItems = it }
         source.writeOnly?.also { target.writeOnly = it }
         source.xml?.also { target.xml = it }
@@ -188,6 +198,15 @@ object SwaggerSchemaCompileUtils {
             copy.uniqueItems = source.uniqueItems
             copy.writeOnly = source.writeOnly
             copy.xml = source.xml
+        }
+    }
+
+
+    fun copyTypeToTypes(schemas: List<SwaggerSchema>) {
+        schemas.forEach { schema ->
+            if(schema.swagger.type != null) {
+                schema.swagger.types = (schema.swagger.types ?: emptySet()) + setOf(schema.swagger.type)
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.copyTypeToTypes
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.iterate
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.resolveReferences
@@ -15,11 +16,14 @@ import io.swagger.v3.oas.models.media.Schema
  */
 class SwaggerSchemaCompileInlineStep {
 
+    private val schemaUtils = SwaggerSchemaUtils()
+
     /**
      * Inline all referenced schema
      */
     fun compile(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
         val schemaList = bundle.flatten()
+        copyTypeToTypes(schemaList)
         val root = resolveReferences(bundle.data.swagger) { refObj ->
             val referencedId = TypeId.parse(refObj.`$ref`)
             val referencedSchema = schemaList.find(referencedId)
@@ -27,7 +31,7 @@ class SwaggerSchemaCompileInlineStep {
                 merge(refObj, referencedSchema.swagger).also {
                     if(it.nullable == true) {
                         it.nullable = null
-                        it.types = setOf("null") + it.types
+                        setNullable(it)
                     }
                     if(it.nullable == false) {
                         it.nullable = null
@@ -43,6 +47,18 @@ class SwaggerSchemaCompileInlineStep {
             typeData = bundle.data.typeData,
             componentSchemas = emptyMap()
         )
+    }
+
+    private fun setNullable(schema: Schema<*>) {
+        if(schema.types != null) {
+            schema.types = setOf("null") + schema.types
+        }
+        if(schema.anyOf != null && schema.anyOf.isNotEmpty()) {
+            schema.anyOf = schema.anyOf + schemaUtils.nullSchema()
+        }
+        if(schema.oneOf != null && schema.oneOf.isNotEmpty()) {
+            schema.oneOf = schema.oneOf + schemaUtils.nullSchema()
+        }
     }
 
     private fun handleDiscriminatorMappings(root: Schema<*>) {

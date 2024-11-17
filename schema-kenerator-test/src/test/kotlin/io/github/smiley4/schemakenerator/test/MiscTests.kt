@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Required
+import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
@@ -19,10 +21,15 @@ import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameProperties
 import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
+import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNamingStrategy
@@ -328,12 +335,145 @@ class MiscTests : FreeSpec({
         }
     }
 
+    "https://github.com/SMILEY4/schema-kenerator/issues/39 - nullable property of sealed class" - {
+
+        "inlining" {
+            val result = typeOf<BIssue39>()
+                .processReflection()
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                {
+                  "type": "object",
+                  "properties": {
+                    "a": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {},
+                          "title": "AIssue39"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "title": "SealedClassIssue39"
+                    }
+                  },
+                  "title": "BIssue39"
+                }
+                """.trimIndent()
+            }
+        }
+
+        "referencing" {
+            val result = typeOf<BIssue39>()
+                .processReflection()
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileReferencingRoot()
+
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.BIssue39"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.BIssue39" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "a": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.SealedClassIssue39"
+                                }
+                              ]
+                            }
+                          },
+                          "title": "BIssue39"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.SealedClassIssue39" to """
+                        {
+                          "anyOf": [
+                            {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.AIssue39"
+                            }
+                          ],
+                          "title": "SealedClassIssue39"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.AIssue39" to """
+                        {
+                          "type": "object",
+                          "properties": {},
+                          "title": "AIssue39"
+                        }
+                    """.trimIndent(),
+                )
+            }
+        }
+
+    }
+
+    "copy swagger field 'type' to 'types'"- {
+
+        "inlining" {
+
+            val result = Bundle(
+                data = SwaggerSchema(
+                    swagger = Schema<Any>().also {
+                        it.type = "myType"
+                    },
+                    typeData = WildcardTypeData()
+                ),
+                supporting = emptyList()
+            ).compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                {
+                  "type": "myType"
+                }
+                """.trimIndent()
+            }
+        }
+
+        "referencing" {
+            val result = Bundle(
+                data = SwaggerSchema(
+                    swagger = Schema<Any>().also {
+                        it.type = "myType"
+                    },
+                    typeData = WildcardTypeData()
+                ),
+                supporting = emptyList()
+            ).compileReferencingRoot()
+
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                            "type": "myType"
+                        }
+                    """.trimIndent(),
+                )
+            }
+        }
+
+    }
+
 }) {
 
     companion object {
-
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
-
 
         class TestClassIssue14a(
             val name: Optional<String?>
@@ -375,6 +515,12 @@ class MiscTests : FreeSpec({
             val nameOfPerson: String,
             val numberOfYears: Int
         )
+
+        sealed class SealedClassIssue39
+
+        class AIssue39: SealedClassIssue39()
+
+        class BIssue39(val a: SealedClassIssue39?)
 
     }
 

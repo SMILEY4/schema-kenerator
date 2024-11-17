@@ -21,6 +21,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationOptionalAndRequiredStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTypeStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
@@ -93,7 +94,7 @@ fun Bundle<SwaggerSchema>.withTitle(builder: (type: BaseTypeData, types: Map<Typ
 /**
  * See [SwaggerSchemaCoreAnnotationDefaultStep], [SwaggerSchemaCoreAnnotationDeprecatedStep], [SwaggerSchemaCoreAnnotationDescriptionStep],
  * [SwaggerSchemaCoreAnnotationExamplesStep], [SwaggerSchemaCoreAnnotationTitleStep], [SwaggerSchemaCoreAnnotationOptionalAndRequiredStep],
- * [SwaggerSchemaCoreAnnotationFormatStep]
+ * [SwaggerSchemaCoreAnnotationFormatStep], [SwaggerSchemaCoreAnnotationTypeStep]
  */
 fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
     return this
@@ -104,6 +105,7 @@ fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
         .let { SwaggerSchemaCoreAnnotationExamplesStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationTitleStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationFormatStep().process(this) }
+        .let { SwaggerSchemaCoreAnnotationTypeStep().process(this) }
 }
 
 
