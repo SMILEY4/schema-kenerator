@@ -9,10 +9,10 @@ version = projectVersion
 plugins {
     kotlin("jvm")
     id("org.owasp.dependencycheck")
+    id("com.github.ben-manes.versions")
     id("io.gitlab.arturbosch.detekt")
     id("com.vanniktech.maven.publish")
     id("org.jetbrains.dokka")
-
 }
 
 repositories {
