@@ -339,49 +339,68 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 )
             ),
             TestData(
-                // top-level lists not directly supported: weird result
                 type = typeOf<List<String>>(),
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "type": "object"
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencing = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
                         }
                     """.trimIndent()
                 ),
                 expectedResultReferencingRoot = mapOf(
                     "." to """
                         {
-                          "type": "object"
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
                         }
                     """.trimIndent(),
                 )
             ),
-            // top-level maps not directly supported: weird result
             TestData(
                 type = typeOf<Map<String, Int>>(),
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "type": "object"
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencing = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32"
+                          }
                         }
                     """.trimIndent()
                 ),
                 expectedResultReferencingRoot = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32"
+                          }
                         }
                     """.trimIndent()
                 )
@@ -503,31 +522,59 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 )
             ),
             TestData(
-                // generics not supported with kotlinx-serialization -> fallback to "any"-schema
                 type = typeOf<ClassWithGenericField<String>>(),
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
-                        "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
                     }
                 """.trimIndent(),
                 expectedResultReferencing = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "value"
+                          ]
                         }
                     """.trimIndent()
                 ),
                 expectedResultReferencingRoot = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "value"
+                          ]
                         }
                     """.trimIndent()
                 )
             ),
             TestData(
-                // generics not supported with kotlinx-serialization -> fallback to "any"-schema
+                // wildcard generics not quite supported with kotlinx-serialization -> fallback to "any"-schema
                 type = typeOf<ClassWithGenericField<*>>(),
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
@@ -551,25 +598,62 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 )
             ),
             TestData(
-                // generics not supported with kotlinx-serialization -> fallback to "any"-schema
                 type = typeOf<ClassWithDeepGeneric<String>>(),
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
-                        "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
                     }
                 """.trimIndent(),
                 expectedResultReferencing = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "value"
+                          ]
                         }
                     """.trimIndent()
                 ),
                 expectedResultReferencingRoot = mapOf(
                     "." to """
                         {
-                            "type": "object"
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "value"
+                          ]
                         }
                     """.trimIndent()
                 )
