@@ -314,42 +314,64 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                // top-level lists not directly supported: weird result
                 type = typeOf<List<String>>(),
                 testName = "list of strings",
                 expectedResultInlining = """
                     {
-                        "type": "object"
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
-                        "type": "object"
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "type": "object"
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                 """.trimIndent(),
             ),
-            // top-level maps not directly supported: weird result
             TestData(
                 type = typeOf<Map<String, Int>>(),
                 testName = "map of strings to integers",
                 expectedResultInlining = """
                     {
-                        "type": "object"
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
-                        "type": "object"
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "type": "object"
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
                     }
                 """.trimIndent(),
             ),
@@ -456,27 +478,55 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                // generics not supported with kotlinx-serialization -> fallback to "any"-schema
                 type = typeOf<ClassWithGenericField<String>>(),
                 testName = "class with defined generic field",
                 expectedResultInlining = """
                     {
-                      "type": "object"
+                      "type": "object",
+                      "required": [
+                        "value"
+                      ],
+                      "properties": {
+                        "value": {
+                          "type": "string"
+                        }
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
-                      "type": "object"
+                      "type": "object",
+                      "required": [
+                        "value"
+                      ],
+                      "properties": {
+                        "value": {
+                          "type": "string"
+                        }
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "type": "object"
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField": {
+                          "type": "object",
+                          "required": [
+                            "value"
+                          ],
+                          "properties": {
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
                     }
                 """.trimIndent(),
             ),
             TestData(
-                // generics not supported with kotlinx-serialization -> fallback to "any"-schema
+                // wildcard generics not quite supported with kotlinx-serialization -> fallback to "any"-schema
                 type = typeOf<ClassWithGenericField<*>>(),
                 testName = "class with wildcard generic field",
                 expectedResultInlining = """
@@ -496,22 +546,59 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                 """.trimIndent(),
             ),
             TestData(
-                // generics not supported with kotlinx-serialization -> fallback to "any"-schema
                 type = typeOf<ClassWithDeepGeneric<String>>(),
                 testName = "class with deep generic field",
                 expectedResultInlining = """
                     {
-                      "type": "object"
+                      "type": "object",
+                      "required": [
+                        "value"
+                      ],
+                      "properties": {
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencing = """
                     {
-                      "type": "object"
+                      "type": "object",
+                      "required": [
+                        "value"
+                      ],
+                      "properties": {
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
                     }
                 """.trimIndent(),
                 expectedResultReferencingRoot = """
                     {
-                        "type": "object"
+                      "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric",
+                      "definitions": {
+                        "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric": {
+                          "type": "object",
+                          "required": [
+                            "value"
+                          ],
+                          "properties": {
+                            "value": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                 """.trimIndent(),
             ),
