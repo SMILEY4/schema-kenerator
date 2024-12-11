@@ -20,6 +20,7 @@ import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -71,7 +72,7 @@ class KotlinxSerializationTypeProcessingStep(
 
     private fun process(type: KType, typeData: MutableList<BaseTypeData>): WrappedTypeData {
         if (type.classifier is KClass<*>) {
-            return (type.classifier as KClass<*>).serializerOrNull()
+            return getSerializer(type)
                 ?.let { parse(it.descriptor, type.isMarkedNullable, typeData, mutableMapOf()) }
                 ?: parseWildcard(typeData)
         } else {
@@ -79,6 +80,13 @@ class KotlinxSerializationTypeProcessingStep(
         }
     }
 
+    private fun getSerializer(type: KType): KSerializer<Any?>? {
+        return try {
+            serializerOrNull(type)
+        } catch (ignore: IllegalArgumentException) {
+            null
+        }
+    }
 
     @Suppress("CyclomaticComplexMethod")
     private fun parse(
