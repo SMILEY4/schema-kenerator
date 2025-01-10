@@ -78,39 +78,35 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["title"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
+            .firstOrNull { it.isNotBlank() }
     }
 
     private fun getDescription(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["description"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
+            .firstOrNull { it.isNotBlank() }
     }
 
     private fun getExample(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["example"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
+            .firstOrNull { it.isNotBlank() }
     }
 
     private fun getHidden(annotations: Collection<AnnotationData>): Boolean? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["hidden"] as Boolean }
-            .firstOrNull()
+            .firstOrNull { it }
     }
 
     private fun getName(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["name"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
+            .firstOrNull { it.isNotBlank() }
     }
 
     private fun getAllowableValues(annotations: Collection<AnnotationData>): List<String>? {
@@ -120,37 +116,36 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
                 @Suppress("UNCHECKED_CAST")
                 it.values["allowableValues"] as Array<String>
             }
-            .map { it.toList().ifEmpty { null } }
-            .firstOrNull()
+            .map { it.toList() }
+            .firstOrNull { it.isNotEmpty() }
     }
 
     private fun getDefaultValue(annotations: Collection<AnnotationData>): String? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["defaultValue"] as String }
-            .map { it.ifBlank { null } }
-            .firstOrNull()
+            .firstOrNull { it.isNotBlank() }
     }
 
     private fun getAccessMode(annotations: Collection<AnnotationData>): Schema.AccessMode? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["accessMode"] as Schema.AccessMode }
-            .firstOrNull()
+            .firstOrNull { it != Schema.AccessMode.AUTO }
     }
 
     private fun getMinLength(annotations: Collection<AnnotationData>): Int? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["minLength"] as Int }
-            .firstOrNull { it >= 0 }
+            .firstOrNull { it != 0 }
     }
 
     private fun getMaxLength(annotations: Collection<AnnotationData>): Int? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["maxLength"] as Int }
-            .firstOrNull { it >= 0 }
+            .firstOrNull { it != Int.MAX_VALUE  }
     }
 
     private fun getFormat(annotations: Collection<AnnotationData>): String? {
@@ -173,7 +168,7 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["exclusiveMinimum"] as Boolean }
-            .firstOrNull()
+            .firstOrNull { it }
     }
 
     private fun getMaximum(annotations: Collection<AnnotationData>): BigDecimal? {
@@ -189,7 +184,7 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["exclusiveMaximum"] as Boolean }
-            .firstOrNull()
+            .firstOrNull { it }
     }
 
 }

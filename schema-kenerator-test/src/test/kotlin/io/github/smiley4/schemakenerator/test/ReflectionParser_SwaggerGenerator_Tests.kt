@@ -1731,8 +1731,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         "myValue": {
                           "maximum": 15,
                           "minimum": 5,
-                          "maxLength": 2147483647,
-                          "minLength": 0,
                           "type": "string",
                           "description": "annotated value class for testing.",
                           "default": "default on property"
@@ -1751,8 +1749,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "myValue": {
                               "maximum": 15,
                               "minimum": 5,
-                              "maxLength": 2147483647,
-                              "minLength": 0,
                               "type": "string",
                               "description": "annotated value class for testing.",
                               "default": "default on property"
@@ -1777,8 +1773,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                             "myValue": {
                               "maximum": 15,
                               "minimum": 5,
-                              "maxLength": 2147483647,
-                              "minLength": 0,
                               "type": "string",
                               "description": "annotated value class for testing.",
                               "default": "default on property"

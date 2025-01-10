@@ -47,17 +47,21 @@ class SwaggerAnnotationsTest : StringSpec({
                 {
                   "title": "My Test Class",
                   "required": [
+                    "emptyAnnotation",
                     "myValue",
                     "someTags"
                   ],
                   "types": ["object"],
                   "properties": {
+                    "emptyAnnotation": {
+                      "exampleSetFlag": false,
+                      "types": [ "string" ]
+                    },
                     "myValue": {
                       "title": "Some Value",
                       "maximum": 9,
                       "exclusiveMaximum": true,
                       "minimum": 0,
-                      "exclusiveMinimum": false,
                       "maxLength": 10,
                       "minLength": 1,
                       "types": ["integer"],
@@ -495,6 +499,9 @@ class SwaggerAnnotationsTest : StringSpec({
                 exclusiveMaximum = true
             )
             val myValue: Int,
+
+            @field:Schema
+            val emptyAnnotation: String,
 
             @field:Schema(
                 hidden = true,
