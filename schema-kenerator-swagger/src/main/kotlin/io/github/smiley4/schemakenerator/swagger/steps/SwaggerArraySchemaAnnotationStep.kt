@@ -28,14 +28,14 @@ class SwaggerArraySchemaAnnotationStep : AbstractSwaggerSchemaStep() {
         return annotations
             .filter { it.name == ArraySchema::class.qualifiedName }
             .map { it.values["minItems"] as Int }
-            .firstOrNull()
+            .firstOrNull { it != Int.MAX_VALUE }
     }
 
     private fun getMaxItems(annotations: Collection<AnnotationData>): Int? {
         return annotations
             .filter { it.name == ArraySchema::class.qualifiedName }
             .map { it.values["maxItems"] as Int }
-            .firstOrNull()
+            .firstOrNull { it != Int.MAX_VALUE }
     }
 
 
@@ -43,7 +43,7 @@ class SwaggerArraySchemaAnnotationStep : AbstractSwaggerSchemaStep() {
         return annotations
             .filter { it.name == ArraySchema::class.qualifiedName }
             .map { it.values["uniqueItems"] as Boolean }
-            .firstOrNull()
+            .firstOrNull { it }
     }
 
 }
