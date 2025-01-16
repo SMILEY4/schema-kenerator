@@ -2,8 +2,12 @@ package io.github.smiley4.schemakenerator.reflection
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.InputType
+import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
 import io.github.smiley4.schemakenerator.core.data.PropertyType
+import io.github.smiley4.schemakenerator.core.data.map
+import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
@@ -15,7 +19,14 @@ import kotlin.reflect.typeOf
 /**
  * See [ReflectionAnnotationSubTypeStep]
  */
-fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<KType> {
+fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
+    return KTypeInput(this).collectSubTypes(maxRecursionDepth)
+}
+
+/**
+ * See [ReflectionAnnotationSubTypeStep]
+ */
+fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
     return ReflectionAnnotationSubTypeStep(
         maxRecursionDepth = maxRecursionDepth
     ).process(this)
@@ -119,11 +130,17 @@ class ReflectionTypeProcessingStepConfig {
     }
 }
 
-
 /**
  * See [ReflectionTypeProcessingStep]
  */
 fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+    return KTypeInput(this).processReflection(configBlock)
+}
+
+/**
+ * See [ReflectionTypeProcessingStep]
+ */
+fun InputType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
     val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
     return ReflectionTypeProcessingStep(
         includeGetters = config.includeGetters,
@@ -142,7 +159,15 @@ fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -
 /**
  * See [ReflectionTypeProcessingStep]
  */
+@JvmName("processReflectionKType")
 fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+    return this.mapToInputType().processReflection(configBlock)
+}
+
+/**
+ * See [ReflectionTypeProcessingStep]
+ */
+fun Bundle<InputType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
     val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
     return ReflectionTypeProcessingStep(
         includeGetters = config.includeGetters,

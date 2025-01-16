@@ -2,6 +2,8 @@ package io.github.smiley4.schemakenerator.reflection.steps
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.InputType
+import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.reflection.data.SubType
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
@@ -15,18 +17,18 @@ import kotlin.reflect.full.starProjectedType
  */
 class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
 
-    fun process(data: KType): Bundle<KType> {
+    fun process(data: InputType): Bundle<InputType> {
 
         var depth = 0
         var countPrev: Int
-        val subtypes = mutableListOf(data)
+        val subtypes: MutableList<InputType> = mutableListOf(data)
 
         do {
             countPrev = subtypes.size
-            subtypes += subtypes
-                .let { process(it) }
+            subtypes += process(subtypes)
                 .flatMap { findSubTypes(it) }
                 .distinct()
+                .map { KTypeInput(it) }
             depth++
         } while (countPrev != subtypes.size && depth < maxRecursionDepth)
 
@@ -36,7 +38,7 @@ class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
         )
     }
 
-    private fun process(types: List<KType>): Collection<BaseTypeData> {
+    private fun process(types: List<InputType>): Collection<BaseTypeData> {
         return types
             .map { ReflectionTypeProcessingStep().process(it) }
             .flatMap { listOf(it.data) + it.supporting }

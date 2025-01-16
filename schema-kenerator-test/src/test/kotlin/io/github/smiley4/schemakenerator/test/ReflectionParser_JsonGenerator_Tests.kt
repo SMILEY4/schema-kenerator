@@ -2,6 +2,10 @@ package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencing
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
@@ -16,6 +20,8 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
@@ -42,12 +48,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .processReflection()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -63,13 +65,12 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileInlineStep().compile(it) }
+                .compileInlining()
 
             schema.json.shouldEqualJson(data.expectedResultInlining)
         }
@@ -79,12 +80,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .processReflection()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -100,13 +97,12 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencing(TitleBuilder.BUILDER_FULL)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -126,12 +122,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .processReflection()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -147,13 +139,12 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencingRoot(TitleBuilder.BUILDER_FULL)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {

@@ -3,6 +3,8 @@ package io.github.smiley4.schemakenerator.jackson.steps
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.InputType
+import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.flatten
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
@@ -22,7 +24,7 @@ class JacksonSubTypeStep(
     /**
      * Finds additional subtypes from jackson [JsonSubTypes]-annotation.
      */
-    fun process(data: KType): Bundle<KType> {
+    fun process(data: InputType): Bundle<InputType> {
         var depth = 0
         var countPrev = 0
         var subtypes = listOf(data)
@@ -35,7 +37,12 @@ class JacksonSubTypeStep(
                 .flatMap { findSubTypes(it) }
 
             subtypes = (subtypes + foundSubtypes)
-                .distinct()
+                .distinctBy {
+                    when(it) {
+                        is KTypeInput -> it.kType
+                        else -> throw IllegalArgumentException("Unsupported input type: '$it'")
+                    }
+                }
                 .toMutableList()
 
             depth++
@@ -47,19 +54,25 @@ class JacksonSubTypeStep(
         )
     }
 
-    private fun process(types: List<KType>): Collection<BaseTypeData> {
+    private fun process(types: List<InputType>): Collection<BaseTypeData> {
         return types
-            .map { typeProcessing(it) }
+            .map {
+                when(it) {
+                    is KTypeInput -> typeProcessing(it.kType)
+                    else -> throw IllegalArgumentException("Unsupported input type: '$it'")
+                }
+            }
             .flatMap { it.flatten() }
     }
 
-    private fun findSubTypes(typeData: BaseTypeData): List<KType> {
+    private fun findSubTypes(typeData: BaseTypeData): List<InputType> {
         @Suppress("UNCHECKED_CAST")
         return typeData.annotations
             .find { it.name == JsonSubTypes::class.qualifiedName!! }
             ?.let { it.values["value"] as Array<JsonSubTypes.Type> }
             ?.let { it.map { v -> v.value } }
             ?.let { it.map { v -> v.starProjectedType } }
+            ?.let { it.map { v -> KTypeInput(v) } }
             ?: emptyList()
     }
 

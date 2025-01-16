@@ -2,9 +2,14 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
+import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencing
+import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
@@ -19,6 +24,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
@@ -46,12 +52,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    SwaggerSchemaGenerationStep(
-                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .processReflection()
+                .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -69,13 +71,12 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileInlineStep().compile(it) }
+                .compileInlining()
                 .let {
                     Result(
                         schema = it.swagger,
@@ -91,12 +92,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    SwaggerSchemaGenerationStep(
-                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .processReflection()
+                .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -114,13 +111,12 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencing(TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,
@@ -136,12 +132,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    SwaggerSchemaGenerationStep(
-                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .processReflection()
+                .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
                         list
@@ -159,13 +151,12 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencingRoot(TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,
@@ -180,8 +171,6 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
 }) {
 
     companion object {
-
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
         private data class Result(
             val schema: Schema<*>,
