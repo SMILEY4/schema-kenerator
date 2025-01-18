@@ -24,7 +24,10 @@ fun KType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<BaseTyp
  * Handles the jackson "JsonSubTypes"-annotation.
  * See [JacksonSubTypeStep] for more info.
  */
-fun InputType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<BaseTypeData>, maxRecursionDepth: Int = 10): Bundle<InputType> {
+fun InputType.collectJacksonSubTypes(
+    typeProcessing: (type: KType) -> Bundle<BaseTypeData>,
+    maxRecursionDepth: Int = 10
+): Bundle<InputType> {
     return JacksonSubTypeStep(
         typeProcessing = typeProcessing,
         maxRecursionDepth = maxRecursionDepth

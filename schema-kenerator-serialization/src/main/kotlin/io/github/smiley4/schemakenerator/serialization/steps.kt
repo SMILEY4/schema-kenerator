@@ -35,7 +35,9 @@ fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProce
 /**
  * See [KotlinxSerializationTypeProcessingStep]
  */
-fun SerialDescriptor.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun SerialDescriptor.processKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<BaseTypeData> {
     return SerialDescriptorInput(this).processKotlinxSerialization(configBlock)
 }
 
@@ -64,14 +66,18 @@ fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationT
  * See [KotlinxSerializationTypeProcessingStep]
  */
 @JvmName("processKotlinxSerializationSerialDescriptor")
-fun Bundle<SerialDescriptor>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun Bundle<SerialDescriptor>.processKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<BaseTypeData> {
     return this.mapToInputType().processKotlinxSerialization(configBlock)
 }
 
 /**
  * See [KotlinxSerializationTypeProcessingStep]
  */
-fun Bundle<InputType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun Bundle<InputType>.processKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<BaseTypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
