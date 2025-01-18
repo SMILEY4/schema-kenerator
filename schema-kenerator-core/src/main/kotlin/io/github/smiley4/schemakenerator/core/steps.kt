@@ -1,7 +1,9 @@
 package io.github.smiley4.schemakenerator.core
 
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.steps.AddAnnotationsStep
 import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
 import io.github.smiley4.schemakenerator.core.steps.MergeGettersStep
@@ -43,4 +45,12 @@ fun Bundle<BaseTypeData>.renameProperties(rename: (name: String) -> String): Bun
  */
 fun Bundle<BaseTypeData>.addDiscriminatorProperty(discriminatorPropertyName: String = "type"): Bundle<BaseTypeData> {
     return AddDiscriminatorStep(discriminatorPropertyName).process(this)
+}
+
+
+/**
+ * See [AddAnnotationsStep]
+ */
+fun Bundle<BaseTypeData>.addAnnotations(annotations: Collection<AnnotationData>): Bundle<BaseTypeData> {
+    return AddAnnotationsStep(annotations).process(this)
 }

@@ -4,20 +4,30 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
+import io.github.smiley4.schemakenerator.core.connectSubTypes
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
+import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
+import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonJsonTypeInfoDiscriminatorStep
 import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.SubType
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -32,9 +42,9 @@ class SubAndSuperTypesTest : StringSpec({
     "reflection subtype-annotation" {
 
         val result = typeOf<BaseClass1>()
-            .let { ReflectionAnnotationSubTypeStep().process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
 
         result.data.qualifiedName shouldBe BaseClass1::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -99,9 +109,9 @@ class SubAndSuperTypesTest : StringSpec({
     "without reflection subtype-annotation" {
 
         val result = typeOf<NormalClass>()
-            .let { ReflectionAnnotationSubTypeStep().process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
 
         result.data.qualifiedName shouldBe NormalClass::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -113,9 +123,9 @@ class SubAndSuperTypesTest : StringSpec({
     "jackson subtype-annotation" {
 
         val result = typeOf<JacksonBaseClass1>()
-            .let { JacksonSubTypeStep(typeProcessing = { type -> ReflectionTypeProcessingStep().process(type) }).process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectJacksonSubTypes(typeProcessing = { t -> t.processReflection() })
+            .processReflection()
+            .connectSubTypes()
 
         result.data.qualifiedName shouldBe JacksonBaseClass1::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -180,9 +190,9 @@ class SubAndSuperTypesTest : StringSpec({
     "without jackson subtype-annotation" {
 
         val result = typeOf<NormalClass>()
-            .let { JacksonSubTypeStep(typeProcessing = { type -> ReflectionTypeProcessingStep().process(type) }).process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectJacksonSubTypes(typeProcessing = { it.processReflection() })
+            .processReflection()
+            .connectSubTypes()
 
         result.data.qualifiedName shouldBe NormalClass::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -194,15 +204,15 @@ class SubAndSuperTypesTest : StringSpec({
     "include default discriminator with swagger-schema" {
 
         val result = typeOf<BaseClass1>()
-            .let { ReflectionAnnotationSubTypeStep().process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
-            .let { JacksonJsonTypeInfoDiscriminatorStep().process(it) }
-            .let { HandleJsonClassDiscriminatorStep().process(it) }
-            .let { AddDiscriminatorStep("_type").process(it) }
-            .let { SwaggerSchemaGenerationStep().generate(it) }
-            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-            .let { SwaggerSchemaCompileInlineStep().compile(it) }
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .addJacksonTypeInfoDiscriminatorProperty()
+            .addJsonClassDiscriminatorProperty()
+            .addDiscriminatorProperty("_type")
+            .generateSwaggerSchema()
+            .withTitle(TitleBuilder.BUILDER_SIMPLE)
+            .compileInlining()
             .swagger
 
         result.discriminator.propertyName shouldBe "_type"
@@ -217,14 +227,15 @@ class SubAndSuperTypesTest : StringSpec({
     "include discriminator from kotlinx @JsonClassDiscriminator with swagger-schema" {
 
         val result = typeOf<KotlinxParent>()
-            .let { KotlinxSerializationTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
-            .let { JacksonJsonTypeInfoDiscriminatorStep().process(it) }
-            .let { HandleJsonClassDiscriminatorStep().process(it) }
-            .let { AddDiscriminatorStep("_type").process(it) }
-            .let { SwaggerSchemaGenerationStep().generate(it) }
-            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-            .let { SwaggerSchemaCompileInlineStep().compile(it) }
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .addJacksonTypeInfoDiscriminatorProperty()
+            .addJsonClassDiscriminatorProperty()
+            .addDiscriminatorProperty("_type")
+            .generateSwaggerSchema()
+            .withTitle(TitleBuilder.BUILDER_SIMPLE)
+            .compileInlining()
             .swagger
 
         result.discriminator.propertyName shouldBe "kotlinx_type"
@@ -239,15 +250,15 @@ class SubAndSuperTypesTest : StringSpec({
     "include discriminator from jackson @JsonClassDiscriminator with swagger-schema" {
 
         val result = typeOf<JacksonParent>()
-            .let { ReflectionAnnotationSubTypeStep(10).process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
-            .let { JacksonJsonTypeInfoDiscriminatorStep().process(it) }
-            .let { HandleJsonClassDiscriminatorStep().process(it) }
-            .let { AddDiscriminatorStep("_type").process(it) }
-            .let { SwaggerSchemaGenerationStep().generate(it) }
-            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-            .let { SwaggerSchemaCompileInlineStep().compile(it) }
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .addJacksonTypeInfoDiscriminatorProperty()
+            .addJsonClassDiscriminatorProperty()
+            .addDiscriminatorProperty("_type")
+            .generateSwaggerSchema()
+            .withTitle(TitleBuilder.BUILDER_SIMPLE)
+            .compileInlining()
             .swagger
 
         result.discriminator.propertyName shouldBe "jackson_type"

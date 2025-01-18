@@ -7,6 +7,8 @@ import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
+import io.github.smiley4.schemakenerator.core.data.InputType
+import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PlaceholderTypeData
@@ -18,6 +20,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
+import io.github.smiley4.schemakenerator.serialization.SerialDescriptorInput
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -55,9 +58,9 @@ class KotlinxSerializationTypeProcessingStep(
 
 ) {
 
-    fun process(type: KType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
+    fun process(type: InputType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
 
-    fun process(type: Bundle<KType>): Bundle<BaseTypeData> {
+    fun process(type: Bundle<InputType>): Bundle<BaseTypeData> {
         val supportingTypeData = mutableListOf<BaseTypeData>()
         type.supporting.forEach { process(it, supportingTypeData) }
 
@@ -68,6 +71,24 @@ class KotlinxSerializationTypeProcessingStep(
             data = typeData.typeData,
             supporting = supportingTypeData
         )
+    }
+
+    private fun process(type: InputType, typeData: MutableList<BaseTypeData>): WrappedTypeData {
+        return when (type) {
+            is KTypeInput -> {
+                if (type.kType.classifier is KClass<*>) {
+                    getSerializer(type.kType)
+                        ?.let { parse(it.descriptor, type.kType.isMarkedNullable, typeData, mutableMapOf()) }
+                        ?: parseWildcard(typeData)
+                } else {
+                    throw IllegalArgumentException("Type is not a class.")
+                }
+            }
+            is SerialDescriptorInput -> {
+                parse(type.descriptor, type.descriptor.isNullable, typeData, mutableMapOf())
+            }
+            else -> throw IllegalArgumentException("Input type '$type' is not supported.")
+        }
     }
 
     private fun process(type: KType, typeData: MutableList<BaseTypeData>): WrappedTypeData {
@@ -87,6 +108,7 @@ class KotlinxSerializationTypeProcessingStep(
             null
         }
     }
+
 
     @Suppress("CyclomaticComplexMethod")
     private fun parse(

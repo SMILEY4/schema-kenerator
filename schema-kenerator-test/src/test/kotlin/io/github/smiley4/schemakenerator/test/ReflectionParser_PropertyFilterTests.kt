@@ -1,8 +1,11 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
+import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
@@ -18,14 +21,14 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep(
-                    includeFunctions = false,
-                    includeGetters = data.includeGetters,
-                    includeWeakGetters = data.includeWeakGetters,
+                .processReflection {
+                    includeFunctions = false
+                    includeGetters = data.includeGetters
+                    includeWeakGetters = data.includeWeakGetters
                     includeHidden = data.includeHidden
-                ).process(it) }
-                .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaCompileInlineStep().compile(it) }
+                }
+                .generateJsonSchema()
+                .compileInlining()
 
             ((schema.json as JsonObject).properties["properties"] as JsonObject).properties.keys shouldContainExactlyInAnyOrder data.expectedProperties
         }

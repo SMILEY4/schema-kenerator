@@ -2,12 +2,16 @@ package io.github.smiley4.schemakenerator.serialization
 
 import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.InputType
+import io.github.smiley4.schemakenerator.core.data.KTypeInput
+import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.steps.RenamePropertiesStep
 import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -25,6 +29,22 @@ fun Bundle<BaseTypeData>.addJsonClassDiscriminatorProperty(): Bundle<BaseTypeDat
  * See [KotlinxSerializationTypeProcessingStep]
  */
 fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+    return KTypeInput(this).processKotlinxSerialization(configBlock)
+}
+
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+fun SerialDescriptor.processKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<BaseTypeData> {
+    return SerialDescriptorInput(this).processKotlinxSerialization(configBlock)
+}
+
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+fun InputType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
@@ -37,7 +57,27 @@ fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProce
 /**
  * See [KotlinxSerializationTypeProcessingStep]
  */
+@JvmName("processKotlinxSerializationKType")
 fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+    return this.mapToInputType().processKotlinxSerialization(configBlock)
+}
+
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+@JvmName("processKotlinxSerializationSerialDescriptor")
+fun Bundle<SerialDescriptor>.processKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<BaseTypeData> {
+    return this.mapToInputType().processKotlinxSerialization(configBlock)
+}
+
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+fun Bundle<InputType>.processKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<BaseTypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,

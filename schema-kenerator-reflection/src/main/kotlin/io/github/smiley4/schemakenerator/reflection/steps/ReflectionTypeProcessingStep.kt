@@ -5,6 +5,8 @@ import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
 import io.github.smiley4.schemakenerator.core.data.EnumTypeData
+import io.github.smiley4.schemakenerator.core.data.InputType
+import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.MapTypeData
 import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.PlaceholderTypeData
@@ -114,13 +116,25 @@ class ReflectionTypeProcessingStep(
     }
 
 
-    fun process(type: KType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
+    fun process(type: InputType): Bundle<BaseTypeData> = process(Bundle(type, emptyList()))
 
-    fun process(type: Bundle<KType>): Bundle<BaseTypeData> {
+    fun process(type: Bundle<InputType>): Bundle<BaseTypeData> {
         val supportingTypeData = mutableListOf<BaseTypeData>()
-        type.supporting.forEach { process(it, supportingTypeData) }
+        type.supporting.forEach {
+            when (it) {
+                is KTypeInput -> process(it.kType, supportingTypeData)
+                else -> throw IllegalArgumentException("Unsupported input type '$it'.")
+            }
+        }
 
-        val typeData = process(type.data, supportingTypeData)
+        val kType = type.data.let {
+            when (it) {
+                is KTypeInput -> it.kType
+                else -> throw IllegalArgumentException("Unsupported input type '$it'.")
+            }
+        }
+
+        val typeData = process(kType, supportingTypeData)
         supportingTypeData.remove(typeData.typeData)
 
         return Bundle(
@@ -128,7 +142,6 @@ class ReflectionTypeProcessingStep(
             supporting = supportingTypeData
         )
     }
-
 
     private fun process(type: KType, typeData: MutableList<BaseTypeData>): WrappedTypeData {
         return if (typeRedirects.containsKey(type)) {
@@ -437,6 +450,7 @@ class ReflectionTypeProcessingStep(
         }
     }
 
+
     @Suppress("SwallowedException")
     private fun canAccessJavaField(property: KProperty<*>): Boolean {
         return try {
@@ -445,6 +459,7 @@ class ReflectionTypeProcessingStep(
             false
         }
     }
+
 
     @Suppress("SwallowedException")
     private fun canAccessJavaMethod(property: KFunction<*>): Boolean {
@@ -691,6 +706,7 @@ class ReflectionTypeProcessingStep(
     }
 
     private fun KClass<*>.getSafeSimpleName(): String = this.simpleName ?: this.java.name
+
 
     /**
      * Qualified name might be null, e.g. for local classes
