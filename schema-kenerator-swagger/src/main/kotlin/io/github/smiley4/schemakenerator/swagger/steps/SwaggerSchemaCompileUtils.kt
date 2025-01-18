@@ -204,8 +204,8 @@ object SwaggerSchemaCompileUtils {
 
     fun copyTypeToTypes(schemas: List<SwaggerSchema>) {
         schemas.forEach { schema ->
-            if(schema.swagger.type != null) {
-                schema.swagger.types = (schema.swagger.types ?: emptySet()) + setOf(schema.swagger.type)
+            if(schema.swagger.type != null && (schema.swagger.types?.isEmpty() == true)) {
+                schema.swagger.types = setOf(schema.swagger.type)
             }
         }
     }

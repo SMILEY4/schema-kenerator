@@ -13,14 +13,12 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUt
 class SwaggerSchemaCoreAnnotationTypeStep : AbstractSwaggerSchemaStep() {
 
     override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
-        if (schema.swagger.format == null) {
-            determineType(schema.typeData.annotations)?.also { format ->
-                schema.swagger.types = setOf(format)
-            }
+        determineType(schema.typeData.annotations)?.also { type ->
+            schema.swagger.types = setOf(type)
         }
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
-            determineType(propData.annotations + propTypeData.annotations)?.also { format ->
-                prop.types = setOf(format)
+            determineType(propData.annotations + propTypeData.annotations)?.also { type ->
+                prop.types = setOf(type)
             }
         }
     }
