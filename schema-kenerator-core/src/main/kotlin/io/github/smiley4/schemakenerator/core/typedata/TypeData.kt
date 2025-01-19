@@ -71,6 +71,21 @@ data class TypeData(
             mapData = null
         )
 
+        fun createPlaceholder(id: TypeId) = TypeData(
+            id = TypeId.createWildcard(),
+            identifyingName = TypeName("*", "*"),
+            descriptiveName = TypeName("*", "*"),
+            typeParameters = mutableListOf(),
+            annotations = mutableListOf(),
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = null,
+            mapData = null
+        )
+
         fun createPlaceholder(
             id: TypeId,
             identifyingName: TypeName,

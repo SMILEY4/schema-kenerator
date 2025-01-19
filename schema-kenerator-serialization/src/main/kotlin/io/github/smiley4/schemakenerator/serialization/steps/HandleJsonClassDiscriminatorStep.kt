@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.serialization.steps
 
-import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.JsonClassDiscriminator
 
@@ -12,7 +12,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 class HandleJsonClassDiscriminatorStep : AbstractAddDiscriminatorStep() {
 
     @OptIn(ExperimentalSerializationApi::class)
-    override fun getDiscriminatorPropertyName(typeData: ObjectTypeData): String? {
+    override fun getDiscriminatorPropertyName(typeData: TypeData): String? {
         val annotation = typeData.annotations.find { it.name == JsonClassDiscriminator::class.qualifiedName }
         if(annotation == null) {
             return null

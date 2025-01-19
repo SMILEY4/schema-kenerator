@@ -6,8 +6,8 @@ import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.data.ReflectionCustomProcessor
-import io.github.smiley4.schemakenerator.reflection.data.ReflectionTypeMatcher
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProcessor
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES

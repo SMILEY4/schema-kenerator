@@ -19,8 +19,6 @@ import io.github.smiley4.schemakenerator.core.typedata.find
 import io.github.smiley4.schemakenerator.core.typedata.findOrThrow
 import io.github.smiley4.schemakenerator.core.typedata.matches
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.data.ReflectionCustomProcessor
-import io.github.smiley4.schemakenerator.reflection.data.ReflectionTypeMatcher
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
@@ -128,13 +126,13 @@ class ReflectionTypeProcessingStep(
 
 
     /**
-     * Process the given type
+     * Process the given input type
      */
     fun process(input: InputType): Bundle<TypeData> = process(Bundle(input, emptyList()))
 
 
     /**
-     * Process the given type bundle
+     * Process the given input type bundle
      */
     fun process(input: Bundle<InputType>): Bundle<TypeData> {
 
@@ -182,7 +180,7 @@ class ReflectionTypeProcessingStep(
     // ====== CLASS ====================================================
 
     /**
-     * Parses the given type as class and adds the results to the givne collection
+     * Parses the given type as class and adds the results to the given collection
      * @param type the input type to parse
      * @param clazz the input class to parse
      * @param knownTypeParameters already parsed type parameter data
@@ -202,38 +200,39 @@ class ReflectionTypeProcessingStep(
         }
 
         // check custom type processors
-        customProcessors
+        val customData = customProcessors
             .firstOrNull { (matcher, _) -> matcher(type, clazz) }
-            ?.also { (_, processor) ->
-                return WrappedTypeData(
-                    typeData = processor().also { result ->
-                        knownTypeData.removeIf {
-                            it.matches(
-                                other = result,
-                                compareId = false,
-                                compareIdentifyingName = true,
-                                compareDescriptiveName = true,
-                                compareTypeParameters = true
-                            )
-                        }
-                        knownTypeData.add(result)
-                    },
+            ?.let { (_, processor) ->
+                WrappedTypeData(
+                    typeData = processor(),
                     nullable = false
                 )
             }
+            ?.also { result ->
+                knownTypeData.removeIf {
+                    it.matches(
+                        other = result.typeData,
+                        compareId = false,
+                        compareIdentifyingName = true,
+                        compareDescriptiveName = true,
+                        compareTypeParameters = true
+                    )
+                }
+                knownTypeData.add(result.typeData)
+            }
+        if(customData != null) {
+            return customData
+        }
 
         // resolve type parameters (i.e. generic types)
         val resolvedTypeParameters = parseTypeParameters(type, clazz, knownTypeParameters, knownTypeData)
 
         // create basic information for this type
         val id = TypeId.create()
-        val identifyingName = TypeName(
-            full = clazz.getSafeQualifiedName(),
-            short = clazz.getSafeSimpleName()
-        )
-        val descriptiveName = identifyingName.copy()
+        val identifyingName = clazz.toTypeName()
+        val descriptiveName = clazz.toTypeName()
 
-        // check if type already parsed
+        // check type has already been parsed
         val existing = knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, resolvedTypeParameters) }
         if (existing != null) {
             return WrappedTypeData(
@@ -279,7 +278,7 @@ class ReflectionTypeProcessingStep(
             emptyList()
         }
 
-        // collect annotation information
+        // collect annotation data
         val annotations = parseAnnotations(clazz)
 
         return when (typeCategory) {
@@ -914,9 +913,12 @@ class ReflectionTypeProcessingStep(
 
 
     /**
-     * Simple name might be null, e.g. for local classes
+     * @return a [TypeName] for this class
      */
-    private fun KClass<*>.getSafeSimpleName(): String = this.simpleName ?: this.java.name
+    private fun KClass<*>.toTypeName() = TypeName(
+        full = this.getSafeQualifiedName(),
+        short = this.simpleName ?: this.java.name
+    )
 
 
     /**

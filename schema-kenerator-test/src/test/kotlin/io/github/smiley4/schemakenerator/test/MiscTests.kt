@@ -18,7 +18,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.renameProperties
+import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
@@ -241,7 +241,7 @@ class MiscTests : FreeSpec({
         "custom renameing (adding prefix)" {
             val result = typeOf<TestClassIssue18>()
                 .processKotlinxSerialization()
-                .renameProperties { name -> "prefix_$name" }
+                .renameMembers { name -> "prefix_$name" }
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -268,7 +268,7 @@ class MiscTests : FreeSpec({
         "kotlinx naming strategy (snake case)" {
             val result = typeOf<TestClassIssue18>()
                 .processKotlinxSerialization()
-                .renameProperties(JsonNamingStrategy.SnakeCase)
+                .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()

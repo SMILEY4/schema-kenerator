@@ -1,30 +1,59 @@
 package io.github.smiley4.schemakenerator.core.typedata
 
+/**
+ * @return the [TypeData] with the given id or null
+ */
 fun Collection<TypeData>.find(id: TypeId): TypeData? {
     return this.find { it.id == id }
 }
 
+
+/**
+ * @return the [TypeData] with the given id. Throws if none exists.
+ */
 fun Collection<TypeData>.findOrThrow(id: TypeId): TypeData {
     return this.find(id) ?: throw IllegalArgumentException("No type data with id '$id' found.");
 }
 
+
+/**
+ * @return the [TypeParameterData] with the given name or null
+ */
 fun Collection<TypeParameterData>.find(name: String): TypeParameterData? {
     return this.find { it.name == name }
 }
 
+
+/**
+ * @return the [TypeParameterData] with the given name. Throws if none exists.
+ */
 fun Collection<TypeParameterData>.findOrThrow(name: String): TypeParameterData {
     return this.find(name) ?: throw IllegalArgumentException("No type parameter with name '$name' found.");
 }
 
+
+/**
+ * @return the [MemberData] with an annotation with the given name (or null).
+ */
 fun Collection<MemberData>.findAnnotatedWith(annotationName: String): MemberData? {
     return this.find { member -> member.annotations.any { annotation -> annotation.name == annotationName } }
 }
 
+
+/**
+ * @return the [MemberData] with the given name or null
+ */
 fun Collection<MemberData>.find(name: String): MemberData? {
     return this.find { it.name == name }
 }
 
 
+/**
+ * @return whether this type data matches the given data of another type data
+ * @param identifyingName the identifying name of the other type data
+ * @param descriptiveName the descriptive name of the other type data
+ * @param typeParameters the type parameters of the other type data.
+ */
 fun TypeData.matches(identifyingName: TypeName, descriptiveName: TypeName, typeParameters: List<TypeParameterData>): Boolean {
     return this.matches(
         TypeData(
@@ -48,6 +77,10 @@ fun TypeData.matches(identifyingName: TypeName, descriptiveName: TypeName, typeP
     )
 }
 
+
+/**
+ * @return whether this type data matches the given other type data. Only compare specified attributes.
+ */
 fun TypeData.matches(
     other: TypeData,
     compareId: Boolean = true,
@@ -78,7 +111,7 @@ fun TypeData.matches(
         if (this.typeParameters.size != other.typeParameters.size) {
             return false
         }
-        if(this.typeParameters.zip(other.typeParameters).any { (a,b) -> a.type != b.type}) {
+        if (this.typeParameters.zip(other.typeParameters).any { (a, b) -> a.type != b.type }) {
             return false
         }
     }
