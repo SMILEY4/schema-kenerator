@@ -7,5 +7,5 @@ data class EnumData(
     /**
      * the possible values of the enum
      */
-    val enumConstants: MutableList<String>,
+    val constants: MutableList<String>,
 )
