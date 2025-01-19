@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.data
 
-import old.BaseTypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 
 /**
@@ -10,7 +10,7 @@ class CompiledJsonSchema(
     /**
      * the original type data
      */
-    val typeData: BaseTypeData,
+    val typeData: TypeData,
     /**
      * the root json schema
      */

@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Default
-import old.AnnotationData
-import old.BaseTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUt
  */
 class JsonSchemaCoreAnnotationDefaultStep : AbstractJsonSchemaStep() {
 
-    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.json is JsonObject && schema.json.properties["default"] == null) {
             determineDefault(schema.typeData.annotations)?.also { default ->
                 schema.json.properties["default"] = JsonTextValue(default)

@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
@@ -17,7 +17,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileUtils
  * Resolves references in prepared json-schemas by collecting them in the definitions-section and referencing them.
  * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
  */
-class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String) {
+class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = JsonSchemaUtils()
 
@@ -26,12 +26,12 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: BaseTypeDat
      * Put referenced schemas into definitions and reference them
      */
     fun compile(bundle: Bundle<JsonSchema>): CompiledJsonSchema {
-        val schemaList = bundle.flatten()
-        val typeDataMap = bundle.buildTypeDataMap()
+        val knownSchemas = bundle.flatten()
+        val knownTypeData = bundle.buildTypeDataMap()
         val definitions = mutableMapOf<String, JsonNode>()
 
         val root = resolveReferences(bundle.data.json) { refObj ->
-            resolve(refObj, schemaList, typeDataMap, definitions)
+            resolveReference(refObj, knownSchemas, knownTypeData, definitions)
         }
 
         return CompiledJsonSchema(
@@ -41,41 +41,73 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: BaseTypeDat
         )
     }
 
-    private fun resolve(
+    private fun resolveReference(
         refObj: JsonObject,
-        schemaList: List<JsonSchema>,
-        typeDataMap: Map<TypeId, BaseTypeData>,
+        knownSchemas: List<JsonSchema>,
+        knownTypeData: Map<TypeId, TypeData>,
         definitions: MutableMap<String, JsonNode>
     ): JsonNode {
-        val referencedId = TypeId.parse((refObj.properties["\$ref"] as JsonTextValue).value)
-        val referencedSchema = schemaList.find(referencedId)
-        return if (referencedSchema != null) {
-            if (shouldReference(referencedSchema.json)) {
-                val refPath = pathBuilder(referencedSchema.typeData, typeDataMap)
-                if (!definitions.containsKey(refPath)) {
-                    definitions[refPath] = placeholder() // break out of infinite loops
-                    definitions[refPath] = resolveReferences(referencedSchema.json) { resolve(it, schemaList, typeDataMap, definitions) }
-                }
-                schemaUtils.referenceSchema(refPath, true)
-            } else {
-                referencedSchema.json.copyNode().also {
-                    if (it is JsonObject) {
-                        it.properties.putAll(buildMap {
-                            this.putAll(refObj.properties)
-                            this.remove("\$ref")
-                        })
-                    }
-                }
-            }
-        } else {
+        val referencedSchema = knownSchemas.find(TypeId((refObj.properties["\$ref"] as JsonTextValue).value))
+        return if (referencedSchema == null) {
             refObj
+        } else {
+            if (shouldReference(referencedSchema.json)) {
+                createReferencing(referencedSchema, knownSchemas, knownTypeData, definitions)
+            } else {
+                createInlining(refObj, referencedSchema)
+            }
         }
     }
 
+
+    /**
+     * Create a json-schema with a proper reference to replace the pending referencing schema.
+     * @param schema the referenced schema
+     * @param knownSchemas all input json schemas
+     * @param knownTypeData all input type data
+     * @param definitions json schema definitions section. Adds new referenced schemas.
+     */
+    private fun createReferencing(
+        schema: JsonSchema,
+        knownSchemas: List<JsonSchema>,
+        knownTypeData: Map<TypeId, TypeData>,
+        definitions: MutableMap<String, JsonNode>,
+    ): JsonNode {
+        val refPath = pathBuilder(schema.typeData, knownTypeData)
+        if (!definitions.containsKey(refPath)) {
+            definitions[refPath] = placeholder() // avoid infinite recursive loops
+            definitions[refPath] = resolveReferences(schema.json) { resolveReference(it, knownSchemas, knownTypeData, definitions) }
+        }
+        return schemaUtils.referenceSchema(refPath, true)
+    }
+
+
+    /**
+     * Create an inline json-schema to replace the pending referencing schema.
+     * @param refObj the schema containing the reference
+     * @param schema the schema referenced by [refObj]
+     */
+    private fun createInlining(refObj: JsonObject, schema: JsonSchema): JsonNode {
+        return schema.json.copyNode().also {
+            if (it is JsonObject) {
+                it.properties.putAll(buildMap {
+                    this.putAll(refObj.properties)
+                    this.remove("\$ref")
+                })
+            }
+        }
+    }
+
+
+    /**
+     * @return a placeholder json object
+     */
     private fun placeholder() = obj { }
 
-    private fun Collection<JsonSchema>.find(id: TypeId): JsonSchema? {
-        return this.find { it.typeData.id == id }
-    }
+
+    /**
+     * @return the [JsonSchema] for the given [TypeId]
+     */
+    private fun Collection<JsonSchema>.find(id: TypeId): JsonSchema? = this.find { it.typeData.id == id }
 
 }

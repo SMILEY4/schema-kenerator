@@ -1,44 +1,35 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import old.BaseTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
+
 
 object TitleBuilder {
 
-    val BUILDER_SIMPLE: (schema: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String = { type, types -> buildSimple(type, types) }
+    val BUILDER_SIMPLE: (schema: TypeData, types: Map<TypeId, TypeData>) -> String = { type, types -> buildSimple(type, types) }
 
-    val BUILDER_FULL: (schema: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String = { type, types -> buildFull(type, types) }
+    val BUILDER_FULL: (schema: TypeData, types: Map<TypeId, TypeData>) -> String = { type, types -> buildFull(type, types) }
 
-    private fun buildSimple(type: BaseTypeData, types: Map<TypeId, BaseTypeData>): String {
-        return type.simpleName
-            .let {
-                if (type.typeParameters.isNotEmpty()) {
-                    val paramString = type.typeParameters
-                        .map { (_, param) -> buildSimple(types[param.type]!!, types) }
-                        .joinToString(",")
-                    "$it<$paramString>"
-                } else {
-                    it
-                }
-            }.let {
-                it + (type.id.additionalId?.let { a -> "#$a" } ?: "")
+    private fun buildSimple(type: TypeData, types: Map<TypeId, TypeData>): String {
+        return buildString { // todo: resolve collisions -> esp. with kotlinx
+            append(type.descriptiveName.short)
+            if(type.typeParameters.isNotEmpty()) {
+                append("<")
+                append(type.typeParameters.joinToString(",") { buildSimple(types[it.type]!!, types) })
+                append(">")
             }
+        }
     }
 
-    private fun buildFull(type: BaseTypeData, types: Map<TypeId, BaseTypeData>): String {
-        return type.qualifiedName
-            .let {
-                if (type.typeParameters.isNotEmpty()) {
-                    val paramString = type.typeParameters
-                        .map { (_, param) -> buildFull(types[param.type]!!, types) }
-                        .joinToString(",")
-                    "$it<$paramString>"
-                } else {
-                    it
-                }
-            }.let {
-                it + (type.id.additionalId?.let { a -> "#$a" } ?: "")
+    private fun buildFull(type: TypeData, types: Map<TypeId, TypeData>): String {
+        return buildString { // todo: resolve collisions -> esp. with kotlinx
+            append(type.descriptiveName.full)
+            if(type.typeParameters.isNotEmpty()) {
+                append("<")
+                append(type.typeParameters.joinToString(",") { buildFull(types[it.type]!!, types) })
+                append(">")
             }
+        }
     }
 
 }

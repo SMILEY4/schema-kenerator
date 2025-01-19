@@ -1,15 +1,14 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.PropertyData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
@@ -49,20 +48,11 @@ class JsonSchemaGenerationStepConfig {
 /**
  * See [JsonSchemaGenerationStep]
  */
-fun Bundle<BaseTypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
+fun Bundle<TypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
     val config = JsonSchemaGenerationStepConfig().apply(configBlock)
     return JsonSchemaGenerationStep(
         optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED,
-    ).generate(this)
-}
-
-
-/**
- * See [JsonSchemaTitleStep]
- */
-@Deprecated("Was renamed", ReplaceWith("withTitle"))
-fun Bundle<JsonSchema>.withAutoTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
-    return withTitle(type)
+    ).process(this)
 }
 
 
@@ -82,7 +72,7 @@ fun Bundle<JsonSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<JsonS
 /**
  * See [JsonSchemaTitleStep]
  */
-fun Bundle<JsonSchema>.withTitle(builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): Bundle<JsonSchema> {
+fun Bundle<JsonSchema>.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): Bundle<JsonSchema> {
     return JsonSchemaTitleStep(builder).process(this)
 }
 
@@ -102,15 +92,6 @@ fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
         .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
         .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
         .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
-}
-
-
-/**
- * See [JsonSchemaAnnotationTypeHintStep]
- */
-fun Bundle<JsonSchema>.handleJsonSchemaAnnotations(): Bundle<JsonSchema> {
-    return this
-        .let { JsonSchemaAnnotationTypeHintStep().process(this) }
 }
 
 
@@ -138,7 +119,7 @@ fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): Com
 /**
  * See [JsonSchemaCompileReferenceStep]
  */
-fun Bundle<JsonSchema>.compileReferencing(builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): CompiledJsonSchema {
+fun Bundle<JsonSchema>.compileReferencing(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): CompiledJsonSchema {
     return JsonSchemaCompileReferenceStep(builder).compile(this)
 }
 
@@ -160,7 +141,7 @@ fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL):
  * See [JsonSchemaCompileReferenceRootStep]
  */
 fun Bundle<JsonSchema>.compileReferencingRoot(
-    builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String
+    builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledJsonSchema {
     return JsonSchemaCompileReferenceRootStep(builder).compile(this)
 }
@@ -169,7 +150,7 @@ fun Bundle<JsonSchema>.compileReferencingRoot(
 /**
  * See [JsonSchemaCustomizeStep.customizeTypes]
  */
-fun Bundle<JsonSchema>.customizeTypes(action: (typeData: BaseTypeData, typeSchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+fun Bundle<JsonSchema>.customizeTypes(action: (typeData: TypeData, typeSchema: JsonNode) -> Unit): Bundle<JsonSchema> {
     return JsonSchemaCustomizeStep().customizeTypes(this, action)
 }
 
@@ -177,6 +158,6 @@ fun Bundle<JsonSchema>.customizeTypes(action: (typeData: BaseTypeData, typeSchem
 /**
  * See [JsonSchemaCustomizeStep.customizeProperties]
  */
-fun Bundle<JsonSchema>.customizeProperties(action: (propertyData: PropertyData, propertySchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+fun Bundle<JsonSchema>.customizeProperties(action: (memberData: MemberData, propertySchema: JsonNode) -> Unit): Bundle<JsonSchema> {
     return JsonSchemaCustomizeStep().customizeProperties(this, action)
 }

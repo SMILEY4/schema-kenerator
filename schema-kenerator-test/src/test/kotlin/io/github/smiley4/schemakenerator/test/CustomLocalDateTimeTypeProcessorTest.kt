@@ -28,7 +28,6 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
         val result = typeOf<ClassWithLocalDateTime>()
             .processReflection()
             .generateJsonSchema()
-            .handleJsonSchemaAnnotations()
             .withTitle(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL)
             .compileInlining()
 

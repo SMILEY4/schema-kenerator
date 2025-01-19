@@ -2,9 +2,9 @@ package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Optional
 import io.github.smiley4.schemakenerator.core.annotations.Required
-import old.BaseTypeData
-import old.PropertyData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
@@ -17,7 +17,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUt
  */
 class JsonSchemaCoreAnnotationOptionalAndRequiredStep : AbstractJsonSchemaStep() {
 
-    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
         iterateProperties(schema, typeDataMap) { _, data, _ ->
             determineRequired(data)?.also { required ->
                 if (required) {
@@ -29,7 +29,7 @@ class JsonSchemaCoreAnnotationOptionalAndRequiredStep : AbstractJsonSchemaStep()
         }
     }
 
-    private fun determineRequired(typeData: PropertyData): Boolean? {
+    private fun determineRequired(typeData: MemberData): Boolean? {
         if (typeData.annotations.any { it.name == Required::class.qualifiedName }) {
             return true
         }

@@ -29,64 +29,64 @@ import kotlin.reflect.typeOf
  * internal / manual tests only
  */
 class _ManualTests : StringSpec({
-
-    "with default ktor-openapi generator" {
-        val result = typeOf<MyInstantClass>()
-            .collectSubTypes()
-            .processReflection()
-            .addMissingSupertypeSubtypeRelations()
-            .handleNameAnnotation()
-            .generateSwaggerSchema()
-            .handleCoreAnnotations()
-            .withTitle(TitleType.SIMPLE)
-            .compileReferencingRoot()
-            .asPrintable()
-            .let { json.writeValueAsString(it) }
-
-        println(result)
-    }
-
-    "with default ktor-openapi generator (fix)" {
-        val result = typeOf<MyInstantClass>()
-            .collectSubTypes()
-            .processReflection()
-            .addMissingSupertypeSubtypeRelations()
-            .handleNameAnnotation()
-            .generateSwaggerSchema()
-            .handleCoreAnnotations()
-            .withTitle(TitleType.SIMPLE)
-            .mergePropertyAttributesIntoType()
-            .compileReferencingRoot()
-            .asPrintable()
-            .let { json.writeValueAsString(it) }
-
-        println(result)
-    }
-
-    "with custom generator" {
-        val result = typeOf<MyInstantClass>()
-            .collectSubTypes()
-            .processReflection {
-                customProcessor<DummyInstant> {
-                    PrimitiveTypeData(
-                        id = TypeId.build(DummyInstant::class.qualifiedName!!),
-                        simpleName = DummyInstant::class.simpleName!!,
-                        qualifiedName = DummyInstant::class.qualifiedName!!,
-                    )
-                }
-            }
-            .addMissingSupertypeSubtypeRelations()
-            .handleNameAnnotation()
-            .generateSwaggerSchema()
-            .handleCoreAnnotations()
-            .withTitle(TitleType.SIMPLE)
-            .let { SwaggerMergePropertyAttributesStep().process(it) }
-            .compileReferencingRoot()
-            .asPrintable()
-            .let { json.writeValueAsString(it) }
-
-        println(result)
-    }
+//
+//    "with default ktor-openapi generator" {
+//        val result = typeOf<MyInstantClass>()
+//            .collectSubTypes()
+//            .processReflection()
+//            .addMissingSupertypeSubtypeRelations()
+//            .handleNameAnnotation()
+//            .generateSwaggerSchema()
+//            .handleCoreAnnotations()
+//            .withTitle(TitleType.SIMPLE)
+//            .compileReferencingRoot()
+//            .asPrintable()
+//            .let { json.writeValueAsString(it) }
+//
+//        println(result)
+//    }
+//
+//    "with default ktor-openapi generator (fix)" {
+//        val result = typeOf<MyInstantClass>()
+//            .collectSubTypes()
+//            .processReflection()
+//            .addMissingSupertypeSubtypeRelations()
+//            .handleNameAnnotation()
+//            .generateSwaggerSchema()
+//            .handleCoreAnnotations()
+//            .withTitle(TitleType.SIMPLE)
+//            .mergePropertyAttributesIntoType()
+//            .compileReferencingRoot()
+//            .asPrintable()
+//            .let { json.writeValueAsString(it) }
+//
+//        println(result)
+//    }
+//
+//    "with custom generator" {
+//        val result = typeOf<MyInstantClass>()
+//            .collectSubTypes()
+//            .processReflection {
+//                customProcessor<DummyInstant> {
+//                    PrimitiveTypeData(
+//                        id = TypeId.build(DummyInstant::class.qualifiedName!!),
+//                        simpleName = DummyInstant::class.simpleName!!,
+//                        qualifiedName = DummyInstant::class.qualifiedName!!,
+//                    )
+//                }
+//            }
+//            .addMissingSupertypeSubtypeRelations()
+//            .handleNameAnnotation()
+//            .generateSwaggerSchema()
+//            .handleCoreAnnotations()
+//            .withTitle(TitleType.SIMPLE)
+//            .let { SwaggerMergePropertyAttributesStep().process(it) }
+//            .compileReferencingRoot()
+//            .asPrintable()
+//            .let { json.writeValueAsString(it) }
+//
+//        println(result)
+//    }
 
 }) {
     companion object {

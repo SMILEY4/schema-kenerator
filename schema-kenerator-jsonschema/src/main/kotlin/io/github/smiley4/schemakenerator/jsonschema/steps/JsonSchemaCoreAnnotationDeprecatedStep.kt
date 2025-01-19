@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Deprecated
-import old.AnnotationData
-import old.BaseTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUt
  */
 class JsonSchemaCoreAnnotationDeprecatedStep : AbstractJsonSchemaStep() {
 
-    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.json is JsonObject && schema.json.properties["deprecated"] == null) {
             determineDeprecated(schema.typeData.annotations)?.also { deprecated ->
                 schema.json.properties["deprecated"] = JsonBooleanValue(deprecated)

@@ -8,7 +8,8 @@ import java.util.UUID
 data class TypeId(val id: String) {
 
     companion object {
-        fun createWildcard() = TypeId("*")
+        val WILDCARD = TypeId("*")
+        fun createWildcard() = WILDCARD
         fun create() = TypeId(UUID.randomUUID().toString())
     }
 
