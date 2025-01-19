@@ -47,6 +47,14 @@ class TypeId(
 
 
         /**
+         * Create a new id from the given id and append the given additionalId
+         */
+        fun build(id: TypeId, appendAdditionalId: String): TypeId {
+            return TypeId(id.base, id.typeParameters, (id.additionalId ?: "") + appendAdditionalId)
+        }
+
+
+        /**
          * @param fullTypeId id of a type as a formatted string, i.e. the output of [TypeId.full]
          * @return a id with the data from the given string
          */

@@ -18,6 +18,8 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.mergePropertyAttributesIntoType
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerMergePropertyAttributesStep
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.Serializable
@@ -44,6 +46,23 @@ class _ManualTests : StringSpec({
         println(result)
     }
 
+    "with default ktor-openapi generator (fix)" {
+        val result = typeOf<MyInstantClass>()
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .withTitle(TitleType.SIMPLE)
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot()
+            .asPrintable()
+            .let { json.writeValueAsString(it) }
+
+        println(result)
+    }
+
     "with custom generator" {
         val result = typeOf<MyInstantClass>()
             .collectSubTypes()
@@ -61,6 +80,7 @@ class _ManualTests : StringSpec({
             .generateSwaggerSchema()
             .handleCoreAnnotations()
             .withTitle(TitleType.SIMPLE)
+            .let { SwaggerMergePropertyAttributesStep().process(it) }
             .compileReferencingRoot()
             .asPrintable()
             .let { json.writeValueAsString(it) }
@@ -79,6 +99,7 @@ class _ManualTests : StringSpec({
             @Format("date-time")
             val time: DummyInstant
         )
+
 
         @Serializable
         class DummyInstant

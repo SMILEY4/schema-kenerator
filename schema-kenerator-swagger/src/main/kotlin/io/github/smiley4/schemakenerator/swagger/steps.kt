@@ -9,6 +9,7 @@ import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
+import io.github.smiley4.schemakenerator.swagger.steps.SwaggerMergePropertyAttributesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
@@ -124,6 +125,14 @@ fun Bundle<SwaggerSchema>.handleSchemaAnnotations(): Bundle<SwaggerSchema> {
     return this
         .let { SwaggerSchemaAnnotationStep().process(this) }
         .let { SwaggerArraySchemaAnnotationStep().process(this) }
+}
+
+
+/**
+ * See [SwaggerMergePropertyAttributesStep]
+ */
+fun Bundle<SwaggerSchema>.mergePropertyAttributesIntoType(): Bundle<SwaggerSchema> {
+    return SwaggerMergePropertyAttributesStep().process(this)
 }
 
 

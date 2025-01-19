@@ -54,29 +54,44 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
         val referencedSchema = schemaList.find(referencedId)
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
-                val refPath = pathBuilder(referencedSchema.typeData, typeDataMap)
-                if (!components.containsKey(refPath)) {
-                    components[refPath] = placeholder() // break out of infinite loops
-                    components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components) }
-                }
-                if (refObj.nullable == true) {
-                    schemaUtils.referenceSchemaNullable(refPath, true)
-                } else {
-                    schemaUtils.referenceSchema(refPath, true)
-                }
+                createRefProperty(refObj, schemaList, typeDataMap, components, referencedSchema)
             } else {
-                merge(refObj, referencedSchema.swagger).also {
-                    if (it.nullable == true) {
-                        it.nullable = null
-                        it.types = setOf("null") + it.types
-                    }
-                    if (it.nullable == false) {
-                        it.nullable = null
-                    }
-                }
+                createInlineProperty(refObj, referencedSchema)
             }
         } else {
             refObj
+        }
+    }
+
+    private fun createRefProperty(
+        refObj: Schema<*>,
+        schemaList: List<SwaggerSchema>,
+        typeDataMap: Map<TypeId, BaseTypeData>,
+        components: MutableMap<String, Schema<*>>,
+        referencedSchema: SwaggerSchema
+    ): Schema<*> {
+        val refPath = pathBuilder(referencedSchema.typeData, typeDataMap)
+        if (!components.containsKey(refPath)) {
+            components[refPath] = placeholder() // break out of infinite loops
+            components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components) }
+        }
+        if (refObj.nullable == true) {
+            return schemaUtils.referenceSchemaNullable(refPath, true)
+        } else {
+            return schemaUtils.referenceSchema(refPath, true)
+        }
+    }
+
+
+    private fun createInlineProperty(refObj: Schema<*>, referencedSchema: SwaggerSchema): Schema<*> {
+        return merge(refObj, referencedSchema.swagger).also {
+            if (it.nullable == true) {
+                it.nullable = null
+                it.types = setOf("null") + it.types
+            }
+            if (it.nullable == false) {
+                it.nullable = null
+            }
         }
     }
 
