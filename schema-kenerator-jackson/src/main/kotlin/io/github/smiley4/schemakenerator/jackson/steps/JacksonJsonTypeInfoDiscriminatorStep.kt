@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.jackson.steps
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 
 /**
  * Handles the [JsonTypeInfo]-annotations and adds a discriminator property with the defined name and
@@ -10,12 +10,12 @@ import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
  */
 class JacksonJsonTypeInfoDiscriminatorStep : AbstractAddDiscriminatorStep() {
 
-    override fun getDiscriminatorPropertyName(typeData: ObjectTypeData): String? {
+    override fun getDiscriminatorPropertyName(typeData: TypeData): String? {
         val annotation = typeData.annotations.find { it.name == JsonTypeInfo::class.qualifiedName }
-        if(annotation == null) {
+        if (annotation == null) {
             return null
         }
-        if(!setOf("PROPERTY", "EXISTING_PROPERTY").contains(annotation.values["include"].toString())) {
+        if (!setOf("PROPERTY", "EXISTING_PROPERTY").contains(annotation.values["include"].toString())) {
             return null
         }
         return annotation.values["property"]?.toString() ?: "type"
