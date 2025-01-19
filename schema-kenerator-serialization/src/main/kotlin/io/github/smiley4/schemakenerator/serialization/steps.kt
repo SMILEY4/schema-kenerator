@@ -5,7 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
-import io.github.smiley4.schemakenerator.core.steps.RenamePropertiesStep
+import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
 import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -207,12 +207,12 @@ class KotlinxSerializationTypeProcessingConfig {
 
 
 /**
- * See [RenamePropertiesStep].
+ * See [RenameMembersStep].
  * Note: no serial descriptor or element index will be passed to the naming strategy, only the serial name
  */
 @OptIn(ExperimentalSerializationApi::class)
 fun Bundle<BaseTypeData>.renameProperties(strategy: JsonNamingStrategy): Bundle<BaseTypeData> {
-    return RenamePropertiesStep { name ->
+    return RenameMembersStep { name ->
         strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
     }.process(this)
 }

@@ -4,7 +4,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Description
 import old.ObjectTypeData
 import old.PropertyType
 import old.Visibility
-import io.github.smiley4.schemakenerator.core.mergeGetters
+import io.github.smiley4.schemakenerator.core.gettersToProperties
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -21,7 +21,7 @@ class MergeGettersTest : StringSpec({
                 includeGetters = true
                 includeHidden = true
             }
-            .mergeGetters()
+            .gettersToProperties()
             .data
 
         (result as ObjectTypeData).members.also { members ->

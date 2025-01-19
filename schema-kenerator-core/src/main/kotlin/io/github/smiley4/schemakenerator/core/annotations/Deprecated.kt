@@ -3,7 +3,6 @@ package io.github.smiley4.schemakenerator.core.annotations
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialInfo
 
-
 /**
  * Specifies whether the annotated object is deprecated.
  * @param deprecated whether the object is deprecated

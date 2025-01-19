@@ -1,15 +1,17 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import old.AnnotationData
-import old.BaseTypeData
+import io.github.smiley4.schemakenerator.core.GenericBundleStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.ObjectTypeData
-import old.PrimitiveTypeData
-import old.PropertyData
-import old.PropertyType
-import old.TypeId
-import old.Visibility
 import io.github.smiley4.schemakenerator.core.data.flatten
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.MemberKind
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeName
+import io.github.smiley4.schemakenerator.core.typedata.Visibility
+import io.github.smiley4.schemakenerator.core.typedata.find
+import io.github.smiley4.schemakenerator.core.typedata.findAnnotatedWith
 
 /**
  * Adds properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.
@@ -17,85 +19,115 @@ import io.github.smiley4.schemakenerator.core.data.flatten
  * If a property with the name already exists, the marker annotation will be added to this existing property.
  * If a type already contains a property annotated with the marker annotation, no new property will be added.
  */
-abstract class AbstractAddDiscriminatorStep {
+abstract class AbstractAddDiscriminatorStep : GenericBundleStep<TypeData, TypeData> {
 
     companion object {
 
-        /**
-         * The name of the discriminator property to add
-         */
         const val MARKER_ANNOTATION_NAME = "discriminator_marker"
 
 
         /**
-         * Create a new [BaseTypeData] for the type of the discriminator property
+         * A [TypeData] for the type of the discriminator property
          */
-        fun buildDiscriminatorType() = PrimitiveTypeData(
-            id = TypeId.build(String::class.qualifiedName!!),
-            simpleName = String::class.simpleName!!,
-            qualifiedName = String::class.qualifiedName!!,
+        val DISCRIMINATOR_TYPE = TypeData(
+            id = TypeId.create(),
+            identifyingName = TypeName(
+                full = String::class.qualifiedName!!,
+                short = String::class.simpleName!!,
+            ),
+            descriptiveName = TypeName(
+                full = String::class.qualifiedName!!,
+                short = String::class.simpleName!!,
+            ),
+            typeParameters = mutableListOf(),
+            annotations = mutableListOf(),
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = null,
+            mapData = null
         )
 
     }
 
-    fun process(bundle: Bundle<BaseTypeData>): Bundle<BaseTypeData> {
-        val (bundleWithDiscriminatorType, discriminatorType) = ensureDiscriminatorTypeExistence(bundle)
+    override fun process(input: Bundle<TypeData>): Bundle<TypeData> {
+        val (bundleWithDiscriminatorType, discriminatorTypeId) = ensureDiscriminatorTypeExistence(input)
         bundleWithDiscriminatorType
             .flatten()
             .asSequence()
-            .filterIsInstance<ObjectTypeData>()
             .filter { it.subtypes.isNotEmpty() }
-            .forEach { handleParent(it, discriminatorType) }
+            .forEach { addDiscriminator(it, discriminatorTypeId) }
         return bundleWithDiscriminatorType
     }
 
-    private fun ensureDiscriminatorTypeExistence(bundle: Bundle<BaseTypeData>): Pair<Bundle<BaseTypeData>, TypeId> {
-        val discriminatorTypeTemplate = buildDiscriminatorType()
-        val discriminatorType = bundle.flatten().find { it.id == discriminatorTypeTemplate.id }
+
+    /**
+     * Ensures that the bundle contains a valid type for the discriminator property. Adds one if necessary and returns it as a new bundle.
+     */
+    private fun ensureDiscriminatorTypeExistence(bundle: Bundle<TypeData>): Pair<Bundle<TypeData>, TypeId> {
+        val discriminatorType = bundle.flatten().find { it.id == DISCRIMINATOR_TYPE.id }
         return if (discriminatorType != null) {
             bundle to discriminatorType.id
         } else {
             Bundle(
                 data = bundle.data,
-                supporting = bundle.supporting + listOf(discriminatorTypeTemplate)
-            ) to discriminatorTypeTemplate.id
+                supporting = bundle.supporting + listOf(DISCRIMINATOR_TYPE)
+            ) to DISCRIMINATOR_TYPE.id
         }
     }
 
-    private fun handleParent(parentTypeData: ObjectTypeData, discriminatorType: TypeId) {
+    private fun addDiscriminator(parentTypeData: TypeData, discriminatorType: TypeId) {
         val discriminatorName = getDiscriminatorPropertyName(parentTypeData)
-        if(discriminatorName == null) {
+        if (discriminatorName == null) {
+            // no name provided -> don't add discriminator
             return
         }
-        if (parentTypeData.members.any { it.annotations.any { a -> a.name == MARKER_ANNOTATION_NAME } }) {
+        if (parentTypeData.members.findAnnotatedWith(MARKER_ANNOTATION_NAME) != null) {
+            // a field marked as "discriminator" (by the marker annotation) already exists -> don't add another one
             return
         }
-        if (parentTypeData.members.any { it.name == discriminatorName }) {
-            parentTypeData.members
-                .find { it.name == discriminatorName }
-                ?.also { it.annotations.add(buildMarkerAnnotation()) }
-            return
+
+        parentTypeData.members.find(discriminatorName)?.also { member ->
+            // a member with the correct name already exists -> don't add another one, just annotate with marker annotation
+            member.annotations.add(buildMarkerAnnotation())
+            return@addDiscriminator
         }
-        parentTypeData.members.add(buildProperty(discriminatorName, discriminatorType))
+
+        // add new member marked with marker annotation
+        parentTypeData.members.add(buildDiscriminatorProperty(discriminatorName, discriminatorType))
     }
 
-    private fun buildProperty(name: String, type: TypeId) = PropertyData(
+
+    /**
+     * @return a new [MemberData] for the discriminator property
+     */
+    private fun buildDiscriminatorProperty(name: String, type: TypeId) = MemberData(
         name = name,
         type = type,
         nullable = false,
         optional = false,
         visibility = Visibility.PUBLIC,
-        kind = PropertyType.PROPERTY,
+        kind = MemberKind.PROPERTY,
         annotations = mutableListOf(buildMarkerAnnotation())
     )
 
+
+    /**
+     * @return a new [AnnotationData] as a marker for the discriminator property
+     */
     private fun buildMarkerAnnotation(): AnnotationData {
-        return AnnotationData(name = MARKER_ANNOTATION_NAME)
+        return AnnotationData(
+            name = MARKER_ANNOTATION_NAME,
+            values = mutableMapOf()
+        )
     }
+
 
     /**
      * Provides the name of the discriminator property. Return null to NOT add a discriminator property
      */
-    abstract fun getDiscriminatorPropertyName(typeData: ObjectTypeData): String?
+    abstract fun getDiscriminatorPropertyName(typeData: TypeData): String?
 
 }

@@ -16,6 +16,15 @@ fun Collection<TypeParameterData>.findOrThrow(name: String): TypeParameterData {
     return this.find(name) ?: throw IllegalArgumentException("No type parameter with name '$name' found.");
 }
 
+fun Collection<MemberData>.findAnnotatedWith(annotationName: String): MemberData? {
+    return this.find { member -> member.annotations.any { annotation -> annotation.name == annotationName } }
+}
+
+fun Collection<MemberData>.find(name: String): MemberData? {
+    return this.find { it.name == name }
+}
+
+
 fun TypeData.matches(identifyingName: TypeName, descriptiveName: TypeName, typeParameters: List<TypeParameterData>): Boolean {
     return this.matches(
         TypeData(

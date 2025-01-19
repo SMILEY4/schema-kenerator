@@ -1,23 +1,17 @@
 package io.github.smiley4.schemakenerator.core.steps
 
+import io.github.smiley4.schemakenerator.core.GenericBundleIndependentContentStep
 import io.github.smiley4.schemakenerator.core.annotations.Name
-import old.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 
 /**
- * Changes the [BaseTypeData.qualifiedName] and [BaseTypeData.simpleName] to the name specified with a [Name]-annotation.
+ * Changes the [TypeData.descriptiveName] to the name specified by a [Name]-annotation.
  */
-class RenameTypesStep {
+class RenameTypesStep : GenericBundleIndependentContentStep<TypeData>() {
 
-    fun process(bundle: Bundle<BaseTypeData>): Bundle<BaseTypeData> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
-    }
-
-    private fun process(data: BaseTypeData) {
-        data.annotations
+    override fun process(input: TypeData) {
+        input.annotations
             .find { it.name == Name::class.qualifiedName }
             ?.let {
                 val name = it.values["name"] as String
@@ -25,8 +19,8 @@ class RenameTypesStep {
                 name to (qualifiedName.ifEmpty { null })
             }
             ?.also { (name, qualifiedName) ->
-                data.simpleName = name
-                data.qualifiedName = qualifiedName ?: name
+                input.descriptiveName.full = qualifiedName ?: name
+                input.descriptiveName.short = name
             }
     }
 

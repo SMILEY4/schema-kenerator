@@ -5,7 +5,7 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
@@ -33,7 +33,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<BaseClass1>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
 
         result.data.qualifiedName shouldBe BaseClass1::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -100,7 +100,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<NormalClass>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
 
         result.data.qualifiedName shouldBe NormalClass::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -114,7 +114,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<JacksonBaseClass1>()
             .collectJacksonSubTypes(typeProcessing = { t -> t.processReflection() })
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
 
         result.data.qualifiedName shouldBe JacksonBaseClass1::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -181,7 +181,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<NormalClass>()
             .collectJacksonSubTypes(typeProcessing = { it.processReflection() })
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
 
         result.data.qualifiedName shouldBe NormalClass::class.qualifiedName
         result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
@@ -195,7 +195,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<BaseClass1>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
             .addJacksonTypeInfoDiscriminatorProperty()
             .addJsonClassDiscriminatorProperty()
             .addDiscriminatorProperty("_type")
@@ -218,7 +218,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<KotlinxParent>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
             .addJacksonTypeInfoDiscriminatorProperty()
             .addJsonClassDiscriminatorProperty()
             .addDiscriminatorProperty("_type")
@@ -241,7 +241,7 @@ class SubAndSuperTypesTest : StringSpec({
         val result = typeOf<JacksonParent>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
             .addJacksonTypeInfoDiscriminatorProperty()
             .addJsonClassDiscriminatorProperty()
             .addDiscriminatorProperty("_type")

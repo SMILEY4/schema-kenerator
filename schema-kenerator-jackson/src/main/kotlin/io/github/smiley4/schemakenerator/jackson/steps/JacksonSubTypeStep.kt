@@ -12,7 +12,7 @@ import kotlin.reflect.full.starProjectedType
 /**
  * Finds additional subtypes from jackson [JsonSubTypes]-annotation.
  * An additional step to add missing subtype-supertype relations
- * later may be required - see [io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep].
+ * later may be required - see [io.github.smiley4.schemakenerator.core.steps.AddMissingSubtypeSupertypeRelations].
  * @param maxRecursionDepth how many "levels" to search for subtypes
  * @param typeProcessing processor to get annotation data from [KType]
  */

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.core.annotations.Type
-import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import old.PrimitiveTypeData
 import old.TypeId
 import io.github.smiley4.schemakenerator.core.handleNameAnnotation
@@ -34,7 +34,7 @@ class _ManualTests : StringSpec({
         val result = typeOf<MyInstantClass>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
             .handleNameAnnotation()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
@@ -50,7 +50,7 @@ class _ManualTests : StringSpec({
         val result = typeOf<MyInstantClass>()
             .collectSubTypes()
             .processReflection()
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
             .handleNameAnnotation()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
@@ -75,7 +75,7 @@ class _ManualTests : StringSpec({
                     )
                 }
             }
-            .connectSubTypes()
+            .addMissingSupertypeSubtypeRelations()
             .handleNameAnnotation()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
