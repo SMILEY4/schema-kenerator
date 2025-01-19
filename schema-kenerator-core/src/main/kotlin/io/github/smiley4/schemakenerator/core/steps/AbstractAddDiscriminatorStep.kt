@@ -1,14 +1,14 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.AnnotationData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.Visibility
+import old.ObjectTypeData
+import old.PrimitiveTypeData
+import old.PropertyData
+import old.PropertyType
+import old.TypeId
+import old.Visibility
 import io.github.smiley4.schemakenerator.core.data.flatten
 
 /**

@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import old.ObjectTypeData
 
 /**
  * Adds properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.

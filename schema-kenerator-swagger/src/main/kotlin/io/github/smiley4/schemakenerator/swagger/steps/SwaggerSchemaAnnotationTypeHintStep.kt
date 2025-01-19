@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import old.BaseTypeData
+import old.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
 

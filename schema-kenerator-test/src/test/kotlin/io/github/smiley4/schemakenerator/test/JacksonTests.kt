@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonJsonSchemaAnnotations
 import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations

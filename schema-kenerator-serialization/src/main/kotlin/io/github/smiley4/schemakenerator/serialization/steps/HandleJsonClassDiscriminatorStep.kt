@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.serialization.steps
 
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.JsonClassDiscriminator

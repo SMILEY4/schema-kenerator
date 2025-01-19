@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.flatten
 
 /**

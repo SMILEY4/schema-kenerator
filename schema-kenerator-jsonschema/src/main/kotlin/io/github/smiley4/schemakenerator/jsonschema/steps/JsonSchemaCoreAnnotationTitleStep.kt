@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Title
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject

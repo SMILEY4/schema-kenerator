@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.core.data
+package old
 
 /**
  * Base data for any type

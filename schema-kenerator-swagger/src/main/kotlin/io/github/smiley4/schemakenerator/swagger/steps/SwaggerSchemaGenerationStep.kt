@@ -2,17 +2,17 @@ package io.github.smiley4.schemakenerator.swagger.steps
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
-import io.github.smiley4.schemakenerator.core.data.EnumTypeData
-import io.github.smiley4.schemakenerator.core.data.MapTypeData
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import old.CollectionTypeData
+import old.EnumTypeData
+import old.MapTypeData
+import old.ObjectTypeData
+import old.PrimitiveTypeData
+import old.PropertyData
+import old.PropertyType
+import old.TypeId
+import old.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema

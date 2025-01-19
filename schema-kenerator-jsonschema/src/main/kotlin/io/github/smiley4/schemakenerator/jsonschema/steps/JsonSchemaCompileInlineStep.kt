@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import old.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema

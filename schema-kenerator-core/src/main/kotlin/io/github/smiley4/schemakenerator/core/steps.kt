@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.core
 
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.AnnotationData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.steps.AddAnnotationsStep
 import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep

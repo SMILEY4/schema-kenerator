@@ -8,8 +8,8 @@ import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.connectSubTypes
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import old.PrimitiveTypeData
+import old.TypeId
 import io.github.smiley4.schemakenerator.core.handleNameAnnotation
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.processReflection

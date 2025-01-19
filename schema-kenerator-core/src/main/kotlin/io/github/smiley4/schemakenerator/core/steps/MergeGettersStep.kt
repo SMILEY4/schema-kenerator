@@ -1,10 +1,10 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
+import old.ObjectTypeData
+import old.PropertyData
+import old.PropertyType
 
 /**
  * Merges getters with their matching property;
@@ -48,7 +48,8 @@ class MergeGettersStep {
                     property.visibility = getter.visibility
                 } else {
                     // create new property from getter
-                    toAdd.add(PropertyData(
+                    toAdd.add(
+                        PropertyData(
                         name = propertyName,
                         type = getter.type,
                         nullable = getter.nullable,
@@ -56,7 +57,8 @@ class MergeGettersStep {
                         visibility = getter.visibility,
                         kind = PropertyType.PROPERTY,
                         annotations = getter.annotations
-                    ))
+                    )
+                    )
                 }
 
             }

@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.core.data
 
+import old.BaseTypeData
+import old.TypeId
 import kotlin.reflect.KType
 
 /**

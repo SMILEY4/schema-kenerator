@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.jackson.steps
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
 
 /**

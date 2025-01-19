@@ -1,10 +1,10 @@
 package io.github.smiley4.schemakenerator.jackson.steps
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyData
+import old.ObjectTypeData
+import old.PropertyData
 
 /**
  * Adds support for the jackson [JsonProperty]-annotation.

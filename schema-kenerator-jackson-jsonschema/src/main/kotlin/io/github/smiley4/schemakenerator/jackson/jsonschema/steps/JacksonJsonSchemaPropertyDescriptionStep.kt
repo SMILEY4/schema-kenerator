@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jackson.jsonschema.steps
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import old.AnnotationData
+import old.BaseTypeData
+import old.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.AbstractJsonSchemaStep

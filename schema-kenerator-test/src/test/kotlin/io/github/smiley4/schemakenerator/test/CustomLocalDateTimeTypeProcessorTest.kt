@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import old.AnnotationData
+import old.PrimitiveTypeData
+import old.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema

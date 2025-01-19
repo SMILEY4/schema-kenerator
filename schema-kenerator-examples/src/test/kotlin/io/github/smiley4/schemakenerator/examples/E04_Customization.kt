@@ -3,10 +3,10 @@
 
 package io.github.smiley4.schemakenerator.examples
 
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import old.AnnotationData
+import old.ObjectTypeData
+import old.PrimitiveTypeData
+import old.TypeId
 import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.customizeProperties

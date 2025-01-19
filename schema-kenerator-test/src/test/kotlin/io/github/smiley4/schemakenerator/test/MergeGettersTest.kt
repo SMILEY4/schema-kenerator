@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.annotations.Description
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
-import io.github.smiley4.schemakenerator.core.data.Visibility
+import old.ObjectTypeData
+import old.PropertyType
+import old.Visibility
 import io.github.smiley4.schemakenerator.core.mergeGetters
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.kotest.core.spec.style.StringSpec

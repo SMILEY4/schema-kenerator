@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.core.data
+package old
 
 import kotlin.math.abs
 import kotlin.random.Random

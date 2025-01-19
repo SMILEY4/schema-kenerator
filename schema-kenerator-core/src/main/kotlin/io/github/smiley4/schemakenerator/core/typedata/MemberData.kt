@@ -1,9 +1,9 @@
-package io.github.smiley4.schemakenerator.core.data
+package io.github.smiley4.schemakenerator.core.typedata
 
 /**
- * Data of a property, e.g. of a field or function
+ * Data of a member of an object, e.g. a field or function
  */
-data class PropertyData(
+data class MemberData(
     /**
      * the name of the property
      */
@@ -27,9 +27,9 @@ data class PropertyData(
     /**
      * the kind of property (e.g. field/property or function
      */
-    var kind: PropertyType,
+    var kind: MemberKind,
     /**
      * the list of annotations of this property
      */
-    val annotations: MutableList<AnnotationData> = mutableListOf()
+    val annotations: MutableList<AnnotationData>
 )

@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.data
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import old.BaseTypeData
 import io.swagger.v3.oas.models.media.Schema
 
 /**
