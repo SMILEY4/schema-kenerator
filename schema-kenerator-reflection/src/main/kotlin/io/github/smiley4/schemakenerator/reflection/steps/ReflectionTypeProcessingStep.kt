@@ -72,7 +72,7 @@ class ReflectionTypeProcessingStep(
     /**
      * custom processors for given types that overwrite the default behaviour
      */
-    private val customProcessors: List<Pair<ReflectionTypeMatcher, ReflectionCustomProcessor>>,
+    private val customProcessors: List<Pair<ReflectionTypeMatcher, ReflectionCustomProcessor>> = emptyList(),
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
@@ -80,6 +80,15 @@ class ReflectionTypeProcessingStep(
 ) {
 
     companion object {
+
+        enum class TypeCategory {
+            PRIMITIVE,
+            OBJECT,
+            ENUM,
+            COLLECTION,
+            MAP
+        }
+
         val DEFAULT_PRIMITIVE_TYPES = setOf<KClass<*>>(
             Number::class,
             Byte::class,
