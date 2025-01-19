@@ -11,12 +11,9 @@ import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.kotest.core.spec.style.StringSpec
-import io.swagger.v3.core.util.Json31
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -51,7 +48,7 @@ class _ManualTests : StringSpec({
         println()
 
         val result = typeOf<MyData>()
-            .processKotlinxSerialization {
+            .processKotlinxSerialization { // todo: better separate typeid, name actual type -> schema generator uses name to determine type -> causes problem when renaming without changing base type
                 serializersModule = JSON.serializersModule
             }
             .also {
