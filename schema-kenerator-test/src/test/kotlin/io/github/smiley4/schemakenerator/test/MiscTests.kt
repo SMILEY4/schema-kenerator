@@ -3,7 +3,9 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
+import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.renameProperties
@@ -24,6 +26,7 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
@@ -469,6 +472,106 @@ class MiscTests : FreeSpec({
 
     }
 
+    "merge property attributes with referenced type" {
+
+        val result = typeOf<ClassWithAnnotatedFields>()
+            .processReflection()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot()
+
+        val componentSchemasCleanIds: Map<String, Schema<*>> = result.componentSchemas
+            .map { (key, value) ->
+                if(key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18")) {
+                    if (value.types.contains("type-a")) {
+                        return@map "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A" to value
+                    }
+                    if (value.types.contains("type-b")) {
+                        return@map "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B" to value
+                    }
+                }
+                if(key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields")) {
+                    value.properties["fieldA"]?.`$ref` = "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A"
+                    value.properties["fieldB"]?.`$ref` = "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B"
+                }
+                key to value
+            }
+            .associate { it }
+
+        (result.swagger to componentSchemasCleanIds).shouldEqualJson {
+            mapOf(
+                "." to """
+                    {
+                      "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields"
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields" to """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "fieldA": {
+                          "${'$'}ref": "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A"
+                        },
+                        "fieldB": {
+                          "${'$'}ref": "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B"
+                        }
+                      },
+                      "required": [
+                        "fieldA",
+                        "fieldB"
+                      ]
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A" to """
+                    {
+                      "type": [
+                        "object",
+                        "type-a"
+                      ],
+                      "format": "format-a",
+                      "properties": {
+                        "nameOfPerson": {
+                          "type": "string"
+                        },
+                        "numberOfYears": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "required": [
+                        "nameOfPerson",
+                        "numberOfYears"
+                      ]
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B" to """
+                    {
+                      "type": [
+                        "object",
+                        "type-b"
+                      ],
+                      "format": "format-b",
+                      "properties": {
+                        "nameOfPerson": {
+                          "type": "string"
+                        },
+                        "numberOfYears": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "required": [
+                        "nameOfPerson",
+                        "numberOfYears"
+                      ]
+                    }
+                """.trimIndent()
+            )
+        }
+
+    }
+
 }) {
 
     companion object {
@@ -519,6 +622,17 @@ class MiscTests : FreeSpec({
         class AIssue39: SealedClassIssue39()
 
         class BIssue39(val a: SealedClassIssue39?)
+
+
+        data class ClassWithAnnotatedFields(
+            @Format("format-a")
+            @Type("type-a")
+            val fieldA: TestClassIssue18,
+            @Format("format-b")
+            @Type("type-b")
+            val fieldB: TestClassIssue18
+        )
+
 
     }
 

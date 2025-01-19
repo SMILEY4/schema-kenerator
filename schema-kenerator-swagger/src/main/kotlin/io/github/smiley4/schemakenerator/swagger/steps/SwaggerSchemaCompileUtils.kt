@@ -150,7 +150,7 @@ object SwaggerSchemaCompileUtils {
      * Creates a shallow copy of the given schema.
      */
     @Suppress("CyclomaticComplexMethod")
-    private fun copy(source: Schema<*>): Schema<*> {
+    fun copy(source: Schema<*>): Schema<*> {
         return Schema<Any>().also { copy ->
             copy.additionalProperties = source.additionalProperties
             copy.allOf = source.allOf
@@ -203,10 +203,12 @@ object SwaggerSchemaCompileUtils {
 
 
     fun copyTypeToTypes(schemas: List<SwaggerSchema>) {
-        schemas.forEach { schema ->
-            if(schema.swagger.type != null) {
-                schema.swagger.types = (schema.swagger.types ?: emptySet()) + setOf(schema.swagger.type)
-            }
+        schemas.forEach { copyTypeToTypes(it) }
+    }
+
+    fun copyTypeToTypes(schema: SwaggerSchema) {
+        if (schema.swagger.type != null && (schema.swagger.types?.isEmpty() != false)) {
+            schema.swagger.types = setOf(schema.swagger.type)
         }
     }
 

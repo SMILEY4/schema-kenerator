@@ -24,7 +24,9 @@ sealed class BaseTypeData(
      * list of annotations on this type
      */
     var annotations: MutableList<AnnotationData>,
-)
+) {
+    abstract fun copy(id: TypeId): BaseTypeData
+}
 
 
 /**
@@ -56,7 +58,9 @@ class PlaceholderTypeData(
     qualifiedName = id.full(),
     typeParameters = mutableMapOf(),
     annotations = mutableListOf(),
-)
+) {
+    override fun copy(id: TypeId) = PlaceholderTypeData(id)
+}
 
 
 /**
@@ -68,7 +72,9 @@ class WildcardTypeData : BaseTypeData(
     qualifiedName = "*",
     typeParameters = mutableMapOf(),
     annotations = mutableListOf(),
-)
+) {
+    override fun copy(id: TypeId) = WildcardTypeData()
+}
 
 
 /**
@@ -80,7 +86,17 @@ class PrimitiveTypeData(
     qualifiedName: String,
     typeParameters: MutableMap<String, TypeParameterData> = mutableMapOf(),
     annotations: MutableList<AnnotationData> = mutableListOf(),
-) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
+) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations) {
+
+    override fun copy(id: TypeId) = PrimitiveTypeData(
+        id = id,
+        simpleName = simpleName,
+        qualifiedName = qualifiedName,
+        typeParameters = typeParameters,
+        annotations = annotations
+    )
+
+}
 
 
 /**
@@ -108,7 +124,21 @@ open class ObjectTypeData(
      * whether the type is an inline value class
      */
     var isInlineValue: Boolean = false
-) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations)
+) : BaseTypeData(id, simpleName, qualifiedName, typeParameters, annotations) {
+
+    override fun copy(id: TypeId) = ObjectTypeData(
+        id = id,
+        simpleName = simpleName,
+        qualifiedName = qualifiedName,
+        typeParameters = typeParameters,
+        annotations = annotations,
+        subtypes = subtypes,
+        supertypes = supertypes,
+        members = members,
+        isInlineValue = isInlineValue,
+    )
+
+}
 
 
 /**
@@ -127,7 +157,20 @@ class EnumTypeData(
      * the possible values of the enum
      */
     var enumConstants: MutableList<String>,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members) {
+
+    override fun copy(id: TypeId) = EnumTypeData(
+        id = id,
+        simpleName = simpleName,
+        qualifiedName = qualifiedName,
+        typeParameters = typeParameters,
+        subtypes = subtypes,
+        supertypes = supertypes,
+        members = members,
+        annotations = annotations,
+        enumConstants = enumConstants,
+    )
+}
 
 
 /**
@@ -150,7 +193,21 @@ class MapTypeData(
      * the type of the values
      */
     var valueType: PropertyData,
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members) {
+
+    override fun copy(id: TypeId) = MapTypeData(
+        id = id,
+        simpleName = simpleName,
+        qualifiedName = qualifiedName,
+        typeParameters = typeParameters,
+        subtypes = subtypes,
+        supertypes = supertypes,
+        members = members,
+        annotations = annotations,
+        keyType = keyType,
+        valueType = valueType,
+    )
+}
 
 
 /**
@@ -173,5 +230,19 @@ class CollectionTypeData(
      * whether the items in the collection are unique
      */
     val unique: Boolean
-) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members)
+) : ObjectTypeData(id, simpleName, qualifiedName, typeParameters, annotations, subtypes, supertypes, members) {
+
+    override fun copy(id: TypeId) = CollectionTypeData(
+        id = id,
+        simpleName = simpleName,
+        qualifiedName = qualifiedName,
+        typeParameters = typeParameters,
+        subtypes = subtypes,
+        supertypes = supertypes,
+        members = members,
+        annotations = annotations,
+        itemType = itemType,
+        unique = unique,
+    )
+}
 
