@@ -32,16 +32,16 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val schema = data.type
                 .processReflection()
                 .handleNameAnnotation()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_FULL)
                 .compileInlining()
@@ -66,16 +66,16 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val schema = data.type
                 .processReflection()
                 .handleNameAnnotation()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
                 .compileInlining()
@@ -100,16 +100,16 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val schema = data.type
                 .processReflection()
                 .handleNameAnnotation()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
                 .compileReferencingRoot(TitleBuilder.BUILDER_SIMPLE)

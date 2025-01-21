@@ -34,14 +34,14 @@ class SwaggerMergePropertyAttributesStep {
         schema.swagger.properties?.values
             ?.filter { it.`$ref` != null }
             ?.forEach { property ->
-                val propertyData = schemas.find { it.typeData.id.full() == property.`$ref` }
+                val propertyData = schemas.find { it.typeData.id.id == property.`$ref` }
                 if (propertyData != null) {
-                    val derivedId = TypeId.build(propertyData.typeData.id, abs(Random.nextLong()).toString())
+                    val derivedId = TypeId.create()
                     val derivedPropertyTypeData = propertyData.typeData.copy(derivedId)
                     val derivedPropertySchema = SwaggerSchemaCompileUtils.copy(propertyData.swagger)
                     SwaggerSchemaCompileUtils.mergeInto(property, derivedPropertySchema)
                     resultingSchemas.add(SwaggerSchema(derivedPropertySchema, derivedPropertyTypeData))
-                    property.`$ref` = derivedId.full()
+                    property.`$ref` = derivedId.id
                 }
             }
         return resultingSchemas

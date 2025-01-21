@@ -1,19 +1,15 @@
 package io.github.smiley4.schemakenerator.test
 
-import old.AnnotationData
-import old.PrimitiveTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeName
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.handleJsonSchemaAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerTypeHint
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleSwaggerAnnotations
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
@@ -57,24 +53,23 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
         val result = typeOf<ClassWithLocalDateTime>()
             .processReflection {
                 customProcessor<LocalDateTime> {
-                    PrimitiveTypeData(
-                        id = TypeId.build(LocalDateTime::class.qualifiedName!!),
-                        simpleName = LocalDateTime::class.simpleName!!,
-                        qualifiedName = LocalDateTime::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = JsonTypeHint::class.qualifiedName!!,
-                                values = mutableMapOf(
-                                    "type" to "date"
-                                ),
-                                annotation = null
-                            )
-                        )
+                    TypeData(
+                        id = TypeId.create(),
+                        identifyingName = TypeName("kotlin.String", "String"),
+                        descriptiveName = TypeName(LocalDateTime::class.qualifiedName!!, LocalDateTime::class.simpleName!!),
+                        typeParameters = mutableListOf(),
+                        annotations = mutableListOf(),
+                        subtypes = mutableListOf(),
+                        supertypes = mutableListOf(),
+                        members = mutableListOf(),
+                        isInlineValue = false,
+                        enumData = null,
+                        collectionData = null,
+                        mapData = null
                     )
                 }
             }
             .generateJsonSchema()
-            .handleJsonSchemaAnnotations()
             .withTitle(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
@@ -105,7 +100,6 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
         val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .processKotlinxSerialization()
             .generateSwaggerSchema()
-            .handleSwaggerAnnotations()
             .withTitle(TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
@@ -134,24 +128,23 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
         val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .processKotlinxSerialization {
                 customProcessor<LocalDateTime> {
-                    PrimitiveTypeData(
-                        id = TypeId.build(LocalDateTime::class.qualifiedName!!),
-                        simpleName = LocalDateTime::class.simpleName!!,
-                        qualifiedName = LocalDateTime::class.qualifiedName!!,
-                        annotations = mutableListOf(
-                            AnnotationData(
-                                name = SwaggerTypeHint::class.qualifiedName!!,
-                                values = mutableMapOf(
-                                    "type" to "date"
-                                ),
-                                annotation = null
-                            )
-                        )
+                    TypeData(
+                        id = TypeId.create(),
+                        identifyingName = TypeName("kotlin.String", "String"),
+                        descriptiveName = TypeName(LocalDateTime::class.qualifiedName!!, LocalDateTime::class.simpleName!!),
+                        typeParameters = mutableListOf(),
+                        annotations = mutableListOf(),
+                        subtypes = mutableListOf(),
+                        supertypes = mutableListOf(),
+                        members = mutableListOf(),
+                        isInlineValue = false,
+                        enumData = null,
+                        collectionData = null,
+                        mapData = null
                     )
                 }
             }
             .generateSwaggerSchema()
-            .handleSwaggerAnnotations()
             .withTitle(TitleBuilder.BUILDER_FULL)
             .compileInlining()
 

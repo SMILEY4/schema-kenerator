@@ -7,7 +7,8 @@ import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.renameMembers
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
@@ -33,6 +34,7 @@ import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNamingStrategy
+import old.WildcardTypeData
 import java.util.Optional
 import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
@@ -433,7 +435,7 @@ class MiscTests : FreeSpec({
                     swagger = Schema<Any>().also {
                         it.type = "myType"
                     },
-                    typeData = WildcardTypeData()
+                    typeData = TypeData.createWildcard()
                 ),
                 supporting = emptyList()
             ).compileInlining()
@@ -453,7 +455,7 @@ class MiscTests : FreeSpec({
                     swagger = Schema<Any>().also {
                         it.type = "myType"
                     },
-                    typeData = WildcardTypeData()
+                    typeData = TypeData.createWildcard()
                 ),
                 supporting = emptyList()
             ).compileReferencingRoot()

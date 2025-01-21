@@ -8,15 +8,9 @@ import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
@@ -64,16 +58,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .processKotlinxSerialization()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {
@@ -113,16 +107,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .processKotlinxSerialization()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {

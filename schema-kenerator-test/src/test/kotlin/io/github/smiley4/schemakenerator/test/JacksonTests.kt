@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonJsonSchemaAnnotations
 import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
@@ -29,7 +28,7 @@ class JacksonTests : StringSpec({
         val result = typeOf<JsonIgnoreTestClass>()
             .processReflection()
             .handleJacksonAnnotations()
-        (result.data as ObjectTypeData).members.also { members ->
+        result.data.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
         }
@@ -39,7 +38,7 @@ class JacksonTests : StringSpec({
         val result = typeOf<JsonIgnoreTypeTestClass>()
             .processReflection()
             .handleJacksonAnnotations()
-        (result.data as ObjectTypeData).members.also { members ->
+        result.data.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
         }
@@ -49,7 +48,7 @@ class JacksonTests : StringSpec({
         val result = typeOf<JsonIgnorePropertiesTestClass>()
             .processReflection()
             .handleJacksonAnnotations()
-        (result.data as ObjectTypeData).members.also { members ->
+        result.data.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
         }
@@ -59,7 +58,7 @@ class JacksonTests : StringSpec({
         val result = typeOf<JsonPropertyTestClass>()
             .processReflection()
             .handleJacksonAnnotations()
-        (result.data as ObjectTypeData).members.also { members ->
+        result.data.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
             members.first().nullable shouldBe false

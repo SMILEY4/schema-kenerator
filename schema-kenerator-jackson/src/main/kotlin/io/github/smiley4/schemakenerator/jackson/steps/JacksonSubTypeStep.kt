@@ -2,11 +2,11 @@ package io.github.smiley4.schemakenerator.jackson.steps
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import io.github.smiley4.schemakenerator.core.GenericStep
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.flatten
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
@@ -19,7 +19,7 @@ import kotlin.reflect.full.starProjectedType
  */
 class JacksonSubTypeStep(
     private val maxRecursionDepth: Int = 10,
-    val typeProcessing: (type: KType) -> Bundle<BaseTypeData>
+    val typeProcessing: (type: KType) -> Bundle<TypeData>
 ) : GenericStep<InputType, Bundle<InputType>> {
 
     /**
@@ -55,7 +55,7 @@ class JacksonSubTypeStep(
         )
     }
 
-    private fun process(types: List<InputType>): Collection<BaseTypeData> {
+    private fun process(types: List<InputType>): Collection<TypeData> {
         return types
             .map {
                 when(it) {
@@ -66,7 +66,7 @@ class JacksonSubTypeStep(
             .flatMap { it.flatten() }
     }
 
-    private fun findSubTypes(typeData: BaseTypeData): List<InputType> {
+    private fun findSubTypes(typeData: TypeData): List<InputType> {
         @Suppress("UNCHECKED_CAST")
         return typeData.annotations
             .find { it.name == JsonSubTypes::class.qualifiedName!! }

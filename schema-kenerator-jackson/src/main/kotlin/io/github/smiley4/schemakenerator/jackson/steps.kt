@@ -1,6 +1,5 @@
 package io.github.smiley4.schemakenerator.jackson
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
@@ -17,7 +16,7 @@ import kotlin.reflect.KType
  * Handles the jackson "JsonSubTypes"-annotation.
  * See [JacksonSubTypeStep] for more info.
  */
-fun KType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<BaseTypeData>, maxRecursionDepth: Int = 10): Bundle<InputType> {
+fun KType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<TypeData>, maxRecursionDepth: Int = 10): Bundle<InputType> {
     return KTypeInput(this).collectJacksonSubTypes(typeProcessing, maxRecursionDepth)
 }
 
@@ -26,7 +25,7 @@ fun KType.collectJacksonSubTypes(typeProcessing: (type: KType) -> Bundle<BaseTyp
  * See [JacksonSubTypeStep] for more info.
  */
 fun InputType.collectJacksonSubTypes(
-    typeProcessing: (type: KType) -> Bundle<BaseTypeData>,
+    typeProcessing: (type: KType) -> Bundle<TypeData>,
     maxRecursionDepth: Int = 10
 ): Bundle<InputType> {
     return JacksonSubTypeStep(
