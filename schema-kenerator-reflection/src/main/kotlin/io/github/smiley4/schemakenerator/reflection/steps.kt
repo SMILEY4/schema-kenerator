@@ -11,8 +11,6 @@ import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES
-import old.PrimitiveTypeData
-import old.PropertyType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf

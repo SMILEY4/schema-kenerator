@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.smiley4.schemakenerator.core.GenericBundleIndependentContentStep
 import io.github.smiley4.schemakenerator.core.typedata.MemberData
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import old.ObjectTypeData
-import old.PropertyData
 
 /**
  * Adds support for the jackson [JsonProperty]-annotation.

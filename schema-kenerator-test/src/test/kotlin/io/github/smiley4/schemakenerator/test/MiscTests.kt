@@ -34,7 +34,6 @@ import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNamingStrategy
-import old.WildcardTypeData
 import java.util.Optional
 import javax.validation.constraints.Size
 import kotlin.reflect.typeOf

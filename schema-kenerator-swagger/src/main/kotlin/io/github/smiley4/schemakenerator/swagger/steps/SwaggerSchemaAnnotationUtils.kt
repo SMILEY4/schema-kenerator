@@ -3,7 +3,6 @@ package io.github.smiley4.schemakenerator.swagger.steps
 import io.github.smiley4.schemakenerator.core.typedata.MemberData
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.core.typedata.TypeId
-import old.PropertyData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 
