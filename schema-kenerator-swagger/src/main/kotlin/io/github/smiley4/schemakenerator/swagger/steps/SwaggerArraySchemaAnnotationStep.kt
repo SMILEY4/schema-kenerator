@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import old.AnnotationData
-import old.BaseTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
  */
 class SwaggerArraySchemaAnnotationStep : AbstractSwaggerSchemaStep() {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
             val mergedAnnotations = propData.annotations + propTypeData.annotations
             getMinItems(mergedAnnotations)?.also { prop.minItems = it }

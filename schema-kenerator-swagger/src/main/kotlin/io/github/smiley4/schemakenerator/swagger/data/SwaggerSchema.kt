@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.data
 
-import old.BaseTypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.swagger.v3.oas.models.media.Schema
 
 /**
@@ -14,5 +14,5 @@ class SwaggerSchema(
     /**
      * the original type data
      */
-    val typeData: BaseTypeData
+    val typeData: TypeData
 )

@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Description
-import old.AnnotationData
-import old.BaseTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
@@ -12,7 +12,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUt
  */
 class SwaggerSchemaCoreAnnotationDescriptionStep : AbstractSwaggerSchemaStep() {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.swagger.description == null) {
             determineDescription(schema.typeData.annotations)?.also { description ->
                 schema.swagger.description = description

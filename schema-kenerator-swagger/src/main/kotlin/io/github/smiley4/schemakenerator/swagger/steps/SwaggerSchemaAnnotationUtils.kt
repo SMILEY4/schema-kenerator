@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import old.BaseTypeData
-import old.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import old.PropertyData
-import old.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 
@@ -14,13 +14,13 @@ object SwaggerSchemaAnnotationUtils {
      */
     fun iterateProperties(
         schema: SwaggerSchema,
-        typeDataMap: Map<TypeId, BaseTypeData>,
-        action: (property: Schema<*>, propertyData: PropertyData, propertyTypeData: BaseTypeData) -> Unit
+        typeDataMap: Map<TypeId, TypeData>,
+        action: (property: Schema<*>, memberData: MemberData, memberTypeData: TypeData) -> Unit
     ) {
-        if (schema.typeData is ObjectTypeData && schema.swagger.properties != null) {
+        if (schema.swagger.properties != null) {
             schema.swagger.properties.forEach { (propKey, prop) ->
-                schema.typeData.members.find { it.name == propKey }?.also { propertyData ->
-                    action(prop, propertyData, typeDataMap[propertyData.type]!!)
+                schema.typeData.members.find { it.name == propKey }?.also { memberData ->
+                    action(prop, memberData, typeDataMap[memberData.type]!!)
                 }
             }
         }
@@ -28,15 +28,15 @@ object SwaggerSchemaAnnotationUtils {
 
 
     /**
-     * Iterate over the properties of the given schema as pairs of [Schema] and [PropertyData] and
+     * Iterate over the properties of the given schema as pairs of [Schema] and [MemberData] and
      * removes them if the condition returns true.
      */
-    fun removePropertyIf(schema: SwaggerSchema, condition: (property: Schema<*>, data: PropertyData) -> Boolean) {
-        if (schema.typeData is ObjectTypeData && schema.swagger.properties != null) {
+    fun removePropertyIf(schema: SwaggerSchema, condition: (property: Schema<*>, memberData: MemberData) -> Boolean) {
+        if (schema.swagger.properties != null) {
             val keysToRemove = mutableSetOf<String>()
             schema.swagger.properties.forEach { (propKey, prop) ->
-                schema.typeData.members.find { it.name == propKey }?.also { propertyData ->
-                    if (condition(prop, propertyData)) {
+                schema.typeData.members.find { it.name == propKey }?.also { memberData ->
+                    if (condition(prop, memberData)) {
                         keysToRemove.add(propKey)
                     }
                 }

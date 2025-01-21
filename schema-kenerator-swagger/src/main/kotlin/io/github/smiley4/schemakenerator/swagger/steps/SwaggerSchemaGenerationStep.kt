@@ -2,18 +2,13 @@ package io.github.smiley4.schemakenerator.swagger.steps
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import old.BaseTypeData
+import io.github.smiley4.schemakenerator.core.GenericBundleStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.CollectionTypeData
-import old.EnumTypeData
-import old.MapTypeData
-import old.ObjectTypeData
-import old.PrimitiveTypeData
-import old.PropertyData
-import old.PropertyType
-import old.TypeId
-import old.WildcardTypeData
 import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.MemberKind
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
@@ -23,42 +18,38 @@ import java.math.BigDecimal
  * Result needs to be "compiled" to get the final swagger-schema.
  * @param optionalAsNonRequired whether to treat optional (non-nullable) properties as required
  */
-class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) {
+class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) : GenericBundleStep<TypeData, SwaggerSchema> {
 
     private val schema = SwaggerSchemaUtils()
 
-    fun generate(bundle: Bundle<BaseTypeData>): Bundle<SwaggerSchema> {
-        val allTypeData = listOf(bundle.data) + bundle.supporting
+    override fun process(input: Bundle<TypeData>): Bundle<SwaggerSchema> {
+        val allTypeData = listOf(input.data) + input.supporting
         return Bundle(
-            data = generate(bundle.data, allTypeData),
-            supporting = bundle.supporting.map { generate(it, allTypeData) }
+            data = generate(input.data, allTypeData),
+            supporting = input.supporting.map { generate(it, allTypeData) }
         )
     }
 
-    private fun generate(typeData: BaseTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
-        if (typeData is ObjectTypeData && typeData.subtypes.isNotEmpty()) {
+    private fun generate(typeData: TypeData, typeDataList: Collection<TypeData>): SwaggerSchema {
+        if (typeData.subtypes.isNotEmpty()) {
             return buildWithSubtypes(typeData, typeDataList)
         }
-        return when (typeData) {
-            is PrimitiveTypeData -> buildPrimitiveSchema(typeData)
-            is EnumTypeData -> buildEnumSchema(typeData)
-            is CollectionTypeData -> buildCollectionSchema(typeData)
-            is MapTypeData -> buildMapSchema(typeData)
-            is ObjectTypeData -> buildObjectSchema(typeData, typeDataList)
-            is WildcardTypeData -> buildAnySchema()
-            else -> SwaggerSchema(
-                swagger = schema.nullSchema(),
-                typeData = WildcardTypeData()
-            )
+        return when {
+            typeData.enumData != null -> buildEnumSchema(typeData)
+            typeData.collectionData != null -> buildCollectionSchema(typeData)
+            typeData.mapData != null -> buildMapSchema(typeData)
+            typeData.id == TypeId.WILDCARD -> buildAnySchema()
+            typeData.members.isEmpty() && typeData.supertypes.isEmpty() -> buildPrimitiveSchema(typeData)
+            else -> buildObjectSchema(typeData, typeDataList)
         }
     }
 
     private fun buildAnySchema(): SwaggerSchema {
-        return SwaggerSchema(schema.anyObjectSchema(), WildcardTypeData())
+        return SwaggerSchema(schema.anyObjectSchema(), TypeData.createWildcard())
     }
 
-    private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): SwaggerSchema {
-        return when (typeData.qualifiedName) {
+    private fun buildPrimitiveSchema(typeData: TypeData): SwaggerSchema {
+        return when (typeData.identifyingName.full) {
             Number::class.qualifiedName -> schema.numberSchema(false)
             Byte::class.qualifiedName -> schema.numericSchema(
                 integer = true,
@@ -110,59 +101,63 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         }
     }
 
-    private fun buildEnumSchema(typeData: EnumTypeData): SwaggerSchema {
+    private fun buildEnumSchema(typeData: TypeData): SwaggerSchema {
         return SwaggerSchema(
-            swagger = schema.enumSchema(typeData.enumConstants),
+            swagger = schema.enumSchema(
+                values = typeData.enumData?.constants ?: emptyList()
+            ),
             typeData = typeData
         )
     }
 
-    private fun buildCollectionSchema(typeData: CollectionTypeData): SwaggerSchema {
+    private fun buildCollectionSchema(typeData: TypeData): SwaggerSchema {
         return SwaggerSchema(
             swagger = schema.arraySchema(
-                schema.referenceSchema(typeData.itemType.type),
-                typeData.unique
+                items = schema.referenceSchema(typeData.collectionData!!.itemType.type),
+                uniqueItems = typeData.collectionData!!.unique
             ),
             typeData = typeData
         )
     }
 
-    private fun buildMapSchema(typeData: MapTypeData): SwaggerSchema {
+    private fun buildMapSchema(typeData: TypeData): SwaggerSchema {
         return SwaggerSchema(
-            swagger = schema.mapObjectSchema(schema.referenceSchema(typeData.valueType.type)),
+            swagger = schema.mapObjectSchema(
+                valueSchema = schema.referenceSchema(typeData.mapData!!.valueType.type)
+            ),
             typeData = typeData
         )
     }
 
-    private fun buildWithSubtypes(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
+    private fun buildWithSubtypes(typeData: TypeData, typeDataList: Collection<TypeData>): SwaggerSchema {
         return SwaggerSchema(
             swagger = schema.subtypesSchema(
-                typeData.subtypes.map { schema.referenceSchema(it.full()) },
-                getDiscriminatorName(typeData),
-                discriminatorMapping(typeData, typeDataList)
+                subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
+                discriminator = getDiscriminatorName(typeData),
+                discriminatorMapping = discriminatorMapping(typeData, typeDataList)
             ),
             typeData = typeData
         )
     }
 
-    private fun discriminatorMapping(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): Map<TypeId,String> {
+    private fun discriminatorMapping(typeData: TypeData, typeDataList: Collection<TypeData>): Map<TypeId, String> {
         return buildMap {
             typeData.subtypes.forEach { subtypeId ->
                 val subtype = typeDataList.find { it.id == subtypeId }!!
-                var name = subtype.qualifiedName // hint: default = qualified name (or from @SerialName) -> already covers kotlinx behaviour
+                var name = subtype.descriptiveName.full // hint: default = qualified name (or from @SerialName) -> already covers kotlinx behaviour
                 val jsonTypeInfo = typeData.annotations.find { it.name == JsonTypeInfo::class.qualifiedName }
                 val jsonSubTypes = typeData.annotations.find { it.name == JsonSubTypes::class.qualifiedName }
-                if(jsonTypeInfo != null) {
+                if (jsonTypeInfo != null) {
                     val mode = jsonTypeInfo.values["use"].toString()
-                    when(mode) {
-                        "CLASS" -> name = subtype.qualifiedName
+                    when (mode) {
+                        "CLASS" -> name = subtype.descriptiveName.full
                         "MINIMAL_CLASS" -> Unit
                         "NAME" -> jsonSubTypes?.also {
                             @Suppress("UNCHECKED_CAST")
                             val subtypeInfo = it.values["value"] as Array<JsonSubTypes.Type>
-                            name = subtypeInfo.find { i -> i.value.qualifiedName == subtype.qualifiedName }?.name ?: ""
+                            name = subtypeInfo.find { i -> i.value.qualifiedName == subtype.descriptiveName.full }?.name ?: ""
                         }
-                        "SIMPLE_NAME" -> name = subtype.simpleName
+                        "SIMPLE_NAME" -> name = subtype.descriptiveName.short
                         "NONE" -> Unit
                         "DEDUCTION" -> Unit
                         "CUSTOM" -> Unit
@@ -173,7 +168,7 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         }
     }
 
-    private fun getDiscriminatorName(typeData: ObjectTypeData): String? {
+    private fun getDiscriminatorName(typeData: TypeData): String? {
         val property = typeData.members.find { member ->
             member.annotations.any { it.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }
         }
@@ -181,7 +176,7 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
     }
 
 
-    private fun buildObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
+    private fun buildObjectSchema(typeData: TypeData, typeDataList: Collection<TypeData>): SwaggerSchema {
         if (typeData.isInlineValue) {
             return buildInlineObjectSchema(typeData, typeDataList)
         }
@@ -209,8 +204,8 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         )
     }
 
-    private fun buildInlineObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): SwaggerSchema {
-        val inlineType = typeData.members.first { it.kind == PropertyType.PROPERTY }
+    private fun buildInlineObjectSchema(typeData: TypeData, typeDataList: Collection<TypeData>): SwaggerSchema {
+        val inlineType = typeData.members.first { it.kind == MemberKind.PROPERTY }
         val inlineTypeData = typeDataList.find { it.id == inlineType.type }
             ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
         val inlineTypeSchema = generate(inlineTypeData, typeDataList)
@@ -220,12 +215,12 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         )
     }
 
-    private fun collectMembers(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): List<PropertyData> {
+    private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {
         return buildList {
             addAll(typeData.members)
             typeData.supertypes.forEach { supertypeId ->
                 val supertype = typeDataList.find { it.id == supertypeId }
-                if (supertype is ObjectTypeData) {
+                if (supertype != null) {
                     addAll(collectMembers(supertype, typeDataList))
                 }
             }

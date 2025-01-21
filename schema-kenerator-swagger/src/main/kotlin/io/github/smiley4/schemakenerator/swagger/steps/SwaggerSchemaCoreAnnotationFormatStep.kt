@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Format
-import old.AnnotationData
-import old.BaseTypeData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
@@ -12,7 +12,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUt
  */
 class SwaggerSchemaCoreAnnotationFormatStep : AbstractSwaggerSchemaStep() {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.swagger.format == null) {
             determineFormat(schema.typeData.annotations)?.also { format ->
                 schema.swagger.format = format

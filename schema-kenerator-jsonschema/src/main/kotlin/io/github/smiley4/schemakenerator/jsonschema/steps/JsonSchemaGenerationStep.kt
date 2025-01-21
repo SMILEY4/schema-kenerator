@@ -124,7 +124,9 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
 
     private fun buildEnumSchema(typeData: TypeData): JsonSchema {
         return JsonSchema(
-            json = schemaUtils.enumSchema(typeData.enumData?.constants ?: emptyList()),
+            json = schemaUtils.enumSchema(
+                values = typeData.enumData?.constants ?: emptyList()
+            ),
             typeData = typeData
         )
     }

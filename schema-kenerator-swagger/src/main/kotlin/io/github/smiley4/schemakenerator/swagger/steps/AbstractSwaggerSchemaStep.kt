@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 abstract class AbstractSwaggerSchemaStep {
@@ -15,6 +15,6 @@ abstract class AbstractSwaggerSchemaStep {
         }
     }
 
-    protected abstract fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>)
+    protected abstract fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>)
 
 }

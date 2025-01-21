@@ -41,6 +41,14 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
         )
     }
 
+
+    /**
+     * Handles a schema object referencing another schema using a temporary reference path.
+     * @param refObj the object with the temporary reference path
+     * @param knownSchemas all known json schemas
+     * @param knownTypeData all known types
+     * @param definitions the current list of schemas in the definitions section. Add new ones to this list.
+     */
     private fun resolveReference(
         refObj: JsonObject,
         knownSchemas: List<JsonSchema>,
@@ -52,9 +60,9 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
             refObj
         } else {
             if (shouldReference(referencedSchema.json)) {
-                createReferencing(referencedSchema, knownSchemas, knownTypeData, definitions)
+                createRefProperty(referencedSchema, knownSchemas, knownTypeData, definitions)
             } else {
-                createInlining(refObj, referencedSchema)
+                createInlineProperty(refObj, referencedSchema)
             }
         }
     }
@@ -67,13 +75,15 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
      * @param knownTypeData all input type data
      * @param definitions json schema definitions section. Adds new referenced schemas.
      */
-    private fun createReferencing(
+    private fun createRefProperty(
         schema: JsonSchema,
         knownSchemas: List<JsonSchema>,
         knownTypeData: Map<TypeId, TypeData>,
         definitions: MutableMap<String, JsonNode>,
     ): JsonNode {
         val refPath = pathBuilder(schema.typeData, knownTypeData)
+        // todo: if ref path already exists (likely for kotlinx + generics) -> append random number -> store relation "random number / path" <-> type data for future re-use
+        //  => Map<typeId,refPath> -> check map before building new refPath, add newly built paths to this map
         if (!definitions.containsKey(refPath)) {
             definitions[refPath] = placeholder() // avoid infinite recursive loops
             definitions[refPath] = resolveReferences(schema.json) { resolveReference(it, knownSchemas, knownTypeData, definitions) }
@@ -87,7 +97,7 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
      * @param refObj the schema containing the reference
      * @param schema the schema referenced by [refObj]
      */
-    private fun createInlining(refObj: JsonObject, schema: JsonSchema): JsonNode {
+    private fun createInlineProperty(refObj: JsonObject, schema: JsonSchema): JsonNode {
         return schema.json.copyNode().also {
             if (it is JsonObject) {
                 it.properties.putAll(buildMap {

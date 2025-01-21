@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.shouldReference
@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils
  * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
  * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
  */
-class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String) {
+class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -38,8 +38,6 @@ class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: Base
                 componentSchemas = result.componentSchemas
             )
         }
-
     }
-
 
 }

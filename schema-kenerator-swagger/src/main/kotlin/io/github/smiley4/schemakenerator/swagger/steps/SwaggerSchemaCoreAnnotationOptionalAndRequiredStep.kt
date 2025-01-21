@@ -2,9 +2,9 @@ package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Optional
 import io.github.smiley4.schemakenerator.core.annotations.Required
-import old.BaseTypeData
-import old.PropertyData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 
@@ -13,7 +13,7 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUt
  */
 class SwaggerSchemaCoreAnnotationOptionalAndRequiredStep : AbstractSwaggerSchemaStep() {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         iterateProperties(schema, typeDataMap) { _, propData, _ ->
             determineRequired(propData)?.also { required ->
                 if (required) {
@@ -25,7 +25,7 @@ class SwaggerSchemaCoreAnnotationOptionalAndRequiredStep : AbstractSwaggerSchema
         }
     }
 
-    private fun determineRequired(typeData: PropertyData): Boolean? {
+    private fun determineRequired(typeData: MemberData): Boolean? {
         if (typeData.annotations.any { it.name == Required::class.qualifiedName }) {
             return true
         }

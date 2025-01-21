@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.copyTypeToTypes
@@ -16,7 +16,7 @@ import io.swagger.v3.oas.models.media.Schema
  * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
  * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
  */
-class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String) {
+class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -25,17 +25,17 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
      * Put referenced schemas into definitions and reference them
      */
     fun compile(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-        val schemaList = bundle.flatten()
-        val typeDataMap = bundle.buildTypeDataMap()
+        val knownSchemas = bundle.flatten()
+        val knownTypeData = bundle.buildTypeDataMap()
         val components = mutableMapOf<String, Schema<*>>()
 
-        copyTypeToTypes(schemaList)
+        copyTypeToTypes(knownSchemas)
 
         val root = resolveReferences(bundle.data.swagger) { refObj ->
-            resolve(refObj, schemaList, typeDataMap, components)
+            resolveReference(refObj, knownSchemas, knownTypeData, components)
         }
 
-        handleDiscriminatorMappings(root, components, typeDataMap)
+        handleDiscriminatorMappings(root, components, knownTypeData)
 
         return CompiledSwaggerSchema(
             typeData = bundle.data.typeData,
@@ -44,17 +44,24 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
         )
     }
 
-    private fun resolve(
+
+    /**
+     * Handles a schema object referencing another schema using a temporary reference path.
+     * @param refObj the object with the temporary reference path
+     * @param knownSchemas all known swagger schemas
+     * @param knownTypeData all known types
+     * @param components the current list of schemas in the components section. Add new ones to this list.
+     */
+    private fun resolveReference(
         refObj: Schema<*>,
-        schemaList: List<SwaggerSchema>,
-        typeDataMap: Map<TypeId, BaseTypeData>,
+        knownSchemas: List<SwaggerSchema>,
+        knownTypeData: Map<TypeId, TypeData>,
         components: MutableMap<String, Schema<*>>
     ): Schema<*> {
-        val referencedId = TypeId.parse(refObj.`$ref`)
-        val referencedSchema = schemaList.find(referencedId)
+        val referencedSchema = knownSchemas.find(TypeId(refObj.`$ref`))
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
-                createRefProperty(refObj, schemaList, typeDataMap, components, referencedSchema)
+                createRefProperty(refObj, referencedSchema, knownSchemas, knownTypeData, components)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
@@ -63,28 +70,44 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
         }
     }
 
+
+    /**
+     * Create a swagger-schema with a proper reference to replace the pending referencing schema.
+     * @param refObj the object with the temporary reference path
+     * @param schema the referenced schema
+     * @param knownSchemas all input json schemas
+     * @param knownTypeData all input type data
+     * @param components swagger schema components section. Adds new referenced schemas.
+     */
     private fun createRefProperty(
         refObj: Schema<*>,
-        schemaList: List<SwaggerSchema>,
-        typeDataMap: Map<TypeId, BaseTypeData>,
+        schema: SwaggerSchema,
+        knownSchemas: List<SwaggerSchema>,
+        knownTypeData: Map<TypeId, TypeData>,
         components: MutableMap<String, Schema<*>>,
-        referencedSchema: SwaggerSchema
     ): Schema<*> {
-        val refPath = pathBuilder(referencedSchema.typeData, typeDataMap)
+        val refPath = pathBuilder(schema.typeData, knownTypeData)
+        // todo: if ref path already exists (likely for kotlinx + generics) -> append random number -> store relation "random number / path" <-> type data for future re-use
+        //  => Map<typeId,refPath> -> check map before building new refPath, add newly built paths to this map
         if (!components.containsKey(refPath)) {
             components[refPath] = placeholder() // break out of infinite loops
-            components[refPath] = resolveReferences(referencedSchema.swagger) { resolve(it, schemaList, typeDataMap, components) }
+            components[refPath] = resolveReferences(schema.swagger) { resolveReference(it, knownSchemas, knownTypeData, components) }
         }
-        if (refObj.nullable == true) {
-            return schemaUtils.referenceSchemaNullable(refPath, true)
+        return if (refObj.nullable == true) {
+            schemaUtils.referenceSchemaNullable(refPath, true)
         } else {
-            return schemaUtils.referenceSchema(refPath, true)
+            schemaUtils.referenceSchema(refPath, true)
         }
     }
 
 
-    private fun createInlineProperty(refObj: Schema<*>, referencedSchema: SwaggerSchema): Schema<*> {
-        return merge(refObj, referencedSchema.swagger).also {
+    /**
+     * Create an inline swagger-schema to replace the pending referencing schema.
+     * @param refObj the schema containing the reference
+     * @param schema the schema referenced by [refObj]
+     */
+    private fun createInlineProperty(refObj: Schema<*>, schema: SwaggerSchema): Schema<*> {
+        return merge(refObj, schema.swagger).also {
             if (it.nullable == true) {
                 it.nullable = null
                 it.types = setOf("null") + it.types
@@ -95,30 +118,48 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: BaseType
         }
     }
 
+
+    /**
+     * Replace temporary reference paths in discriminator mappings
+     * @param root the root schema
+     * @param components swagger schema components section. Adds new referenced schemas.
+     * @param knownTypeData all input type data
+     */
     private fun handleDiscriminatorMappings(
         root: Schema<*>,
         components: MutableMap<String, Schema<*>>,
-        typeDataMap: Map<TypeId, BaseTypeData>
+        knownTypeData: Map<TypeId, TypeData>
     ) {
-        handleDiscriminatorMappings(root, typeDataMap)
-        components.forEach { (_, schema) -> handleDiscriminatorMappings(schema, typeDataMap) }
+        handleDiscriminatorMappings(root, knownTypeData)
+        components.forEach { (_, schema) -> handleDiscriminatorMappings(schema, knownTypeData) }
     }
 
-    private fun handleDiscriminatorMappings(swaggerSchema: Schema<*>, typeDataMap: Map<TypeId, BaseTypeData>) {
-        if (swaggerSchema.discriminator?.mapping == null) {
+
+    /**
+     * Replace temporary reference paths in discriminator mappings
+     * @param schema the current schema to process
+     * @param knownTypeData all input type data
+     */
+    private fun handleDiscriminatorMappings(schema: Schema<*>, knownTypeData: Map<TypeId, TypeData>) {
+        if (schema.discriminator?.mapping == null) {
             return
         }
-        swaggerSchema.discriminator.mapping = swaggerSchema.discriminator.mapping.mapValues { (_, target) ->
-            val referencedId = TypeId.parse(target)
-            val referencedType = typeDataMap[referencedId]!!
-            schemaUtils.componentReference(pathBuilder(referencedType, typeDataMap))
+        schema.discriminator.mapping = schema.discriminator.mapping.mapValues { (_, target) ->
+            val referencedType = knownTypeData[TypeId(target)]!!
+            schemaUtils.componentReference(pathBuilder(referencedType, knownTypeData))
         }
     }
 
+
+    /**
+     * @return a placeholder schema object
+     */
     private fun placeholder() = Schema<Any>()
 
-    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? {
-        return this.find { it.typeData.id == id }
-    }
+
+    /**
+     * @return the [SwaggerSchema] for the given [TypeId]
+     */
+    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? = this.find { it.typeData.id == id }
 
 }

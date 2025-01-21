@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger
 
-import old.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import old.PropertyData
-import old.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
@@ -11,7 +11,6 @@ import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerMergePropertyAttributesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationTypeHintStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
@@ -52,11 +51,11 @@ class SwaggerSchemaGenerationStepConfig {
 /**
  * See [SwaggerSchemaGenerationStep]
  */
-fun Bundle<BaseTypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): Bundle<SwaggerSchema> {
+fun Bundle<TypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): Bundle<SwaggerSchema> {
     val config = SwaggerSchemaGenerationStepConfig().apply(configBlock)
     return SwaggerSchemaGenerationStep(
         optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED,
-    ).generate(this)
+    ).process(this)
 }
 
 
@@ -87,7 +86,7 @@ fun Bundle<SwaggerSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<Sw
 /**
  * See [SwaggerSchemaTitleStep]
  */
-fun Bundle<SwaggerSchema>.withTitle(builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String): Bundle<SwaggerSchema> {
+fun Bundle<SwaggerSchema>.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): Bundle<SwaggerSchema> {
     return SwaggerSchemaTitleStep(builder).process(this)
 }
 
@@ -107,14 +106,6 @@ fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
         .let { SwaggerSchemaCoreAnnotationTitleStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationFormatStep().process(this) }
         .let { SwaggerSchemaCoreAnnotationTypeStep().process(this) }
-}
-
-
-/**
- * See [SwaggerSchemaAnnotationTypeHintStep]
- */
-fun Bundle<SwaggerSchema>.handleSwaggerAnnotations(): Bundle<SwaggerSchema> {
-    return SwaggerSchemaAnnotationTypeHintStep().process(this)
 }
 
 
@@ -163,7 +154,7 @@ fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.OPENAPI
  * See [SwaggerSchemaCompileReferenceStep]
  */
 fun Bundle<SwaggerSchema>.compileReferencing(
-    builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String
+    builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledSwaggerSchema {
     return SwaggerSchemaCompileReferenceStep(builder).compile(this)
 }
@@ -188,7 +179,7 @@ fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.OPE
  * See [SwaggerSchemaCompileReferenceRootStep]
  */
 fun Bundle<SwaggerSchema>.compileReferencingRoot(
-    builder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String
+    builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledSwaggerSchema {
     return SwaggerSchemaCompileReferenceRootStep(builder).compile(this)
 }
@@ -198,7 +189,7 @@ fun Bundle<SwaggerSchema>.compileReferencingRoot(
  * See [SwaggerSchemaCustomizeStep.customizeTypes]
  */
 fun Bundle<SwaggerSchema>.customizeTypes(
-    action: (typeData: BaseTypeData, typeSchema: Schema<*>) -> Unit
+    action: (typeData: TypeData, typeSchema: Schema<*>) -> Unit
 ): Bundle<SwaggerSchema> {
     return SwaggerSchemaCustomizeStep().customizeTypes(this, action)
 }
@@ -208,7 +199,7 @@ fun Bundle<SwaggerSchema>.customizeTypes(
  * See [SwaggerSchemaCustomizeStep.customizeProperties]
  */
 fun Bundle<SwaggerSchema>.customizeProperties(
-    action: (propertyData: PropertyData, propertySchema: Schema<*>) -> Unit
+    action: (propertyData: MemberData, propertySchema: Schema<*>) -> Unit
 ): Bundle<SwaggerSchema> {
     return SwaggerSchemaCustomizeStep().customizeProperties(this, action)
 }
