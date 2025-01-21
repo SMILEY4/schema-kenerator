@@ -3,6 +3,7 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty

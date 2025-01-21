@@ -2,7 +2,6 @@
 
 package io.github.smiley4.schemakenerator.serialization.steps
 
-import com.sun.tools.javac.tree.TreeInfo.fullName
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
@@ -718,8 +717,8 @@ class KotlinxSerializationTypeProcessingStep(
      * @return a [TypeName] for this class
      */
     private fun SerialDescriptor.toTypeName() = TypeName(
-        full = this.shortName(),
-        short = this.fullName(),
+        full = this.fullName(),
+        short = this.shortName(),
     )
 
     /**

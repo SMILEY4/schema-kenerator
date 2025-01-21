@@ -34,8 +34,8 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
             typeData.collectionData != null -> buildCollectionSchema(typeData)
             typeData.mapData != null -> buildMapSchema(typeData)
             typeData.id == TypeId.WILDCARD -> buildAnySchema()
-            typeData.members.isEmpty() && typeData.supertypes.isEmpty() -> buildPrimitiveSchema(typeData)
-            else -> buildObjectSchema(typeData, typeDataList)
+            typeData.members.isNotEmpty() -> buildObjectSchema(typeData, typeDataList)
+            else -> buildPrimitiveSchema(typeData) ?: buildObjectSchema(typeData, typeDataList)
         }
     }
 
@@ -45,7 +45,7 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
 
 
     @Suppress("LongMethod")
-    private fun buildPrimitiveSchema(typeData: TypeData): JsonSchema {
+    private fun buildPrimitiveSchema(typeData: TypeData): JsonSchema? {
         return when (typeData.identifyingName.full) {
             Number::class.qualifiedName -> schemaUtils.numericSchema(
                 integer = false,
@@ -113,8 +113,8 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
             )
             Any::class.qualifiedName -> schemaUtils.anyObjectSchema()
             Unit::class.qualifiedName -> schemaUtils.nullSchema()
-            else -> schemaUtils.nullSchema()
-        }.let {
+            else -> null
+        }?.let {
             JsonSchema(
                 json = it,
                 typeData = typeData

@@ -39,8 +39,8 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
             typeData.collectionData != null -> buildCollectionSchema(typeData)
             typeData.mapData != null -> buildMapSchema(typeData)
             typeData.id == TypeId.WILDCARD -> buildAnySchema()
-            typeData.members.isEmpty() && typeData.supertypes.isEmpty() -> buildPrimitiveSchema(typeData)
-            else -> buildObjectSchema(typeData, typeDataList)
+            typeData.members.isNotEmpty() -> buildObjectSchema(typeData, typeDataList)
+            else -> buildPrimitiveSchema(typeData) ?: buildObjectSchema(typeData, typeDataList)
         }
     }
 
@@ -48,7 +48,7 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         return SwaggerSchema(schema.anyObjectSchema(), TypeData.createWildcard())
     }
 
-    private fun buildPrimitiveSchema(typeData: TypeData): SwaggerSchema {
+    private fun buildPrimitiveSchema(typeData: TypeData): SwaggerSchema? {
         return when (typeData.identifyingName.full) {
             Number::class.qualifiedName -> schema.numberSchema(false)
             Byte::class.qualifiedName -> schema.numericSchema(
@@ -92,8 +92,8 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
             )
             Any::class.qualifiedName -> schema.anyObjectSchema()
             Unit::class.qualifiedName -> schema.nullSchema()
-            else -> schema.nullSchema()
-        }.let {
+            else -> null
+        }?.let {
             SwaggerSchema(
                 swagger = it,
                 typeData = typeData
