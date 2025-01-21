@@ -12,6 +12,8 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileUtils.shouldReference
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 /**
  * Resolves references in prepared json-schemas by collecting them in the definitions-section and referencing them.
@@ -29,9 +31,10 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
         val knownSchemas = bundle.flatten()
         val knownTypeData = bundle.buildTypeDataMap()
         val definitions = mutableMapOf<String, JsonNode>()
+        val refPathMapping = mutableMapOf<TypeId, String>()
 
         val root = resolveReferences(bundle.data.json) { refObj ->
-            resolveReference(refObj, knownSchemas, knownTypeData, definitions)
+            resolveReference(refObj, knownSchemas, knownTypeData, refPathMapping, definitions)
         }
 
         return CompiledJsonSchema(
@@ -47,12 +50,14 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
      * @param refObj the object with the temporary reference path
      * @param knownSchemas all known json schemas
      * @param knownTypeData all known types
+     * @param refPathMapping already mapped reference paths for types. Add new paths to this map.
      * @param definitions the current list of schemas in the definitions section. Add new ones to this list.
      */
     private fun resolveReference(
         refObj: JsonObject,
         knownSchemas: List<JsonSchema>,
         knownTypeData: Map<TypeId, TypeData>,
+        refPathMapping: MutableMap<TypeId, String>,
         definitions: MutableMap<String, JsonNode>
     ): JsonNode {
         val referencedSchema = knownSchemas.find(TypeId((refObj.properties["\$ref"] as JsonTextValue).value))
@@ -60,7 +65,7 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
             refObj
         } else {
             if (shouldReference(referencedSchema.json)) {
-                createRefProperty(referencedSchema, knownSchemas, knownTypeData, definitions)
+                createRefProperty(referencedSchema, knownSchemas, knownTypeData, refPathMapping, definitions)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
@@ -73,20 +78,33 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
      * @param schema the referenced schema
      * @param knownSchemas all input json schemas
      * @param knownTypeData all input type data
+     * @param refPathMapping already mapped reference paths for types. Add new paths to this map.
      * @param definitions json schema definitions section. Adds new referenced schemas.
      */
     private fun createRefProperty(
         schema: JsonSchema,
         knownSchemas: List<JsonSchema>,
         knownTypeData: Map<TypeId, TypeData>,
+        refPathMapping: MutableMap<TypeId, String>,
         definitions: MutableMap<String, JsonNode>,
     ): JsonNode {
-        val refPath = pathBuilder(schema.typeData, knownTypeData)
-        // todo: if ref path already exists (likely for kotlinx + generics) -> append random number -> store relation "random number / path" <-> type data for future re-use
-        //  => Map<typeId,refPath> -> check map before building new refPath, add newly built paths to this map
-        if (!definitions.containsKey(refPath)) {
-            definitions[refPath] = placeholder() // avoid infinite recursive loops
-            definitions[refPath] = resolveReferences(schema.json) { resolveReference(it, knownSchemas, knownTypeData, definitions) }
+        val refPath = if(refPathMapping.containsKey(schema.typeData.id)) {
+            refPathMapping[schema.typeData.id]!!
+        } else {
+            var newRefPath = pathBuilder(schema.typeData, knownTypeData)
+            if(definitions.containsKey(newRefPath)) {
+                newRefPath += Random.nextInt(100..999) // todo: generate better random suffix
+            }
+            refPathMapping[schema.typeData.id] = newRefPath
+            definitions[newRefPath] = placeholder() // avoid infinite recursive loops
+            definitions[newRefPath] = resolveReferences(schema.json) { resolveReference(
+                it,
+                knownSchemas,
+                knownTypeData,
+                refPathMapping,
+                definitions
+            ) }
+            newRefPath
         }
         return schemaUtils.referenceSchema(refPath, true)
     }

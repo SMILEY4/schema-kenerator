@@ -4,8 +4,6 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import kotlin.math.abs
-import kotlin.random.Random
 
 /**
  * Merge the attributes of a property into the referenced type.
@@ -41,7 +39,7 @@ class SwaggerMergePropertyAttributesStep {
                     val derivedPropertySchema = SwaggerSchemaCompileUtils.copy(propertyData.swagger)
                     SwaggerSchemaCompileUtils.mergeInto(property, derivedPropertySchema)
                     resultingSchemas.add(SwaggerSchema(derivedPropertySchema, derivedPropertyTypeData))
-                    property.`$ref` = derivedId.id
+                    property.`raw$ref`(derivedId.id)
                 }
             }
         return resultingSchemas
