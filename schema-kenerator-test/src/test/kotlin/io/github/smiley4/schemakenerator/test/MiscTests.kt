@@ -237,7 +237,7 @@ class MiscTests : FreeSpec({
         }
     }
 
-    "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties"- {
+    "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties" - {
 
         "custom renameing (adding prefix)" {
             val result = typeOf<TestClassIssue18>()
@@ -308,7 +308,7 @@ class MiscTests : FreeSpec({
             .processReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
-                if(propertyData.name == "describeMe" && propertySchema is JsonObject) {
+                if (propertyData.name == "describeMe" && propertySchema is JsonObject) {
                     propertySchema.properties["description"] = JsonTextValue("test description")
                 }
             }
@@ -425,7 +425,7 @@ class MiscTests : FreeSpec({
 
     }
 
-    "copy swagger field 'type' to 'types'"- {
+    "copy swagger field 'type' to 'types'" - {
 
         "inlining" {
 
@@ -483,7 +483,7 @@ class MiscTests : FreeSpec({
 
         val componentSchemasCleanIds: Map<String, Schema<*>> = result.componentSchemas
             .map { (key, value) ->
-                if(key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18")) {
+                if (key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18")) {
                     if (value.types.contains("type-a")) {
                         return@map "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A" to value
                     }
@@ -491,7 +491,7 @@ class MiscTests : FreeSpec({
                         return@map "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B" to value
                     }
                 }
-                if(key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields")) {
+                if (key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields")) {
                     value.properties["fieldA"]?.`$ref` = "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A"
                     value.properties["fieldB"]?.`$ref` = "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B"
                 }
@@ -572,6 +572,72 @@ class MiscTests : FreeSpec({
 
     }
 
+    "generic nested classes with nullable type parameter" - {
+
+        // todo: case did not work before -> "value" was not nullable
+
+        "reflection" {
+            val result = typeOf<GenericClass<String?>>()
+                .processReflection()
+                .generateSwaggerSchema()
+                .compileInlining()
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "nested": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "null",
+                                "string"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "nested"
+                      ]
+                    }
+                """.trimIndent()
+            }
+        }
+
+        "kotlinx-serialization" {
+            val result = typeOf<GenericClass<String?>>()
+                .processKotlinxSerialization()
+                .generateSwaggerSchema()
+                .compileInlining()
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "nested": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "null",
+                                "string"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "nested"
+                      ]
+                    }
+                """.trimIndent()
+            }
+        }
+
+    }
+
 }) {
 
     companion object {
@@ -611,6 +677,7 @@ class MiscTests : FreeSpec({
             val password: String?
         )
 
+
         @Serializable
         data class TestClassIssue18(
             val nameOfPerson: String,
@@ -619,7 +686,7 @@ class MiscTests : FreeSpec({
 
         sealed class SealedClassIssue39
 
-        class AIssue39: SealedClassIssue39()
+        class AIssue39 : SealedClassIssue39()
 
         class BIssue39(val a: SealedClassIssue39?)
 
@@ -633,6 +700,13 @@ class MiscTests : FreeSpec({
             val fieldB: TestClassIssue18
         )
 
+
+        @Serializable
+        data class GenericClass<T>(val nested: NestedGenericClass<T>)
+
+
+        @Serializable
+        data class NestedGenericClass<T>(val value: T)
 
     }
 

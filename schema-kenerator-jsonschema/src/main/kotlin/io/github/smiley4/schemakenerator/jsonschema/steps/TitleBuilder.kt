@@ -11,7 +11,7 @@ object TitleBuilder {
     val BUILDER_FULL: (schema: TypeData, types: Map<TypeId, TypeData>) -> String = { type, types -> buildFull(type, types) }
 
     private fun buildSimple(type: TypeData, types: Map<TypeId, TypeData>): String {
-        return buildString { // todo: resolve collisions -> esp. with kotlinx
+        return buildString {
             append(type.descriptiveName.short)
             if(type.typeParameters.isNotEmpty()) {
                 append("<")
@@ -22,7 +22,7 @@ object TitleBuilder {
     }
 
     private fun buildFull(type: TypeData, types: Map<TypeId, TypeData>): String {
-        return buildString { // todo: resolve collisions -> esp. with kotlinx
+        return buildString {
             append(type.descriptiveName.full)
             if(type.typeParameters.isNotEmpty()) {
                 append("<")

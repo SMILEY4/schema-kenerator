@@ -437,7 +437,7 @@ class ReflectionTypeProcessingStep(
                 val typeParameter = knownTypeParameters.findOrThrow(classifier.name)
                 WrappedTypeId(
                     id = knownTypeData.findOrThrow(typeParameter.type).id,
-                    nullable = typeParameter.nullable // todo: before always "false" -> check if was a bug before, i.e. nested classes with generics & top level was nullable -> nested also nullable
+                    nullable = typeParameter.nullable
                 )
             }
             else -> throw IllegalArgumentException("Unhandled classifier type: '$classifier'.")
@@ -612,7 +612,7 @@ class ReflectionTypeProcessingStep(
                 val typeParameter = knownTypeParameters.findOrThrow(classifier.name)
                 WrappedTypeId(
                     id = knownTypeData.findOrThrow(typeParameter.type).id,
-                    nullable = typeParameter.nullable // todo: before always "false" -> check if was a bug before, i.e. nested classes with generics & top level was nullable -> nested also nullable
+                    nullable = typeParameter.nullable
                 )
             }
             else -> throw IllegalArgumentException("Unhandled classifier type")
@@ -826,7 +826,7 @@ class ReflectionTypeProcessingStep(
      */
     private fun parseAnnotation(annotation: Annotation): AnnotationData {
         return AnnotationData(
-            name = annotation.annotationClass.getSafeQualifiedName(), // todo: did not use "getSafeQualifiedName" before -> check if this was an error
+            name = annotation.annotationClass.getSafeQualifiedName(),
             values = annotation.annotationClass.members
                 .filterIsInstance<KProperty<*>>()
                 .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }

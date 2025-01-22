@@ -687,7 +687,7 @@ class KotlinxSerializationTypeProcessingStep(
      */
     private fun parseAnnotation(annotation: Annotation): AnnotationData {
         return AnnotationData(
-            name = annotation.annotationClass.getSafeQualifiedName(), // todo: did not use "getSafeQualifiedName" before -> check if this was an error
+            name = annotation.annotationClass.getSafeQualifiedName(),
             values = annotation.annotationClass.members
                 .filterIsInstance<KProperty<*>>()
                 .filter { it.javaField?.let { jf -> !Modifier.isStatic(jf.modifiers) } ?: true }
