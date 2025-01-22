@@ -82,7 +82,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                     ],
                     "properties": {
                         "dateTime": {
-                            "type": "date",
+                            "type": "string",
                             "title": "java.time.LocalDateTime"
                         }
                     },
@@ -155,7 +155,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                   "type": "object",
                   "properties": {
                     "dateTime": {
-                      "type": "date",
+                      "type": "string",
                       "title": "java.time.LocalDateTime"
                     }
                   },
