@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.core.data
 
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import kotlin.reflect.KType
 
 /**
@@ -10,18 +12,33 @@ data class Bundle<T>(
     val supporting: List<T>
 )
 
+
+/**
+ * Flattens this bundle by merging [Bundle.data] and [Bundle.supporting] into a single list
+ */
 fun <T> Bundle<T>.flatten(): List<T> = listOf(data) + supporting
 
 
-fun Bundle<BaseTypeData>.flattenToMap(): Map<TypeId, BaseTypeData> = flatten().associateBy { it.id }
+/**
+ * Flattens this bundle by merging [Bundle.data] and [Bundle.supporting] into a single map with the [TypeData.id] as keys.
+ */
+fun Bundle<TypeData>.flattenToMap(): Map<TypeId, TypeData> = flatten().associateBy { it.id }
 
-fun <T,R> Bundle<T>.map(transform: (T) -> R): Bundle<R> {
+
+/**
+ * Map all content of this bundle by applying the given transform.
+ */
+fun <T, R> Bundle<T>.map(transform: (T) -> R): Bundle<R> {
     return Bundle(
         data = transform(data),
         supporting = supporting.map(transform),
     )
 }
 
+
+/**
+ * Map all content of this bundle from [KType] to [InputType] (i.e. [KTypeInput]).
+ */
 fun Bundle<KType>.mapToInputType(): Bundle<InputType> {
     return this.map { KTypeInput(it) }
 }

@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jackson.jsonschema.steps
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.steps.AbstractJsonSchemaStep
@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUt
  */
 class JacksonJsonSchemaPropertyDescriptionStep : AbstractJsonSchemaStep() {
 
-    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
             getDescription(propData.annotations + propTypeData.annotations)?.also { description ->
                 prop.properties["description"] = JsonTextValue(description)

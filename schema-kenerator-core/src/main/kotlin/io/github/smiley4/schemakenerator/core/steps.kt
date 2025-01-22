@@ -1,56 +1,48 @@
 package io.github.smiley4.schemakenerator.core
 
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.steps.AddAnnotationsStep
 import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
-import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
-import io.github.smiley4.schemakenerator.core.steps.MergeGettersStep
-import io.github.smiley4.schemakenerator.core.steps.RenamePropertiesStep
+import io.github.smiley4.schemakenerator.core.steps.AddMissingSubtypeSupertypeRelations
+import io.github.smiley4.schemakenerator.core.steps.GettersToPropertiesStep
+import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
 import io.github.smiley4.schemakenerator.core.steps.RenameTypesStep
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 
 /**
- * See [ConnectSubTypesStep]
+ * See [AddMissingSubtypeSupertypeRelations]
  */
-fun Bundle<BaseTypeData>.connectSubTypes(): Bundle<BaseTypeData> {
-    return ConnectSubTypesStep().process(this)
+fun Bundle<TypeData>.addMissingSupertypeSubtypeRelations(): Bundle<TypeData> { // todo: renamed from connectSubTypes
+    return AddMissingSubtypeSupertypeRelations().process(this)
 }
+
 
 /**
  * See [RenameTypesStep]
  */
-fun Bundle<BaseTypeData>.handleNameAnnotation(): Bundle<BaseTypeData> {
+fun Bundle<TypeData>.handleNameAnnotation(): Bundle<TypeData> {
     return RenameTypesStep().process(this)
 }
 
 
 /**
- * See [MergeGettersStep]
+ * See [GettersToPropertiesStep]
  */
-fun Bundle<BaseTypeData>.mergeGetters(): Bundle<BaseTypeData> {
-    return MergeGettersStep().process(this)
+fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> { // todo: renamed from  mergeGetters
+    return GettersToPropertiesStep().process(this)
 }
 
 
 /**
- * See [RenamePropertiesStep]
+ * See [RenameMembersStep]
  */
-fun Bundle<BaseTypeData>.renameProperties(rename: (name: String) -> String): Bundle<BaseTypeData> {
-    return RenamePropertiesStep(rename).process(this)
+fun Bundle<TypeData>.renameMembers(rename: (name: String) -> String): Bundle<TypeData> { // todo: renamed from renameProperties
+    return RenameMembersStep(rename).process(this)
 }
+
 
 /**
  * See [AddDiscriminatorStep]
  */
-fun Bundle<BaseTypeData>.addDiscriminatorProperty(discriminatorPropertyName: String = "type"): Bundle<BaseTypeData> {
+fun Bundle<TypeData>.addDiscriminatorProperty(discriminatorPropertyName: String = "type"): Bundle<TypeData> {
     return AddDiscriminatorStep(discriminatorPropertyName).process(this)
-}
-
-
-/**
- * See [AddAnnotationsStep]
- */
-fun Bundle<BaseTypeData>.addAnnotations(annotations: Collection<AnnotationData>): Bundle<BaseTypeData> {
-    return AddAnnotationsStep(annotations).process(this)
 }

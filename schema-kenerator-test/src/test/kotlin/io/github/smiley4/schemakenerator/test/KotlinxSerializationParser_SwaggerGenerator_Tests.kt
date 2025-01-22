@@ -1,26 +1,18 @@
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationFormatStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing

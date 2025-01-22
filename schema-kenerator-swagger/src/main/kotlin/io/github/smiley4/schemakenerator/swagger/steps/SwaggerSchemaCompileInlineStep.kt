@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.flatten
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.copyTypeToTypes
@@ -25,20 +25,11 @@ class SwaggerSchemaCompileInlineStep {
         val schemaList = bundle.flatten()
         copyTypeToTypes(schemaList)
         val root = resolveReferences(bundle.data.swagger) { refObj ->
-            val referencedId = TypeId.parse(refObj.`$ref`)
-            val referencedSchema = schemaList.find(referencedId)
-            if(referencedSchema != null) {
-                merge(refObj, referencedSchema.swagger).also {
-                    if(it.nullable == true) {
-                        it.nullable = null
-                        setNullable(it)
-                    }
-                    if(it.nullable == false) {
-                        it.nullable = null
-                    }
-                }
-            } else {
+            val referencedSchema = schemaList.find(TypeId(refObj.`$ref`))
+            if(referencedSchema == null) {
                 refObj
+            } else {
+                createInlining(refObj, referencedSchema)
             }
         }
         handleDiscriminatorMappings(root)
@@ -49,6 +40,27 @@ class SwaggerSchemaCompileInlineStep {
         )
     }
 
+    /**
+     * Create an inline swagger-schema to replace the pending referencing schema.
+     * @param refObj the schema containing the reference
+     * @param schema the schema referenced by [refObj]
+     */
+    private fun createInlining(refObj: Schema<*>, schema: SwaggerSchema): Schema<*> {
+        return merge(refObj, schema.swagger).also {
+            if(it.nullable == true) {
+                it.nullable = null
+                setNullable(it)
+            }
+            if(it.nullable == false) {
+                it.nullable = null
+            }
+        }
+    }
+
+
+    /**
+     * Mark the given schema as a nullable type
+     */
     private fun setNullable(schema: Schema<*>) {
         if(schema.types != null) {
             schema.types = setOf("null") + schema.types
@@ -61,6 +73,10 @@ class SwaggerSchemaCompileInlineStep {
         }
     }
 
+
+    /**
+     * Remove discriminator mappings -> not supported by when inlining
+     */
     private fun handleDiscriminatorMappings(root: Schema<*>) {
         iterate(root) {
             if(root.discriminator != null) {
@@ -70,8 +86,10 @@ class SwaggerSchemaCompileInlineStep {
         }
     }
 
-    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? {
-        return this.find { it.typeData.id == id }
-    }
+    /**
+     * @return the [JsonSchema] for the given [TypeId]
+     */
+    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? = this.find { it.typeData.id == id }
+
 
 }

@@ -1,13 +1,17 @@
 package io.github.smiley4.schemakenerator.serialization
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
-import io.github.smiley4.schemakenerator.core.steps.RenamePropertiesStep
+import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationCustomProcessor
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeMatcher
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.serialization.steps.fullName
+import io.github.smiley4.schemakenerator.serialization.steps.matches
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -21,30 +25,31 @@ import kotlin.reflect.typeOf
 /**
  * See [HandleJsonClassDiscriminatorStep]
  */
-fun Bundle<BaseTypeData>.addJsonClassDiscriminatorProperty(): Bundle<BaseTypeData> {
+fun Bundle<TypeData>.addJsonClassDiscriminatorProperty(): Bundle<TypeData> {
     return HandleJsonClassDiscriminatorStep().process(this)
 }
 
+
 /**
  * See [KotlinxSerializationTypeProcessingStep]
  */
-fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
     return KTypeInput(this).processKotlinxSerialization(configBlock)
 }
 
-/**
- * See [KotlinxSerializationTypeProcessingStep]
- */
-fun SerialDescriptor.processKotlinxSerialization(
-    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-): Bundle<BaseTypeData> {
-    return SerialDescriptorInput(this).processKotlinxSerialization(configBlock)
-}
 
 /**
  * See [KotlinxSerializationTypeProcessingStep]
  */
-fun InputType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun SerialDescriptor.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+    return SerialDescriptorInput(this).processKotlinxSerialization(configBlock)
+}
+
+
+/**
+ * See [KotlinxSerializationTypeProcessingStep]
+ */
+fun InputType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
@@ -58,9 +63,10 @@ fun InputType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeP
  * See [KotlinxSerializationTypeProcessingStep]
  */
 @JvmName("processKotlinxSerializationKType")
-fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
     return this.mapToInputType().processKotlinxSerialization(configBlock)
 }
+
 
 /**
  * See [KotlinxSerializationTypeProcessingStep]
@@ -68,16 +74,17 @@ fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationT
 @JvmName("processKotlinxSerializationSerialDescriptor")
 fun Bundle<SerialDescriptor>.processKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-): Bundle<BaseTypeData> {
+): Bundle<TypeData> {
     return this.mapToInputType().processKotlinxSerialization(configBlock)
 }
+
 
 /**
  * See [KotlinxSerializationTypeProcessingStep]
  */
 fun Bundle<InputType>.processKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-): Bundle<BaseTypeData> {
+): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
@@ -88,9 +95,9 @@ fun Bundle<InputType>.processKotlinxSerialization(
 
 class KotlinxSerializationTypeProcessingConfig {
 
-    var customProcessors = mutableMapOf<String, () -> BaseTypeData>()
+    var customProcessors = mutableListOf<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProcessor>>()
 
-    var typeRedirects = mutableMapOf<String, KType>()
+    var typeRedirects = mutableMapOf<String, InputType>()
 
     var knownNotParameterized = mutableSetOf<String>()
 
@@ -98,44 +105,28 @@ class KotlinxSerializationTypeProcessingConfig {
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
-    fun customProcessor(serializerName: String, processor: () -> BaseTypeData) {
-        customProcessors[serializerName] = processor
+    fun customProcessor(serializerName: String, processor: KotlinxSerializationCustomProcessor) {
+        customProcessors.add(
+            { descriptor: SerialDescriptor -> descriptor.fullName() == serializerName } to processor
+        )
     }
 
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
-    fun customProcessor(type: KClass<*>, processor: () -> BaseTypeData) {
-        customProcessors[type.qualifiedName ?: type.java.name] = processor
+    fun customProcessor(type: KClass<*>, processor: KotlinxSerializationCustomProcessor) {
+        customProcessors.add(
+            { descriptor: SerialDescriptor -> descriptor.matches(type) } to processor
+        )
     }
 
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
-    inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
+    inline fun <reified T> customProcessor(noinline processor: KotlinxSerializationCustomProcessor) {
         customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
-    }
-
-
-    /**
-     * Add custom processors for the given types that overwrites the default behaviour
-     */
-    @JvmName("customProcessors_serializerName")
-    fun customProcessors(processors: Map<String, () -> BaseTypeData>) {
-        customProcessors.putAll(processors)
-    }
-
-
-    /**
-     * Add custom processors for the given types that overwrites the default behaviour
-     */
-    @JvmName("customProcessors_type")
-    fun customProcessors(processors: Map<KClass<*>, () -> BaseTypeData>) {
-        processors.forEach { (k, v) ->
-            customProcessors[k.qualifiedName ?: k.java.name] = v
-        }
     }
 
 
@@ -143,7 +134,7 @@ class KotlinxSerializationTypeProcessingConfig {
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
      */
     fun redirect(from: String, to: KType) {
-        typeRedirects[from] = to
+        typeRedirects[from] = KTypeInput(to)
     }
 
 
@@ -155,7 +146,7 @@ class KotlinxSerializationTypeProcessingConfig {
         val idFrom = (clazz.qualifiedName ?: clazz.java.name).let {
             it + if (from.isMarkedNullable) "?" else ""
         }
-        typeRedirects[idFrom] = to
+        typeRedirects[idFrom] = KTypeInput(to)
     }
 
 
@@ -164,14 +155,6 @@ class KotlinxSerializationTypeProcessingConfig {
      */
     inline fun <reified FROM, reified TO> redirect() {
         redirect(typeOf<FROM>(), typeOf<TO>())
-    }
-
-
-    /**
-     * Redirect from the given types to the other given types, i.e. when a type is processed, the associated type is used instead.
-     */
-    fun redirect(redirects: Map<String, KType>) {
-        typeRedirects.putAll(redirects)
     }
 
 
@@ -207,12 +190,12 @@ class KotlinxSerializationTypeProcessingConfig {
 
 
 /**
- * See [RenamePropertiesStep].
+ * See [RenameMembersStep].
  * Note: no serial descriptor or element index will be passed to the naming strategy, only the serial name
  */
 @OptIn(ExperimentalSerializationApi::class)
-fun Bundle<BaseTypeData>.renameProperties(strategy: JsonNamingStrategy): Bundle<BaseTypeData> {
-    return RenamePropertiesStep { name ->
+fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> { // todo: was renamed from renameProperties
+    return RenameMembersStep { name ->
         strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
     }.process(this)
 }

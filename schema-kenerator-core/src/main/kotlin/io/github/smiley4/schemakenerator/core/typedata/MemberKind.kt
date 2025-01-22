@@ -1,9 +1,9 @@
-package io.github.smiley4.schemakenerator.core.data
+package io.github.smiley4.schemakenerator.core.typedata
 
 /**
- * The type of the property/member of a type
+ * The type of member
  */
-enum class PropertyType {
+enum class MemberKind {
 
     /**
      * the property is a field / kotlin-property

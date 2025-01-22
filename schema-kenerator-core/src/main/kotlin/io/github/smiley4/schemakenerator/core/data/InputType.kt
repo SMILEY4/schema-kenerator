@@ -1,7 +1,6 @@
 package io.github.smiley4.schemakenerator.core.data
 
-import kotlin.reflect.KType
-
+/**
+ * A generic type as input or origin for the pipeline.
+ */
 interface InputType
-
-class KTypeInput(val kType: KType) : InputType

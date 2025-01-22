@@ -3,11 +3,11 @@
 
 package io.github.smiley4.schemakenerator.examples
 
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.renameProperties
+import old.AnnotationData
+import old.ObjectTypeData
+import old.PrimitiveTypeData
+import old.TypeId
+import io.github.smiley4.schemakenerator.core.renameMembers
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.customizeTypes
@@ -20,7 +20,6 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.renameProperties
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.customizeProperties
 import io.github.smiley4.schemakenerator.swagger.customizeTypes
@@ -235,7 +234,7 @@ class E04_Customization : FreeSpec({
 
             val jsonSchema = typeOf<ExampleClass>()
                 .processReflection()
-                .renameProperties { originalName -> "prefix_$originalName" }
+                .renameMembers { originalName -> "prefix_$originalName" }
                 .generateJsonSchema()
                 .compileInlining()
                 .json.prettyPrint()
@@ -263,7 +262,7 @@ class E04_Customization : FreeSpec({
 
             val jsonSchema = typeOf<ExampleClass>()
                 .processReflection()
-                .renameProperties(JsonNamingStrategy.SnakeCase)
+                .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateJsonSchema()
                 .compileInlining()
                 .json.prettyPrint()

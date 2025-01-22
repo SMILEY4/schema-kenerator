@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.swagger.v3.oas.models.media.Discriminator
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
@@ -159,8 +159,7 @@ class SwaggerSchemaUtils {
                     it.propertyName = discriminator
                     it.mapping = buildMap {
                         discriminatorMapping.forEach { (typeId, name) ->
-                            val target = typeId.full()
-                            this[name] = target
+                            this[name] = typeId.id
                         }
                     }
                 }
@@ -181,21 +180,21 @@ class SwaggerSchemaUtils {
 
     fun componentReference(id: String) = "#/components/schemas/$id"
 
-    fun referenceSchema(id: TypeId, isInComponents: Boolean = false): Schema<*> {
-        return referenceSchema(id.full(), isInComponents)
+    fun referenceSchema(type: TypeId, prefixComponents: Boolean = false): Schema<*> {
+        return referenceSchema(type.id, prefixComponents)
     }
 
-    fun referenceSchema(id: String, isInComponents: Boolean = false): Schema<*> {
+    fun referenceSchema(refId: String, prefixComponents: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
-            schema.`raw$ref`(if (isInComponents) componentReference(id) else id)
+            schema.`raw$ref`(if (prefixComponents) componentReference(refId) else refId)
         }
     }
 
-    fun referenceSchemaNullable(id: String, isInComponents: Boolean = false): Schema<*> {
+    fun referenceSchemaNullable(refId: String, prefixComponents: Boolean = false): Schema<*> {
         return Schema<String>().also { schema ->
             schema.oneOf = buildList {
                 add(nullSchema())
-                add(referenceSchema(id, isInComponents))
+                add(referenceSchema(refId, prefixComponents))
             }
         }
     }

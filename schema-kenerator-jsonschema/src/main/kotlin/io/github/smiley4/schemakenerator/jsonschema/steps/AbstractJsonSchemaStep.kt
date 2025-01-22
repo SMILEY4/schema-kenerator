@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 
 abstract class AbstractJsonSchemaStep {
@@ -15,6 +15,6 @@ abstract class AbstractJsonSchemaStep {
         }
     }
 
-    protected abstract fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>)
+    protected abstract fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>)
 
 }

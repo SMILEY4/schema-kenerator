@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileUtils.shouldReference
@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileUtils
  * Resolves references in prepared json-schemas by collecting them in the definitions-section and referencing them.
  * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
  */
-class JsonSchemaCompileReferenceRootStep(private val pathBuilder: (type: BaseTypeData, types: Map<TypeId, BaseTypeData>) -> String) {
+class JsonSchemaCompileReferenceRootStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = JsonSchemaUtils()
 

@@ -1,14 +1,14 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 /**
- * Returns the [BaseTypeData] contained in this [Bundle] of [SwaggerSchema] as a map with the [TypeId] as key.
+ * Returns the [TypeData] contained in this [Bundle] of [SwaggerSchema] as a map with the [TypeId] as key.
  */
-fun Bundle<SwaggerSchema>.buildTypeDataMap(): Map<TypeId, BaseTypeData> {
+fun Bundle<SwaggerSchema>.buildTypeDataMap(): Map<TypeId, TypeData> {
     val bundle = this
     return buildMap {
         this[bundle.data.typeData.id] = bundle.data.typeData

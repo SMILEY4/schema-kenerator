@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.array
@@ -76,7 +76,6 @@ class JsonSchemaUtils {
             //"maxItems" to 10
             //"minItems" to 0
             //"maxItems" to 99
-
         }
     }
 
@@ -102,12 +101,12 @@ class JsonSchemaUtils {
 
     /**
      * Schema for a key-value-map object with the given schema for the values
-     * @param valueSchema the schema for the values
+     * @param values the schema for the values
      */
-    fun mapObjectSchema(valueSchema: JsonNode): JsonObject {
+    fun mapObjectSchema(values: JsonNode): JsonObject {
         return obj {
             "type" to "object"
-            "additionalProperties" to valueSchema
+            "additionalProperties" to values
         }
     }
 
@@ -147,13 +146,13 @@ class JsonSchemaUtils {
 
     //=====  REFERENCE ==============================
 
-    fun referenceSchema(id: TypeId, isInDefinitions: Boolean = false): JsonObject {
-        return referenceSchema(id.full(), isInDefinitions)
+    fun referenceSchema(type: TypeId, prefixDefinitions: Boolean = false): JsonObject {
+        return referenceSchema(type.id, prefixDefinitions)
     }
 
-    fun referenceSchema(id: String, isInDefinitions: Boolean = false): JsonObject {
+    fun referenceSchema(refId: String, prefixDefinitions: Boolean = false): JsonObject {
         return obj {
-            "\$ref" to if(isInDefinitions) "#/definitions/$id" else id
+            "\$ref" to if(prefixDefinitions) "#/definitions/$refId" else refId
         }
     }
 

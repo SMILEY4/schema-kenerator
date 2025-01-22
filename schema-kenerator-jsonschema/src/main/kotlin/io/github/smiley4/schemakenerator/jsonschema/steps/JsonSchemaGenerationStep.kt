@@ -1,15 +1,12 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
+import io.github.smiley4.schemakenerator.core.GenericBundleStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.CollectionTypeData
-import io.github.smiley4.schemakenerator.core.data.EnumTypeData
-import io.github.smiley4.schemakenerator.core.data.MapTypeData
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
-import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.data.flatten
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.MemberKind
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 
@@ -17,44 +14,40 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
  * Generates json-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
  * Result needs to be "compiled" to get the final json-schema.
  */
-class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) {
+class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) : GenericBundleStep<TypeData, JsonSchema> {
 
     private val schemaUtils = JsonSchemaUtils()
 
-    fun generate(bundle: Bundle<BaseTypeData>): Bundle<JsonSchema> {
-        val types = listOf(bundle.data) + bundle.supporting
+    override fun process(input: Bundle<TypeData>): Bundle<JsonSchema> {
+        val typeDataList = input.flatten()
         return Bundle(
-            data = generate(bundle.data, types),
-            supporting = bundle.supporting.map { generate(it, types) }
+            data = generate(input.data, typeDataList),
+            supporting = input.supporting.map { generate(it, typeDataList) }
         )
     }
 
-    private fun generate(typeData: BaseTypeData, typeDataList: Collection<BaseTypeData>): JsonSchema {
-        if (typeData is ObjectTypeData && typeData.subtypes.isNotEmpty()) {
+    private fun generate(typeData: TypeData, typeDataList: Collection<TypeData>): JsonSchema {
+        if (typeData.subtypes.isNotEmpty()) {
             return buildWithSubtypes(typeData)
         }
-        return when (typeData) {
-            is PrimitiveTypeData -> buildPrimitiveSchema(typeData)
-            is EnumTypeData -> buildEnumSchema(typeData)
-            is CollectionTypeData -> buildCollectionSchema(typeData)
-            is MapTypeData -> buildMapSchema(typeData)
-            is ObjectTypeData -> buildObjectSchema(typeData, typeDataList)
-            is WildcardTypeData -> buildAnySchema()
-            else -> JsonSchema(
-                json = schemaUtils.nullSchema(),
-                typeData = WildcardTypeData()
-            )
+        return when {
+            typeData.enumData != null -> buildEnumSchema(typeData)
+            typeData.collectionData != null -> buildCollectionSchema(typeData)
+            typeData.mapData != null -> buildMapSchema(typeData)
+            typeData.id == TypeId.WILDCARD -> buildAnySchema()
+            typeData.members.isNotEmpty() -> buildObjectSchema(typeData, typeDataList)
+            else -> buildPrimitiveSchema(typeData) ?: buildObjectSchema(typeData, typeDataList)
         }
     }
 
     private fun buildAnySchema(): JsonSchema {
-        return JsonSchema(schemaUtils.anyObjectSchema(), WildcardTypeData())
+        return JsonSchema(schemaUtils.anyObjectSchema(), TypeData.createWildcard())
     }
 
 
     @Suppress("LongMethod")
-    private fun buildPrimitiveSchema(typeData: PrimitiveTypeData): JsonSchema {
-        return when (typeData.qualifiedName) {
+    private fun buildPrimitiveSchema(typeData: TypeData): JsonSchema? {
+        return when (typeData.identifyingName.full) {
             Number::class.qualifiedName -> schemaUtils.numericSchema(
                 integer = false,
                 min = null,
@@ -121,8 +114,8 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
             )
             Any::class.qualifiedName -> schemaUtils.anyObjectSchema()
             Unit::class.qualifiedName -> schemaUtils.nullSchema()
-            else -> schemaUtils.nullSchema()
-        }.let {
+            else -> null
+        }?.let {
             JsonSchema(
                 json = it,
                 typeData = typeData
@@ -130,40 +123,44 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
         }
     }
 
-    private fun buildEnumSchema(typeData: EnumTypeData): JsonSchema {
+    private fun buildEnumSchema(typeData: TypeData): JsonSchema {
         return JsonSchema(
-            json = schemaUtils.enumSchema(typeData.enumConstants),
+            json = schemaUtils.enumSchema(
+                values = typeData.enumData?.constants ?: emptyList()
+            ),
             typeData = typeData
         )
     }
 
-    private fun buildCollectionSchema(typeData: CollectionTypeData): JsonSchema {
+    private fun buildCollectionSchema(typeData: TypeData): JsonSchema {
         return JsonSchema(
             json = schemaUtils.arraySchema(
-                schemaUtils.referenceSchema(typeData.itemType.type),
-                typeData.unique
+                items = schemaUtils.referenceSchema(typeData.collectionData!!.itemType.type),
+                uniqueItems = typeData.collectionData?.unique ?: false
             ),
             typeData = typeData
         )
     }
 
-    private fun buildMapSchema(typeData: MapTypeData): JsonSchema {
+    private fun buildMapSchema(typeData: TypeData): JsonSchema {
         return JsonSchema(
-            json = schemaUtils.mapObjectSchema(schemaUtils.referenceSchema(typeData.valueType.type)),
+            json = schemaUtils.mapObjectSchema(
+                values = schemaUtils.referenceSchema(typeData.mapData!!.valueType.type)
+            ),
             typeData = typeData
         )
     }
 
-    private fun buildWithSubtypes(typeData: ObjectTypeData): JsonSchema {
+    private fun buildWithSubtypes(typeData: TypeData): JsonSchema {
         return JsonSchema(
             json = schemaUtils.subtypesSchema(
-                typeData.subtypes.map { schemaUtils.referenceSchema(it.full()) }
+                subtypes = typeData.subtypes.map { schemaUtils.referenceSchema(it) }
             ),
             typeData = typeData
         )
     }
 
-    private fun buildObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): JsonSchema {
+    private fun buildObjectSchema(typeData: TypeData, typeDataList: Collection<TypeData>): JsonSchema {
         if (typeData.isInlineValue) {
             return buildInlineObjectSchema(typeData, typeDataList)
         }
@@ -186,8 +183,8 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
         )
     }
 
-    private fun buildInlineObjectSchema(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): JsonSchema {
-        val inlineType = typeData.members.first { it.kind == PropertyType.PROPERTY }
+    private fun buildInlineObjectSchema(typeData: TypeData, typeDataList: Collection<TypeData>): JsonSchema {
+        val inlineType = typeData.members.first { it.kind == MemberKind.PROPERTY }
         val inlineTypeData = typeDataList.find { it.id == inlineType.type }
             ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
         val inlineTypeSchema = generate(inlineTypeData, typeDataList)
@@ -197,14 +194,13 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
         )
     }
 
-    private fun collectMembers(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): List<PropertyData> {
+    private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {
         return buildList {
             addAll(typeData.members)
             typeData.supertypes.forEach { supertypeId ->
-                val supertype = typeDataList.find { it.id == supertypeId }
-                if (supertype is ObjectTypeData) {
-                    addAll(collectMembers(supertype, typeDataList))
-                }
+                typeDataList
+                    .find { it.id == supertypeId }
+                    ?.also { supertype -> addAll(collectMembers(supertype, typeDataList)) }
             }
         }
     }

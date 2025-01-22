@@ -6,7 +6,6 @@ import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
-import io.github.smiley4.schemakenerator.swagger.handleSwaggerAnnotations
 import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidationAnnotations
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.assertions.json.ArrayOrder
@@ -33,7 +32,6 @@ class SwaggerAnnotationsTest : StringSpec({
         val result = typeOf<MyTestClass>()
             .processReflection()
             .generateSwaggerSchema()
-            .handleSwaggerAnnotations()
             .handleSchemaAnnotations()
             .compileInlining()
         jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()

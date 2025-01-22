@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationUtils.iterateProperties
 import io.swagger.v3.oas.models.media.Schema
@@ -18,7 +18,7 @@ class SwaggerSchemaCustomizeStep {
      */
     fun customizeTypes(
         bundle: Bundle<SwaggerSchema>,
-        action: (typeData: BaseTypeData, typeSchema: Schema<*>) -> Unit
+        action: (typeData: TypeData, typeSchema: Schema<*>) -> Unit
     ): Bundle<SwaggerSchema> {
         return bundle.also { schema ->
             processTypes(schema.data, action)
@@ -26,7 +26,7 @@ class SwaggerSchemaCustomizeStep {
         }
     }
 
-    private fun processTypes(schema: SwaggerSchema, action: (typeData: BaseTypeData, typeSchema: Schema<*>) -> Unit) {
+    private fun processTypes(schema: SwaggerSchema, action: (typeData: TypeData, typeSchema: Schema<*>) -> Unit) {
         action(schema.typeData, schema.swagger)
     }
 
@@ -36,7 +36,7 @@ class SwaggerSchemaCustomizeStep {
      */
     fun customizeProperties(
         bundle: Bundle<SwaggerSchema>,
-        action: (propertyData: PropertyData, propertySchema: Schema<*>) -> Unit
+        action: (propertyData: MemberData, propertySchema: Schema<*>) -> Unit
     ): Bundle<SwaggerSchema> {
         val typeDataMap = bundle.buildTypeDataMap()
         return bundle.also { schema ->
@@ -47,8 +47,8 @@ class SwaggerSchemaCustomizeStep {
 
     private fun processProperties(
         schema: SwaggerSchema,
-        typeDataMap: Map<TypeId, BaseTypeData>,
-        action: (typeData: PropertyData, typeSchema: Schema<*>) -> Unit
+        typeDataMap: Map<TypeId, TypeData>,
+        action: (typeData: MemberData, typeSchema: Schema<*>) -> Unit
     ) {
         iterateProperties(schema, typeDataMap) { prop, propData, _ ->
             action(propData, prop)
@@ -61,7 +61,7 @@ class SwaggerSchemaCustomizeStep {
      */
     fun customizeProperties(
         bundle: Bundle<SwaggerSchema>,
-        action: (propertyData: PropertyData, propertyType: BaseTypeData, propertySchema: Schema<*>) -> Unit
+        action: (memberData: MemberData, memberTypeData: TypeData, propertySchema: Schema<*>) -> Unit
     ): Bundle<SwaggerSchema> {
         val typeDataMap = bundle.buildTypeDataMap()
         return bundle.also { schema ->
@@ -72,8 +72,8 @@ class SwaggerSchemaCustomizeStep {
 
     private fun processProperties(
         schema: SwaggerSchema,
-        typeDataMap: Map<TypeId, BaseTypeData>,
-        action: (typeData: PropertyData, propertyType: BaseTypeData, typeSchema: Schema<*>) -> Unit
+        typeDataMap: Map<TypeId, TypeData>,
+        action: (memberData: MemberData, memberTypeData: TypeData, typeSchema: Schema<*>) -> Unit
     ) {
         iterateProperties(schema, typeDataMap) { prop, propData, propType ->
             action(propData, propType, prop)

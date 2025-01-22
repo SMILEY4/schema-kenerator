@@ -6,9 +6,9 @@ package io.github.smiley4.schemakenerator.examples
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import old.ObjectTypeData
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
@@ -129,7 +129,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                     .processReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
-                    .connectSubTypes()
+                    .addMissingSupertypeSubtypeRelations()
 
                 println(extracted.data.simpleName + ": " + (extracted.data as ObjectTypeData).subtypes.map { it.simple() })           // -> "ParentManual: [ChildOne, ChildTwo]"
                 extracted.supporting.forEach { supporting -> println((supporting as ObjectTypeData).supertypes.map { it.simple() }) } // -> "[ParentManual]", "[ParentManual]"
@@ -154,7 +154,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                     .processReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
-                    .connectSubTypes()
+                    .addMissingSupertypeSubtypeRelations()
 
                 println(extracted.data.simpleName + ": " + (extracted.data as ObjectTypeData).subtypes.map { it.simple() })           // -> "ParentCore: [ChildOne, ChildTwo]"
                 extracted.supporting.forEach { supporting -> println((supporting as ObjectTypeData).supertypes.map { it.simple() }) } // -> "[ParentCore]", "[ParentCore]"
@@ -182,7 +182,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                     .processReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
-                    .connectSubTypes()
+                    .addMissingSupertypeSubtypeRelations()
 
                 println(extracted.data.simpleName + ": " + (extracted.data as ObjectTypeData).subtypes.map { it.simple() })           // -> "ParentJackson: [ChildOne, ChildTwo]"
                 extracted.supporting.forEach { supporting -> println((supporting as ObjectTypeData).supertypes.map { it.simple() }) } // -> "[ParentJackson]", "[ParentJackson]"

@@ -1,13 +1,13 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
-import io.github.smiley4.schemakenerator.core.data.PrimitiveTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProcessor
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES
@@ -22,6 +22,7 @@ fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
     return KTypeInput(this).collectSubTypes(maxRecursionDepth)
 }
 
+
 /**
  * See [ReflectionAnnotationSubTypeStep]
  */
@@ -34,7 +35,7 @@ fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
 
 class ReflectionTypeProcessingStepConfig {
 
-    var customProcessors = mutableMapOf<KClass<*>, () -> BaseTypeData>()
+    var customProcessors = mutableListOf<Pair<ReflectionTypeMatcher, ReflectionCustomProcessor>>()
 
     var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeProcessingStep.DEFAULT_REDIRECTS) }
 
@@ -84,24 +85,18 @@ class ReflectionTypeProcessingStepConfig {
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
-    fun customProcessor(type: KClass<*>, processor: () -> BaseTypeData) {
-        customProcessors[type] = processor
+    fun customProcessor(clazz: KClass<*>, processor: ReflectionCustomProcessor) {
+        customProcessors.add(
+            { _: KType, c: KClass<*> -> c == clazz } to processor
+        )
     }
 
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
      */
-    inline fun <reified T> customProcessor(noinline processor: () -> BaseTypeData) {
+    inline fun <reified T> customProcessor(noinline processor: ReflectionCustomProcessor) {
         customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
-    }
-
-
-    /**
-     * Add custom processors for given type that overwrites the default behaviour
-     */
-    fun customProcessors(processors: Map<KClass<*>, () -> BaseTypeData>) {
-        customProcessors.putAll(processors)
     }
 
 
@@ -129,17 +124,19 @@ class ReflectionTypeProcessingStepConfig {
     }
 }
 
-/**
- * See [ReflectionTypeProcessingStep]
- */
-fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
-    return KTypeInput(this).processReflection(configBlock)
-}
 
 /**
  * See [ReflectionTypeProcessingStep]
  */
-fun InputType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
+    return KTypeInput(this).processReflection(configBlock)
+}
+
+
+/**
+ * See [ReflectionTypeProcessingStep]
+ */
+fun InputType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
     return ReflectionTypeProcessingStep(
         includeGetters = config.includeGetters,
@@ -159,14 +156,15 @@ fun InputType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.
  * See [ReflectionTypeProcessingStep]
  */
 @JvmName("processReflectionKType")
-fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
     return this.mapToInputType().processReflection(configBlock)
 }
+
 
 /**
  * See [ReflectionTypeProcessingStep]
  */
-fun Bundle<InputType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<BaseTypeData> {
+fun Bundle<InputType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
     return ReflectionTypeProcessingStep(
         includeGetters = config.includeGetters,

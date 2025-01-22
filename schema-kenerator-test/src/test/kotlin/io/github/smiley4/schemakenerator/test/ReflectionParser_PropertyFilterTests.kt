@@ -3,10 +3,7 @@ package io.github.smiley4.schemakenerator.test
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -45,10 +42,16 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
         ) {
             @JvmName("getter_publicField")
             fun getPublicField() = publicField
+
+
             @JvmName("getter_privateField")
             fun getPrivateField() = privateField
+
+
             @JvmName("getter_publicFlag")
             fun isPublicFlag() = isPublicFlag
+
+
             @JvmName("getter_privateFlag")
             fun isPrivateFlag() = isPrivateFlag
             fun getOtherValue() = "hello"
@@ -77,9 +80,9 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 includeHidden = false,
                 expectedProperties = listOf(
                     // "privateField",
-                     "publicField",
+                    "publicField",
                     // "isPrivateFlag",
-                     "isPublicFlag",
+                    "isPublicFlag",
                     // "getOtherValue",
                     // "getPrivateField",
                     // "getPublicField",
@@ -97,12 +100,12 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 includeHidden = false,
                 expectedProperties = listOf(
                     // "privateField",
-                     "publicField",
-                     "isPrivateFlag",
-                     "isPublicFlag",
-                     "getOtherValue",
-                     "getPrivateField",
-                     "getPublicField",
+                    "publicField",
+                    "isPrivateFlag",
+                    "isPublicFlag",
+                    "getOtherValue",
+                    "getPrivateField",
+                    "getPublicField",
                     // "doSomethingNoReturn",
                     // "doSomethingWithReturn",
                     // "doSomethingWithReturnPrivate",
@@ -117,17 +120,17 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 includeHidden = false,
                 expectedProperties = listOf(
                     // "privateField",
-                     "publicField",
+                    "publicField",
                     // "isPrivateFlag",
-                     "isPublicFlag",
+                    "isPublicFlag",
                     // "getOtherValue",
                     // "getPrivateField",
                     // "getPublicField",
-                     "doSomethingNoReturn",
-                     "doSomethingWithReturn",
+                    "doSomethingNoReturn",
+                    "doSomethingWithReturn",
                     // "doSomethingWithReturnPrivate",
-                     "hashCode",
-                     "toString"
+                    "hashCode",
+                    "toString"
                 )
             ),
             TestData(
@@ -137,17 +140,17 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 includeHidden = false,
                 expectedProperties = listOf(
                     // "privateField",
-                     "publicField",
-                     "isPrivateFlag",
-                     "isPublicFlag",
-                     "getOtherValue",
-                     "getPrivateField",
-                     "getPublicField",
-                     "doSomethingNoReturn",
-                     "doSomethingWithReturn",
+                    "publicField",
+                    "isPrivateFlag",
+                    "isPublicFlag",
+                    "getOtherValue",
+                    "getPrivateField",
+                    "getPublicField",
+                    "doSomethingNoReturn",
+                    "doSomethingWithReturn",
                     // "doSomethingWithReturnPrivate",
-                     "hashCode",
-                     "toString"
+                    "hashCode",
+                    "toString"
                 )
             ),
             TestData(
@@ -156,10 +159,10 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 includeWeakGetters = false,
                 includeHidden = true,
                 expectedProperties = listOf(
-                     "privateField",
-                     "publicField",
-                     "isPrivateFlag",
-                     "isPublicFlag",
+                    "privateField",
+                    "publicField",
+                    "isPrivateFlag",
+                    "isPublicFlag",
                     // "getOtherValue",
                     // "getPrivateField",
                     // "getPublicField",
@@ -176,13 +179,13 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
                 includeWeakGetters = false,
                 includeHidden = true,
                 expectedProperties = listOf(
-                     "privateField",
-                     "publicField",
-                     "isPrivateFlag",
-                     "isPublicFlag",
-                     "getOtherValue",
-                     "getPrivateField",
-                     "getPublicField",
+                    "privateField",
+                    "publicField",
+                    "isPrivateFlag",
+                    "isPublicFlag",
+                    "getOtherValue",
+                    "getPrivateField",
+                    "getPublicField",
                     // "doSomethingNoReturn",
                     // "doSomethingWithReturn",
                     // "doSomethingWithReturnPrivate",

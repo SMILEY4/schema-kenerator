@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.core.steps
 
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
 
 /**
  * Adds properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.
@@ -8,9 +8,9 @@ import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
  * If a type already contains a property annotated with the marker annotation, no new property will be added.
  * @param discriminatorPropertyName the name of the property to add. The type will always be [String].
  */
-class AddDiscriminatorStep(private val discriminatorPropertyName: String = "type") : AbstractAddDiscriminatorStep() {
+class AddDiscriminatorStep(private val discriminatorPropertyName: String) : AbstractAddDiscriminatorStep() {
 
-    override fun getDiscriminatorPropertyName(typeData: ObjectTypeData): String {
+    override fun getDiscriminatorPropertyName(typeData: TypeData): String {
         return discriminatorPropertyName
     }
 

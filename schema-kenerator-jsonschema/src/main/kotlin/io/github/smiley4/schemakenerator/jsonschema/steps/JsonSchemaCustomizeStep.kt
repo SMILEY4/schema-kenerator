@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.PropertyData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUtils.iterateProperties
@@ -18,7 +18,7 @@ class JsonSchemaCustomizeStep {
      */
     fun customizeTypes(
         bundle: Bundle<JsonSchema>,
-        action: (typeData: BaseTypeData, typeSchema: JsonNode) -> Unit
+        action: (typeData: TypeData, typeSchema: JsonNode) -> Unit
     ): Bundle<JsonSchema> {
         return bundle.also { schema ->
             processTypes(schema.data, action)
@@ -26,7 +26,7 @@ class JsonSchemaCustomizeStep {
         }
     }
 
-    private fun processTypes(schema: JsonSchema, action: (typeData: BaseTypeData, typeSchema: JsonNode) -> Unit) {
+    private fun processTypes(schema: JsonSchema, action: (typeData: TypeData, typeSchema: JsonNode) -> Unit) {
         action(schema.typeData, schema.json)
     }
 
@@ -36,7 +36,7 @@ class JsonSchemaCustomizeStep {
      */
     fun customizeProperties(
         bundle: Bundle<JsonSchema>,
-        action: (propertyData: PropertyData, propertySchema: JsonNode) -> Unit
+        action: (propertyData: MemberData, propertySchema: JsonNode) -> Unit
     ): Bundle<JsonSchema> {
         val typeDataMap = bundle.buildTypeDataMap()
         return bundle.also { schema ->
@@ -47,8 +47,8 @@ class JsonSchemaCustomizeStep {
 
     private fun processProperties(
         schema: JsonSchema,
-        typeDataMap: Map<TypeId, BaseTypeData>,
-        action: (typeData: PropertyData, typeSchema: JsonNode) -> Unit
+        typeDataMap: Map<TypeId, TypeData>,
+        action: (typeData: MemberData, typeSchema: JsonNode) -> Unit
     ) {
         iterateProperties(schema, typeDataMap) { prop, propData, _ ->
             action(propData, prop)
@@ -61,22 +61,22 @@ class JsonSchemaCustomizeStep {
      */
     fun customizeProperties(
         bundle: Bundle<JsonSchema>,
-        action: (propertyData: PropertyData, propertyTypeData: BaseTypeData, propertySchema: JsonNode) -> Unit
+        action: (memberData: MemberData, memberTypeData: TypeData, propertySchema: JsonNode) -> Unit
     ): Bundle<JsonSchema> {
         val typeDataMap = bundle.buildTypeDataMap()
         return bundle.also { schema ->
-            processProperties(schema.data, typeDataMap, action)
-            schema.supporting.forEach { processProperties(it, typeDataMap, action) }
+            processMembers(schema.data, typeDataMap, action)
+            schema.supporting.forEach { processMembers(it, typeDataMap, action) }
         }
     }
 
-    private fun processProperties(
+    private fun processMembers(
         schema: JsonSchema,
-        typeDataMap: Map<TypeId, BaseTypeData>,
-        action: (typeData: PropertyData, propertyTypeData: BaseTypeData, typeSchema: JsonNode) -> Unit
+        typeDataMap: Map<TypeId, TypeData>,
+        action: (typeData: MemberData, memberTypeData: TypeData, typeSchema: JsonNode) -> Unit
     ) {
-        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
-            action(propData, propTypeData, prop)
+        iterateProperties(schema, typeDataMap) { prop, memberData, memberTypeData ->
+            action(memberData, memberTypeData, prop)
         }
     }
 

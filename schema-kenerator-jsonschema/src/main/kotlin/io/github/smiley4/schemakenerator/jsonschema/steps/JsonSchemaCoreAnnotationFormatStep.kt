@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.annotations.Format
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.BaseTypeData
-import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaAnnotationUt
  */
 class JsonSchemaCoreAnnotationFormatStep : AbstractJsonSchemaStep() {
 
-    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, BaseTypeData>) {
+    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.json is JsonObject && schema.json.properties["format"] == null) {
             determineFormat(schema.typeData.annotations)?.also { format ->
                 schema.json.properties["format"] = JsonTextValue(format)

@@ -1,10 +1,9 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.annotations.Description
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.data.PropertyType
-import io.github.smiley4.schemakenerator.core.data.Visibility
-import io.github.smiley4.schemakenerator.core.mergeGetters
+import io.github.smiley4.schemakenerator.core.gettersToProperties
+import io.github.smiley4.schemakenerator.core.typedata.MemberKind
+import io.github.smiley4.schemakenerator.core.typedata.Visibility
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -21,10 +20,10 @@ class MergeGettersTest : StringSpec({
                 includeGetters = true
                 includeHidden = true
             }
-            .mergeGetters()
+            .gettersToProperties()
             .data
 
-        (result as ObjectTypeData).members.also { members ->
+        result.members.also { members ->
 
             members shouldHaveSize 3
 
@@ -34,17 +33,17 @@ class MergeGettersTest : StringSpec({
 
             members.find { it.name == "someValue" }.also { someValue ->
                 someValue shouldNotBe null
-                someValue!!.nullable shouldBe  false
-                someValue.visibility shouldBe  Visibility.PUBLIC
-                someValue.kind shouldBe PropertyType.PROPERTY
+                someValue!!.nullable shouldBe false
+                someValue.visibility shouldBe Visibility.PUBLIC
+                someValue.kind shouldBe MemberKind.PROPERTY
                 someValue.annotations shouldHaveSize 1
             }
 
             members.find { it.name == "flagged" }.also { flagged ->
                 flagged shouldNotBe null
-                flagged!!.nullable shouldBe  false
-                flagged.visibility shouldBe  Visibility.PUBLIC
-                flagged.kind shouldBe PropertyType.PROPERTY
+                flagged!!.nullable shouldBe false
+                flagged.visibility shouldBe Visibility.PUBLIC
+                flagged.kind shouldBe MemberKind.PROPERTY
                 flagged.annotations shouldHaveSize 0
             }
         }

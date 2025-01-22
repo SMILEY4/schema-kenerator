@@ -1,21 +1,14 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.handleNameAnnotation
-import io.github.smiley4.schemakenerator.core.steps.RenameTypesStep
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
-import io.github.smiley4.schemakenerator.serialization.renameProperties
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
@@ -39,16 +32,16 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val schema = data.type
                 .processReflection()
                 .handleNameAnnotation()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_FULL)
                 .compileInlining()
@@ -73,16 +66,16 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val schema = data.type
                 .processReflection()
                 .handleNameAnnotation()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
                 .compileInlining()
@@ -107,16 +100,16 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val schema = data.type
                 .processReflection()
                 .handleNameAnnotation()
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
                 .compileReferencingRoot(TitleBuilder.BUILDER_SIMPLE)
