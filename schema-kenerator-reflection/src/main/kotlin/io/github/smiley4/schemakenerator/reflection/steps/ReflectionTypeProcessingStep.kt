@@ -15,9 +15,11 @@ import io.github.smiley4.schemakenerator.core.typedata.TypeName
 import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
 import io.github.smiley4.schemakenerator.core.typedata.Visibility
 import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
+import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeId
 import io.github.smiley4.schemakenerator.core.typedata.find
 import io.github.smiley4.schemakenerator.core.typedata.findOrThrow
 import io.github.smiley4.schemakenerator.core.typedata.matches
+import io.github.smiley4.schemakenerator.core.typedata.toWrappedTypeId
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
@@ -404,7 +406,7 @@ class ReflectionTypeProcessingStep(
             val resolvedType = resolveTypeProjection(argType, knownTypeParameters, knownTypeData)
             TypeParameterData(
                 name = name,
-                type = resolvedType.typeData.id,
+                type = resolvedType.id,
                 nullable = (argType.type?.isMarkedNullable ?: false) || resolvedType.nullable,
             )
         }
@@ -422,25 +424,26 @@ class ReflectionTypeProcessingStep(
         typeProjection: KTypeProjection,
         knownTypeParameters: List<TypeParameterData>,
         knownTypeData: MutableList<TypeData>
-    ): WrappedTypeData {
+    ): WrappedTypeId {
         if (typeProjection.type == null) {
-            return WrappedTypeData(
-                typeData = knownTypeData.find(TypeId.createWildcard()) ?: TypeData.createWildcard(),
+            return WrappedTypeId(
+                id = resolveWildcard(knownTypeData).id,
                 nullable = false
             )
         }
         return when (val classifier = typeProjection.type?.classifier) {
-            is KClass<*> -> parseClass(typeProjection.type!!, classifier, knownTypeParameters, knownTypeData)
+            is KClass<*> -> parseClass(typeProjection.type!!, classifier, knownTypeParameters, knownTypeData).toWrappedTypeId()
             is KTypeParameter -> {
                 val typeParameter = knownTypeParameters.findOrThrow(classifier.name)
-                WrappedTypeData(
-                    typeData = knownTypeData.findOrThrow(typeParameter.type),
-                    nullable = typeParameter.nullable // todo: before always "false" -> check if was bug before, i.e. nested classes with generics & top level was nullable -> nested also nullable
+                WrappedTypeId(
+                    id = knownTypeData.findOrThrow(typeParameter.type).id,
+                    nullable = typeParameter.nullable // todo: before always "false" -> check if was a bug before, i.e. nested classes with generics & top level was nullable -> nested also nullable
                 )
             }
             else -> throw IllegalArgumentException("Unhandled classifier type: '$classifier'.")
         }
     }
+
 
     // ====== MEMBERS ==================================================
 
@@ -556,7 +559,7 @@ class ReflectionTypeProcessingStep(
         val type = resolveMemberType(member.returnType, knownTypeParameters, knownTypeData)
         return MemberData(
             name = member.name,
-            type = type.typeData.id,
+            type = type.id,
             nullable = member.returnType.isMarkedNullable || type.nullable,
             optional = isOptional,
             annotations = parseAnnotations(member, clazz).toMutableList(),
@@ -581,7 +584,7 @@ class ReflectionTypeProcessingStep(
         val type = resolveMemberType(member.returnType, knownTypeParameters, knownTypeData)
         return MemberData(
             name = member.name,
-            type = type.typeData.id,
+            type = type.id,
             nullable = member.returnType.isMarkedNullable || type.nullable,
             optional = false,
             annotations = parseAnnotations(member).toMutableList(),
@@ -602,14 +605,14 @@ class ReflectionTypeProcessingStep(
         type: KType,
         knownTypeParameters: List<TypeParameterData>,
         knownTypeData: MutableList<TypeData>
-    ): WrappedTypeData {
+    ): WrappedTypeId {
         return when (val classifier = type.classifier) {
-            is KClass<*> -> parseClass(type, classifier, knownTypeParameters, knownTypeData)
+            is KClass<*> -> parseClass(type, classifier, knownTypeParameters, knownTypeData).toWrappedTypeId()
             is KTypeParameter -> {
                 val typeParameter = knownTypeParameters.findOrThrow(classifier.name)
-                WrappedTypeData(
-                    typeData = knownTypeData.findOrThrow(typeParameter.type),
-                    nullable = typeParameter.nullable // todo: before always "false" -> check if was bug before, i.e. nested classes with generics & top level was nullable -> nested also nullable
+                WrappedTypeId(
+                    id = knownTypeData.findOrThrow(typeParameter.type).id,
+                    nullable = typeParameter.nullable // todo: before always "false" -> check if was a bug before, i.e. nested classes with generics & top level was nullable -> nested also nullable
                 )
             }
             else -> throw IllegalArgumentException("Unhandled classifier type")
@@ -881,6 +884,14 @@ class ReflectionTypeProcessingStep(
     }
 
     // ====== UTILS ====================================================
+
+    /**
+     * Resolves a wildcard type. Either creating a new one and adding it to the known types of returning an already existing wildcard type.
+     */
+    private fun resolveWildcard(knownTypeData: MutableList<TypeData>): TypeData {
+        val wildcard = TypeData.createWildcard()
+        return knownTypeData.find(wildcard.id) ?: wildcard.also { knownTypeData.add(it) }
+    }
 
     /**
      * @return the specific [MemberKind] of the given function, i.e. whether it is a "normal" function, a getter or a "weak" getter
