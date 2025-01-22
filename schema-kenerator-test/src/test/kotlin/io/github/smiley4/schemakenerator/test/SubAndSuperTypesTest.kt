@@ -6,6 +6,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
 import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.flattenToMap
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
@@ -45,49 +49,49 @@ class SubAndSuperTypesTest : StringSpec({
         )
 
         result.data.also {
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf(
                 SubClass1A::class.qualifiedName,
                 SubClass1B::class.qualifiedName,
                 SubClass1C::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
         }
 
         result.supporting.find { it.identifyingName.full == SubClass1A::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t -> result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass1::class.qualifiedName
             )
         }
         result.supporting.find { it.identifyingName.full == SubClass1B::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf(
                 BaseClass1::class.qualifiedName
             )
         }
         result.supporting.find { it.identifyingName.full == SubClass1C::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass1::class.qualifiedName
             )
         }
 
         result.supporting.find { it.identifyingName.full == BaseClass2::class.qualifiedName }!!.also {
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 SubClass2A::class.qualifiedName,
                 SubClass2B::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
         }
         result.supporting.find { it.identifyingName.full == SubClass2A::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass2::class.qualifiedName
             )
         }
         result.supporting.find { it.identifyingName.full == SubClass2B::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass2::class.qualifiedName
             )
         }
@@ -126,49 +130,49 @@ class SubAndSuperTypesTest : StringSpec({
         )
 
         result.data.also {
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonSubClass1A::class.qualifiedName,
                 JacksonSubClass1B::class.qualifiedName,
                 JacksonSubClass1C::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
         }
 
         result.supporting.find { it.identifyingName.full == JacksonSubClass1A::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass1::class.qualifiedName
             )
         }
         result.supporting.find { it.identifyingName.full == JacksonSubClass1B::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass1::class.qualifiedName
             )
         }
         result.supporting.find { it.identifyingName.full == JacksonSubClass1C::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass1::class.qualifiedName
             )
         }
 
         result.supporting.find { it.identifyingName.full == JacksonBaseClass2::class.qualifiedName }!!.also {
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonSubClass2A::class.qualifiedName,
                 JacksonSubClass2B::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
         }
         result.supporting.find { it.identifyingName.full == JacksonSubClass2A::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass2::class.qualifiedName
             )
         }
         result.supporting.find { it.identifyingName.full == JacksonSubClass2B::class.qualifiedName }!!.also { it ->
-            it.subtypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.id } shouldContainExactlyInAnyOrder listOf(
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass2::class.qualifiedName
             )
         }
@@ -261,6 +265,8 @@ class SubAndSuperTypesTest : StringSpec({
 }) {
 
     companion object {
+
+        fun Bundle<TypeData>.find(id: TypeId) = this.flattenToMap()[id]!!
 
         @SubType(SubClass1A::class)
         @SubType(SubClass1B::class)
