@@ -40,7 +40,7 @@ object TitleBuilder {
         { type, types -> buildOpenApiFull(type, types) }
 
     private fun buildSimple(type: TypeData, types: Map<TypeId, TypeData>): String {
-        return buildString { // todo: resolve collisions -> esp. with kotlinx
+        return buildString {
             append(type.descriptiveName.short)
             if (type.typeParameters.isNotEmpty()) {
                 append("<")
@@ -51,7 +51,7 @@ object TitleBuilder {
     }
 
     private fun buildFull(type: TypeData, types: Map<TypeId, TypeData>): String {
-        return buildString { // todo: resolve collisions -> esp. with kotlinx
+        return buildString {
             append(type.descriptiveName.full)
             if (type.typeParameters.isNotEmpty()) {
                 append("<")
@@ -62,7 +62,7 @@ object TitleBuilder {
     }
 
     private fun buildOpenApiSimple(type: TypeData, types: Map<TypeId, TypeData>): String {
-        return buildString { // todo: resolve collisions -> esp. with kotlinx
+        return buildString {
             append(type.descriptiveName.short)
             if (type.typeParameters.isNotEmpty()) {
                 append("_")
@@ -72,7 +72,7 @@ object TitleBuilder {
     }
 
     private fun buildOpenApiFull(type: TypeData, types: Map<TypeId, TypeData>): String {
-        return buildString { // todo: resolve collisions -> esp. with kotlinx
+        return buildString {
             append(type.descriptiveName.full)
             if (type.typeParameters.isNotEmpty()) {
                 append("_")

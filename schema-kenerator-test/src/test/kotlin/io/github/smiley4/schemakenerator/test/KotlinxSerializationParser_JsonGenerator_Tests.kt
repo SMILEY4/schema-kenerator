@@ -107,16 +107,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .processKotlinxSerialization()
-//                .also { schema ->
-//                    if (schema.data.id.additionalId != null) {
-//                        additionalIds.add(schema.data.id.additionalId!!)
-//                    }
-//                    schema.supporting.forEach {
-//                        if (it.id.additionalId != null) {
-//                            additionalIds.add(it.id.additionalId!!)
-//                        }
-//                    }
-//                }
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {
@@ -831,11 +821,11 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                 "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
                             },
                             "valueString": {
-                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2"
                             }
                         },
                         "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -879,7 +869,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                     }
                                 }
                             },
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -901,7 +891,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                         "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
                                     },
                                     "valueString": {
-                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2"
                                     }
                                 }
                             }

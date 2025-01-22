@@ -2,6 +2,7 @@ package io.github.smiley4.schemakenerator.jsonschema.steps
 
 import io.github.smiley4.schemakenerator.core.GenericBundleStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.typedata.MemberData
 import io.github.smiley4.schemakenerator.core.typedata.MemberKind
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
@@ -18,10 +19,10 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
     private val schemaUtils = JsonSchemaUtils()
 
     override fun process(input: Bundle<TypeData>): Bundle<JsonSchema> {
-        val types = listOf(input.data) + input.supporting
+        val typeDataList = input.flatten()
         return Bundle(
-            data = generate(input.data, types),
-            supporting = input.supporting.map { generate(it, types) }
+            data = generate(input.data, typeDataList),
+            supporting = input.supporting.map { generate(it, typeDataList) }
         )
     }
 

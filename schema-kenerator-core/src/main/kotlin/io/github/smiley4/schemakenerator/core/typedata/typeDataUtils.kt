@@ -74,6 +74,7 @@ fun TypeData.matches(identifyingName: TypeName, descriptiveName: TypeName, typeP
         compareIdentifyingName = true,
         compareDescriptiveName = true,
         compareTypeParameters = true,
+        compareMembers = false,
     )
 }
 
@@ -87,6 +88,7 @@ fun TypeData.matches(
     compareIdentifyingName: Boolean = false,
     compareDescriptiveName: Boolean = false,
     compareTypeParameters: Boolean = false,
+    compareMembers: Boolean = false,
 ): Boolean {
 
     if (compareId) {
@@ -114,6 +116,23 @@ fun TypeData.matches(
         if (this.typeParameters.zip(other.typeParameters).any { (a, b) -> a.type != b.type }) {
             return false
         }
+    }
+
+    if (compareMembers) {
+        if (this.members.size != other.members.size) {
+            return false
+        }
+        if (this.members.map { it.name }.toSet() != other.members.map { it.name }.toSet()) {
+            return false
+        }
+        this.members.map { thisMember -> thisMember to other.members.find { it.name == thisMember.name }!! }
+            .forEach { (thisMember, otherMember) ->
+                if (thisMember.type != otherMember.type) return@matches false
+                if (thisMember.nullable != otherMember.nullable) return@matches false
+                if (thisMember.optional != otherMember.optional) return@matches false
+                if (thisMember.kind != otherMember.kind) return@matches false
+                if (thisMember.visibility != otherMember.visibility) return@matches false
+            }
     }
 
     return true

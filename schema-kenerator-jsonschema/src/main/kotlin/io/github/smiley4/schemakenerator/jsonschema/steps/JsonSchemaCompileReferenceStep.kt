@@ -31,10 +31,11 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
         val knownSchemas = bundle.flatten()
         val knownTypeData = bundle.buildTypeDataMap()
         val definitions = mutableMapOf<String, JsonNode>()
+        val pathCounters = mutableMapOf<String, Int>()
         val refPathMapping = mutableMapOf<TypeId, String>()
 
         val root = resolveReferences(bundle.data.json) { refObj ->
-            resolveReference(refObj, knownSchemas, knownTypeData, refPathMapping, definitions)
+            resolveReference(refObj, knownSchemas, knownTypeData, refPathMapping, definitions, pathCounters)
         }
 
         return CompiledJsonSchema(
@@ -52,20 +53,22 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
      * @param knownTypeData all known types
      * @param refPathMapping already mapped reference paths for types. Add new paths to this map.
      * @param definitions the current list of schemas in the definitions section. Add new ones to this list.
+     * @param pathCounters counts of often any (original) path is used in the definitions-section
      */
     private fun resolveReference(
         refObj: JsonObject,
         knownSchemas: List<JsonSchema>,
         knownTypeData: Map<TypeId, TypeData>,
         refPathMapping: MutableMap<TypeId, String>,
-        definitions: MutableMap<String, JsonNode>
+        definitions: MutableMap<String, JsonNode>,
+        pathCounters: MutableMap<String, Int>
     ): JsonNode {
         val referencedSchema = knownSchemas.find(TypeId((refObj.properties["\$ref"] as JsonTextValue).value))
         return if (referencedSchema == null) {
             refObj
         } else {
             if (shouldReference(referencedSchema.json)) {
-                createRefProperty(referencedSchema, knownSchemas, knownTypeData, refPathMapping, definitions)
+                createRefProperty(referencedSchema, knownSchemas, knownTypeData, refPathMapping, definitions, pathCounters)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
@@ -80,6 +83,7 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
      * @param knownTypeData all input type data
      * @param refPathMapping already mapped reference paths for types. Add new paths to this map.
      * @param definitions json schema definitions section. Adds new referenced schemas.
+     * @param pathCounters counts of often any (original) path is used in the definitions-section
      */
     private fun createRefProperty(
         schema: JsonSchema,
@@ -87,13 +91,15 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
         knownTypeData: Map<TypeId, TypeData>,
         refPathMapping: MutableMap<TypeId, String>,
         definitions: MutableMap<String, JsonNode>,
+        pathCounters: MutableMap<String, Int>
     ): JsonNode {
         val refPath = if(refPathMapping.containsKey(schema.typeData.id)) {
             refPathMapping[schema.typeData.id]!!
         } else {
             var newRefPath = pathBuilder(schema.typeData, knownTypeData)
+            pathCounters[newRefPath] = (pathCounters[newRefPath] ?: 0) + 1
             if(definitions.containsKey(newRefPath)) {
-                newRefPath += Random.nextInt(100..999) // todo: generate better random suffix
+                newRefPath += pathCounters[newRefPath]
             }
             refPathMapping[schema.typeData.id] = newRefPath
             definitions[newRefPath] = placeholder() // avoid infinite recursive loops
@@ -102,7 +108,8 @@ class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, t
                 knownSchemas,
                 knownTypeData,
                 refPathMapping,
-                definitions
+                definitions,
+                pathCounters
             ) }
             newRefPath
         }

@@ -29,6 +29,7 @@ import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
+import kotlinx.serialization.descriptors.nonNullOriginal
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -130,12 +131,14 @@ class KotlinxSerializationTypeProcessingStep(
     ): WrappedTypeData {
 
         // input serial descriptor has already been parsed before (or is currently being parsed) -> break out of infinite loops
-        if (processedDescriptors.containsKey(descriptor)) {
-            return WrappedTypeData(typeData = processedDescriptors[descriptor]!!, nullable = nullable)
+        if (processedDescriptors.containsKey(descriptor.nonNullOriginal)) {
+            return WrappedTypeData(typeData = processedDescriptors[descriptor.nonNullOriginal]!!, nullable = descriptor != descriptor.nonNullOriginal)
         }
 
         // reserve this descriptor / mark this descriptor as processed with a pending result
-        processedDescriptors[descriptor] = TypeData.createWildcard()
+        // reserve type-id so that other types can already reference this type (e.g. members resulting in a reference loop)
+        val reservedTypeId = TypeId.create()
+        processedDescriptors[descriptor] = TypeData.createPlaceholder(reservedTypeId)
 
         // check type redirects
         if (typeRedirects.containsKey(descriptor.redirectKey(nullable))) {
@@ -161,7 +164,8 @@ class KotlinxSerializationTypeProcessingStep(
                         compareId = false,
                         compareIdentifyingName = true,
                         compareDescriptiveName = true,
-                        compareTypeParameters = true
+                        compareTypeParameters = true,
+                        compareMembers = true,
                     )
                 }
                 knownTypeData.add(result.typeData)
@@ -181,7 +185,7 @@ class KotlinxSerializationTypeProcessingStep(
             else -> when (descriptor.kind) {
                 StructureKind.LIST -> parseList(descriptor, knownTypeData, processedDescriptors)
                 StructureKind.MAP -> parseMap(descriptor, knownTypeData, processedDescriptors)
-                StructureKind.CLASS -> parseClass(descriptor, knownTypeData, processedDescriptors)
+                StructureKind.CLASS -> parseClass(reservedTypeId, descriptor, knownTypeData, processedDescriptors)
                 StructureKind.OBJECT -> parseObject(descriptor, knownTypeData)
                 PolymorphicKind.OPEN -> parseSealed(descriptor, knownTypeData, processedDescriptors)
                 PolymorphicKind.SEALED -> parseSealed(descriptor, knownTypeData, processedDescriptors)
@@ -195,7 +199,7 @@ class KotlinxSerializationTypeProcessingStep(
                 PrimitiveKind.SHORT -> parsePrimitive(descriptor, knownTypeData, Short::class.toTypeName())
                 PrimitiveKind.STRING -> parsePrimitive(descriptor, knownTypeData, String::class.toTypeName())
                 SerialKind.ENUM -> parseEnum(descriptor, knownTypeData)
-                SerialKind.CONTEXTUAL -> parseClass(descriptor, knownTypeData, processedDescriptors)
+                SerialKind.CONTEXTUAL -> parseClass(reservedTypeId, descriptor, knownTypeData, processedDescriptors)
             }
         }
             .also { result ->
@@ -205,7 +209,8 @@ class KotlinxSerializationTypeProcessingStep(
                         compareId = false,
                         compareIdentifyingName = true,
                         compareDescriptiveName = true,
-                        compareTypeParameters = true
+                        compareTypeParameters = true,
+                        compareMembers = true,
                     )
                 }
                 knownTypeData.add(result)
@@ -411,6 +416,7 @@ class KotlinxSerializationTypeProcessingStep(
      * @param processedDescriptors already processed descriptors with their type data. Adds new results to this map.
      */
     private fun parseClass(
+        reservedTypeId: TypeId,
         descriptor: SerialDescriptor,
         knownTypeData: MutableList<TypeData>,
         processedDescriptors: MutableMap<SerialDescriptor, TypeData>
@@ -458,7 +464,7 @@ class KotlinxSerializationTypeProcessingStep(
 
         // build type
         return TypeData(
-            id = TypeId.create(),
+            id = reservedTypeId,
             identifyingName = identifyingName,
             descriptiveName = descriptiveName,
             typeParameters = mutableListOf(),

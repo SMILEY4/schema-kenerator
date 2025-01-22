@@ -215,7 +215,8 @@ class ReflectionTypeProcessingStep(
                         compareId = false,
                         compareIdentifyingName = true,
                         compareDescriptiveName = true,
-                        compareTypeParameters = true
+                        compareTypeParameters = true,
+                        compareMembers = false
                     )
                 }
                 knownTypeData.add(result.typeData)
@@ -367,7 +368,8 @@ class ReflectionTypeProcessingStep(
                     compareId = false,
                     compareIdentifyingName = true,
                     compareDescriptiveName = true,
-                    compareTypeParameters = true
+                    compareTypeParameters = true,
+                    compareMembers = false
                 )
             }
             knownTypeData.add(result)

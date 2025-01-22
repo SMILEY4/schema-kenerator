@@ -11,8 +11,6 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileUtils.shouldReference
 import io.swagger.v3.oas.models.media.Schema
-import kotlin.random.Random
-import kotlin.random.nextInt
 
 /**
  * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
@@ -30,12 +28,13 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData
         val knownSchemas = bundle.flatten()
         val knownTypeData = bundle.buildTypeDataMap()
         val components = mutableMapOf<String, Schema<*>>()
+        val pathCounters = mutableMapOf<String, Int>()
         val refPathMapping = mutableMapOf<TypeId, String>()
 
         copyTypeToTypes(knownSchemas)
 
         val root = resolveReferences(bundle.data.swagger) { refObj ->
-            resolveReference(refObj, knownSchemas, knownTypeData, refPathMapping, components)
+            resolveReference(refObj, knownSchemas, knownTypeData, refPathMapping, components, pathCounters)
         }
 
         handleDiscriminatorMappings(root, components, knownTypeData)
@@ -55,18 +54,20 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData
      * @param knownTypeData all known types
      * @param refPathMapping already mapped reference paths for types. Add new paths to this map.
      * @param components the current list of schemas in the components section. Add new ones to this list.
+     * @param pathCounters counts of often any (original) path is used in the component-section
      */
     private fun resolveReference(
         refObj: Schema<*>,
         knownSchemas: List<SwaggerSchema>,
         knownTypeData: Map<TypeId, TypeData>,
         refPathMapping: MutableMap<TypeId, String>,
-        components: MutableMap<String, Schema<*>>
+        components: MutableMap<String, Schema<*>>,
+        pathCounters: MutableMap<String, Int>
     ): Schema<*> {
         val referencedSchema = knownSchemas.find(TypeId(refObj.`$ref`))
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
-                createRefProperty(refObj, referencedSchema, knownSchemas, knownTypeData, refPathMapping, components)
+                createRefProperty(refObj, referencedSchema, knownSchemas, knownTypeData, refPathMapping, components, pathCounters)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
@@ -84,6 +85,7 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData
      * @param knownTypeData all input type data
      * @param refPathMapping already mapped reference paths for types. Add new paths to this map.
      * @param components swagger schema components section. Adds new referenced schemas.
+     * @param pathCounters counts of often any (original) path is used in the component-section
      */
     private fun createRefProperty(
         refObj: Schema<*>,
@@ -92,17 +94,28 @@ class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData
         knownTypeData: Map<TypeId, TypeData>,
         refPathMapping: MutableMap<TypeId, String>,
         components: MutableMap<String, Schema<*>>,
+        pathCounters: MutableMap<String, Int>
     ): Schema<*> {
-        val refPath = if(refPathMapping.containsKey(schema.typeData.id)) {
+        val refPath = if (refPathMapping.containsKey(schema.typeData.id)) {
             refPathMapping[schema.typeData.id]!!
         } else {
             var newRefPath = pathBuilder(schema.typeData, knownTypeData)
-            if(components.containsKey(newRefPath)) {
-                newRefPath += Random.nextInt(100..999) // todo: generate better random suffix
+            pathCounters[newRefPath] = (pathCounters[newRefPath] ?: 0) + 1
+            if (components.containsKey(newRefPath)) {
+                newRefPath += pathCounters[newRefPath]
             }
             refPathMapping[schema.typeData.id] = newRefPath
             components[newRefPath] = placeholder() // break out of infinite loops
-            components[newRefPath] = resolveReferences(schema.swagger) { resolveReference(it, knownSchemas, knownTypeData, refPathMapping, components) }
+            components[newRefPath] = resolveReferences(schema.swagger) {
+                resolveReference(
+                    it,
+                    knownSchemas,
+                    knownTypeData,
+                    refPathMapping,
+                    components,
+                    pathCounters
+                )
+            }
             newRefPath
         }
 
