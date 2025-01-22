@@ -29,16 +29,6 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val schema = data.type
                 .processKotlinxSerialization()
-//                .also { schema ->
-//                    if (schema.data.id.additionalId != null) {
-//                        additionalIds.add(schema.data.id.additionalId!!)
-//                    }
-//                    schema.supporting.forEach {
-//                        if (it.id.additionalId != null) {
-//                            additionalIds.add(it.id.additionalId!!)
-//                        }
-//                    }
-//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_FULL)
                 .compileInlining()
@@ -500,7 +490,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "kotlin.String"
                                     }
                                 },
-                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
                             }
                         },
                         "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics"
@@ -540,7 +530,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "String"
                                     }
                                 },
-                                "title": "ClassWithGenericField#0"
+                                "title": "ClassWithGenericField"
                             }
                         },
                         "title": "ClassWIthDifferentGenerics"
@@ -565,7 +555,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                 },
                                 "title": "ClassWithGenericField"
                             },
-                            "ClassWithGenericField#0": {
+                            "ClassWithGenericField2": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -576,7 +566,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "String"
                                     }
                                 },
-                                "title": "ClassWithGenericField#0"
+                                "title": "ClassWithGenericField"
                             },
                             "ClassWIthDifferentGenerics": {
                                 "type": "object",
@@ -589,7 +579,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "${'$'}ref": "#/definitions/ClassWithGenericField"
                                     },
                                     "valueString": {
-                                        "${'$'}ref": "#/definitions/ClassWithGenericField#0"
+                                        "${'$'}ref": "#/definitions/ClassWithGenericField2"
                                     }
                                 },
                                 "title": "ClassWIthDifferentGenerics"
