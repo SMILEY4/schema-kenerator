@@ -4,7 +4,6 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.map
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlin.reflect.KType
 
 /**
  * A [InputType] containing [SerialDescriptor] (usually acquired via kotlinx-serialization)

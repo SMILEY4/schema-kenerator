@@ -82,6 +82,7 @@ fun TypeData.matches(identifyingName: TypeName, descriptiveName: TypeName, typeP
 /**
  * @return whether this type data matches the given other type data. Only compare specified attributes.
  */
+@Suppress("LongParameterList", "CyclomaticComplexMethod", "ReturnCount")
 fun TypeData.matches(
     other: TypeData,
     compareId: Boolean = true,

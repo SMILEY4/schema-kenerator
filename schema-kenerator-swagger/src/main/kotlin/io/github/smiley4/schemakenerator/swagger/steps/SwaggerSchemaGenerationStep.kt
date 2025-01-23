@@ -144,7 +144,8 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
         return buildMap {
             typeData.subtypes.forEach { subtypeId ->
                 val subtype = typeDataList.find { it.id == subtypeId }!!
-                var name = subtype.descriptiveName.full // hint: default = qualified name (or from @SerialName) -> already covers kotlinx behaviour
+                // hint: default = qualified name (or from @SerialName) -> already covers kotlinx behaviour
+                var name = subtype.descriptiveName.full
                 val jsonTypeInfo = typeData.annotations.find { it.name == JsonTypeInfo::class.qualifiedName }
                 val jsonSubTypes = typeData.annotations.find { it.name == JsonSubTypes::class.qualifiedName }
                 if (jsonTypeInfo != null) {

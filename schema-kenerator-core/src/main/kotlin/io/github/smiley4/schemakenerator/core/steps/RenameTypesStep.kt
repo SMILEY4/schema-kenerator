@@ -2,7 +2,6 @@ package io.github.smiley4.schemakenerator.core.steps
 
 import io.github.smiley4.schemakenerator.core.GenericBundleIndependentContentStep
 import io.github.smiley4.schemakenerator.core.annotations.Name
-import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 
 /**

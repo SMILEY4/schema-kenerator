@@ -128,7 +128,7 @@ class KotlinxSerializationTypeProcessingStep(
      * @param knownTypeData the already known type data. Adds new results to this collection.
      * @param processedDescriptors already processed descriptors with their type data. Adds new results to this map.
      */
-    @Suppress("CyclomaticComplexMethod")
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun parse(
         descriptor: SerialDescriptor,
         nullable: Boolean,
@@ -138,7 +138,10 @@ class KotlinxSerializationTypeProcessingStep(
 
         // input serial descriptor has already been parsed before (or is currently being parsed) -> break out of infinite loops
         if (processedDescriptors.containsKey(descriptor.nonNullOriginal)) {
-            return WrappedTypeData(typeData = processedDescriptors[descriptor.nonNullOriginal]!!, nullable = descriptor != descriptor.nonNullOriginal)
+            return WrappedTypeData(
+                typeData = processedDescriptors[descriptor.nonNullOriginal]!!,
+                nullable = descriptor != descriptor.nonNullOriginal
+            )
         }
 
         // reserve this descriptor / mark this descriptor as processed with a pending result
