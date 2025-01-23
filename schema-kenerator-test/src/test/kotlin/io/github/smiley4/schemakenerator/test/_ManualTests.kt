@@ -48,7 +48,7 @@ class _ManualTests : StringSpec({
         println()
 
         val result = typeOf<MyData>()
-            .processKotlinxSerialization { // todo: better separate typeid, name actual type -> schema generator uses name to determine type -> causes problem when renaming without changing base type
+            .processKotlinxSerialization {
                 serializersModule = JSON.serializersModule
             }
             .also {

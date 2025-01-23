@@ -31,10 +31,21 @@ import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
 import io.swagger.v3.oas.models.media.Schema
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
+import kotlinx.serialization.modules.SerializersModule
+import java.time.Instant
 import java.util.Optional
+import java.util.UUID
 import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
 
@@ -574,8 +585,6 @@ class MiscTests : FreeSpec({
 
     "generic nested classes with nullable type parameter" - {
 
-        // todo: case did not work before -> "value" was not nullable
-
         "reflection" {
             val result = typeOf<GenericClass<String?>>()
                 .processReflection()
@@ -631,6 +640,86 @@ class MiscTests : FreeSpec({
                       "required": [
                         "nested"
                       ]
+                    }
+                """.trimIndent()
+            }
+        }
+
+    }
+
+    "kotlinx contextual" - {
+
+
+        "with serializers from config" {
+
+            val json = Json {
+                serializersModule = SerializersModule {
+                    contextual(UUID::class, MyUUIDSerializer)
+                    contextual(Instant::class, MyInstantSerializer)
+                }
+            }
+
+            val result = typeOf<TestClassContextual>()
+                .processKotlinxSerialization {
+                    serializersModule = json.serializersModule
+                }
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "timestamp": {
+                          "type": "integer",
+                          "format": "int64",
+                          "title": "Instant"
+                        },
+                        "id": {
+                          "type": "string",
+                          "title": "UUID"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "timestamp"
+                      ],
+                      "title": "TestClassContextual"
+                    }
+                """.trimIndent()
+            }
+        }
+
+        "with serializers from annotation" {
+
+            val result = typeOf<TestClassContextualWithSerializers>()
+                .processKotlinxSerialization {}
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "timestamp": {
+                          "type": "integer",
+                          "format": "int64",
+                          "title": "Instant"
+                        },
+                        "id": {
+                          "type": "string",
+                          "title": "UUID"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "timestamp"
+                      ],
+                      "title": "TestClassContextualWithSerializers"
                     }
                 """.trimIndent()
             }
@@ -707,6 +796,39 @@ class MiscTests : FreeSpec({
 
         @Serializable
         data class NestedGenericClass<T>(val value: T)
+
+
+
+        @Serializable
+        data class TestClassContextual(
+            @Contextual
+            val timestamp: Instant,
+            @Contextual
+            val id: UUID,
+        )
+
+        @Serializable
+        data class TestClassContextualWithSerializers(
+            @Contextual
+            @Serializable(with = MyInstantSerializer::class)
+            val timestamp: Instant,
+            @Contextual
+            @Serializable(with = MyUUIDSerializer::class)
+            val id: UUID,
+        )
+
+
+        object MyInstantSerializer : KSerializer<Instant> {
+            override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("java.time.Instant", PrimitiveKind.LONG)
+            override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.toEpochMilli())
+            override fun deserialize(decoder: Decoder): Instant = Instant.ofEpochMilli(decoder.decodeLong())
+        }
+
+        object MyUUIDSerializer : KSerializer<UUID> {
+            override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
+            override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+            override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
+        }
 
     }
 

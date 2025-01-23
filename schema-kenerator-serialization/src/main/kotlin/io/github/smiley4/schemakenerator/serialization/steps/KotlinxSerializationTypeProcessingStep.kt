@@ -184,8 +184,6 @@ class KotlinxSerializationTypeProcessingStep(
         // check contextual descriptors
         val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
         if (contextualByKClass != null) {
-            // todo: for uuid-example: contextualByKClass is primitiveSerialDescriptor of kind "string", but there is no way to pass the "string" information along
-            //  -> idea: seperate "name"/id from "underlying type"
             return parse(contextualByKClass, nullable, knownTypeData, processedDescriptors)
         }
 

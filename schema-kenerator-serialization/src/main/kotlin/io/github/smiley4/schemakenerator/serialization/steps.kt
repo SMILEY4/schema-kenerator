@@ -202,7 +202,7 @@ class KotlinxSerializationTypeProcessingConfig {
  * Note: no serial descriptor or element index will be passed to the naming strategy, only the serial name
  */
 @OptIn(ExperimentalSerializationApi::class)
-fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> { // todo: was renamed from renameProperties
+fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> {
     return RenameMembersStep { name ->
         strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
     }.process(this)
