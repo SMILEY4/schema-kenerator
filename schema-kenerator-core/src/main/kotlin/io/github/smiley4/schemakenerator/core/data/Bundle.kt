@@ -24,6 +24,11 @@ fun <T> Bundle<T>.flatten(): List<T> = listOf(data) + supporting
  */
 fun Bundle<TypeData>.flattenToMap(): Map<TypeId, TypeData> = flatten().associateBy { it.id }
 
+/**
+ * Finds the type data with the given name
+ */
+fun Bundle<TypeData>.find(id: TypeId) = flattenToMap()[id]
+
 
 /**
  * Map all content of this bundle by applying the given transform.

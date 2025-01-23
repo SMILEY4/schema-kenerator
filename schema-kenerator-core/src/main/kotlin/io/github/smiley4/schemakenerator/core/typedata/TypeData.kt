@@ -95,3 +95,5 @@ data class TypeData(
     }
 
 }
+
+fun TypeData.findTypeParameter(name: String) = typeParameters.find { it.name == name }

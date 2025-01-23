@@ -3,23 +3,21 @@
 
 package io.github.smiley4.schemakenerator.examples
 
-import old.AnnotationData
-import old.ObjectTypeData
-import old.PrimitiveTypeData
-import old.TypeId
 import io.github.smiley4.schemakenerator.core.renameMembers
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeName
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.customizeTypes
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonTypeHint
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.handleJsonSchemaAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.customizeProperties
 import io.github.smiley4.schemakenerator.swagger.customizeTypes
@@ -62,27 +60,26 @@ class E04_Customization : FreeSpec({
 
                     // register a custom processor for the type "LocalDateTime"
                     customProcessor<LocalDateTime> {
-                        // Create a primitive type data for "LocalDateTime".
+                        // Create type data for "LocalDateTime".
                         // By default, local date time would have been processed possibly as a complex object with unwanted properties.
-                        PrimitiveTypeData(
-                            id = TypeId.build(LocalDateTime::class.qualifiedName!!),
-                            simpleName = LocalDateTime::class.simpleName!!,
-                            qualifiedName = LocalDateTime::class.qualifiedName!!,
-                            annotations = mutableListOf(
-                                AnnotationData( // add the "JsonTypeHint" to tell the "handleJsonSchemaAnnotations"-step to treat this type as the json-type "date"
-                                    name = JsonTypeHint::class.qualifiedName!!,
-                                    values = mutableMapOf(
-                                        "type" to "date"
-                                    ),
-                                    annotation = null
-                                )
-                            )
+                        TypeData(
+                            id = TypeId.create(),
+                            identifyingName = TypeName("kotlin.String", "String"), // the type should be treated as if it was a string
+                            descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
+                            typeParameters = mutableListOf(),
+                            annotations = mutableListOf(),
+                            subtypes = mutableListOf(),
+                            supertypes = mutableListOf(),
+                            members = mutableListOf(),
+                            isInlineValue = false,
+                            enumData = null,
+                            collectionData = null,
+                            mapData = null
                         )
                     }
 
                 }
                 .generateJsonSchema()
-                .handleJsonSchemaAnnotations() // read the "JsonTypeHint" annotation and set the json-object type accordingly
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining()
                 .json.prettyPrint()
@@ -109,27 +106,26 @@ class E04_Customization : FreeSpec({
 
                     // register a custom processor for the type "LocalDateTime"
                     customProcessor<LocalDateTime> {
-                        // Create a primitive type data for "LocalDateTime".
+                        // Create type data for "LocalDateTime".
                         // By default, local date time would have been processed possibly as a complex object with unwanted properties.
-                        PrimitiveTypeData(
-                            id = TypeId.build(LocalDateTime::class.qualifiedName!!),
-                            simpleName = LocalDateTime::class.simpleName!!,
-                            qualifiedName = LocalDateTime::class.qualifiedName!!,
-                            annotations = mutableListOf(
-                                AnnotationData( // add the "JsonTypeHint" to tell the "handleJsonSchemaAnnotations"-step to treat this type as the json-type "date"
-                                    name = JsonTypeHint::class.qualifiedName!!,
-                                    values = mutableMapOf(
-                                        "type" to "date"
-                                    ),
-                                    annotation = null
-                                )
-                            )
+                        TypeData(
+                            id = TypeId.create(),
+                            identifyingName = TypeName("kotlin.String", "String"), // the type should be treated as if it was a string
+                            descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
+                            typeParameters = mutableListOf(),
+                            annotations = mutableListOf(),
+                            subtypes = mutableListOf(),
+                            supertypes = mutableListOf(),
+                            members = mutableListOf(),
+                            isInlineValue = false,
+                            enumData = null,
+                            collectionData = null,
+                            mapData = null
                         )
                     }
 
                 }
                 .generateJsonSchema()
-                .handleJsonSchemaAnnotations() // read the "JsonTypeHint" annotation and set the json-object type accordingly
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining()
                 .json.prettyPrint()
@@ -307,12 +303,14 @@ class E04_Customization : FreeSpec({
                 .processReflection()
                 .generateJsonSchema()
                 .customizeTypes { typeData, typeSchema ->
-                    if (typeData is ObjectTypeData && typeData.members.any { it.name.contains("secret") } && typeSchema is JsonObject) {
+                    if (typeData.members.any { it.name.contains("secret") } && typeSchema is JsonObject) {
+                        // adds the description to any type that has a member with "secret" in the name
                         typeSchema.properties["description"] = JsonTextValue("Note: A secret property has been detected!")
                     }
                 }
                 .customizeProperties { propertyData, propertySchema ->
                     if(propertyData.name.contains("secret") && propertySchema is JsonObject) {
+                        // adds the description to any property with "secret" in the name
                         propertySchema.properties["description"] = JsonTextValue("Note: This property was detected as a secret property!")
                     }
                 }
@@ -345,12 +343,14 @@ class E04_Customization : FreeSpec({
                 .processReflection()
                 .generateSwaggerSchema()
                 .customizeTypes { typeData, typeSchema ->
-                    if (typeData is ObjectTypeData && typeData.members.any { it.name.contains("secret") }) {
+                    if (typeData.members.any { it.name.contains("secret") }) {
+                        // adds the description to any type that has a member with "secret" in the name
                         typeSchema.description = "Note: A secret property has been detected!"
                     }
                 }
                 .customizeProperties { propertyData, propertySchema ->
                     if(propertyData.name.contains("secret")) {
+                        // adds the description to any property with "secret" in the name
                         propertySchema.description = "Note: This property was detected as a secret property!"
                     }
                 }
