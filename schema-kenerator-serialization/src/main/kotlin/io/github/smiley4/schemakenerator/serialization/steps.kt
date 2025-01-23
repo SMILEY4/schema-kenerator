@@ -17,6 +17,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.json.JsonNamingStrategy
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -53,8 +54,9 @@ fun InputType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeP
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
+        serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
-        knownNotParameterized = config.knownNotParameterized
+        knownNotParameterized = config.knownNotParameterized,
     ).process(this)
 }
 
@@ -88,8 +90,9 @@ fun Bundle<InputType>.processKotlinxSerialization(
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return KotlinxSerializationTypeProcessingStep(
         customProcessors = config.customProcessors,
+        serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
-        knownNotParameterized = config.knownNotParameterized
+        knownNotParameterized = config.knownNotParameterized,
     ).process(this)
 }
 
@@ -101,6 +104,11 @@ class KotlinxSerializationTypeProcessingConfig {
 
     var knownNotParameterized = mutableSetOf<String>()
 
+
+    /**
+     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
+     */
+    var serializersModule: SerializersModule? = null
 
     /**
      * Add a custom processor for the given type that overwrites the default behaviour
@@ -194,7 +202,7 @@ class KotlinxSerializationTypeProcessingConfig {
  * Note: no serial descriptor or element index will be passed to the naming strategy, only the serial name
  */
 @OptIn(ExperimentalSerializationApi::class)
-fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> { // todo: was renamed from renameProperties
+fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> {
     return RenameMembersStep { name ->
         strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
     }.process(this)

@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.core.typedata.TypeData
 /**
  * See [AddMissingSubtypeSupertypeRelations]
  */
-fun Bundle<TypeData>.addMissingSupertypeSubtypeRelations(): Bundle<TypeData> { // todo: renamed from connectSubTypes
+fun Bundle<TypeData>.addMissingSupertypeSubtypeRelations(): Bundle<TypeData> {
     return AddMissingSubtypeSupertypeRelations().process(this)
 }
 
@@ -27,7 +27,7 @@ fun Bundle<TypeData>.handleNameAnnotation(): Bundle<TypeData> {
 /**
  * See [GettersToPropertiesStep]
  */
-fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> { // todo: renamed from  mergeGetters
+fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> {
     return GettersToPropertiesStep().process(this)
 }
 
@@ -35,7 +35,7 @@ fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> { // todo: renamed 
 /**
  * See [RenameMembersStep]
  */
-fun Bundle<TypeData>.renameMembers(rename: (name: String) -> String): Bundle<TypeData> { // todo: renamed from renameProperties
+fun Bundle<TypeData>.renameMembers(rename: (name: String) -> String): Bundle<TypeData> {
     return RenameMembersStep(rename).process(this)
 }
 

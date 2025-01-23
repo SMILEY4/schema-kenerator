@@ -27,9 +27,11 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.capturedKClass
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.descriptors.nonNullOriginal
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializerOrNull
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -45,6 +47,10 @@ class KotlinxSerializationTypeProcessingStep(
      * custom processors for given types that overwrite the default behaviour
      */
     private val customProcessors: List<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProcessor>> = emptyList(),
+    /**
+     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
+     */
+    private val serializersModule: SerializersModule? = null,
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
@@ -173,6 +179,12 @@ class KotlinxSerializationTypeProcessingStep(
             }
         if (customData != null) {
             return customData
+        }
+
+        // check contextual descriptors
+        val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
+        if (contextualByKClass != null) {
+            return parse(contextualByKClass, nullable, knownTypeData, processedDescriptors)
         }
 
         // parse descriptor
