@@ -694,7 +694,7 @@ class MiscTests : FreeSpec({
 
         "with serializers from annotation" {
 
-            val result = typeOf<TestClassContextualWithSerializers>()
+            val result = typeOf<TestClassSerializableWith>()
                 .processKotlinxSerialization {}
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -808,11 +808,9 @@ class MiscTests : FreeSpec({
         )
 
         @Serializable
-        data class TestClassContextualWithSerializers(
-            @Contextual
+        data class TestClassSerializableWith(
             @Serializable(with = MyInstantSerializer::class)
             val timestamp: Instant,
-            @Contextual
             @Serializable(with = MyUUIDSerializer::class)
             val id: UUID,
         )
