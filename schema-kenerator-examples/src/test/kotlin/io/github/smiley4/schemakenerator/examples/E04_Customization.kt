@@ -66,15 +66,6 @@ class E04_Customization : FreeSpec({
                             id = TypeId.create(),
                             identifyingName = TypeName("kotlin.String", "String"), // the type should be treated as if it was a string
                             descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
-                            typeParameters = mutableListOf(),
-                            annotations = mutableListOf(),
-                            subtypes = mutableListOf(),
-                            supertypes = mutableListOf(),
-                            members = mutableListOf(),
-                            isInlineValue = false,
-                            enumData = null,
-                            collectionData = null,
-                            mapData = null
                         )
                     }
 
@@ -112,15 +103,6 @@ class E04_Customization : FreeSpec({
                             id = TypeId.create(),
                             identifyingName = TypeName("kotlin.String", "String"), // the type should be treated as if it was a string
                             descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
-                            typeParameters = mutableListOf(),
-                            annotations = mutableListOf(),
-                            subtypes = mutableListOf(),
-                            supertypes = mutableListOf(),
-                            members = mutableListOf(),
-                            isInlineValue = false,
-                            enumData = null,
-                            collectionData = null,
-                            mapData = null
                         )
                     }
 

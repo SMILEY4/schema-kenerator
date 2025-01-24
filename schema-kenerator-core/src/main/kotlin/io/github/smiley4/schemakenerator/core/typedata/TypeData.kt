@@ -19,39 +19,39 @@ data class TypeData(
     /**
      * the type parameters (i.e. generics) of this type
      */
-    val typeParameters: MutableList<TypeParameterData>,
+    val typeParameters: MutableList<TypeParameterData> = mutableListOf(),
     /**
      * list of annotations on this type
      */
-    val annotations: MutableList<AnnotationData>,
+    val annotations: MutableList<AnnotationData> = mutableListOf(),
     /**
      * the list of subtypes, i.e. types that extend this type
      */
-    val subtypes: MutableList<TypeId>,
+    val subtypes: MutableList<TypeId> = mutableListOf(),
     /**
      * the list of supertype, i.e. types this type extends
      */
-    val supertypes: MutableList<TypeId>,
+    val supertypes: MutableList<TypeId> = mutableListOf(),
     /**
      * list of members, e.g. properties, functions
      */
-    val members: MutableList<MemberData>,
+    val members: MutableList<MemberData> = mutableListOf(),
     /**
      * whether the type is an inline value class
      */
-    var isInlineValue: Boolean,
+    var isInlineValue: Boolean = false,
     /**
      * Additional information for enums
      */
-    var enumData: EnumData?,
+    var enumData: EnumData? = null,
     /**
      * Additional information for collections (e.g. lists, arrays, sets)
      */
-    var collectionData: CollectionData?,
+    var collectionData: CollectionData? = null,
     /**
      * Additional information for maps
      */
-    var mapData: MapData?
+    var mapData: MapData? = null
 ) {
 
     companion object {
