@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationCustomProcessor
+import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationCustomProvider
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeMatcher
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
 import io.github.smiley4.schemakenerator.serialization.steps.fullName
@@ -98,7 +98,7 @@ fun Bundle<InputType>.processKotlinxSerialization(
 
 class KotlinxSerializationTypeProcessingConfig {
 
-    var customProcessors = mutableListOf<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProcessor>>()
+    var customProcessors = mutableListOf<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProvider>>()
 
     var typeRedirects = mutableMapOf<String, InputType>()
 
@@ -110,31 +110,45 @@ class KotlinxSerializationTypeProcessingConfig {
      */
     var serializersModule: SerializersModule? = null
 
+
     /**
-     * Add a custom processor for the given type that overwrites the default behaviour
+     * Add a new custom type overwriting types matched by the given matcher.
      */
-    fun customProcessor(serializerName: String, processor: KotlinxSerializationCustomProcessor) {
-        customProcessors.add(
-            { descriptor: SerialDescriptor -> descriptor.fullName() == serializerName } to processor
+    fun custom(matcher: KotlinxSerializationTypeMatcher, provider: KotlinxSerializationCustomProvider) {
+        customProcessors.add(matcher to provider)
+    }
+
+
+    /**
+     * Add a custom type overwriting the given type.
+     * Matches types by [SerialDescriptor.serialName] equals the given name.
+     */
+    fun custom(serializerName: String, provider: KotlinxSerializationCustomProvider) {
+        custom(
+            { descriptor: SerialDescriptor -> descriptor.fullName() == serializerName },
+            provider
         )
     }
 
 
     /**
-     * Add a custom processor for the given type that overwrites the default behaviour
+     * Add a custom type overwriting the given type.
+     * Matches types by [SerialDescriptor.serialName] equals the qualified name of the given class.
      */
-    fun customProcessor(type: KClass<*>, processor: KotlinxSerializationCustomProcessor) {
-        customProcessors.add(
-            { descriptor: SerialDescriptor -> descriptor.matches(type) } to processor
+    fun custom(type: KClass<*>, provider: KotlinxSerializationCustomProvider) {
+        custom(
+            { descriptor: SerialDescriptor -> descriptor.matches(type) },
+            provider
         )
     }
 
 
     /**
-     * Add a custom processor for the given type that overwrites the default behaviour
+     * Add a custom type overwriting the given type.
+     * Matches types by [SerialDescriptor.serialName] equals the qualified name of the given type parameter.
      */
-    inline fun <reified T> customProcessor(noinline processor: KotlinxSerializationCustomProcessor) {
-        customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
+    inline fun <reified T> custom(noinline provider: KotlinxSerializationCustomProvider) {
+        custom(typeOf<T>().classifier!! as KClass<*>, provider)
     }
 
 
@@ -167,7 +181,7 @@ class KotlinxSerializationTypeProcessingConfig {
 
 
     /**
-     * Mark the type with the given full/qualified name as "not parameterized", i.e as not having any generic type parameters.
+     * Mark the type with the given full/qualified name as "not parameterized", i.e. as not having any generic type parameters.
      * This helps the type processing step to determine whether two types are truly the same.
      */
     fun markNotParameterized(name: String) {

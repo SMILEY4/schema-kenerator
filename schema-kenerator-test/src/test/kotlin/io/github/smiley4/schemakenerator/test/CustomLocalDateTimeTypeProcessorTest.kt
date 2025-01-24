@@ -52,7 +52,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
         val result = typeOf<ClassWithLocalDateTime>()
             .processReflection {
-                customProcessor<LocalDateTime> {
+                custom<LocalDateTime> {
                     TypeData(
                         id = TypeId.create(),
                         identifyingName = TypeName("kotlin.String", "String"),
@@ -127,7 +127,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
         val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .processKotlinxSerialization {
-                customProcessor<LocalDateTime> {
+                custom<LocalDateTime> {
                     TypeData(
                         id = TypeId.create(),
                         identifyingName = TypeName("kotlin.String", "String"),

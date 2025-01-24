@@ -46,7 +46,7 @@ class KotlinxSerializationTypeProcessingStep(
     /**
      * custom processors for given types that overwrite the default behaviour
      */
-    private val customProcessors: List<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProcessor>> = emptyList(),
+    private val customProcessors: List<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProvider>> = emptyList(),
     /**
      * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
      */

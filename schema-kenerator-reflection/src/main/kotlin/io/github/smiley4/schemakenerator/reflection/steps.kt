@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProcessor
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProvider
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
@@ -35,25 +35,25 @@ fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
 
 class ReflectionTypeProcessingStepConfig {
 
-    var customProcessors = mutableListOf<Pair<ReflectionTypeMatcher, ReflectionCustomProcessor>>()
+    var customProcessors = mutableListOf<Pair<ReflectionTypeMatcher, ReflectionCustomProvider>>()
 
     var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeProcessingStep.DEFAULT_REDIRECTS) }
 
 
     /**
-     * Whether to include getters as members of classes (see [PropertyType.GETTER]).
+     * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.GETTER]).
      */
     var includeGetters: Boolean = false
 
 
     /**
-     * Whether to include weak getters as members of classes (see [PropertyType.WEAK_GETTER]).
+     * Whether to include weak getters as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.WEAK_GETTER]).
      */
     var includeWeakGetters: Boolean = false
 
 
     /**
-     * Whether to include functions as members of classes (see [PropertyType.FUNCTION]).
+     * Whether to include functions as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.FUNCTION]).
      */
     var includeFunctions: Boolean = false
 
@@ -71,32 +71,40 @@ class ReflectionTypeProcessingStepConfig {
 
 
     /**
-     * The list of types that are considered "primitive types" and returned as [PrimitiveTypeData]
+     * The list of types that are considered "primitive types"
      */
     var primitiveTypes: MutableSet<KClass<*>> = DEFAULT_PRIMITIVE_TYPES.toMutableSet()
 
 
     /**
-     * Whether to use toString for enum values or the declared name
+     * Whether to use "toString" for enum values or the declared "name"
      */
     var enumConstType: EnumConstType = EnumConstType.NAME
 
 
     /**
-     * Add a custom processor for the given type that overwrites the default behaviour
+     * Add a new custom type for types matched by the given matcher
      */
-    fun customProcessor(clazz: KClass<*>, processor: ReflectionCustomProcessor) {
-        customProcessors.add(
-            { _: KType, c: KClass<*> -> c == clazz } to processor
+    fun custom(matcher: ReflectionTypeMatcher, provider: ReflectionCustomProvider) {
+        customProcessors.add(matcher to provider)
+    }
+
+    /**
+     * Add a custom type overwriting the given type
+     */
+    fun custom(clazz: KClass<*>, provider: ReflectionCustomProvider) {
+        custom(
+            { _: KType, c: KClass<*> -> c == clazz },
+            provider
         )
     }
 
 
     /**
-     * Add a custom processor for the given type that overwrites the default behaviour
+     * Add a custom type overwriting the given type
      */
-    inline fun <reified T> customProcessor(noinline processor: ReflectionCustomProcessor) {
-        customProcessor(typeOf<T>().classifier!! as KClass<*>, processor)
+    inline fun <reified T> custom(noinline provider: ReflectionCustomProvider) {
+        custom(typeOf<T>().classifier!! as KClass<*>, provider)
     }
 
 

@@ -59,7 +59,7 @@ class E04_Customization : FreeSpec({
                 .processReflection {
 
                     // register a custom processor for the type "LocalDateTime"
-                    customProcessor<LocalDateTime> {
+                    custom<LocalDateTime> {
                         // Create type data for "LocalDateTime".
                         // By default, local date time would have been processed possibly as a complex object with unwanted properties.
                         TypeData(
@@ -96,7 +96,7 @@ class E04_Customization : FreeSpec({
                 .processKotlinxSerialization {
 
                     // register a custom processor for the type "LocalDateTime"
-                    customProcessor<LocalDateTime> {
+                    custom<LocalDateTime> {
                         // Create type data for "LocalDateTime".
                         // By default, local date time would have been processed possibly as a complex object with unwanted properties.
                         TypeData(
