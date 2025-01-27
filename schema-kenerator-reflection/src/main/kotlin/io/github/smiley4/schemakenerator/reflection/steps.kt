@@ -5,12 +5,13 @@ import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.reflection.analyze.DefaultReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl
+import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl.Companion.DEFAULT_PRIMITIVE_TYPES
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProvider
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep.Companion.DEFAULT_PRIMITIVE_TYPES
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -37,7 +38,7 @@ class ReflectionTypeProcessingStepConfig {
 
     var customProcessors = mutableListOf<Pair<ReflectionTypeMatcher, ReflectionCustomProvider>>()
 
-    var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeProcessingStep.DEFAULT_REDIRECTS) }
+    var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeAnalyzerImpl.DEFAULT_REDIRECTS) }
 
 
     /**
@@ -146,17 +147,31 @@ fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -
  */
 fun InputType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
-    return ReflectionTypeProcessingStep(
-        includeGetters = config.includeGetters,
-        includeWeakGetters = config.includeWeakGetters,
-        includeFunctions = config.includeFunctions,
-        includeHidden = config.includeHidden,
-        includeStatic = config.includeStatic,
-        primitiveTypes = config.primitiveTypes,
-        customProcessors = config.customProcessors,
-        enumConstType = config.enumConstType,
-        typeRedirects = config.typeRedirects
+    return ReflectionTypeAnalyzerImpl(
+        typeRedirects = config.typeRedirects,
+        modules = listOf(
+            DefaultReflectionTypeAnalyzerModule(
+                includeGetters = config.includeGetters,
+                includeWeakGetters = config.includeWeakGetters,
+                includeFunctions = config.includeFunctions,
+                includeHidden = config.includeHidden,
+                includeStatic = config.includeStatic,
+                primitiveTypes = config.primitiveTypes,
+                enumConstType = config.enumConstType,
+            )
+        )
     ).process(this)
+//    return ReflectionTypeProcessingStep(
+//        includeGetters = config.includeGetters,
+//        includeWeakGetters = config.includeWeakGetters,
+//        includeFunctions = config.includeFunctions,
+//        includeHidden = config.includeHidden,
+//        includeStatic = config.includeStatic,
+//        primitiveTypes = config.primitiveTypes,
+//        customProcessors = config.customProcessors,
+//        enumConstType = config.enumConstType,
+//        typeRedirects = config.typeRedirects
+//    ).process(this)
 }
 
 
@@ -174,17 +189,31 @@ fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepCon
  */
 fun Bundle<InputType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
-    return ReflectionTypeProcessingStep(
-        includeGetters = config.includeGetters,
-        includeWeakGetters = config.includeWeakGetters,
-        includeFunctions = config.includeFunctions,
-        includeHidden = config.includeHidden,
-        includeStatic = config.includeStatic,
-        primitiveTypes = config.primitiveTypes,
-        customProcessors = config.customProcessors,
-        enumConstType = config.enumConstType,
-        typeRedirects = config.typeRedirects
+    return ReflectionTypeAnalyzerImpl(
+        typeRedirects = config.typeRedirects,
+        modules = listOf(
+            DefaultReflectionTypeAnalyzerModule(
+                includeGetters = config.includeGetters,
+                includeWeakGetters = config.includeWeakGetters,
+                includeFunctions = config.includeFunctions,
+                includeHidden = config.includeHidden,
+                includeStatic = config.includeStatic,
+                primitiveTypes = config.primitiveTypes,
+                enumConstType = config.enumConstType,
+            )
+        )
     ).process(this)
+//    return ReflectionTypeProcessingStep(
+//        includeGetters = config.includeGetters,
+//        includeWeakGetters = config.includeWeakGetters,
+//        includeFunctions = config.includeFunctions,
+//        includeHidden = config.includeHidden,
+//        includeStatic = config.includeStatic,
+//        primitiveTypes = config.primitiveTypes,
+//        customProcessors = config.customProcessors,
+//        enumConstType = config.enumConstType,
+//        typeRedirects = config.typeRedirects
+//    ).process(this)
 }
 
 

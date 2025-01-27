@@ -719,7 +719,7 @@ class MiscTests : FreeSpec({
                         "id",
                         "timestamp"
                       ],
-                      "title": "TestClassContextualWithSerializers"
+                      "title": "TestClassSerializableWith"
                     }
                 """.trimIndent()
             }
