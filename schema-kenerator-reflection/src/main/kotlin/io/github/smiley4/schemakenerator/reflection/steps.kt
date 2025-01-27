@@ -5,10 +5,11 @@ import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.reflection.analyze.DefaultReflectionTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer.Companion.DEFAULT_PRIMITIVE_TYPES
+import io.github.smiley4.schemakenerator.reflection.steps.DefaultReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeAnalyzerImpl
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.steps.SimpleTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.Companion.DEFAULT_PRIMITIVE_TYPES
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProvider
@@ -161,7 +162,7 @@ class ReflectionTypeAnalysisConfig {
 
 
 /**
- * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
+ * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
  */
 fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
     return KTypeInput(this).analyseTypeUsingReflection(configBlock)
@@ -169,19 +170,19 @@ fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.(
 
 
 /**
- * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
+ * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
  */
 fun InputType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeAnalysisConfig().apply(configBlock)
     return ReflectionTypeAnalyzerImpl(
         typeRedirects = config.typeRedirects,
         modules = config.buildCustomModules()
-    ).process(this)
+    ).analyze(this)
 }
 
 
 /**
- * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
+ * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
  */
 @JvmName("analyseKTypeUsingReflection")
 fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
@@ -190,14 +191,14 @@ fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysis
 
 
 /**
- * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
+ * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
  */
 fun Bundle<InputType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeAnalysisConfig().apply(configBlock)
     return ReflectionTypeAnalyzerImpl(
         typeRedirects = config.typeRedirects,
         modules = config.buildCustomModules()
-    ).process(this)
+    ).analyze(this)
 }
 
 

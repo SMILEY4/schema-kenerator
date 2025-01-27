@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection.analyze
+package io.github.smiley4.schemakenerator.reflection.steps
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
@@ -8,6 +8,8 @@ import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
 import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
 import io.github.smiley4.schemakenerator.core.typedata.matches
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -44,22 +46,22 @@ class ReflectionTypeAnalyzerImpl(
 
 
     /**
-     * Process the given input type
+     * Analyze the given input type
      */
-    fun process(input: InputType): Bundle<TypeData> = process(Bundle(input, emptyList()))
+    fun analyze(input: InputType): Bundle<TypeData> = analyze(Bundle(input, emptyList()))
 
 
     /**
-     * Process the given input type bundle
+     * Analyze the given input type bundle
      */
-    fun process(input: Bundle<InputType>): Bundle<TypeData> {
+    fun analyze(input: Bundle<InputType>): Bundle<TypeData> {
 
         val knownTypeData = mutableListOf<TypeData>()
 
         // process supporting inputs
         input.supporting.forEach {
             when (it) {
-                is KTypeInput -> process(it.kType, knownTypeData)
+                is KTypeInput -> analyze(it.kType, knownTypeData)
                 else -> throw IllegalArgumentException("Unsupported input type '$it'.")
             }
         }
@@ -67,7 +69,7 @@ class ReflectionTypeAnalyzerImpl(
         // process main input
         val typeData = input.data.let {
             when (it) {
-                is KTypeInput -> process(it.kType, knownTypeData)
+                is KTypeInput -> analyze(it.kType, knownTypeData)
                 else -> throw IllegalArgumentException("Unsupported input type '$it'.")
             }
         }
@@ -81,15 +83,15 @@ class ReflectionTypeAnalyzerImpl(
 
 
     /**
-     * Process the given type and adds new results to the given collection.
+     * Analyze the given type and adds new results to the given collection.
      * @param type the type to process
      * @param knownTypeData the already known type data. Adds new results to this collection.
      */
-    private fun process(type: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
+    private fun analyze(type: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
         return if (typeRedirects.containsKey(type)) {
-            process(typeRedirects[type]!!, knownTypeData)
+            analyze(typeRedirects[type]!!, knownTypeData)
         } else if (type.classifier is KClass<*>) {
-            parseClass(type, type.classifier as KClass<*>, emptyList(), knownTypeData)
+            analyzeClass(type, type.classifier as KClass<*>, emptyList(), knownTypeData)
         } else {
             throw IllegalArgumentException("Type is not a class: '${type.classifier}'.")
         }
@@ -102,7 +104,7 @@ class ReflectionTypeAnalyzerImpl(
         knownTypeParameters: List<TypeParameterData>,
         knownTypeData: MutableList<TypeData>
     ): WrappedTypeData {
-        return parseClass(type, clazz, knownTypeParameters, knownTypeData)
+        return analyzeClass(type, clazz, knownTypeParameters, knownTypeData)
     }
 
 
@@ -113,7 +115,7 @@ class ReflectionTypeAnalyzerImpl(
      * @param knownTypeParameters already parsed type parameter data
      * @param knownTypeData the already known type data. Adds new results to this collection.
      */
-    private fun parseClass(
+    private fun analyzeClass(
         type: KType,
         clazz: KClass<*>,
         knownTypeParameters: List<TypeParameterData>,
@@ -122,7 +124,7 @@ class ReflectionTypeAnalyzerImpl(
 
         // check type redirects
         if (typeRedirects.containsKey(type)) {
-            return process(typeRedirects[type]!!, knownTypeData)
+            return analyze(typeRedirects[type]!!, knownTypeData)
         }
 
         // find matching analyzer module for type

@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection.analyze.provided
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
 import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
 import io.github.smiley4.schemakenerator.core.typedata.MemberData
@@ -8,7 +8,6 @@ import io.github.smiley4.schemakenerator.core.typedata.Visibility
 import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeId
 import io.github.smiley4.schemakenerator.core.typedata.findOrThrow
 import io.github.smiley4.schemakenerator.core.typedata.toWrappedTypeId
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerModule
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass

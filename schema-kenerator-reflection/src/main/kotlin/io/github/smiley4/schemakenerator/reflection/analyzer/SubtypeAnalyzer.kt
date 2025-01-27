@@ -1,8 +1,7 @@
-package io.github.smiley4.schemakenerator.reflection.analyze.provided
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.core.typedata.TypeId
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerModule
 import kotlin.reflect.full.starProjectedType
 
 /**

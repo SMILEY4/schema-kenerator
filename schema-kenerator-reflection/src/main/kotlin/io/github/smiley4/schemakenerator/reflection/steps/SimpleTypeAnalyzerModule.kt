@@ -1,12 +1,10 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.reflection.steps
 
 import io.github.smiley4.schemakenerator.core.typedata.TypeName
 import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeParameterAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyzer.TypeParameterAnalyzer
 import io.github.smiley4.schemakenerator.reflection.data.MinimalTypeData
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProvider
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 

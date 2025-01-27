@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection.analyze.provided
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
@@ -6,7 +6,6 @@ import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeId
 import io.github.smiley4.schemakenerator.core.typedata.find
 import io.github.smiley4.schemakenerator.core.typedata.findOrThrow
 import io.github.smiley4.schemakenerator.core.typedata.toWrappedTypeId
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerModule
 import kotlin.reflect.KClass
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection

@@ -1,6 +1,6 @@
-package io.github.smiley4.schemakenerator.reflection.analyze.provided
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer.TypeCategory
+import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.TypeCategory
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf

@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection.analyze
+package io.github.smiley4.schemakenerator.reflection.steps
 
 import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
 import io.github.smiley4.schemakenerator.core.typedata.CollectionData
@@ -10,15 +10,16 @@ import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.core.typedata.TypeName
 import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
 import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.AnnotationAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.CollectionAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.EnumAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.MemberAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.SubtypeAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.SupertypeAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer.TypeCategory
-import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeParameterAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.AnnotationAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.CollectionAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.EnumAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.MemberAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyzer.SubtypeAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.SupertypeAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.TypeCategory
+import io.github.smiley4.schemakenerator.reflection.analyzer.TypeParameterAnalyzer
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.data.MinimalTypeData
 import kotlin.reflect.KCallable
