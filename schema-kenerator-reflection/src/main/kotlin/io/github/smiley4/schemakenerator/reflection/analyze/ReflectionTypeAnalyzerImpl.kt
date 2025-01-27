@@ -18,41 +18,12 @@ class ReflectionTypeAnalyzerImpl(
      */
     private val typeRedirects: Map<KType, KType> = DEFAULT_REDIRECTS,
     /**
-     * todo
+     * List of modules for type analysis. First matching module is used to analyze a given type.
      */
     private val modules: List<ReflectionTypeAnalyzerModule>
-
 ) : ReflectionTypeAnalyzer {
 
     companion object {
-
-        enum class TypeCategory {
-            PRIMITIVE,
-            OBJECT,
-            ENUM,
-            COLLECTION,
-            MAP
-        }
-
-        val DEFAULT_PRIMITIVE_TYPES = setOf<KClass<*>>(
-            Number::class,
-            Byte::class,
-            Short::class,
-            Int::class,
-            Long::class,
-            UByte::class,
-            UShort::class,
-            UInt::class,
-            ULong::class,
-            Float::class,
-            Double::class,
-            Boolean::class,
-            Char::class,
-            String::class,
-            Any::class,
-            Unit::class,
-        )
-
 
         @OptIn(ExperimentalUnsignedTypes::class)
         val DEFAULT_REDIRECTS = mapOf(
@@ -155,7 +126,8 @@ class ReflectionTypeAnalyzerImpl(
         }
 
         // find matching analyzer module for type
-        val module = modules.first { it.matches() }
+        val module = modules.firstOrNull { it.applies(type, clazz) }
+            ?: throw IllegalArgumentException("No analysis module matches the given type '$type'.")
 
         // create minimal type data
         val id = TypeId.create()

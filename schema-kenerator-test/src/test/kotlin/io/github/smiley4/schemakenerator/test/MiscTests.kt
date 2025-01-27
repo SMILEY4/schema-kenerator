@@ -17,7 +17,7 @@ import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -55,7 +55,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClassIssue14a>()
-                .processReflection {
+                .analyseTypeUsingReflection {
                     redirect<Optional<String?>, String?>()
                 }
                 .generateJsonSchema()
@@ -105,7 +105,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClassIssue16>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateJsonSchema {
                     optionalHandling = OptionalHandling.NON_REQUIRED
                 }
@@ -222,7 +222,7 @@ class MiscTests : FreeSpec({
 
     "https://github.com/SMILEY4/schema-kenerator/issues/20 - include annotations from constructor parameters" {
         val result = typeOf<TestClassIssue20>()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .handleJacksonAnnotations()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
@@ -316,7 +316,7 @@ class MiscTests : FreeSpec({
         )
 
         val result = typeOf<TestClass>()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
                 if (propertyData.name == "describeMe" && propertySchema is JsonObject) {
@@ -351,7 +351,7 @@ class MiscTests : FreeSpec({
 
         "inlining" {
             val result = typeOf<BIssue39>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining()
@@ -383,7 +383,7 @@ class MiscTests : FreeSpec({
 
         "referencing" {
             val result = typeOf<BIssue39>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileReferencingRoot()
@@ -486,7 +486,7 @@ class MiscTests : FreeSpec({
     "merge property attributes with referenced type" {
 
         val result = typeOf<ClassWithAnnotatedFields>()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
             .mergePropertyAttributesIntoType()
@@ -587,7 +587,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<GenericClass<String?>>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileInlining()
             result.swagger.shouldEqualJson {

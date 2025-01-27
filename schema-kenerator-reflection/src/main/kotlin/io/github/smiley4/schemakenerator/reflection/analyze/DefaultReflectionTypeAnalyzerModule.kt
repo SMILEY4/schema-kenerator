@@ -10,7 +10,6 @@ import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.core.typedata.TypeName
 import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
 import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl.Companion.TypeCategory
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.AnnotationAnalyzer
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.CollectionAnalyzer
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.EnumAnalyzer
@@ -18,6 +17,7 @@ import io.github.smiley4.schemakenerator.reflection.analyze.provided.MemberAnaly
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.SubtypeAnalyzer
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.SupertypeAnalyzer
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer
+import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer.TypeCategory
 import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeParameterAnalyzer
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.data.MinimalTypeData
@@ -25,6 +25,7 @@ import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
+import kotlin.reflect.KType
 
 
 class DefaultReflectionTypeAnalyzerModule(
@@ -68,7 +69,8 @@ class DefaultReflectionTypeAnalyzerModule(
     private val collectionAnalyzer = CollectionAnalyzer()
 
 
-    override fun matches() = true
+    override fun applies(type: KType, clazz: KClass<*>) = true
+
 
     override fun preAnalyze(context: ReflectionTypeAnalyzerModule.Context): MinimalTypeData {
         return MinimalTypeData(
@@ -77,6 +79,7 @@ class DefaultReflectionTypeAnalyzerModule(
             typeParameters = typeParameterAnalyzer.analyzeTypeParameters(context)
         )
     }
+
 
     override fun analyze(context: ReflectionTypeAnalyzerModule.Context, minimalTypeData: MinimalTypeData): WrappedTypeData {
 

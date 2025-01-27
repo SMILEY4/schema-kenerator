@@ -28,10 +28,26 @@ interface ReflectionTypeAnalyzerModule {
         }
     }
 
-    fun matches(): Boolean
 
+    /**
+     * @return whether this module applies to the given type.
+     */
+    fun applies(type: KType, clazz: KClass<*>): Boolean
+
+
+    /**
+     * A quick pre-analysis step with all input data in the given context.
+     * @param context the input context with the current type to analyse
+     * @return [MinimalTypeData] with some basic information
+     */
     fun preAnalyze(context: Context): MinimalTypeData
 
+
+    /**
+     * The full type analysis.
+     * @param context the input context with the current type to analyse and currently known additional data
+     * @return [TypeData] with additional nullability information
+     */
     fun analyze(context: Context, minimalTypeData: MinimalTypeData): WrappedTypeData
 
 }

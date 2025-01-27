@@ -4,7 +4,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.gettersToProperties
 import io.github.smiley4.schemakenerator.core.typedata.MemberKind
 import io.github.smiley4.schemakenerator.core.typedata.Visibility
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -16,7 +16,7 @@ class MergeGettersTest : StringSpec({
     "merge getter" {
 
         val result = typeOf<MyTestClass>()
-            .processReflection {
+            .analyseTypeUsingReflection {
                 includeGetters = true
                 includeHidden = true
             }

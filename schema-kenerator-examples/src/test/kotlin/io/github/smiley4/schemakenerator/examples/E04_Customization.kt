@@ -15,7 +15,7 @@ import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -56,7 +56,7 @@ class E04_Customization : FreeSpec({
         "... using reflection" {
 
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
-                .processReflection {
+                .analyseTypeUsingReflection {
 
                     // register a custom processor for the type "LocalDateTime"
                     custom<LocalDateTime> {
@@ -143,7 +143,7 @@ class E04_Customization : FreeSpec({
         "reflection" {
 
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
-                .processReflection {
+                .analyseTypeUsingReflection {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
                     redirect<LocalDateTime, String>()
                 }
@@ -211,7 +211,7 @@ class E04_Customization : FreeSpec({
             // e.g. here by adding a prefix to all properties.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .renameMembers { originalName -> "prefix_$originalName" }
                 .generateJsonSchema()
                 .compileInlining()
@@ -239,7 +239,7 @@ class E04_Customization : FreeSpec({
             // Note: schema-kenerator-serialization is required, even though this also works without using kotlinx-serialization for data extraction.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateJsonSchema()
                 .compileInlining()
@@ -282,7 +282,7 @@ class E04_Customization : FreeSpec({
         "json-schema" {
 
             val jsonSchema = typeOf<ExampleClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateJsonSchema()
                 .customizeTypes { typeData, typeSchema ->
                     if (typeData.members.any { it.name.contains("secret") } && typeSchema is JsonObject) {
@@ -322,7 +322,7 @@ class E04_Customization : FreeSpec({
         "swagger" {
 
             val swaggerSchema = typeOf<ExampleClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateSwaggerSchema()
                 .customizeTypes { typeData, typeSchema ->
                     if (typeData.members.any { it.name.contains("secret") }) {

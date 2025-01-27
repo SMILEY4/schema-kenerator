@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.reflection.analyze.provided
 
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl.Companion.TypeCategory
+import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer.TypeCategory
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
@@ -9,7 +9,39 @@ import kotlin.reflect.typeOf
 /**
  * Functions for determining the [TypeCategory] reflection.
  */
-class TypeCategoryAnalyzer() {
+class TypeCategoryAnalyzer {
+
+    enum class TypeCategory {
+        PRIMITIVE,
+        OBJECT,
+        ENUM,
+        COLLECTION,
+        MAP
+    }
+
+    companion object {
+
+        val DEFAULT_PRIMITIVE_TYPES = setOf<KClass<*>>(
+            Number::class,
+            Byte::class,
+            Short::class,
+            Int::class,
+            Long::class,
+            UByte::class,
+            UShort::class,
+            UInt::class,
+            ULong::class,
+            Float::class,
+            Double::class,
+            Boolean::class,
+            Char::class,
+            String::class,
+            Any::class,
+            Unit::class,
+        )
+
+    }
+
 
     /**
      * Determine the general category the given type falls into (e.g. primitive, enum, collection, ...)

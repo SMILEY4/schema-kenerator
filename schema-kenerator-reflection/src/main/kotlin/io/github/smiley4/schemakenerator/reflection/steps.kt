@@ -7,11 +7,12 @@ import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.reflection.analyze.DefaultReflectionTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl
-import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerImpl.Companion.DEFAULT_PRIMITIVE_TYPES
+import io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyze.provided.TypeCategoryAnalyzer.Companion.DEFAULT_PRIMITIVE_TYPES
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
+import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProvider
 import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -34,12 +35,7 @@ fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
 }
 
 
-class ReflectionTypeProcessingStepConfig {
-
-    var customProcessors = mutableListOf<Pair<ReflectionTypeMatcher, ReflectionCustomProvider>>()
-
-    var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeAnalyzerImpl.DEFAULT_REDIRECTS) }
-
+class ReflectionTypeAnalysisConfig {
 
     /**
      * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.GETTER]).
@@ -83,15 +79,42 @@ class ReflectionTypeProcessingStepConfig {
     var enumConstType: EnumConstType = EnumConstType.NAME
 
 
-    /**
-     * Add a new custom type for types matched by the given matcher
-     */
-    fun custom(matcher: ReflectionTypeMatcher, provider: ReflectionCustomProvider) {
-        customProcessors.add(matcher to provider)
+    var customModules = mutableListOf<ReflectionTypeAnalyzerModule>()
+
+    internal fun buildCustomModules(): List<ReflectionTypeAnalyzerModule> {
+        val allModules = listOf(
+            DefaultReflectionTypeAnalyzerModule(
+                includeGetters = includeGetters,
+                includeWeakGetters = includeWeakGetters,
+                includeFunctions = includeFunctions,
+                includeHidden = includeHidden,
+                includeStatic = includeStatic,
+                primitiveTypes = primitiveTypes,
+                enumConstType = enumConstType,
+            )
+        ) + customModules
+        return allModules.reversed()
     }
 
     /**
-     * Add a custom type overwriting the given type
+     * Adds a new [ReflectionTypeAnalyzerModule].
+     * Modules overwrite previous modules when matching the same type.
+     */
+    fun custom(module: ReflectionTypeAnalyzerModule) {
+        customModules.add(module)
+    }
+
+    /**
+     * Add a new custom type for types matched by the given matcher.
+     * Modules overwrite previous modules when matching the same type.
+     */
+    fun custom(matcher: ReflectionTypeMatcher, provider: ReflectionCustomProvider) {
+        customModules.add(SimpleTypeAnalyzerModule(matcher, provider))
+    }
+
+    /**
+     * Add a custom type overwriting the given type.
+     * Modules overwrite previous modules when matching the same type.
      */
     fun custom(clazz: KClass<*>, provider: ReflectionCustomProvider) {
         custom(
@@ -102,12 +125,15 @@ class ReflectionTypeProcessingStepConfig {
 
 
     /**
-     * Add a custom type overwriting the given type
+     * Add a custom type overwriting the given type.
+     * Modules overwrite previous modules when matching the same type.
      */
     inline fun <reified T> custom(noinline provider: ReflectionCustomProvider) {
         custom(typeOf<T>().classifier!! as KClass<*>, provider)
     }
 
+
+    var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeAnalyzerImpl.DEFAULT_REDIRECTS) }
 
     /**
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
@@ -135,85 +161,43 @@ class ReflectionTypeProcessingStepConfig {
 
 
 /**
- * See [ReflectionTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
  */
-fun KType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
-    return KTypeInput(this).processReflection(configBlock)
+fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    return KTypeInput(this).analyseTypeUsingReflection(configBlock)
 }
 
 
 /**
- * See [ReflectionTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
  */
-fun InputType.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
-    val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
+fun InputType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    val config = ReflectionTypeAnalysisConfig().apply(configBlock)
     return ReflectionTypeAnalyzerImpl(
         typeRedirects = config.typeRedirects,
-        modules = listOf(
-            DefaultReflectionTypeAnalyzerModule(
-                includeGetters = config.includeGetters,
-                includeWeakGetters = config.includeWeakGetters,
-                includeFunctions = config.includeFunctions,
-                includeHidden = config.includeHidden,
-                includeStatic = config.includeStatic,
-                primitiveTypes = config.primitiveTypes,
-                enumConstType = config.enumConstType,
-            )
-        )
+        modules = config.buildCustomModules()
     ).process(this)
-//    return ReflectionTypeProcessingStep(
-//        includeGetters = config.includeGetters,
-//        includeWeakGetters = config.includeWeakGetters,
-//        includeFunctions = config.includeFunctions,
-//        includeHidden = config.includeHidden,
-//        includeStatic = config.includeStatic,
-//        primitiveTypes = config.primitiveTypes,
-//        customProcessors = config.customProcessors,
-//        enumConstType = config.enumConstType,
-//        typeRedirects = config.typeRedirects
-//    ).process(this)
 }
 
 
 /**
- * See [ReflectionTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
  */
-@JvmName("processReflectionKType")
-fun Bundle<KType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
-    return this.mapToInputType().processReflection(configBlock)
+@JvmName("analyseKTypeUsingReflection")
+fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    return this.mapToInputType().analyseTypeUsingReflection(configBlock)
 }
 
 
 /**
- * See [ReflectionTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.reflection.analyze.ReflectionTypeAnalyzer]
  */
-fun Bundle<InputType>.processReflection(configBlock: ReflectionTypeProcessingStepConfig.() -> Unit = {}): Bundle<TypeData> {
-    val config = ReflectionTypeProcessingStepConfig().apply(configBlock)
+fun Bundle<InputType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    val config = ReflectionTypeAnalysisConfig().apply(configBlock)
     return ReflectionTypeAnalyzerImpl(
         typeRedirects = config.typeRedirects,
-        modules = listOf(
-            DefaultReflectionTypeAnalyzerModule(
-                includeGetters = config.includeGetters,
-                includeWeakGetters = config.includeWeakGetters,
-                includeFunctions = config.includeFunctions,
-                includeHidden = config.includeHidden,
-                includeStatic = config.includeStatic,
-                primitiveTypes = config.primitiveTypes,
-                enumConstType = config.enumConstType,
-            )
-        )
+        modules = config.buildCustomModules()
     ).process(this)
-//    return ReflectionTypeProcessingStep(
-//        includeGetters = config.includeGetters,
-//        includeWeakGetters = config.includeWeakGetters,
-//        includeFunctions = config.includeFunctions,
-//        includeHidden = config.includeHidden,
-//        includeStatic = config.includeStatic,
-//        primitiveTypes = config.primitiveTypes,
-//        customProcessors = config.customProcessors,
-//        enumConstType = config.enumConstType,
-//        typeRedirects = config.typeRedirects
-//    ).process(this)
 }
 
 

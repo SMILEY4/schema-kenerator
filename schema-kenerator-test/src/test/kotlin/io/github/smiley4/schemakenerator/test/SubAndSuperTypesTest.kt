@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminator
 import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.SubType
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
@@ -35,7 +35,7 @@ class SubAndSuperTypesTest : StringSpec({
 
         val result = typeOf<BaseClass1>()
             .collectSubTypes()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
 
         result.data.identifyingName.full shouldBe BaseClass1::class.qualifiedName
@@ -102,7 +102,7 @@ class SubAndSuperTypesTest : StringSpec({
 
         val result = typeOf<NormalClass>()
             .collectSubTypes()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
 
         result.data.identifyingName.full shouldBe NormalClass::class.qualifiedName
@@ -115,8 +115,8 @@ class SubAndSuperTypesTest : StringSpec({
     "jackson subtype-annotation" {
 
         val result = typeOf<JacksonBaseClass1>()
-            .collectJacksonSubTypes(typeProcessing = { t -> t.processReflection() })
-            .processReflection()
+            .collectJacksonSubTypes(typeProcessing = { t -> t.analyseTypeUsingReflection() })
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
 
         result.data.identifyingName.full shouldBe JacksonBaseClass1::class.qualifiedName
@@ -182,8 +182,8 @@ class SubAndSuperTypesTest : StringSpec({
     "without jackson subtype-annotation" {
 
         val result = typeOf<NormalClass>()
-            .collectJacksonSubTypes(typeProcessing = { it.processReflection() })
-            .processReflection()
+            .collectJacksonSubTypes(typeProcessing = { it.analyseTypeUsingReflection() })
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
 
         result.data.identifyingName.full shouldBe NormalClass::class.qualifiedName
@@ -197,7 +197,7 @@ class SubAndSuperTypesTest : StringSpec({
 
         val result = typeOf<BaseClass1>()
             .collectSubTypes()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
             .addJacksonTypeInfoDiscriminatorProperty()
             .addJsonClassDiscriminatorProperty()
@@ -220,7 +220,7 @@ class SubAndSuperTypesTest : StringSpec({
 
         val result = typeOf<KotlinxParent>()
             .collectSubTypes()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
             .addJacksonTypeInfoDiscriminatorProperty()
             .addJsonClassDiscriminatorProperty()
@@ -243,7 +243,7 @@ class SubAndSuperTypesTest : StringSpec({
 
         val result = typeOf<JacksonParent>()
             .collectSubTypes()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
             .addJacksonTypeInfoDiscriminatorProperty()
             .addJsonClassDiscriminatorProperty()

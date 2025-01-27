@@ -3,9 +3,8 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -25,7 +24,7 @@ class DiscriminatorTests : FreeSpec({
 
         "inlining" {
             val result = typeOf<TestClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .addDiscriminatorProperty("_type")
                 .generateSwaggerSchema()
                 .compileInlining()
@@ -68,7 +67,7 @@ class DiscriminatorTests : FreeSpec({
 
             "openapi simple path" {
                 val result = typeOf<TestClass>()
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
                     .compileReferencing(RefType.OPENAPI_SIMPLE)
@@ -101,7 +100,7 @@ class DiscriminatorTests : FreeSpec({
 
             "openapi full path" {
                 val result = typeOf<TestClass>()
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
                     .compileReferencing(RefType.OPENAPI_FULL)
@@ -134,7 +133,7 @@ class DiscriminatorTests : FreeSpec({
 
             "simple path" {
                 val result = typeOf<TestClass>()
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
                     .compileReferencing(RefType.OPENAPI_SIMPLE)
@@ -167,7 +166,7 @@ class DiscriminatorTests : FreeSpec({
 
             "full path" {
                 val result = typeOf<TestClass>()
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
                     .compileReferencing(RefType.FULL)
@@ -206,7 +205,7 @@ class DiscriminatorTests : FreeSpec({
 
         "use class" {
             val result = typeOf<JacksonUseClassTestClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
                 .compileReferencing(RefType.OPENAPI_SIMPLE)
@@ -239,7 +238,7 @@ class DiscriminatorTests : FreeSpec({
 
         "use name" {
             val result = typeOf<JacksonUseNameTestClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
                 .compileReferencing(RefType.OPENAPI_SIMPLE)
@@ -272,7 +271,7 @@ class DiscriminatorTests : FreeSpec({
 
         "use simple name" {
             val result = typeOf<JacksonUseSimpleNameTestClass>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
                 .compileReferencing(RefType.OPENAPI_SIMPLE)
