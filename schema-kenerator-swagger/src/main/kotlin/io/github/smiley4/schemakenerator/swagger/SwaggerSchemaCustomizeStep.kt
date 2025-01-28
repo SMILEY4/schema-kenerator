@@ -8,10 +8,7 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
 import io.swagger.v3.oas.models.media.Schema
 
-/**
- * Further customization options
- */
-class SwaggerSchemaCustomizeStep {
+internal class SwaggerSchemaCustomizeStep {
 
     /**
      * Provide a function that is called for each type and swagger-schema. Can be used to manually manipulate the generated swagger-schema.

@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.CollectionData
@@ -10,18 +10,8 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.reflection.analyzer.AnnotationAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.CollectionAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.EnumAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.MemberAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.reflection.analyzer.SubtypeAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.SupertypeAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer
 import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.TypeCategory
-import io.github.smiley4.schemakenerator.reflection.analyzer.TypeParameterAnalyzer
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.data.MinimalTypeData
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection.data
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData

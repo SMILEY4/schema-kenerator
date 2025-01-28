@@ -1,17 +1,12 @@
 package io.github.smiley4.schemakenerator.swagger.generator
 
-import io.github.smiley4.schemakenerator.core.GenericBundleStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
-/**
- * Generates swagger-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
- * Result needs to be "compiled" to get the final swagger-schema.
- */
-class SwaggerSchemaGeneratorImpl(private val modules: List<SwaggerSchemaGenerationModule>) : GenericBundleStep<TypeData, SwaggerSchema>, SwaggerSchemaGenerator {
+internal class SwaggerSchemaGeneratorImpl(private val modules: List<SwaggerSchemaGenerationModule>) : SwaggerSchemaGenerator {
 
-    override fun process(input: Bundle<TypeData>): Bundle<SwaggerSchema> {
+    fun process(input: Bundle<TypeData>): Bundle<SwaggerSchema> {
         val allTypeData = listOf(input.data) + input.supporting
         return Bundle(
             data = generate(input.data, allTypeData),

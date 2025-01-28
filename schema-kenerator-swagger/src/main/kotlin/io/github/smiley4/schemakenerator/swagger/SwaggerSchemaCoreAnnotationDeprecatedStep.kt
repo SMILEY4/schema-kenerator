@@ -1,18 +1,24 @@
 package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.annotations.Deprecated
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
-/**
- * Sets deprecated-flag from [Deprecated] or kotlin's [Deprecated]-annotation.
- */
-class SwaggerSchemaCoreAnnotationDeprecatedStep : AbstractSwaggerSchemaStep() {
+internal class SwaggerSchemaCoreAnnotationDeprecatedStep {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.swagger.deprecated == null) {
             determineDeprecated(schema.typeData.annotations)?.also { deprecated ->
                 schema.swagger.deprecated = deprecated
@@ -37,7 +43,7 @@ class SwaggerSchemaCoreAnnotationDeprecatedStep : AbstractSwaggerSchemaStep() {
     }
 
     private fun determineDeprecatedStd(annotations: Collection<AnnotationData>): Boolean? {
-        return if (annotations.any { it.name == Deprecated::class.qualifiedName }) {
+        return if (annotations.any { it.name == kotlin.Deprecated::class.qualifiedName }) {
             true
         } else {
             null

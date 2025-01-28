@@ -12,11 +12,7 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.resol
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.shouldReference
 import io.swagger.v3.oas.models.media.Schema
 
-/**
- * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
- * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
- */
-class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 

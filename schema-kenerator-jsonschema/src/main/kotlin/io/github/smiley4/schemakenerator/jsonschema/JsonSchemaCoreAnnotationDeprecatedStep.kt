@@ -2,19 +2,25 @@ package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.core.annotations.Deprecated
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
 
-/**
- * Sets deprecated-flag from [Deprecated] or kotlin's [Deprecated]-annotation.
- */
-class JsonSchemaCoreAnnotationDeprecatedStep : AbstractJsonSchemaStep() {
+internal class JsonSchemaCoreAnnotationDeprecatedStep {
 
-    override fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
+    fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.json is JsonObject && schema.json.properties["deprecated"] == null) {
             determineDeprecated(schema.typeData.annotations)?.also { deprecated ->
                 schema.json.properties["deprecated"] = JsonBooleanValue(deprecated)

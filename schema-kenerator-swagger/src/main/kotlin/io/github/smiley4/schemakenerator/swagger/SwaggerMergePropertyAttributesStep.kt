@@ -5,10 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
-/**
- * Merge the attributes of a property into the referenced type.
- */
-class SwaggerMergePropertyAttributesStep {
+internal class SwaggerMergePropertyAttributesStep {
 
     fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
         val open = bundle.flatten().toMutableList()

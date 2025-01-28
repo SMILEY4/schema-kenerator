@@ -2,17 +2,23 @@ package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
 
-/**
- * Modifies type of swagger-objects with the core [Type]-annotation.
- */
-class SwaggerSchemaCoreAnnotationTypeStep : AbstractSwaggerSchemaStep() {
+internal class SwaggerSchemaCoreAnnotationTypeStep {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         determineType(schema.typeData.annotations)?.also { type ->
             schema.swagger.types = setOf(type)
         }

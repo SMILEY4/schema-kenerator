@@ -5,7 +5,6 @@ import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.AbstractSwaggerSchemaStep
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
 import io.github.smiley4.schemakenerator.swagger.buildTypeDataMap
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema

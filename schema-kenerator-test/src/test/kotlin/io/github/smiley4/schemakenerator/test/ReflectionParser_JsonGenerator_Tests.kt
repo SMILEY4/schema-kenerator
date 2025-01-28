@@ -8,15 +8,11 @@ import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCoreAnnotationDefaultStep
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCoreAnnotationDeprecatedStep
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCoreAnnotationDescriptionStep
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCoreAnnotationExamplesStep
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCoreAnnotationFormatStep
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
+import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
@@ -46,13 +42,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
@@ -78,13 +68,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
@@ -120,13 +104,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }

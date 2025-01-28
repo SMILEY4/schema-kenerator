@@ -10,10 +10,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.resolveReferences
 
-/**
- * Resolves references in prepared json-schemas by inlining them.
- */
-class JsonSchemaCompileInlineStep {
+internal class JsonSchemaCompileInlineStep {
 
     /**
      * Inline all referenced schema

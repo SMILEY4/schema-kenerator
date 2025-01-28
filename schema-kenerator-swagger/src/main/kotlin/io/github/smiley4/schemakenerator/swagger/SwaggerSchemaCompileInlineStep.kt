@@ -11,10 +11,7 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.resolveReferences
 import io.swagger.v3.oas.models.media.Schema
 
-/**
- * Resolves references in prepared swagger-schemas by inlining them.
- */
-class SwaggerSchemaCompileInlineStep {
+internal class SwaggerSchemaCompileInlineStep {
 
     private val schemaUtils = SwaggerSchemaUtils()
 

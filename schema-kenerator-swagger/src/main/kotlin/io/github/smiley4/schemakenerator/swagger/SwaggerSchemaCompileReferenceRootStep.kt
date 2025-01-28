@@ -7,14 +7,9 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.shouldReference
 
-/**
- * Resolves references in prepared swagger-schemas by collecting them in the components-section and referencing them.
- * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
- */
-class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = SwaggerSchemaUtils()
-
 
     /**
      * Put referenced schemas into definitions and reference them

@@ -8,10 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
 
-/**
- * Further customization options
- */
-class JsonSchemaCustomizeStep {
+internal class JsonSchemaCustomizeStep {
 
     /**
      * Provide a function that is called for each type and json-schema. Can be used to manually manipulate the generated json-schema.

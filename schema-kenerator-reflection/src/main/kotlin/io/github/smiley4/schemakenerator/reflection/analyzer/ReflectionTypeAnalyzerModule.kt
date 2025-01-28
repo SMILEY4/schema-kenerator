@@ -4,10 +4,12 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.reflection.data.MinimalTypeData
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
+/**
+ * Module to use for analysis of a matching type
+ */
 interface ReflectionTypeAnalyzerModule {
 
     class Context(

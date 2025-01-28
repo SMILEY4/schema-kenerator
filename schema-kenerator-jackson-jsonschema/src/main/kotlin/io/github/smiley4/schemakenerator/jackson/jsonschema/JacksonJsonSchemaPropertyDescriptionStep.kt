@@ -7,7 +7,6 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.jsonschema.AbstractJsonSchemaStep
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
 import io.github.smiley4.schemakenerator.jsonschema.buildTypeDataMap
 

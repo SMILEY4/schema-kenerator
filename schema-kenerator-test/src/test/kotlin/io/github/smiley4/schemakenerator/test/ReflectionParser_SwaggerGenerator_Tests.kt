@@ -7,15 +7,9 @@ import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.SwaggerArraySchemaAnnotationStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCoreAnnotationDefaultStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCoreAnnotationDeprecatedStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCoreAnnotationDescriptionStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCoreAnnotationExamplesStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCoreAnnotationFormatStep
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass
@@ -49,14 +43,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAnnotations) {
                         list
-                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
-                            .let { SwaggerSchemaAnnotationStep().process(it) }
-                            .let { SwaggerArraySchemaAnnotationStep().process(it) }
+                            .handleCoreAnnotations()
+                            .handleSchemaAnnotations()
                     } else {
                         list
                     }
@@ -89,14 +77,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAnnotations) {
                         list
-                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
-                            .let { SwaggerSchemaAnnotationStep().process(it) }
-                            .let { SwaggerArraySchemaAnnotationStep().process(it) }
+                            .handleCoreAnnotations()
+                            .handleSchemaAnnotations()
                     } else {
                         list
                     }
@@ -129,14 +111,8 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 .let { list ->
                     if (data.withAnnotations) {
                         list
-                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
-                            .let { SwaggerSchemaAnnotationStep().process(it) }
-                            .let { SwaggerArraySchemaAnnotationStep().process(it) }
+                            .handleCoreAnnotations()
+                            .handleSchemaAnnotations()
                     } else {
                         list
                     }

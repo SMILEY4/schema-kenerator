@@ -13,11 +13,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.shouldReference
 
-/**
- * Resolves references in prepared json-schemas by collecting them in the definitions-section and referencing them.
- * @param pathBuilder builds the path to reference the type, i.e. which "name" to use
- */
-class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     private val schemaUtils = JsonSchemaUtils()
 

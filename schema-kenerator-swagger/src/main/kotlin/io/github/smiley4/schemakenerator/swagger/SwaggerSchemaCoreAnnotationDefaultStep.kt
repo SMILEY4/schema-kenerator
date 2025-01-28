@@ -2,17 +2,23 @@ package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
 
-/**
- * Adds default values from [Default]-annotation
- */
-class SwaggerSchemaCoreAnnotationDefaultStep : AbstractSwaggerSchemaStep() {
+internal class SwaggerSchemaCoreAnnotationDefaultStep {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.swagger.default == null) {
             determineDefault(schema.typeData.annotations)?.also { default ->
                 schema.swagger.setDefault(default)

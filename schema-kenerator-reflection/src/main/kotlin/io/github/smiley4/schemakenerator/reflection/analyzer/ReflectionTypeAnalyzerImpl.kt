@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.reflection
+package io.github.smiley4.schemakenerator.reflection.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
@@ -8,13 +8,11 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.core.data.matches
-import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer
-import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-class ReflectionTypeAnalyzerImpl(
+internal class ReflectionTypeAnalyzerImpl(
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */

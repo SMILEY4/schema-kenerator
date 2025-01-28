@@ -5,11 +5,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
-/**
- * Adds an automatically determined title to schemas.
- * @param titleBuilder the builder for the title
- */
-class SwaggerSchemaTitleStep(private val titleBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class SwaggerSchemaTitleStep(private val titleBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
         val typeDataMap = bundle.buildTypeDataMap()

@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
@@ -9,32 +10,18 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.re
 import io.swagger.v3.oas.annotations.media.Schema
 import java.math.BigDecimal
 
-/**
- * Adds support for swagger [Schema]-annotation
- * - on types
- *      - title
- *      - description
- * - on properties
- *      - name
- *      - title
- *      - description
- *      - example
- *      - hidden
- *      - allowableValues
- *      - defaultValue
- *      - accessMode
- *      - minLength
- *      - maxLength,
- *      - format
- *      - minimum
- *      - maximum
- *      - exclusiveMaximum
- *      - exclusiveMinimum
- */
-class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
+internal class SwaggerSchemaAnnotationStep {
+
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
 
     @Suppress("CyclomaticComplexMethod")
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         getTitle(schema.typeData.annotations)?.also { schema.swagger.title = it }
         getDescription(schema.typeData.annotations)?.also { schema.swagger.description = it }
 

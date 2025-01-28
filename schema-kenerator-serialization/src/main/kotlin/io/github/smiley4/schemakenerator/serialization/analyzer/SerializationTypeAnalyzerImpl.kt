@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSerializationApi::class)
 
-package io.github.smiley4.schemakenerator.serialization
+package io.github.smiley4.schemakenerator.serialization.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
@@ -9,9 +9,6 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.core.data.matches
-import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer
-import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.serialization.analyzer.fullName
 import io.github.smiley4.schemakenerator.serialization.data.SerialDescriptorInput
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -23,7 +20,7 @@ import kotlinx.serialization.serializerOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
-class SerializationTypeAnalyzerImpl(
+internal class SerializationTypeAnalyzerImpl(
     /**
      * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
      */

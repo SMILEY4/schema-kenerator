@@ -1,6 +1,5 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.core.GenericStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
@@ -10,15 +9,9 @@ import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
 
-/**
- * Finds additional subtypes from [SubType]-annotation.
- * An additional step to add missing subtype-supertype relations
- * later may be required - see [io.github.smiley4.schemakenerator.core.steps.AddMissingSubtypeSupertypeRelations].
- * @param maxRecursionDepth how many "levels" to search for subtypes
- */
-class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) : GenericStep<InputType, Bundle<InputType>> {
+internal class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) {
 
-    override fun process(input: InputType): Bundle<InputType> {
+    fun process(input: InputType): Bundle<InputType> {
 
         var depth = 0
         var countPrev: Int

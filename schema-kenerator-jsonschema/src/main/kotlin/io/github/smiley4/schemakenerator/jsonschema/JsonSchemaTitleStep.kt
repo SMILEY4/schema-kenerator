@@ -7,11 +7,7 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
-/**
- * Adds an automatically determined title to schemas.
- * @param titleBuilder the builder for the title
- */
-class JsonSchemaTitleStep(private val titleBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class JsonSchemaTitleStep(private val titleBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
     fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
         val typeDataMap = bundle.buildTypeDataMap()

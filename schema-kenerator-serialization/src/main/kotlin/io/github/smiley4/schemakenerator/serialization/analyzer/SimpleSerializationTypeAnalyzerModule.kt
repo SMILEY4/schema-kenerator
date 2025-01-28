@@ -1,7 +1,6 @@
-package io.github.smiley4.schemakenerator.serialization
+package io.github.smiley4.schemakenerator.serialization.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
 import kotlinx.serialization.descriptors.SerialDescriptor
 
 class SimpleSerializationTypeAnalyzerModule(

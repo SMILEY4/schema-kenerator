@@ -1,18 +1,22 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.GenericBundleIndependentContentStep
 import io.github.smiley4.schemakenerator.core.annotations.Title
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
-/**
- * Adds a title specified by the [Title]-annotation
- */
-class JsonSchemaCoreAnnotationTitleStep : GenericBundleIndependentContentStep<JsonSchema>() {
+internal class JsonSchemaCoreAnnotationTitleStep {
 
-    override fun process(input: JsonSchema) {
+    fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
+        return bundle.also { schema ->
+            process(schema.data)
+            schema.supporting.forEach { process(it) }
+        }
+    }
+
+    private fun process(input: JsonSchema) {
         if (input.json is JsonObject && input.json.properties["title"] == null) {
             determineTitle(input.typeData)?.also { title ->
                 input.json.properties["title"] = JsonTextValue(title)

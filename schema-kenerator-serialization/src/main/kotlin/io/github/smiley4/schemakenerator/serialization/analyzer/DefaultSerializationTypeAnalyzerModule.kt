@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSerializationApi::class)
 
-package io.github.smiley4.schemakenerator.serialization
+package io.github.smiley4.schemakenerator.serialization.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.CollectionData
 import io.github.smiley4.schemakenerator.core.data.EnumData
@@ -14,10 +14,6 @@ import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.core.data.matches
-import io.github.smiley4.schemakenerator.serialization.analyzer.AnnotationAnalyzer
-import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.serialization.analyzer.fullName
-import io.github.smiley4.schemakenerator.serialization.analyzer.shortName
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -450,7 +446,7 @@ class DefaultSerializationTypeAnalyzerModule(
      */
     private fun SerialDescriptor.toTypeName() = TypeName(
         full = this.fullName(),
-        short = this.shortName(),
+        short = this.serialName.split(".").last().replace("?", "")
     )
 
 }
