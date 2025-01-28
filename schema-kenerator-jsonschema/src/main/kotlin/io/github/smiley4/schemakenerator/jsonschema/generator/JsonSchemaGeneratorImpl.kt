@@ -17,7 +17,7 @@ internal class JsonSchemaGeneratorImpl(private val modules: List<JsonSchemaGener
 
     override fun generate(typeData: TypeData, knownTypeData: List<TypeData>): JsonSchema {
         val module = modules.firstOrNull { it.applies(typeData) }
-            ?: throw IllegalArgumentException("No json generator module matches the given type '${typeData.identifyingName.full}' (${typeData.id}).")
+            ?: throw IllegalArgumentException("No json generator module matches the given type '${typeData.identifyingName.full}'.")
 
         return module.generate(
             JsonSchemaGeneratorModule.Context(
@@ -27,6 +27,5 @@ internal class JsonSchemaGeneratorImpl(private val modules: List<JsonSchemaGener
             )
         )
     }
-
 
 }

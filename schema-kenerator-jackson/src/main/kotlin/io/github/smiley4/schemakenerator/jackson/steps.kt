@@ -51,7 +51,8 @@ fun InputType.collectJacksonSubTypes(
  *  - adds support for jackson [JsonIgnore]-annotation and removes annotated members
  *  - adds support for jackson [JsonIgnoreType]-annotation and removes members of the annotated type
  *  - adds support for jackson [JsonIgnoreProperties]-annotation and removes specified members from the annotated types.
- *  - adds support for the jackson [JsonProperty]-annotation. Renames annotated members and modifies their nullability according to the specified values.
+ *  - adds support for the jackson [JsonProperty]-annotation.
+ *  Renames annotated members and modifies their nullability according to the specified values.
  *  Add this step after type analysis and before schema generation.
  */
 fun Bundle<TypeData>.handleJacksonAnnotations(): Bundle<TypeData> {

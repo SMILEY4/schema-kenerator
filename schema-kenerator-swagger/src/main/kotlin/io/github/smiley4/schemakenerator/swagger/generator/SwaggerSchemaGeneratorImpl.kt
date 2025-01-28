@@ -16,7 +16,7 @@ internal class SwaggerSchemaGeneratorImpl(private val modules: List<SwaggerSchem
 
     override fun generate(typeData: TypeData, typeDataList: List<TypeData>): SwaggerSchema {
         val module = modules.firstOrNull { it.applies(typeData) }
-            ?: throw IllegalArgumentException("No swagger generator module matches the given type '${typeData.identifyingName.full}' (${typeData.id}).")
+            ?: throw IllegalArgumentException("No swagger generator module matches the given type '${typeData.identifyingName.full}'.")
 
         return module.generate(
             SwaggerSchemaGenerationModule.Context(
