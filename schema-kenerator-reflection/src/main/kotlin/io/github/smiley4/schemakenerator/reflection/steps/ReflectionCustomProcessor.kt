@@ -6,4 +6,4 @@ import kotlin.reflect.KType
 
 typealias ReflectionTypeMatcher = (type: KType, clazz: KClass<*>) -> Boolean
 
-typealias ReflectionCustomProcessor = () -> TypeData
+typealias ReflectionCustomProvider = () -> TypeData

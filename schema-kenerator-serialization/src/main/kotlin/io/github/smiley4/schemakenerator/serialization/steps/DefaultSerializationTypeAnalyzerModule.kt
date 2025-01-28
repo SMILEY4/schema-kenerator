@@ -1,0 +1,454 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
+package io.github.smiley4.schemakenerator.serialization.steps
+
+import io.github.smiley4.schemakenerator.core.typedata.CollectionData
+import io.github.smiley4.schemakenerator.core.typedata.EnumData
+import io.github.smiley4.schemakenerator.core.typedata.MapData
+import io.github.smiley4.schemakenerator.core.typedata.MemberData
+import io.github.smiley4.schemakenerator.core.typedata.MemberKind
+import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.typedata.TypeName
+import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
+import io.github.smiley4.schemakenerator.core.typedata.Visibility
+import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
+import io.github.smiley4.schemakenerator.core.typedata.matches
+import io.github.smiley4.schemakenerator.serialization.analyzer.AnnotationAnalyzer
+import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.descriptors.PolymorphicKind
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.SerialKind
+import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.elementDescriptors
+import kotlinx.serialization.descriptors.elementNames
+import kotlin.reflect.KClass
+
+class DefaultSerializationTypeAnalyzerModule(
+    /**
+     * types that are known to not have any type parameters
+     */
+    private val knownNotParameterized: Set<String> = emptySet()
+) : SerializationTypeAnalyzerModule {
+
+    private val annotationAnalyzer = AnnotationAnalyzer()
+
+    override fun applies(descriptor: SerialDescriptor) = true
+
+    override fun analyze(context: SerializationTypeAnalyzerModule.Context): WrappedTypeData {
+
+        return when (context.descriptor.fullName()) {
+            Unit::class.qualifiedName -> analyzePrimitive(context, Unit::class.toTypeName())
+            UByte::class.qualifiedName -> analyzePrimitive(context, UByte::class.toTypeName())
+            UShort::class.qualifiedName -> analyzePrimitive(context, UShort::class.toTypeName())
+            UInt::class.qualifiedName -> analyzePrimitive(context, UInt::class.toTypeName())
+            ULong::class.qualifiedName -> analyzePrimitive(context, ULong::class.toTypeName())
+            else -> when (context.descriptor.kind) {
+                StructureKind.LIST -> analyzeList(context)
+                StructureKind.MAP -> analyzeMap(context)
+                StructureKind.CLASS -> analyzeClass(context)
+                StructureKind.OBJECT -> analyzeObject(context)
+                PolymorphicKind.OPEN -> analyzeSealed(context)
+                PolymorphicKind.SEALED -> analyzeSealed(context)
+                PrimitiveKind.BOOLEAN -> analyzePrimitive(context, Boolean::class.toTypeName())
+                PrimitiveKind.BYTE -> analyzePrimitive(context, Byte::class.toTypeName())
+                PrimitiveKind.CHAR -> analyzePrimitive(context, Char::class.toTypeName())
+                PrimitiveKind.DOUBLE -> analyzePrimitive(context, Double::class.toTypeName())
+                PrimitiveKind.FLOAT -> analyzePrimitive(context, Float::class.toTypeName())
+                PrimitiveKind.INT -> analyzePrimitive(context, Int::class.toTypeName())
+                PrimitiveKind.LONG -> analyzePrimitive(context, Long::class.toTypeName())
+                PrimitiveKind.SHORT -> analyzePrimitive(context, Short::class.toTypeName())
+                PrimitiveKind.STRING -> analyzePrimitive(context, String::class.toTypeName())
+                SerialKind.ENUM -> analyzeEnum(context)
+                SerialKind.CONTEXTUAL -> analyzeClass(context)
+            }
+        }.let {
+            WrappedTypeData(
+                typeData = it,
+                nullable = context.nullable || context.descriptor.isNullable
+            )
+        }
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as a primitive type
+     * @param context the context with the current type to analyze
+     * @param identifyingName the identifying name for this type. Might be different as the name from the serial descriptor
+     */
+    private fun analyzePrimitive(context: SerializationTypeAnalyzerModule.Context, identifyingName: TypeName): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+
+        // check type has already been parsed
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, emptyList()) }
+        if (existing != null) {
+            return existing
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // build type
+        return TypeData(
+            id = context.id,
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(),
+            annotations = annotations,
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = null,
+            mapData = null
+        )
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as a list
+     * @param context the context with the current type to analyze
+     */
+    private fun analyzeList(context: SerializationTypeAnalyzerModule.Context): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+        val identifyingName = context.descriptor.toTypeName()
+
+        // collect information about item type
+        val itemDescriptor = context.descriptor.getElementDescriptor(0)
+        val itemName = context.descriptor.getElementName(0)
+        val itemType = context.analyze(itemDescriptor)
+        val itemParameter = TypeParameterData(
+            name = itemName,
+            type = itemType.typeData.id,
+            nullable = itemDescriptor.isNullable || itemType.nullable,
+        )
+
+        // check type has already been parsed
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf(itemParameter)) }
+        if (existing != null) {
+            return existing
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // build type
+        return TypeData(
+            id = context.id,
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(itemParameter),
+            annotations = annotations,
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = CollectionData(
+                unique = false,
+                itemType = MemberData(
+                    name = "item",
+                    type = itemParameter.type,
+                    nullable = itemParameter.nullable,
+                    optional = false,
+                    kind = MemberKind.PROPERTY,
+                    visibility = Visibility.PUBLIC,
+                    annotations = mutableListOf(),
+                ),
+            ),
+            mapData = null
+        )
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as a map
+     * @param context the context with the current type to analyze
+     */
+    private fun analyzeMap(context: SerializationTypeAnalyzerModule.Context): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+        val identifyingName = context.descriptor.toTypeName()
+
+        // collect information about key type
+        val keyDescriptor = context.descriptor.getElementDescriptor(0)
+        val keyName = context.descriptor.getElementName(0)
+        val keyType = context.analyze(keyDescriptor)
+        val keyParameter = TypeParameterData(
+            name = keyName,
+            type = keyType.typeData.id,
+            nullable = keyDescriptor.isNullable || keyType.nullable,
+        )
+
+        // collect information about value type
+        val valueDescriptor = context.descriptor.getElementDescriptor(1)
+        val valueName = context.descriptor.getElementName(1)
+        val valueType = context.analyze(valueDescriptor)
+        val valueParameter = TypeParameterData(
+            name = valueName,
+            type = valueType.typeData.id,
+            nullable = valueDescriptor.isNullable || valueType.nullable,
+        )
+
+        // check type has already been parsed
+        val existing =
+            context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf(keyParameter, valueParameter)) }
+        if (existing != null) {
+            return existing
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // build type
+        return TypeData(
+            id = context.id,
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(keyParameter, valueParameter),
+            annotations = annotations,
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = null,
+            mapData = MapData(
+                keyType = MemberData(
+                    name = "key",
+                    type = keyParameter.type,
+                    nullable = keyParameter.nullable,
+                    optional = false,
+                    kind = MemberKind.PROPERTY,
+                    visibility = Visibility.PUBLIC,
+                    annotations = mutableListOf(),
+                ),
+                valueType = MemberData(
+                    name = "value",
+                    type = valueParameter.type,
+                    nullable = valueParameter.nullable,
+                    optional = false,
+                    kind = MemberKind.PROPERTY,
+                    visibility = Visibility.PUBLIC,
+                    annotations = mutableListOf(),
+                ),
+            )
+        )
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as a class
+     * @param context the context with the current type to analyze
+     */
+    private fun analyzeClass(context: SerializationTypeAnalyzerModule.Context): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+        val identifyingName = context.descriptor.toTypeName()
+
+        // Check type has already been parsed.
+        // Only search if we know this type does not have type parameters, otherwise we can't trust possible matches due to
+        // possible differences in type parameters that are not exposed by kotlinx-serialization.
+        if (knownNotParameterized.contains(descriptiveName.full)) {
+            val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
+            if (existing != null) {
+                return existing
+            }
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // collect members
+        val members = buildList {
+            for (i in 0..<context.descriptor.elementsCount) {
+                val fieldName = context.descriptor.getElementName(i)
+                val fieldDescriptor = context.descriptor.getElementDescriptor(i)
+                val fieldType = context.analyze(fieldDescriptor)
+                add(
+                    MemberData(
+                        name = fieldName,
+                        type = fieldType.typeData.id,
+                        nullable = fieldDescriptor.isNullable || fieldType.nullable,
+                        optional = context.descriptor.isElementOptional(i),
+                        kind = MemberKind.PROPERTY,
+                        visibility = Visibility.PUBLIC,
+                        annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor.getElementAnnotations(i)),
+                    )
+                )
+            }
+        }
+
+        // whether class is inline class
+        val isInline = context.descriptor.isInline
+
+        // build type
+        return TypeData(
+            id = context.id,
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(),
+            annotations = annotations,
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = members.toMutableList(),
+            isInlineValue = isInline,
+            enumData = null,
+            collectionData = null,
+            mapData = null
+        )
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as a sealed class
+     * @param context the context with the current type to analyze
+     */
+    private fun analyzeSealed(context: SerializationTypeAnalyzerModule.Context): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+        val identifyingName = context.descriptor.toTypeName()
+
+        // Check type has already been parsed.
+        // Only search if we know this type does not have type parameters, otherwise we can't trust possible matches due to
+        // possible differences in type parameters that are not exposed by kotlinx-serialization.
+        if (knownNotParameterized.contains(descriptiveName.full)) {
+            val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
+            if (existing != null) {
+                return existing
+            }
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // collect subtypes
+        val subtypes = context.descriptor.elementDescriptors
+            .toList()[1].elementDescriptors
+            .map { context.analyze(it).typeData.id }
+
+        // build type
+        return TypeData(
+            id = context.id,
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(),
+            annotations = annotations,
+            subtypes = subtypes.toMutableList(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = null,
+            mapData = null
+        )
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as an object
+     * @param context the context with the current type to analyze
+     */
+    private fun analyzeObject(context: SerializationTypeAnalyzerModule.Context): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+        val identifyingName = context.descriptor.toTypeName()
+
+        // check type has already been parsed
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
+        if (existing != null) {
+            return existing
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // build type
+        return TypeData(
+            id = context.id,
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(),
+            annotations = annotations,
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = null,
+            collectionData = null,
+            mapData = null
+        )
+    }
+
+
+    /**
+     * Analyze the given serial descriptor classified as an enum
+     * @param context the context with the current type to analyze
+     */
+    private fun analyzeEnum(context: SerializationTypeAnalyzerModule.Context): TypeData {
+
+        // create basic information for this type
+        val descriptiveName = context.descriptor.toTypeName()
+        val identifyingName = context.descriptor.toTypeName()
+
+        // check type has already been parsed
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
+        if (existing != null) {
+            return existing
+        }
+
+        // collect annotation data
+        val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
+
+        // collect enum constants
+        val constants = context.descriptor.elementNames
+
+        // build type
+        return TypeData(
+            id = TypeId.create(),
+            identifyingName = identifyingName,
+            descriptiveName = descriptiveName,
+            typeParameters = mutableListOf(),
+            annotations = annotations,
+            subtypes = mutableListOf(),
+            supertypes = mutableListOf(),
+            members = mutableListOf(),
+            isInlineValue = false,
+            enumData = EnumData(
+                constants = constants.toMutableList()
+            ),
+            collectionData = null,
+            mapData = null
+        )
+    }
+
+
+    /**
+     * @return a [TypeName] for this class
+     */
+    private fun KClass<*>.toTypeName() = TypeName(
+        full = this.qualifiedName ?: this.java.name,
+        short = this.simpleName ?: this.java.name
+    )
+
+
+    /**
+     * @return a [TypeName] for this class
+     */
+    private fun SerialDescriptor.toTypeName() = TypeName(
+        full = this.fullName(),
+        short = this.shortName(),
+    )
+
+}

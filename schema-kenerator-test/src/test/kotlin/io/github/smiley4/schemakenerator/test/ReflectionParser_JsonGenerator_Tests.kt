@@ -16,7 +16,7 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
@@ -42,7 +42,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -74,7 +74,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -116,7 +116,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {

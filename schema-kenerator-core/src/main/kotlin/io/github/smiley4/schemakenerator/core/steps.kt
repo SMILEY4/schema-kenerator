@@ -25,18 +25,18 @@ fun Bundle<TypeData>.handleNameAnnotation(): Bundle<TypeData> {
 
 
 /**
- * See [GettersToPropertiesStep]
- */
-fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> {
-    return GettersToPropertiesStep().process(this)
-}
-
-
-/**
  * See [RenameMembersStep]
  */
 fun Bundle<TypeData>.renameMembers(rename: (name: String) -> String): Bundle<TypeData> {
     return RenameMembersStep(rename).process(this)
+}
+
+
+/**
+ * See [GettersToPropertiesStep]
+ */
+fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> {
+    return GettersToPropertiesStep().process(this)
 }
 
 

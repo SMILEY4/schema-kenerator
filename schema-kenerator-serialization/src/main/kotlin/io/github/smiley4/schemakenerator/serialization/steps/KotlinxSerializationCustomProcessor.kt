@@ -5,4 +5,4 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 
 typealias KotlinxSerializationTypeMatcher = (descriptor: SerialDescriptor) -> Boolean
 
-typealias KotlinxSerializationCustomProcessor = () -> TypeData
+typealias KotlinxSerializationCustomProvider = () -> TypeData

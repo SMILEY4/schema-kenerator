@@ -1,4 +1,4 @@
-package io.github.smiley4.schemakenerator.serialization
+package io.github.smiley4.schemakenerator.serialization.data
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType

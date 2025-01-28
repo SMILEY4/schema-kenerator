@@ -2,8 +2,8 @@ package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
@@ -14,7 +14,7 @@ class RedirectTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClass>()
-                .processReflection {
+                .analyseTypeUsingReflection {
                     redirect<NestedClass, String>()
                     redirect<String, Int>()
                 }
@@ -42,7 +42,7 @@ class RedirectTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<TestClass>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
                     redirect<NestedClass, String>()
                     redirect<String, Int>()
                 }
@@ -74,7 +74,7 @@ class RedirectTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClass>()
-                .processReflection {
+                .analyseTypeUsingReflection {
                     redirect<String, String?>()
                 }
                 .generateJsonSchema()
@@ -112,7 +112,7 @@ class RedirectTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<TestClass>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
                     redirect<String, String?>()
                 }
                 .generateJsonSchema()

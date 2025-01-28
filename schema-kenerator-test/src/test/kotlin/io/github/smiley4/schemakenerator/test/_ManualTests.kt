@@ -11,7 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.Contextual
@@ -48,7 +48,7 @@ class _ManualTests : StringSpec({
         println()
 
         val result = typeOf<MyData>()
-            .processKotlinxSerialization {
+            .analyzeTypeUsingKotlinxSerialization {
                 serializersModule = JSON.serializersModule
             }
             .also {

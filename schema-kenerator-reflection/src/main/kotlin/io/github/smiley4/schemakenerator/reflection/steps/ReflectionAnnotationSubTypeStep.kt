@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.reflection.data.SubType
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
@@ -41,7 +42,7 @@ class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: Int = 10) :
 
     private fun process(types: List<InputType>): Collection<TypeData> {
         return types
-            .map { ReflectionTypeProcessingStep().process(it) }
+            .map { it.analyseTypeUsingReflection() }
             .flatMap { listOf(it.data) + it.supporting }
     }
 

@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -41,7 +41,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -74,7 +74,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -112,7 +112,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
