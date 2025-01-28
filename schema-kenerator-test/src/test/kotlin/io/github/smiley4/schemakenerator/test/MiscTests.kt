@@ -18,7 +18,7 @@ import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
@@ -78,7 +78,7 @@ class MiscTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<TestClassIssue14b>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
                     redirect<Int, String?>()
                 }
                 .generateJsonSchema()
@@ -133,7 +133,7 @@ class MiscTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<TestClassIssue16>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema {
                     optionalHandling = OptionalHandling.NON_REQUIRED
                 }
@@ -166,7 +166,7 @@ class MiscTests : FreeSpec({
 
         "json" {
             val result = typeOf<TestClassIssue19>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -193,7 +193,7 @@ class MiscTests : FreeSpec({
 
         "swagger" {
             val result = typeOf<TestClassIssue19>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -252,7 +252,7 @@ class MiscTests : FreeSpec({
 
         "custom renameing (adding prefix)" {
             val result = typeOf<TestClassIssue18>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .renameMembers { name -> "prefix_$name" }
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
@@ -279,7 +279,7 @@ class MiscTests : FreeSpec({
 
         "kotlinx naming strategy (snake case)" {
             val result = typeOf<TestClassIssue18>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
@@ -617,7 +617,7 @@ class MiscTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<GenericClass<String?>>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema()
                 .compileInlining()
             result.swagger.shouldEqualJson {
@@ -660,7 +660,7 @@ class MiscTests : FreeSpec({
             }
 
             val result = typeOf<TestClassContextual>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
                     serializersModule = json.serializersModule
                 }
                 .generateSwaggerSchema()
@@ -695,7 +695,7 @@ class MiscTests : FreeSpec({
         "with serializers from annotation" {
 
             val result = typeOf<TestClassSerializableWith>()
-                .processKotlinxSerialization {}
+                .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining()

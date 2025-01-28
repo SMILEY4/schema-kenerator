@@ -18,6 +18,7 @@ interface ReflectionTypeAnalyzerModule {
         val knownTypeParameters: List<TypeParameterData>,
         val knownTypeData: MutableList<TypeData>
     ) {
+
         fun analyze(type: KType, clazz: KClass<*>): WrappedTypeData  {
             return this.analyzer.analyze(
                 type = type,
@@ -26,6 +27,7 @@ interface ReflectionTypeAnalyzerModule {
                 knownTypeData = knownTypeData
             )
         }
+
     }
 
 

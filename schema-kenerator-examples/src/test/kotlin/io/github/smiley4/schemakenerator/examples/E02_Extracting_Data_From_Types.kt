@@ -16,7 +16,7 @@ import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.data.SubType
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -57,7 +57,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         }
 
         "... using kotlinx-serialization" {
-            val extracted = typeOf<SimpleClass>().processKotlinxSerialization()
+            val extracted = typeOf<SimpleClass>().analyzeTypeUsingKotlinxSerialization()
 
             // The "processKotlinxSerialization()"-step fulfills the same role as "processReflection"-step, but uses the kotlinx-serialization library.
             // In general "processKotlinxSerialization()" has access to less/different information and the produces different results than reflection.
@@ -68,7 +68,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
 
         "configuring the kotlinx-serialization step" {
             // The "processKotlinxSerialization()"-step has parameters to configure its behavior
-            typeOf<SimpleClass>().processKotlinxSerialization {
+            typeOf<SimpleClass>().analyzeTypeUsingKotlinxSerialization {
                 // kotlinx-serialization looses some information about type parameters. Because of this, the "processKotlinxSerialization()"-step
                 // has to treat types more carefully to avoid collisions and types overwriting other types with different type parameters.
                 // This more careful behaviour can be disabled for specific types that are known to not have any
@@ -95,7 +95,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extractedReflection = typeOf<SealedParent>().analyseTypeUsingReflection()
-                val extractedKotlinx = typeOf<SealedParent>().processKotlinxSerialization()
+                val extractedKotlinx = typeOf<SealedParent>().analyzeTypeUsingKotlinxSerialization()
 
                 // Subtypes of sealed classes and interfaces are detected and extracted automatically, regardless of whether reflection or kotlinx-serialization is used.
 
@@ -207,7 +207,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extracted = typeOf<SealedParent>()
-                    .processKotlinxSerialization()
+                    .analyzeTypeUsingKotlinxSerialization()
                     .addDiscriminatorProperty("_type") // adds a property "_type" to all types with subtypes
 
                 val discriminatorProperty = extracted.data.members.find { it.name == "_type" }!!
@@ -233,7 +233,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extracted = typeOf<ParentDiscriminatorKotlinx>()
-                    .processKotlinxSerialization()
+                    .analyzeTypeUsingKotlinxSerialization()
                     .addJsonClassDiscriminatorProperty() // adds a property with the name specified in @JsonClassDiscriminator to all annotated types with subtypes
 
                 val discriminatorProperty = extracted.data.members.find { it.name == "_type" }!!

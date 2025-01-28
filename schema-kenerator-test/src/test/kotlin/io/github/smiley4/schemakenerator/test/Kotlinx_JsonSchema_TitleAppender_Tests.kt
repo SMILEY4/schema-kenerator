@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
@@ -28,7 +28,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_FULL)
                 .compileInlining()
@@ -51,7 +51,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
 //                .also { schema ->
 //                    if (schema.data.id.additionalId != null) {
 //                        additionalIds.add(schema.data.id.additionalId!!)
@@ -84,7 +84,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
 //                .also { schema ->
 //                    if (schema.data.id.additionalId != null) {
 //                        additionalIds.add(schema.data.id.additionalId!!)

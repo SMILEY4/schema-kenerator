@@ -10,7 +10,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
@@ -36,7 +36,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {
@@ -57,7 +57,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
 //                .also { schema ->
 //                    if (schema.data.id.additionalId != null) {
 //                        additionalIds.add(schema.data.id.additionalId!!)
@@ -106,7 +106,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {

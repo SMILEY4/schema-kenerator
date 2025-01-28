@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.data.RefType
@@ -306,7 +306,7 @@ class DiscriminatorTests : FreeSpec({
 
     "kotlinx-serialization" {
         val result = typeOf<KotlinxTestClass>()
-            .processKotlinxSerialization()
+            .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .generateSwaggerSchema()
             .compileReferencing(RefType.OPENAPI_SIMPLE)

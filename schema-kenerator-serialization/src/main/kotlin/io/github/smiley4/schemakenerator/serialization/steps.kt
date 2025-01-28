@@ -6,10 +6,15 @@ import io.github.smiley4.schemakenerator.core.data.KTypeInput
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
 import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.serialization.data.SerialDescriptorInput
+import io.github.smiley4.schemakenerator.serialization.data.mapToInputType
+import io.github.smiley4.schemakenerator.serialization.steps.DefaultSerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationCustomProvider
 import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeMatcher
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.serialization.steps.SerializationTypeAnalyzerImpl
+import io.github.smiley4.schemakenerator.serialization.steps.SimpleSerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.steps.fullName
 import io.github.smiley4.schemakenerator.serialization.steps.matches
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -32,78 +37,69 @@ fun Bundle<TypeData>.addJsonClassDiscriminatorProperty(): Bundle<TypeData> {
 
 
 /**
- * See [KotlinxSerializationTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun KType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
-    return KTypeInput(this).processKotlinxSerialization(configBlock)
+fun KType.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+    return KTypeInput(this).analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 
 
 /**
- * See [KotlinxSerializationTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun SerialDescriptor.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
-    return SerialDescriptorInput(this).processKotlinxSerialization(configBlock)
+fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+    return SerialDescriptorInput(this).analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 
 
 /**
- * See [KotlinxSerializationTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun InputType.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+fun InputType.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
-    return KotlinxSerializationTypeProcessingStep(
-        customProcessors = config.customProcessors,
+    return SerializationTypeAnalyzerImpl(
         serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
-        knownNotParameterized = config.knownNotParameterized,
-    ).process(this)
+        modules = config.buildCustomModules()
+    ).analyze(this)
 }
 
 
 /**
- * See [KotlinxSerializationTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
 @JvmName("processKotlinxSerializationKType")
-fun Bundle<KType>.processKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
-    return this.mapToInputType().processKotlinxSerialization(configBlock)
+fun Bundle<KType>.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+    return this.mapToInputType().analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 
 
 /**
- * See [KotlinxSerializationTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
 @JvmName("processKotlinxSerializationSerialDescriptor")
-fun Bundle<SerialDescriptor>.processKotlinxSerialization(
+fun Bundle<SerialDescriptor>.analyzeTypeUsingKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
 ): Bundle<TypeData> {
-    return this.mapToInputType().processKotlinxSerialization(configBlock)
+    return this.mapToInputType().analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 
 
 /**
- * See [KotlinxSerializationTypeProcessingStep]
+ * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun Bundle<InputType>.processKotlinxSerialization(
+fun Bundle<InputType>.analyzeTypeUsingKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
 ): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
-    return KotlinxSerializationTypeProcessingStep(
-        customProcessors = config.customProcessors,
+    return SerializationTypeAnalyzerImpl(
         serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
-        knownNotParameterized = config.knownNotParameterized,
-    ).process(this)
+        modules = config.buildCustomModules()
+    ).analyze(this)
 }
 
 class KotlinxSerializationTypeProcessingConfig {
-
-    var customProcessors = mutableListOf<Pair<KotlinxSerializationTypeMatcher, KotlinxSerializationCustomProvider>>()
-
-    var typeRedirects = mutableMapOf<String, InputType>()
-
-    var knownNotParameterized = mutableSetOf<String>()
-
 
     /**
      * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
@@ -111,73 +107,7 @@ class KotlinxSerializationTypeProcessingConfig {
     var serializersModule: SerializersModule? = null
 
 
-    /**
-     * Add a new custom type overwriting types matched by the given matcher.
-     */
-    fun custom(matcher: KotlinxSerializationTypeMatcher, provider: KotlinxSerializationCustomProvider) {
-        customProcessors.add(matcher to provider)
-    }
-
-
-    /**
-     * Add a custom type overwriting the given type.
-     * Matches types by [SerialDescriptor.serialName] equals the given name.
-     */
-    fun custom(serializerName: String, provider: KotlinxSerializationCustomProvider) {
-        custom(
-            { descriptor: SerialDescriptor -> descriptor.fullName() == serializerName },
-            provider
-        )
-    }
-
-
-    /**
-     * Add a custom type overwriting the given type.
-     * Matches types by [SerialDescriptor.serialName] equals the qualified name of the given class.
-     */
-    fun custom(type: KClass<*>, provider: KotlinxSerializationCustomProvider) {
-        custom(
-            { descriptor: SerialDescriptor -> descriptor.matches(type) },
-            provider
-        )
-    }
-
-
-    /**
-     * Add a custom type overwriting the given type.
-     * Matches types by [SerialDescriptor.serialName] equals the qualified name of the given type parameter.
-     */
-    inline fun <reified T> custom(noinline provider: KotlinxSerializationCustomProvider) {
-        custom(typeOf<T>().classifier!! as KClass<*>, provider)
-    }
-
-
-    /**
-     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-     */
-    fun redirect(from: String, to: KType) {
-        typeRedirects[from] = KTypeInput(to)
-    }
-
-
-    /**
-     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-     */
-    fun redirect(from: KType, to: KType) {
-        val clazz = from.classifier!! as KClass<*>
-        val idFrom = (clazz.qualifiedName ?: clazz.java.name).let {
-            it + if (from.isMarkedNullable) "?" else ""
-        }
-        typeRedirects[idFrom] = KTypeInput(to)
-    }
-
-
-    /**
-     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-     */
-    inline fun <reified FROM, reified TO> redirect() {
-        redirect(typeOf<FROM>(), typeOf<TO>())
-    }
+    var knownNotParameterized = mutableSetOf<String>()
 
 
     /**
@@ -206,6 +136,99 @@ class KotlinxSerializationTypeProcessingConfig {
     inline fun <reified T> markNotParameterized() {
         val clazz = typeOf<T>().classifier!! as KClass<*>
         markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
+    }
+
+
+    var customModules = mutableListOf<SerializationTypeAnalyzerModule>()
+
+    internal fun buildCustomModules(): List<SerializationTypeAnalyzerModule> {
+        val allModules = listOf(
+            DefaultSerializationTypeAnalyzerModule(
+                knownNotParameterized = knownNotParameterized
+            )
+        ) + customModules
+        return allModules.reversed()
+    }
+
+    /**
+     * Adds a new [SerializationTypeAnalyzerModule].
+     * Modules overwrite previous modules when matching the same type.
+     */
+    fun custom(module: SerializationTypeAnalyzerModule) {
+        customModules.add(module)
+    }
+
+
+    /**
+     * Add a new custom type for types matched by the given matcher.
+     * Modules overwrite previous modules when matching the same type.
+     */
+    fun custom(matcher: KotlinxSerializationTypeMatcher, provider: KotlinxSerializationCustomProvider) {
+        custom(SimpleSerializationTypeAnalyzerModule(matcher, provider))
+    }
+
+
+    /**
+     * Add a new custom type for types matched by the given serial name.
+     * Modules overwrite previous modules when matching the same type.
+     */
+    fun custom(serializerName: String, provider: KotlinxSerializationCustomProvider) {
+        custom(
+            { descriptor: SerialDescriptor -> descriptor.fullName() == serializerName },
+            provider
+        )
+    }
+
+
+    /**
+     * Add a custom type overwriting the given type.
+     * Modules overwrite previous modules when matching the same type.
+     */
+    fun custom(type: KClass<*>, provider: KotlinxSerializationCustomProvider) {
+        custom(
+            { descriptor: SerialDescriptor -> descriptor.matches(type) },
+            provider
+        )
+    }
+
+
+    /**
+     * Add a custom type overwriting the given type.
+     * Modules overwrite previous modules when matching the same type.
+     */
+    inline fun <reified T> custom(noinline provider: KotlinxSerializationCustomProvider) {
+        custom(typeOf<T>().classifier!! as KClass<*>, provider)
+    }
+
+
+    var typeRedirects = mutableMapOf<String, InputType>()
+
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    fun redirect(from: String, to: KType) {
+        typeRedirects[from] = KTypeInput(to)
+    }
+
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    fun redirect(from: KType, to: KType) {
+        val clazz = from.classifier!! as KClass<*>
+        val idFrom = (clazz.qualifiedName ?: clazz.java.name).let {
+            it + if (from.isMarkedNullable) "?" else ""
+        }
+        typeRedirects[idFrom] = KTypeInput(to)
+    }
+
+
+    /**
+     * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     */
+    inline fun <reified FROM, reified TO> redirect() {
+        redirect(typeOf<FROM>(), typeOf<TO>())
     }
 
 }

@@ -16,7 +16,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.customizeProperties
@@ -93,7 +93,7 @@ class E04_Customization : FreeSpec({
         "... using kotlinx-serialization" {
 
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
 
                     // register a custom processor for the type "LocalDateTime"
                     custom<LocalDateTime> {
@@ -170,7 +170,7 @@ class E04_Customization : FreeSpec({
         "kotlinx-serialization" {
 
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
                     redirect<LocalDateTime, String>()
                 }
