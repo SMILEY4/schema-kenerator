@@ -1,13 +1,13 @@
 package io.github.smiley4.schemakenerator.reflection.analyzer
 
-import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
-import io.github.smiley4.schemakenerator.core.typedata.MemberData
-import io.github.smiley4.schemakenerator.core.typedata.MemberKind
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.Visibility
-import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeId
-import io.github.smiley4.schemakenerator.core.typedata.findOrThrow
-import io.github.smiley4.schemakenerator.core.typedata.toWrappedTypeId
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.MemberData
+import io.github.smiley4.schemakenerator.core.data.MemberKind
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.Visibility
+import io.github.smiley4.schemakenerator.core.data.WrappedTypeId
+import io.github.smiley4.schemakenerator.core.data.findOrThrow
+import io.github.smiley4.schemakenerator.core.data.toWrappedTypeId
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass

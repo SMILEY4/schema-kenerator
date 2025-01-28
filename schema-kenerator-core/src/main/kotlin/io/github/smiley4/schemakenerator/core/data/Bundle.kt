@@ -1,7 +1,5 @@
 package io.github.smiley4.schemakenerator.core.data
 
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import kotlin.reflect.KType
 
 /**

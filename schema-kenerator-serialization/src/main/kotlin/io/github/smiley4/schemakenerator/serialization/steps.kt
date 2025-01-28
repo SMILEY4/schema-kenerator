@@ -3,24 +3,23 @@ package io.github.smiley4.schemakenerator.serialization
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
-import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.renameMembers
+import io.github.smiley4.schemakenerator.serialization.analyzer.DefaultSerializationTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.serialization.analyzer.KotlinxSerializationCustomProvider
+import io.github.smiley4.schemakenerator.serialization.analyzer.KotlinxSerializationTypeMatcher
+import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerImpl
 import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.serialization.analyzer.SimpleSerializationTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.serialization.analyzer.fullName
 import io.github.smiley4.schemakenerator.serialization.data.SerialDescriptorInput
 import io.github.smiley4.schemakenerator.serialization.data.mapToInputType
-import io.github.smiley4.schemakenerator.serialization.steps.DefaultSerializationTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationCustomProvider
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeMatcher
-import io.github.smiley4.schemakenerator.serialization.steps.SerializationTypeAnalyzerImpl
-import io.github.smiley4.schemakenerator.serialization.steps.SimpleSerializationTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.serialization.steps.fullName
-import io.github.smiley4.schemakenerator.serialization.steps.matches
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KClass
@@ -29,7 +28,8 @@ import kotlin.reflect.typeOf
 
 
 /**
- * See [HandleJsonClassDiscriminatorStep]
+ * Handles the [JsonClassDiscriminator]-annotations and adds a discriminator property with the defined name and
+ * annotated with a marker annotation called [io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME]
  */
 fun Bundle<TypeData>.addJsonClassDiscriminatorProperty(): Bundle<TypeData> {
     return HandleJsonClassDiscriminatorStep().process(this)
@@ -37,7 +37,20 @@ fun Bundle<TypeData>.addJsonClassDiscriminatorProperty(): Bundle<TypeData> {
 
 
 /**
- * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
+ * Renames members of types according to the given [JsonNamingStrategy].
+ * Add this step after type analysis and before schema generation.
+ */
+@OptIn(ExperimentalSerializationApi::class)
+fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> {
+    return this.renameMembers { name ->
+        strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
+    }
+}
+
+
+/**
+ * Analyze the type and using kotlinx-serialization and return the extracted data.
+ * @param configBlock the configuration
  */
 fun KType.analyzeTypeUsingKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
@@ -47,7 +60,8 @@ fun KType.analyzeTypeUsingKotlinxSerialization(
 
 
 /**
- * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
+ * Analyze the type and using kotlinx-serialization and return the extracted data.
+ * @param configBlock the configuration
  */
 fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
@@ -57,7 +71,8 @@ fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(
 
 
 /**
- * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
+ * Analyze the type and using kotlinx-serialization and return the extracted data.
+ * @param configBlock the configuration
  */
 fun InputType.analyzeTypeUsingKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
@@ -72,7 +87,8 @@ fun InputType.analyzeTypeUsingKotlinxSerialization(
 
 
 /**
- * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
+ * Analyze the type and using kotlinx-serialization and return the extracted data.
+ * @param configBlock the configuration
  */
 @JvmName("processKotlinxSerializationKType")
 fun Bundle<KType>.analyzeTypeUsingKotlinxSerialization(
@@ -83,7 +99,8 @@ fun Bundle<KType>.analyzeTypeUsingKotlinxSerialization(
 
 
 /**
- * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
+ * Analyze the type and using kotlinx-serialization and return the extracted data.
+ * @param configBlock the configuration
  */
 @JvmName("processKotlinxSerializationSerialDescriptor")
 fun Bundle<SerialDescriptor>.analyzeTypeUsingKotlinxSerialization(
@@ -94,7 +111,8 @@ fun Bundle<SerialDescriptor>.analyzeTypeUsingKotlinxSerialization(
 
 
 /**
- * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
+ * Analyze the type and using kotlinx-serialization and return the extracted data.
+ * @param configBlock the configuration
  */
 fun Bundle<InputType>.analyzeTypeUsingKotlinxSerialization(
     configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
@@ -113,7 +131,6 @@ class KotlinxSerializationTypeProcessingConfig {
      * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
      */
     var serializersModule: SerializersModule? = null
-
 
     var knownNotParameterized = mutableSetOf<String>()
 
@@ -158,6 +175,7 @@ class KotlinxSerializationTypeProcessingConfig {
         return allModules.reversed()
     }
 
+
     /**
      * Adds a new [SerializationTypeAnalyzerModule].
      * Modules overwrite previous modules when matching the same type.
@@ -194,7 +212,7 @@ class KotlinxSerializationTypeProcessingConfig {
      */
     fun custom(type: KClass<*>, provider: KotlinxSerializationCustomProvider) {
         custom(
-            { descriptor: SerialDescriptor -> descriptor.matches(type) },
+            { descriptor: SerialDescriptor -> descriptor.fullName() == (type.qualifiedName ?: type.java.name) },
             provider
         )
     }
@@ -239,16 +257,4 @@ class KotlinxSerializationTypeProcessingConfig {
         redirect(typeOf<FROM>(), typeOf<TO>())
     }
 
-}
-
-
-/**
- * See [RenameMembersStep].
- * Note: no serial descriptor or element index will be passed to the naming strategy, only the serial name
- */
-@OptIn(ExperimentalSerializationApi::class)
-fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> {
-    return RenameMembersStep { name ->
-        strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
-    }.process(this)
 }

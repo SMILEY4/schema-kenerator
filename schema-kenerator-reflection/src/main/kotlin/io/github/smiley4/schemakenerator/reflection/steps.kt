@@ -3,23 +3,26 @@ package io.github.smiley4.schemakenerator.reflection
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.mapToInputType
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.reflection.steps.DefaultReflectionTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeAnalyzerImpl
+import io.github.smiley4.schemakenerator.reflection.analyzer.DefaultReflectionTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionCustomProvider
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerImpl
 import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerModule
-import io.github.smiley4.schemakenerator.reflection.steps.SimpleTypeAnalyzerModule
+import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeMatcher
+import io.github.smiley4.schemakenerator.reflection.analyzer.SimpleTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.Companion.DEFAULT_PRIMITIVE_TYPES
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionCustomProvider
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeMatcher
+import io.github.smiley4.schemakenerator.reflection.data.SubType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 /**
- * See [ReflectionAnnotationSubTypeStep]
+ * Finds additional subtypes from [SubType]-annotation.
+ * An additional step to add missing subtype-supertype relations .later may be required
+ * Add this step before type analysis.
+ * @param maxRecursionDepth how many "levels" to search for subtypes
  */
 fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
     return KTypeInput(this).collectSubTypes(maxRecursionDepth)
@@ -27,7 +30,10 @@ fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
 
 
 /**
- * See [ReflectionAnnotationSubTypeStep]
+ * Finds additional subtypes from [SubType]-annotation.
+ * An additional step to add missing subtype-supertype relations later may be required.
+ * Add this step before type analysis.
+ * @param maxRecursionDepth how many "levels" to search for subtypes
  */
 fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
     return ReflectionAnnotationSubTypeStep(
@@ -36,22 +42,67 @@ fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
 }
 
 
+/**
+ * Analyze the type and using reflection and return the extracted data.
+ * @param configBlock the configuration
+ */
+fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    return KTypeInput(this).analyseTypeUsingReflection(configBlock)
+}
+
+
+/**
+ * Analyze the type and using reflection and return the extracted data.
+ * @param configBlock the configuration
+ */
+fun InputType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    val config = ReflectionTypeAnalysisConfig().apply(configBlock)
+    return ReflectionTypeAnalyzerImpl(
+        typeRedirects = config.typeRedirects,
+        modules = config.buildCustomModules()
+    ).analyze(this)
+}
+
+
+/**
+ * Analyze the type and using reflection and return the extracted data.
+ * @param configBlock the configuration
+ */
+@JvmName("analyseKTypeUsingReflection")
+fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    return this.mapToInputType().analyseTypeUsingReflection(configBlock)
+}
+
+
+/**
+ * Analyze the type and using reflection and return the extracted data.
+ * @param configBlock the configuration
+ */
+fun Bundle<InputType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    val config = ReflectionTypeAnalysisConfig().apply(configBlock)
+    return ReflectionTypeAnalyzerImpl(
+        typeRedirects = config.typeRedirects,
+        modules = config.buildCustomModules()
+    ).analyze(this)
+}
+
+
 class ReflectionTypeAnalysisConfig {
 
     /**
-     * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.GETTER]).
+     * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind]).
      */
     var includeGetters: Boolean = false
 
 
     /**
-     * Whether to include weak getters as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.WEAK_GETTER]).
+     * Whether to include weak getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind]).
      */
     var includeWeakGetters: Boolean = false
 
 
     /**
-     * Whether to include functions as members of classes (see [io.github.smiley4.schemakenerator.core.typedata.MemberKind.FUNCTION]).
+     * Whether to include functions as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind]).
      */
     var includeFunctions: Boolean = false
 
@@ -80,7 +131,10 @@ class ReflectionTypeAnalysisConfig {
     var enumConstType: EnumConstType = EnumConstType.NAME
 
 
-    var customModules = mutableListOf<ReflectionTypeAnalyzerModule>()
+    /**
+     * List of configured [ReflectionTypeAnalyzerModule] to use for analysis.
+     */
+    var modules = mutableListOf<ReflectionTypeAnalyzerModule>()
 
     internal fun buildCustomModules(): List<ReflectionTypeAnalyzerModule> {
         val allModules = listOf(
@@ -93,25 +147,28 @@ class ReflectionTypeAnalysisConfig {
                 primitiveTypes = primitiveTypes,
                 enumConstType = enumConstType,
             )
-        ) + customModules
+        ) + modules
         return allModules.reversed()
     }
+
 
     /**
      * Adds a new [ReflectionTypeAnalyzerModule].
      * Modules overwrite previous modules when matching the same type.
      */
     fun custom(module: ReflectionTypeAnalyzerModule) {
-        customModules.add(module)
+        modules.add(module)
     }
+
 
     /**
      * Add a new custom type for types matched by the given matcher.
      * Modules overwrite previous modules when matching the same type.
      */
     fun custom(matcher: ReflectionTypeMatcher, provider: ReflectionCustomProvider) {
-        customModules.add(SimpleTypeAnalyzerModule(matcher, provider))
+        modules.add(SimpleTypeAnalyzerModule(matcher, provider))
     }
+
 
     /**
      * Add a custom type overwriting the given type.
@@ -134,7 +191,11 @@ class ReflectionTypeAnalysisConfig {
     }
 
 
+    /**
+     * list of configured type redirects.
+     */
     var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeAnalyzerImpl.DEFAULT_REDIRECTS) }
+
 
     /**
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
@@ -159,46 +220,3 @@ class ReflectionTypeAnalysisConfig {
         typeRedirects.putAll(redirects)
     }
 }
-
-
-/**
- * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
- */
-fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-    return KTypeInput(this).analyseTypeUsingReflection(configBlock)
-}
-
-
-/**
- * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
- */
-fun InputType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-    val config = ReflectionTypeAnalysisConfig().apply(configBlock)
-    return ReflectionTypeAnalyzerImpl(
-        typeRedirects = config.typeRedirects,
-        modules = config.buildCustomModules()
-    ).analyze(this)
-}
-
-
-/**
- * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
- */
-@JvmName("analyseKTypeUsingReflection")
-fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-    return this.mapToInputType().analyseTypeUsingReflection(configBlock)
-}
-
-
-/**
- * See [io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzer]
- */
-fun Bundle<InputType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-    val config = ReflectionTypeAnalysisConfig().apply(configBlock)
-    return ReflectionTypeAnalyzerImpl(
-        typeRedirects = config.typeRedirects,
-        modules = config.buildCustomModules()
-    ).analyze(this)
-}
-
-

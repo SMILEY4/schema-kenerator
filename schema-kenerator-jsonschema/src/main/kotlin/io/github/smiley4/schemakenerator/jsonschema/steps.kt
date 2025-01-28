@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.typedata.MemberData
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.data.MemberData
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
@@ -12,27 +12,155 @@ import io.github.smiley4.schemakenerator.jsonschema.generator.DefaultJsonSchemaG
 import io.github.smiley4.schemakenerator.jsonschema.generator.JsonSchemaGeneratorImpl
 import io.github.smiley4.schemakenerator.jsonschema.generator.JsonSchemaGeneratorModule
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDefaultStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationFormatStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationOptionalAndRequiredStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTypeStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
+
+
+/**
+ * Generates json schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
+ * Result needs to be "compiled" to get the final json schema.
+ */
+fun Bundle<TypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
+    val config = JsonSchemaGenerationStepConfig().apply(configBlock)
+    return JsonSchemaGeneratorImpl(config.buildCustomModules()).process(this)
+}
+
+
+/**
+ * Adds an automatically determined title to schemas.
+ * @param type the type of the title
+ */
+fun Bundle<JsonSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
+    return withTitle(
+        when (type) {
+            TitleType.FULL -> TitleBuilder.BUILDER_FULL
+            TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+        }
+    )
+}
+
+
+/**
+ * Adds an automatically determined title to schemas.
+ * @param builder the function building the title for the given type
+ */
+fun Bundle<JsonSchema>.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): Bundle<JsonSchema> {
+    return JsonSchemaTitleStep(builder).process(this)
+}
+
+
+/**
+ * Add support for the following schema-kenerator-core annotations:
+ * - [io.github.smiley4.schemakenerator.core.annotations.Optional]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Required]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Default]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Deprecated] and [kotlin.Deprecated]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Description]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Example]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Title]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Format]
+ * - [io.github.smiley4.schemakenerator.core.annotations.Type]
+ * Add this step after schema generation and before schema compilation.
+ */
+fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
+    return this
+        .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
+        .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
+        .let { JsonSchemaCoreAnnotationDeprecatedStep().process(this) }
+        .let { JsonSchemaCoreAnnotationDescriptionStep().process(this) }
+        .let { JsonSchemaCoreAnnotationExamplesStep().process(this) }
+        .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
+        .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
+        .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
+}
+
+
+/**
+ * Resolves references in generated json schemas by inlining them.
+ */
+fun Bundle<JsonSchema>.compileInlining(): CompiledJsonSchema {
+    return JsonSchemaCompileInlineStep().compile(this)
+}
+
+
+/**
+ * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+ * @param pathType the type of the schema reference path
+ */
+fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchema {
+    return compileReferencing(
+        when (pathType) {
+            RefType.FULL -> TitleBuilder.BUILDER_FULL
+            RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+        }
+    )
+}
+
+
+/**
+ * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+ * @param builder builds the path to reference the type, i.e. which "name" to use
+ */
+fun Bundle<JsonSchema>.compileReferencing(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): CompiledJsonSchema {
+    return JsonSchemaCompileReferenceStep(builder).compile(this)
+}
+
+
+/**
+ * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+ * @param pathType the type of the schema reference path
+ */
+fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchema {
+    return compileReferencingRoot(
+        when (pathType) {
+            RefType.FULL -> TitleBuilder.BUILDER_FULL
+            RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+        }
+    )
+}
+
+
+/**
+ * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+ * @param builder builds the path to reference the type, i.e. which "name" to use
+ */
+fun Bundle<JsonSchema>.compileReferencingRoot(
+    builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+): CompiledJsonSchema {
+    return JsonSchemaCompileReferenceRootStep(builder).compile(this)
+}
+
+
+/**
+ * Provide a function that is called for each type and json schema.
+ * Can be used to manually manipulate the generated json schema.
+ */
+fun Bundle<JsonSchema>.customizeTypes(action: (typeData: TypeData, typeSchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+    return JsonSchemaCustomizeStep().customizeTypes(this, action)
+}
+
+
+/**
+ * Provide a function that is called for each property. Can be used to manually manipulate the generated json schema.
+ */
+fun Bundle<JsonSchema>.customizeProperties(action: (memberData: MemberData, propertySchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+    return JsonSchemaCustomizeStep().customizeProperties(this, action)
+}
+
 
 enum class OptionalHandling {
+    /**
+     * Handle optional parameters as "required" in the schema
+     */
     REQUIRED,
+
+
+    /**
+     * Handle optional parameters as not required in the schema
+     */
     NON_REQUIRED
 }
 
 class JsonSchemaGenerationStepConfig {
+
     /**
      * How to handle optional properties
      *
@@ -56,126 +184,12 @@ class JsonSchemaGenerationStepConfig {
         return allModules.reversed()
     }
 
+
+    /**
+     * Add a custom schema generation module.
+     */
     fun custom(module: JsonSchemaGeneratorModule) {
         customModules.add(module)
     }
 
-    // todo: dsl for "custom"
-
-}
-
-
-/**
- * See [JsonSchemaGenerationStep]
- */
-fun Bundle<TypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
-    val config = JsonSchemaGenerationStepConfig().apply(configBlock)
-    return JsonSchemaGeneratorImpl(config.buildCustomModules()).process(this)
-}
-
-
-/**
- * See [JsonSchemaTitleStep]
- */
-fun Bundle<JsonSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
-    return withTitle(
-        when (type) {
-            TitleType.FULL -> TitleBuilder.BUILDER_FULL
-            TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
-        }
-    )
-}
-
-
-/**
- * See [JsonSchemaTitleStep]
- */
-fun Bundle<JsonSchema>.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): Bundle<JsonSchema> {
-    return JsonSchemaTitleStep(builder).process(this)
-}
-
-
-/**
- * See [JsonSchemaCoreAnnotationDefaultStep], [JsonSchemaCoreAnnotationDeprecatedStep], [JsonSchemaCoreAnnotationDescriptionStep],
- * [JsonSchemaCoreAnnotationExamplesStep], [JsonSchemaCoreAnnotationTitleStep], [JsonSchemaCoreAnnotationOptionalAndRequiredStep],
- * [JsonSchemaCoreAnnotationFormatStep], [JsonSchemaCoreAnnotationTypeStep]
- */
-fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
-    return this
-        .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
-        .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
-        .let { JsonSchemaCoreAnnotationDeprecatedStep().process(this) }
-        .let { JsonSchemaCoreAnnotationDescriptionStep().process(this) }
-        .let { JsonSchemaCoreAnnotationExamplesStep().process(this) }
-        .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
-        .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
-        .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
-}
-
-
-/**
- * See [JsonSchemaCompileInlineStep]
- */
-fun Bundle<JsonSchema>.compileInlining(): CompiledJsonSchema {
-    return JsonSchemaCompileInlineStep().compile(this)
-}
-
-
-/**
- * See [JsonSchemaCompileReferenceStep]
- */
-fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchema {
-    return compileReferencing(
-        when (pathType) {
-            RefType.FULL -> TitleBuilder.BUILDER_FULL
-            RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
-        }
-    )
-}
-
-
-/**
- * See [JsonSchemaCompileReferenceStep]
- */
-fun Bundle<JsonSchema>.compileReferencing(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): CompiledJsonSchema {
-    return JsonSchemaCompileReferenceStep(builder).compile(this)
-}
-
-
-/**
- * See [JsonSchemaCompileReferenceRootStep]
- */
-fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchema {
-    return compileReferencingRoot(
-        when (pathType) {
-            RefType.FULL -> TitleBuilder.BUILDER_FULL
-            RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
-        }
-    )
-}
-
-
-/**
- * See [JsonSchemaCompileReferenceRootStep]
- */
-fun Bundle<JsonSchema>.compileReferencingRoot(
-    builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
-): CompiledJsonSchema {
-    return JsonSchemaCompileReferenceRootStep(builder).compile(this)
-}
-
-
-/**
- * See [JsonSchemaCustomizeStep.customizeTypes]
- */
-fun Bundle<JsonSchema>.customizeTypes(action: (typeData: TypeData, typeSchema: JsonNode) -> Unit): Bundle<JsonSchema> {
-    return JsonSchemaCustomizeStep().customizeTypes(this, action)
-}
-
-
-/**
- * See [JsonSchemaCustomizeStep.customizeProperties]
- */
-fun Bundle<JsonSchema>.customizeProperties(action: (memberData: MemberData, propertySchema: JsonNode) -> Unit): Bundle<JsonSchema> {
-    return JsonSchemaCustomizeStep().customizeProperties(this, action)
 }

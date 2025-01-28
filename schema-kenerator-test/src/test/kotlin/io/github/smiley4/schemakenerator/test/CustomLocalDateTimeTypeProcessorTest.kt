@@ -1,8 +1,8 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
-import io.github.smiley4.schemakenerator.core.typedata.TypeName
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
@@ -10,7 +10,7 @@ import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.TitleBuilder
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
 import io.kotest.core.spec.style.StringSpec
@@ -24,7 +24,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
         val result = typeOf<ClassWithLocalDateTime>()
             .analyseTypeUsingReflection()
             .generateJsonSchema()
-            .withTitle(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL)
+            .withTitle(io.github.smiley4.schemakenerator.jsonschema.TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
         result.json.shouldEqualJson {
@@ -70,7 +70,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                 }
             }
             .generateJsonSchema()
-            .withTitle(io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder.BUILDER_FULL)
+            .withTitle(io.github.smiley4.schemakenerator.jsonschema.TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
         result.json.shouldEqualJson {

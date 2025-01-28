@@ -5,7 +5,7 @@ import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics

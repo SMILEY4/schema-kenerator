@@ -2,13 +2,13 @@ package io.github.smiley4.schemakenerator.swagger.generator
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.steps.AbstractAddDiscriminatorStep
-import io.github.smiley4.schemakenerator.core.typedata.MemberData
-import io.github.smiley4.schemakenerator.core.typedata.MemberKind
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.data.MemberData
+import io.github.smiley4.schemakenerator.core.data.MemberKind
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaUtils
+import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 

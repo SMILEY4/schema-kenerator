@@ -5,10 +5,10 @@ package io.github.smiley4.schemakenerator.examples
 
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.renameMembers
-import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
-import io.github.smiley4.schemakenerator.core.typedata.TypeName
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.customizeTypes

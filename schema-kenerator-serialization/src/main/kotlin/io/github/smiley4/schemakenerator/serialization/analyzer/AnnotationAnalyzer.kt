@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.serialization.analyzer
 
-import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import kotlinx.serialization.descriptors.SerialDescriptor
 import java.lang.reflect.Modifier
 import kotlin.reflect.KProperty

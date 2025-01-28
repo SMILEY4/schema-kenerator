@@ -1,8 +1,11 @@
 package io.github.smiley4.schemakenerator.jsonschema.generator
 
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 
+/**
+ * Module to use for generating json schema of a matching type
+ */
 interface JsonSchemaGeneratorModule {
 
     data class Context(
@@ -17,8 +20,16 @@ interface JsonSchemaGeneratorModule {
 
     }
 
+    /**
+     * @return whether this module applies to the given type.
+     */
     fun applies(typeData: TypeData): Boolean
 
+
+    /**
+     * Generate the json schema.
+     * @return the generated schema
+     */
     fun generate(context: Context): JsonSchema
 
 }

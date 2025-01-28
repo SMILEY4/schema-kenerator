@@ -3,9 +3,9 @@
 package io.github.smiley4.schemakenerator.examples
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.find
-import io.github.smiley4.schemakenerator.core.typedata.findTypeParameter
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.find
+import io.github.smiley4.schemakenerator.core.data.findTypeParameter
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
