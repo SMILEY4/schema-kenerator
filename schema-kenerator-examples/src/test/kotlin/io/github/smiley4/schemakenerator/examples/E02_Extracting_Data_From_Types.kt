@@ -6,17 +6,17 @@ package io.github.smiley4.schemakenerator.examples
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
+import io.github.smiley4.schemakenerator.core.data.find
 import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.data.SubType
-import io.github.smiley4.schemakenerator.reflection.processReflection
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -28,19 +28,19 @@ class E02_Extracting_Data_From_Types : FreeSpec({
     "extracting basic data from classes ..." - {
 
         "... using reflection" {
-            val extracted = typeOf<SimpleClass>().processReflection()
+            val extracted = typeOf<SimpleClass>().analyseTypeUsingReflection()
 
-            // With the "processReflection()"-step, information about the given type is extracted and stored in "BaseTypeData" using jvm reflection features.
+            // With the "analyseTypeUsingReflection()"-step, information about the given type is extracted and stored in "BaseTypeData" using jvm reflection features.
             // The result is extracted information about the type "SimpleClass" as well as other referenced types, i.e. "String" and "Int".
             // The data for the root type (i.e. "SimpleClass") is stored in "Bundle#data" and referenced types ("String", "Int") in "Bundle#supporting".
 
-            println(extracted.data.simpleName)                  // -> "SimpleClass"
-            println(extracted.supporting.map { it.simpleName }) // -> "[String, Int]"
+            println(extracted.data.descriptiveName.short)                  // -> "SimpleClass"
+            println(extracted.supporting.map { it.descriptiveName.short }) // -> "[String, Int]"
         }
 
         "configuring the reflection step" {
-            // The "processReflection()"-step has some parameters to configure its behavior and what information to include
-            typeOf<SimpleClass>().processReflection {
+            // The "analyseTypeUsingReflection()"-step has some parameters to configure its behavior and what information to include
+            typeOf<SimpleClass>().analyseTypeUsingReflection {
                 // whether to include getter functions as members of a type
                 includeGetters = false
                 // whether to include weak getter functions (i.e. function same as getters but do not start with "get...()")  as members of a type
@@ -57,19 +57,19 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         }
 
         "... using kotlinx-serialization" {
-            val extracted = typeOf<SimpleClass>().processKotlinxSerialization()
+            val extracted = typeOf<SimpleClass>().analyzeTypeUsingKotlinxSerialization()
 
-            // The "processKotlinxSerialization()"-step fulfills the same role as "processReflection"-step, but uses the kotlinx-serialization library.
-            // In general "processKotlinxSerialization()" has access to less/different information and the produces different results than reflection.
+            // The "analyzeTypeUsingKotlinxSerialization()"-step fulfills the same role as "analyzeTypeUsingKotlinxSerialization"-step, but uses the kotlinx-serialization library.
+            // In general "analyzeTypeUsingKotlinxSerialization()" has access to less/different information and the produces different results than reflection.
 
-            println(extracted.data.simpleName)                  // -> "SimpleClass"
-            println(extracted.supporting.map { it.simpleName }) // -> "[String, Int]"
+            println(extracted.data.descriptiveName.short)                  // -> "SimpleClass"
+            println(extracted.supporting.map { it.descriptiveName.short }) // -> "[String, Int]"
         }
 
         "configuring the kotlinx-serialization step" {
-            // The "processKotlinxSerialization()"-step has parameters to configure its behavior
-            typeOf<SimpleClass>().processKotlinxSerialization {
-                // kotlinx-serialization looses some information about type parameters. Because of this, the "processKotlinxSerialization()"-step
+            // The "analyzeTypeUsingKotlinxSerialization()"-step has parameters to configure its behavior
+            typeOf<SimpleClass>().analyzeTypeUsingKotlinxSerialization {
+                // kotlinx-serialization looses some information about type parameters. Because of this, the "analyzeTypeUsingKotlinxSerialization()"-step
                 // has to treat types more carefully to avoid collisions and types overwriting other types with different type parameters.
                 // This more careful behaviour can be disabled for specific types that are known to not have any
                 // type parameters with the "markNotParameterized" configuration option.
@@ -94,24 +94,24 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 //     @Serializable class ChildTwo : SealedParent()
                 // }
 
-                val extractedReflection = typeOf<SealedParent>().processReflection()
-                val extractedKotlinx = typeOf<SealedParent>().processKotlinxSerialization()
+                val extractedReflection = typeOf<SealedParent>().analyseTypeUsingReflection()
+                val extractedKotlinx = typeOf<SealedParent>().analyzeTypeUsingKotlinxSerialization()
 
-                // Subtypes of sealed classes and interfaces are detected and extracted automatically, regardless of reflection or kotlinx-serialization.
+                // Subtypes of sealed classes and interfaces are detected and extracted automatically, regardless of whether reflection or kotlinx-serialization is used.
 
-                println(extractedReflection.data.simpleName + ": " + (extractedReflection.data as ObjectTypeData).subtypes.map { it.simple() })  // -> "SealedParent: [ChildOne, ChildTwo]"
-                println(extractedKotlinx.data.simpleName + ": " + (extractedKotlinx.data as ObjectTypeData).subtypes.map { it.simple() })        // -> "SealedParent: [ChildOne, ChildTwo]"
+                println(extractedReflection.data.descriptiveName.short + ": " + extractedReflection.data.subtypes.map { extractedReflection.find(it)!!.descriptiveName.short })  // -> "SealedParent: [ChildOne, ChildTwo]"
+                println(extractedKotlinx.data.descriptiveName.short + ": " + extractedKotlinx.data.subtypes.map { extractedKotlinx.find(it)!!.descriptiveName.short })        // -> "SealedParent: [ChildOne, ChildTwo]"
 
                 // The detected subtypes are added to Bundle#supporting and are referenced by the parent-type via their ids
 
-                println(extractedReflection.data.simpleName)                  // -> "SealedParent"
-                println(extractedReflection.supporting.map { it.simpleName }) // -> "[ChildOne, ChildTwo]"
+                println(extractedReflection.data.descriptiveName.short)                  // -> "SealedParent"
+                println(extractedReflection.supporting.map { it.descriptiveName.short }) // -> "[ChildOne, ChildTwo]"
 
             }
 
             "manually including subtypes" {
 
-                // When using classes that are not "sealed", subtypes are not automatically detected and have to be added to the "known types" for them to be included.
+                // When using classes that are not "sealed", subtypes are not automatically detected and have to be added to the input types for them to be included.
 
                 // open class ParentManual {
                 //     class ChildOne : ParentManual()
@@ -125,14 +125,14 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                         typeOf<ParentManual.ChildTwo>()
                     )
                 )
-                    // extract information from all "known" types individually, i.e. from "ParentManual", "ChildOne", "ChildTwo"
-                    .processReflection()
+                    // extract information from all input types individually, i.e. from "ParentManual", "ChildOne", "ChildTwo"
+                    .analyseTypeUsingReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
-                    // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
-                    .connectSubTypes()
+                    // The "addMissingSupertypeSubtypeRelations()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
+                    .addMissingSupertypeSubtypeRelations()
 
-                println(extracted.data.simpleName + ": " + (extracted.data as ObjectTypeData).subtypes.map { it.simple() })           // -> "ParentManual: [ChildOne, ChildTwo]"
-                extracted.supporting.forEach { supporting -> println((supporting as ObjectTypeData).supertypes.map { it.simple() }) } // -> "[ParentManual]", "[ParentManual]"
+                println(extracted.data.descriptiveName.short + ": " + extracted.data.subtypes.map { extracted.find(it)!!.descriptiveName.short }) // -> "ParentManual: [ChildOne, ChildTwo]"
+                extracted.supporting.forEach { supporting -> println(supporting.supertypes.map { extracted.find(it)!!.descriptiveName.short }) }  // -> "[ParentManual]", "[ParentManual]"
 
             }
 
@@ -151,13 +151,13 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 val extracted = typeOf<ParentCore>()
                     // the "collectSubTypes()"-step looks at the @SubType-annotations present on any type (recursive) and adds the referenced types to be included in the next steps.
                     .collectSubTypes()
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
-                    .connectSubTypes()
+                    .addMissingSupertypeSubtypeRelations()
 
-                println(extracted.data.simpleName + ": " + (extracted.data as ObjectTypeData).subtypes.map { it.simple() })           // -> "ParentCore: [ChildOne, ChildTwo]"
-                extracted.supporting.forEach { supporting -> println((supporting as ObjectTypeData).supertypes.map { it.simple() }) } // -> "[ParentCore]", "[ParentCore]"
+                println(extracted.data.descriptiveName.short+ ": " + extracted.data.subtypes.map { extracted.find(it)!!.descriptiveName.short }) // -> "ParentCore: [ChildOne, ChildTwo]"
+                extracted.supporting.forEach { supporting -> println(supporting.supertypes.map { extracted.find(it)!!.descriptiveName.short }) } // -> "[ParentCore]", "[ParentCore]"
             }
 
             "jackson @JsonSubTypes-annotation" {
@@ -177,15 +177,15 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 val extracted = typeOf<ParentJackson>()
                     // the "collectJacksonSubTypes()"-step looks at the @JsonSubTypes-annotation present on any type (recursive) and adds the referenced types to be included in the next steps.
                     .collectJacksonSubTypes({
-                        it.processReflection() // this step needs to intermediate information from the types. This specifies how this information is extracted. reflection is reccomended here.
+                        it.analyseTypeUsingReflection() // this step needs to intermediate information from the types. This specifies how this information is extracted. reflection is recommended here.
                     })
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
-                    .connectSubTypes()
+                    .addMissingSupertypeSubtypeRelations()
 
-                println(extracted.data.simpleName + ": " + (extracted.data as ObjectTypeData).subtypes.map { it.simple() })           // -> "ParentJackson: [ChildOne, ChildTwo]"
-                extracted.supporting.forEach { supporting -> println((supporting as ObjectTypeData).supertypes.map { it.simple() }) } // -> "[ParentJackson]", "[ParentJackson]"
+                println(extracted.data.descriptiveName.short + ": " + extracted.data.subtypes.map { extracted.find(it)!!.descriptiveName.short }) // -> "ParentJackson: [ChildOne, ChildTwo]"
+                extracted.supporting.forEach { supporting -> println(supporting.supertypes.map { extracted.find(it)!!.descriptiveName.short }) }  // -> "[ParentJackson]", "[ParentJackson]"
             }
 
         }
@@ -207,13 +207,13 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extracted = typeOf<SealedParent>()
-                    .processKotlinxSerialization()
+                    .analyzeTypeUsingKotlinxSerialization()
                     .addDiscriminatorProperty("_type") // adds a property "_type" to all types with subtypes
 
-                val discriminatorProperty = (extracted.data as ObjectTypeData).members.find { it.name == "_type" }!!
-                println(discriminatorProperty.name)                        // -> "_type"
-                println(discriminatorProperty.type.full())                 // -> "kotlin.String"
-                println(discriminatorProperty.annotations.map { it.name }) // -> "[discriminator_marker]"
+                val discriminatorProperty = extracted.data.members.find { it.name == "_type" }!!
+                println(discriminatorProperty.name)                                         // -> "_type"
+                println(extracted.find(discriminatorProperty.type)!!.descriptiveName.full)  // -> "kotlin.String"
+                println(discriminatorProperty.annotations.map { it.name })                  // -> "[discriminator_marker]"
 
                 // An "annotation" with name "discriminator_marker" is added to the property to mark it and make it possible to find it later, e.g. when generating schemas.
                 // If a property with the name already exists, the maker annotation is added to this property instead.
@@ -233,13 +233,13 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extracted = typeOf<ParentDiscriminatorKotlinx>()
-                    .processKotlinxSerialization()
+                    .analyzeTypeUsingKotlinxSerialization()
                     .addJsonClassDiscriminatorProperty() // adds a property with the name specified in @JsonClassDiscriminator to all annotated types with subtypes
 
-                val discriminatorProperty = (extracted.data as ObjectTypeData).members.find { it.name == "_type" }!!
-                println(discriminatorProperty.name)                        // -> "_type"
-                println(discriminatorProperty.type.full())                 // -> "kotlin.String"
-                println(discriminatorProperty.annotations.map { it.name }) // -> "[discriminator_marker]"
+                val discriminatorProperty = extracted.data.members.find { it.name == "_type" }!!
+                println(discriminatorProperty.name)                                         // -> "_type"
+                println(extracted.find(discriminatorProperty.type)!!.descriptiveName.full)  // -> "kotlin.String"
+                println(discriminatorProperty.annotations.map { it.name })                  // -> "[discriminator_marker]"
 
                 // An "annotation" with name "discriminator_marker" is added to the property to mark it and make it possible to find it later, e.g. when generating schemas.
                 // If a property with the name already exists, the maker annotation is added to this property instead.
@@ -263,13 +263,13 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extracted = typeOf<ParentDiscriminatorJackson>()
-                    .processReflection()
+                    .analyseTypeUsingReflection()
                     .addJacksonTypeInfoDiscriminatorProperty() // adds a property with the name specified in @JsonTypeInfo#property to all annotated types with subtypes
 
-                val discriminatorProperty = (extracted.data as ObjectTypeData).members.find { it.name == "_type" }!!
-                println(discriminatorProperty.name)                        // -> "_type"
-                println(discriminatorProperty.type.full())                 // -> "kotlin.String"
-                println(discriminatorProperty.annotations.map { it.name }) // -> "[discriminator_marker]"
+                val discriminatorProperty = extracted.data.members.find { it.name == "_type" }!!
+                println(discriminatorProperty.name)                                         // -> "_type"
+                println(extracted.find(discriminatorProperty.type)!!.descriptiveName.full)  // -> "kotlin.String"
+                println(discriminatorProperty.annotations.map { it.name })                  // -> "[discriminator_marker]"
 
                 // An "annotation" with name "discriminator_marker" is added to the property to mark it and make it possible to find it later, e.g. when generating schemas.
                 // If a property with the name already exists, the maker annotation is added to this property instead.

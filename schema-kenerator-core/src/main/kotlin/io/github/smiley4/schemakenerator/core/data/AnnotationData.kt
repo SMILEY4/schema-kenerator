@@ -7,13 +7,9 @@ data class AnnotationData(
     /**
      * The name of the annotation - usually the full qualified name of the annotation-class
      */
-    val name: String,
+    var name: String,
     /**
      * the values of the annotation
      */
-    val values: MutableMap<String, Any?> = mutableMapOf(),
-    /**
-     * the annotation itself, if available
-     */
-    val annotation: Annotation? = null,
+    val values: MutableMap<String, Any?>,
 )

@@ -1,13 +1,13 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
+import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
@@ -28,20 +28,10 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
-                .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_FULL).process(it) }
-                .let { JsonSchemaCompileInlineStep().compile(it) }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateJsonSchema()
+                .withTitle(TitleBuilder.BUILDER_FULL)
+                .compileInlining()
 
             schema.json.prettyPrint()
                 .let {
@@ -61,20 +51,20 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
-                .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-                .let { JsonSchemaCompileInlineStep().compile(it) }
+                .analyzeTypeUsingKotlinxSerialization()
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
+                .generateJsonSchema()
+                .withTitle(TitleBuilder.BUILDER_SIMPLE)
+                .compileInlining()
 
             schema.json.prettyPrint()
                 .let {
@@ -94,20 +84,20 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
-                .let { JsonSchemaGenerationStep().generate(it) }
-                .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_SIMPLE).compile(it) }
+                .analyzeTypeUsingKotlinxSerialization()
+//                .also { schema ->
+//                    if (schema.data.id.additionalId != null) {
+//                        additionalIds.add(schema.data.id.additionalId!!)
+//                    }
+//                    schema.supporting.forEach {
+//                        if (it.id.additionalId != null) {
+//                            additionalIds.add(it.id.additionalId!!)
+//                        }
+//                    }
+//                }
+                .generateJsonSchema()
+                .withTitle(TitleBuilder.BUILDER_SIMPLE)
+                .compileReferencingRoot(TitleBuilder.BUILDER_SIMPLE)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -500,7 +490,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "kotlin.String"
                                     }
                                 },
-                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
                             }
                         },
                         "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics"
@@ -540,7 +530,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "String"
                                     }
                                 },
-                                "title": "ClassWithGenericField#0"
+                                "title": "ClassWithGenericField"
                             }
                         },
                         "title": "ClassWIthDifferentGenerics"
@@ -565,7 +555,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                 },
                                 "title": "ClassWithGenericField"
                             },
-                            "ClassWithGenericField#0": {
+                            "ClassWithGenericField2": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -576,7 +566,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "title": "String"
                                     }
                                 },
-                                "title": "ClassWithGenericField#0"
+                                "title": "ClassWithGenericField"
                             },
                             "ClassWIthDifferentGenerics": {
                                 "type": "object",
@@ -589,7 +579,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
                                         "${'$'}ref": "#/definitions/ClassWithGenericField"
                                     },
                                     "valueString": {
-                                        "${'$'}ref": "#/definitions/ClassWithGenericField#0"
+                                        "${'$'}ref": "#/definitions/ClassWithGenericField2"
                                     }
                                 },
                                 "title": "ClassWIthDifferentGenerics"

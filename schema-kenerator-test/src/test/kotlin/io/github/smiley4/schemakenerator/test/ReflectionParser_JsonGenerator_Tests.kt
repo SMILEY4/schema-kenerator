@@ -2,21 +2,17 @@ package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencing
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDefaultStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDeprecatedStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationDescriptionStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationExamplesStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationFormatStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
+import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
+import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
@@ -42,34 +38,23 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyseTypeUsingReflection()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileInlineStep().compile(it) }
+                .compileInlining()
 
             schema.json.shouldEqualJson(data.expectedResultInlining)
         }
@@ -79,34 +64,23 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyseTypeUsingReflection()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencing(TitleBuilder.BUILDER_FULL)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -126,34 +100,23 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { ReflectionTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyseTypeUsingReflection()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencingRoot(TitleBuilder.BUILDER_FULL)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {

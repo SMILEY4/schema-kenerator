@@ -4,20 +4,22 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
-import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
-import io.github.smiley4.schemakenerator.core.steps.ConnectSubTypesStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonJsonTypeInfoDiscriminatorStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
+import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.flattenToMap
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
+import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.SubType
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionAnnotationSubTypeStep
-import io.github.smiley4.schemakenerator.reflection.steps.ReflectionTypeProcessingStep
-import io.github.smiley4.schemakenerator.serialization.steps.HandleJsonClassDiscriminatorStep
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
+import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -32,12 +34,12 @@ class SubAndSuperTypesTest : StringSpec({
     "reflection subtype-annotation" {
 
         val result = typeOf<BaseClass1>()
-            .let { ReflectionAnnotationSubTypeStep().process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectSubTypes()
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
 
-        result.data.qualifiedName shouldBe BaseClass1::class.qualifiedName
-        result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
+        result.data.identifyingName.full shouldBe BaseClass1::class.qualifiedName
+        result.supporting.map { it.identifyingName.full } shouldContainExactlyInAnyOrder listOf(
             SubClass1A::class.qualifiedName,
             SubClass1B::class.qualifiedName,
             SubClass1C::class.qualifiedName,
@@ -46,50 +48,50 @@ class SubAndSuperTypesTest : StringSpec({
             SubClass2B::class.qualifiedName,
         )
 
-        result.data.let { it as ObjectTypeData }.also {
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.data.also {
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf(
                 SubClass1A::class.qualifiedName,
                 SubClass1B::class.qualifiedName,
                 SubClass1C::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
         }
 
-        result.supporting.find { it.qualifiedName == SubClass1A::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == SubClass1A::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t -> result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass1::class.qualifiedName
             )
         }
-        result.supporting.find { it.qualifiedName == SubClass1B::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == SubClass1B::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf(
                 BaseClass1::class.qualifiedName
             )
         }
-        result.supporting.find { it.qualifiedName == SubClass1C::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == SubClass1C::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t -> result.find(t).identifyingName.full } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass1::class.qualifiedName
             )
         }
 
-        result.supporting.find { it.qualifiedName == BaseClass2::class.qualifiedName }!!.let { it as ObjectTypeData }.also {
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == BaseClass2::class.qualifiedName }!!.also {
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 SubClass2A::class.qualifiedName,
                 SubClass2B::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
         }
-        result.supporting.find { it.qualifiedName == SubClass2A::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == SubClass2A::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass2::class.qualifiedName
             )
         }
-        result.supporting.find { it.qualifiedName == SubClass2B::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == SubClass2B::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 BaseClass2::class.qualifiedName
             )
         }
@@ -99,12 +101,12 @@ class SubAndSuperTypesTest : StringSpec({
     "without reflection subtype-annotation" {
 
         val result = typeOf<NormalClass>()
-            .let { ReflectionAnnotationSubTypeStep().process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectSubTypes()
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
 
-        result.data.qualifiedName shouldBe NormalClass::class.qualifiedName
-        result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
+        result.data.identifyingName.full shouldBe NormalClass::class.qualifiedName
+        result.supporting.map { it.identifyingName.full } shouldContainExactlyInAnyOrder listOf(
             String::class.qualifiedName,
         )
 
@@ -113,12 +115,12 @@ class SubAndSuperTypesTest : StringSpec({
     "jackson subtype-annotation" {
 
         val result = typeOf<JacksonBaseClass1>()
-            .let { JacksonSubTypeStep(typeProcessing = { type -> ReflectionTypeProcessingStep().process(type) }).process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectJacksonSubTypes(typeProcessing = { t -> t.analyseTypeUsingReflection() })
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
 
-        result.data.qualifiedName shouldBe JacksonBaseClass1::class.qualifiedName
-        result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
+        result.data.identifyingName.full shouldBe JacksonBaseClass1::class.qualifiedName
+        result.supporting.map { it.identifyingName.full } shouldContainExactlyInAnyOrder listOf(
             JacksonSubClass1A::class.qualifiedName,
             JacksonSubClass1B::class.qualifiedName,
             JacksonSubClass1C::class.qualifiedName,
@@ -127,50 +129,50 @@ class SubAndSuperTypesTest : StringSpec({
             JacksonSubClass2B::class.qualifiedName,
         )
 
-        result.data.let { it as ObjectTypeData }.also {
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.data.also {
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonSubClass1A::class.qualifiedName,
                 JacksonSubClass1B::class.qualifiedName,
                 JacksonSubClass1C::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
         }
 
-        result.supporting.find { it.qualifiedName == JacksonSubClass1A::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == JacksonSubClass1A::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass1::class.qualifiedName
             )
         }
-        result.supporting.find { it.qualifiedName == JacksonSubClass1B::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == JacksonSubClass1B::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass1::class.qualifiedName
             )
         }
-        result.supporting.find { it.qualifiedName == JacksonSubClass1C::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == JacksonSubClass1C::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass1::class.qualifiedName
             )
         }
 
-        result.supporting.find { it.qualifiedName == JacksonBaseClass2::class.qualifiedName }!!.let { it as ObjectTypeData }.also {
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == JacksonBaseClass2::class.qualifiedName }!!.also {
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonSubClass2A::class.qualifiedName,
                 JacksonSubClass2B::class.qualifiedName,
             )
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
         }
-        result.supporting.find { it.qualifiedName == JacksonSubClass2A::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == JacksonSubClass2A::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass2::class.qualifiedName
             )
         }
-        result.supporting.find { it.qualifiedName == JacksonSubClass2B::class.qualifiedName }!!.let { it as ObjectTypeData }.also { it ->
-            it.subtypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf()
-            it.supertypes.map { t -> t.base } shouldContainExactlyInAnyOrder listOf(
+        result.supporting.find { it.identifyingName.full == JacksonSubClass2B::class.qualifiedName }!!.also { it ->
+            it.subtypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf()
+            it.supertypes.map { t ->result.find(t).identifyingName.full} shouldContainExactlyInAnyOrder listOf(
                 JacksonBaseClass2::class.qualifiedName
             )
         }
@@ -180,12 +182,12 @@ class SubAndSuperTypesTest : StringSpec({
     "without jackson subtype-annotation" {
 
         val result = typeOf<NormalClass>()
-            .let { JacksonSubTypeStep(typeProcessing = { type -> ReflectionTypeProcessingStep().process(type) }).process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
+            .collectJacksonSubTypes(typeProcessing = { it.analyseTypeUsingReflection() })
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
 
-        result.data.qualifiedName shouldBe NormalClass::class.qualifiedName
-        result.supporting.map { it.qualifiedName } shouldContainExactlyInAnyOrder listOf(
+        result.data.identifyingName.full shouldBe NormalClass::class.qualifiedName
+        result.supporting.map { it.identifyingName.full } shouldContainExactlyInAnyOrder listOf(
             String::class.qualifiedName,
         )
 
@@ -194,15 +196,15 @@ class SubAndSuperTypesTest : StringSpec({
     "include default discriminator with swagger-schema" {
 
         val result = typeOf<BaseClass1>()
-            .let { ReflectionAnnotationSubTypeStep().process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
-            .let { JacksonJsonTypeInfoDiscriminatorStep().process(it) }
-            .let { HandleJsonClassDiscriminatorStep().process(it) }
-            .let { AddDiscriminatorStep("_type").process(it) }
-            .let { SwaggerSchemaGenerationStep().generate(it) }
-            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-            .let { SwaggerSchemaCompileInlineStep().compile(it) }
+            .collectSubTypes()
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .addJacksonTypeInfoDiscriminatorProperty()
+            .addJsonClassDiscriminatorProperty()
+            .addDiscriminatorProperty("_type")
+            .generateSwaggerSchema()
+            .withTitle(TitleBuilder.BUILDER_SIMPLE)
+            .compileInlining()
             .swagger
 
         result.discriminator.propertyName shouldBe "_type"
@@ -217,14 +219,15 @@ class SubAndSuperTypesTest : StringSpec({
     "include discriminator from kotlinx @JsonClassDiscriminator with swagger-schema" {
 
         val result = typeOf<KotlinxParent>()
-            .let { KotlinxSerializationTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
-            .let { JacksonJsonTypeInfoDiscriminatorStep().process(it) }
-            .let { HandleJsonClassDiscriminatorStep().process(it) }
-            .let { AddDiscriminatorStep("_type").process(it) }
-            .let { SwaggerSchemaGenerationStep().generate(it) }
-            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-            .let { SwaggerSchemaCompileInlineStep().compile(it) }
+            .collectSubTypes()
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .addJacksonTypeInfoDiscriminatorProperty()
+            .addJsonClassDiscriminatorProperty()
+            .addDiscriminatorProperty("_type")
+            .generateSwaggerSchema()
+            .withTitle(TitleBuilder.BUILDER_SIMPLE)
+            .compileInlining()
             .swagger
 
         result.discriminator.propertyName shouldBe "kotlinx_type"
@@ -232,22 +235,22 @@ class SubAndSuperTypesTest : StringSpec({
         result.anyOf.forEach { subtype ->
             subtype.required shouldContain "kotlinx_type"
             subtype.properties.keys shouldContain "kotlinx_type"
-            subtype.properties["kotlinx_type"]?.types shouldContainExactlyInAnyOrder  setOf("string")
+            subtype.properties["kotlinx_type"]?.types shouldContainExactlyInAnyOrder setOf("string")
         }
     }
 
     "include discriminator from jackson @JsonClassDiscriminator with swagger-schema" {
 
         val result = typeOf<JacksonParent>()
-            .let { ReflectionAnnotationSubTypeStep(10).process(it) }
-            .let { ReflectionTypeProcessingStep().process(it) }
-            .let { ConnectSubTypesStep().process(it) }
-            .let { JacksonJsonTypeInfoDiscriminatorStep().process(it) }
-            .let { HandleJsonClassDiscriminatorStep().process(it) }
-            .let { AddDiscriminatorStep("_type").process(it) }
-            .let { SwaggerSchemaGenerationStep().generate(it) }
-            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
-            .let { SwaggerSchemaCompileInlineStep().compile(it) }
+            .collectSubTypes()
+            .analyseTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .addJacksonTypeInfoDiscriminatorProperty()
+            .addJsonClassDiscriminatorProperty()
+            .addDiscriminatorProperty("_type")
+            .generateSwaggerSchema()
+            .withTitle(TitleBuilder.BUILDER_SIMPLE)
+            .compileInlining()
             .swagger
 
         result.discriminator.propertyName shouldBe "jackson_type"
@@ -262,6 +265,8 @@ class SubAndSuperTypesTest : StringSpec({
 }) {
 
     companion object {
+
+        fun Bundle<TypeData>.find(id: TypeId) = this.flattenToMap()[id]!!
 
         @SubType(SubClass1A::class)
         @SubType(SubClass1B::class)

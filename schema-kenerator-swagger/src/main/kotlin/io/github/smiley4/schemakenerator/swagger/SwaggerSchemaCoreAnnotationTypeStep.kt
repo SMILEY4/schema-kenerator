@@ -1,0 +1,39 @@
+package io.github.smiley4.schemakenerator.swagger
+
+import io.github.smiley4.schemakenerator.core.annotations.Type
+import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
+
+internal class SwaggerSchemaCoreAnnotationTypeStep {
+
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+        determineType(schema.typeData.annotations)?.also { type ->
+            schema.swagger.types = setOf(type)
+        }
+        iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
+            determineType(propData.annotations + propTypeData.annotations)?.also { type ->
+                prop.types = setOf(type)
+            }
+        }
+    }
+
+    private fun determineType(annotations: Collection<AnnotationData>): String? {
+        return annotations
+            .filter { it.name == Type::class.qualifiedName }
+            .map { it.values["type"] as String }
+            .firstOrNull()
+    }
+
+}

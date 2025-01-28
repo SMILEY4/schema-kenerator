@@ -2,13 +2,13 @@
 
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
+import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
-import io.github.smiley4.schemakenerator.core.renameProperties
+import io.github.smiley4.schemakenerator.core.renameMembers
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
@@ -17,23 +17,35 @@ import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.renameProperties
+import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
 import io.swagger.v3.oas.models.media.Schema
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
+import kotlinx.serialization.modules.SerializersModule
+import java.time.Instant
 import java.util.Optional
+import java.util.UUID
 import javax.validation.constraints.Size
 import kotlin.reflect.typeOf
 
@@ -43,7 +55,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClassIssue14a>()
-                .processReflection {
+                .analyseTypeUsingReflection {
                     redirect<Optional<String?>, String?>()
                 }
                 .generateJsonSchema()
@@ -66,7 +78,7 @@ class MiscTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<TestClassIssue14b>()
-                .processKotlinxSerialization {
+                .analyzeTypeUsingKotlinxSerialization {
                     redirect<Int, String?>()
                 }
                 .generateJsonSchema()
@@ -93,7 +105,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClassIssue16>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateJsonSchema {
                     optionalHandling = OptionalHandling.NON_REQUIRED
                 }
@@ -121,7 +133,7 @@ class MiscTests : FreeSpec({
 
         "kotlinx-serialization" {
             val result = typeOf<TestClassIssue16>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema {
                     optionalHandling = OptionalHandling.NON_REQUIRED
                 }
@@ -154,7 +166,7 @@ class MiscTests : FreeSpec({
 
         "json" {
             val result = typeOf<TestClassIssue19>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -181,7 +193,7 @@ class MiscTests : FreeSpec({
 
         "swagger" {
             val result = typeOf<TestClassIssue19>()
-                .processKotlinxSerialization()
+                .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -210,7 +222,7 @@ class MiscTests : FreeSpec({
 
     "https://github.com/SMILEY4/schema-kenerator/issues/20 - include annotations from constructor parameters" {
         val result = typeOf<TestClassIssue20>()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .handleJacksonAnnotations()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
@@ -236,12 +248,12 @@ class MiscTests : FreeSpec({
         }
     }
 
-    "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties"- {
+    "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties" - {
 
         "custom renameing (adding prefix)" {
             val result = typeOf<TestClassIssue18>()
-                .processKotlinxSerialization()
-                .renameProperties { name -> "prefix_$name" }
+                .analyzeTypeUsingKotlinxSerialization()
+                .renameMembers { name -> "prefix_$name" }
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -267,8 +279,8 @@ class MiscTests : FreeSpec({
 
         "kotlinx naming strategy (snake case)" {
             val result = typeOf<TestClassIssue18>()
-                .processKotlinxSerialization()
-                .renameProperties(JsonNamingStrategy.SnakeCase)
+                .analyzeTypeUsingKotlinxSerialization()
+                .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -304,10 +316,10 @@ class MiscTests : FreeSpec({
         )
 
         val result = typeOf<TestClass>()
-            .processReflection()
+            .analyseTypeUsingReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
-                if(propertyData.name == "describeMe" && propertySchema is JsonObject) {
+                if (propertyData.name == "describeMe" && propertySchema is JsonObject) {
                     propertySchema.properties["description"] = JsonTextValue("test description")
                 }
             }
@@ -339,7 +351,7 @@ class MiscTests : FreeSpec({
 
         "inlining" {
             val result = typeOf<BIssue39>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining()
@@ -371,7 +383,7 @@ class MiscTests : FreeSpec({
 
         "referencing" {
             val result = typeOf<BIssue39>()
-                .processReflection()
+                .analyseTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileReferencingRoot()
@@ -424,7 +436,7 @@ class MiscTests : FreeSpec({
 
     }
 
-    "copy swagger field 'type' to 'types'"- {
+    "copy swagger field 'type' to 'types'" - {
 
         "inlining" {
 
@@ -433,7 +445,7 @@ class MiscTests : FreeSpec({
                     swagger = Schema<Any>().also {
                         it.type = "myType"
                     },
-                    typeData = WildcardTypeData()
+                    typeData = TypeData.createWildcard()
                 ),
                 supporting = emptyList()
             ).compileInlining()
@@ -453,7 +465,7 @@ class MiscTests : FreeSpec({
                     swagger = Schema<Any>().also {
                         it.type = "myType"
                     },
-                    typeData = WildcardTypeData()
+                    typeData = TypeData.createWildcard()
                 ),
                 supporting = emptyList()
             ).compileReferencingRoot()
@@ -466,6 +478,250 @@ class MiscTests : FreeSpec({
                         }
                     """.trimIndent(),
                 )
+            }
+        }
+
+    }
+
+    "merge property attributes with referenced type" {
+
+        val result = typeOf<ClassWithAnnotatedFields>()
+            .analyseTypeUsingReflection()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot()
+
+        val componentSchemasCleanIds: Map<String, Schema<*>> = result.componentSchemas
+            .map { (key, value) ->
+                if (key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18")) {
+                    if (value.types.contains("type-a")) {
+                        return@map "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A" to value
+                    }
+                    if (value.types.contains("type-b")) {
+                        return@map "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B" to value
+                    }
+                }
+                if (key.startsWith("io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields")) {
+                    value.properties["fieldA"]?.`$ref` = "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A"
+                    value.properties["fieldB"]?.`$ref` = "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B"
+                }
+                key to value
+            }
+            .associate { it }
+
+        (result.swagger to componentSchemasCleanIds).shouldEqualJson {
+            mapOf(
+                "." to """
+                    {
+                      "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields"
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithAnnotatedFields" to """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "fieldA": {
+                          "${'$'}ref": "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A"
+                        },
+                        "fieldB": {
+                          "${'$'}ref": "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B"
+                        }
+                      },
+                      "required": [
+                        "fieldA",
+                        "fieldB"
+                      ]
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#A" to """
+                    {
+                      "type": [
+                        "object",
+                        "type-a"
+                      ],
+                      "format": "format-a",
+                      "properties": {
+                        "nameOfPerson": {
+                          "type": "string"
+                        },
+                        "numberOfYears": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "required": [
+                        "nameOfPerson",
+                        "numberOfYears"
+                      ]
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.TestClassIssue18#B" to """
+                    {
+                      "type": [
+                        "object",
+                        "type-b"
+                      ],
+                      "format": "format-b",
+                      "properties": {
+                        "nameOfPerson": {
+                          "type": "string"
+                        },
+                        "numberOfYears": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "required": [
+                        "nameOfPerson",
+                        "numberOfYears"
+                      ]
+                    }
+                """.trimIndent()
+            )
+        }
+
+    }
+
+    "generic nested classes with nullable type parameter" - {
+
+        "reflection" {
+            val result = typeOf<GenericClass<String?>>()
+                .analyseTypeUsingReflection()
+                .generateSwaggerSchema()
+                .compileInlining()
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "nested": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "null",
+                                "string"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "nested"
+                      ]
+                    }
+                """.trimIndent()
+            }
+        }
+
+        "kotlinx-serialization" {
+            val result = typeOf<GenericClass<String?>>()
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateSwaggerSchema()
+                .compileInlining()
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "nested": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "null",
+                                "string"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "nested"
+                      ]
+                    }
+                """.trimIndent()
+            }
+        }
+
+    }
+
+    "kotlinx contextual" - {
+
+
+        "with serializers from config" {
+
+            val json = Json {
+                serializersModule = SerializersModule {
+                    contextual(UUID::class, MyUUIDSerializer)
+                    contextual(Instant::class, MyInstantSerializer)
+                }
+            }
+
+            val result = typeOf<TestClassContextual>()
+                .analyzeTypeUsingKotlinxSerialization {
+                    serializersModule = json.serializersModule
+                }
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "timestamp": {
+                          "type": "integer",
+                          "format": "int64",
+                          "title": "Instant"
+                        },
+                        "id": {
+                          "type": "string",
+                          "title": "UUID"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "timestamp"
+                      ],
+                      "title": "TestClassContextual"
+                    }
+                """.trimIndent()
+            }
+        }
+
+        "with serializers from annotation" {
+
+            val result = typeOf<TestClassSerializableWith>()
+                .analyzeTypeUsingKotlinxSerialization {}
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileInlining()
+
+            result.swagger.shouldEqualJson {
+                """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "timestamp": {
+                          "type": "integer",
+                          "format": "int64",
+                          "title": "Instant"
+                        },
+                        "id": {
+                          "type": "string",
+                          "title": "UUID"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "timestamp"
+                      ],
+                      "title": "TestClassSerializableWith"
+                    }
+                """.trimIndent()
             }
         }
 
@@ -510,6 +766,7 @@ class MiscTests : FreeSpec({
             val password: String?
         )
 
+
         @Serializable
         data class TestClassIssue18(
             val nameOfPerson: String,
@@ -518,9 +775,58 @@ class MiscTests : FreeSpec({
 
         sealed class SealedClassIssue39
 
-        class AIssue39: SealedClassIssue39()
+        class AIssue39 : SealedClassIssue39()
 
         class BIssue39(val a: SealedClassIssue39?)
+
+
+        data class ClassWithAnnotatedFields(
+            @Format("format-a")
+            @Type("type-a")
+            val fieldA: TestClassIssue18,
+            @Format("format-b")
+            @Type("type-b")
+            val fieldB: TestClassIssue18
+        )
+
+
+        @Serializable
+        data class GenericClass<T>(val nested: NestedGenericClass<T>)
+
+
+        @Serializable
+        data class NestedGenericClass<T>(val value: T)
+
+
+
+        @Serializable
+        data class TestClassContextual(
+            @Contextual
+            val timestamp: Instant,
+            @Contextual
+            val id: UUID,
+        )
+
+        @Serializable
+        data class TestClassSerializableWith(
+            @Serializable(with = MyInstantSerializer::class)
+            val timestamp: Instant,
+            @Serializable(with = MyUUIDSerializer::class)
+            val id: UUID,
+        )
+
+
+        object MyInstantSerializer : KSerializer<Instant> {
+            override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("java.time.Instant", PrimitiveKind.LONG)
+            override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.toEpochMilli())
+            override fun deserialize(decoder: Decoder): Instant = Instant.ofEpochMilli(decoder.decodeLong())
+        }
+
+        object MyUUIDSerializer : KSerializer<UUID> {
+            override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
+            override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+            override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
+        }
 
     }
 

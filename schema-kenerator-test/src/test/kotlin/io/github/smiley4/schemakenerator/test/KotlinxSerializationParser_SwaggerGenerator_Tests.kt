@@ -1,22 +1,15 @@
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.OptionalHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationFormatStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencing
+import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.TitleBuilder
+import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
@@ -43,34 +36,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let {
-                    SwaggerSchemaGenerationStep(
-                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileInlineStep().compile(it) }
+                .compileInlining()
 
 
             schema.swagger.shouldEqualJson(data.expectedResultInlining)
@@ -81,34 +63,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let {
-                    SwaggerSchemaGenerationStep(
-                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencing(TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,
@@ -124,34 +95,23 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let {
-                    SwaggerSchemaGenerationStep(
-                        optionalAsNonRequired = SwaggerSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
-                        list
-                            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
-                            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
+                        list.handleCoreAnnotations()
                     } else {
                         list
                     }
                 }
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { SwaggerSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { SwaggerSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencingRoot()
                 .let {
                     Result(
                         schema = it.swagger,
@@ -166,8 +126,6 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
 }) {
 
     companion object {
-
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
         private data class Result(
             val schema: Schema<*>,

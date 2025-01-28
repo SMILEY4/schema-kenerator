@@ -7,13 +7,13 @@ data class TypeParameterData(
     /**
      * the name of the type parameter
      */
-    val name: String,
+    var name: String,
     /**
-     * the id of the type parameter
+     * the id of the type
      */
-    val type: TypeId,
+    var type: TypeId,
     /**
      * whether the type parameter is nullable
      */
-    val nullable: Boolean
+    var nullable: Boolean,
 )

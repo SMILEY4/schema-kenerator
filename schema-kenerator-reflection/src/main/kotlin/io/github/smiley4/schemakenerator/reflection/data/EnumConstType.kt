@@ -5,8 +5,6 @@ enum class EnumConstType {
      * Use the declared name of the enum
      */
     NAME,
-
-
     /**
      * Use the result of the toString-function
      */

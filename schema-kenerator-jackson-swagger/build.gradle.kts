@@ -26,9 +26,6 @@ dependencies {
     implementation(project(":schema-kenerator-core"))
     implementation(project(":schema-kenerator-jackson"))
     implementation(project(":schema-kenerator-swagger"))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$versionJackson")
-    implementation("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
-
 }
 
 kotlin {

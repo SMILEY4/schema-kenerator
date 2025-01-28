@@ -2,15 +2,15 @@ package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencing
+import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
-import io.github.smiley4.schemakenerator.serialization.steps.KotlinxSerializationTypeProcessingStep
+import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
+import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
@@ -36,21 +36,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileInlineStep().compile(it) }
+                .compileInlining()
 
             schema.json.shouldEqualJson(data.expectedResultInlining)
         }
@@ -62,31 +57,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencing(TitleBuilder.BUILDER_FULL)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -116,31 +96,16 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .let { KotlinxSerializationTypeProcessingStep().process(it) }
-                .also { schema ->
-                    if (schema.data.id.additionalId != null) {
-                        additionalIds.add(schema.data.id.additionalId!!)
-                    }
-                    schema.supporting.forEach {
-                        if (it.id.additionalId != null) {
-                            additionalIds.add(it.id.additionalId!!)
-                        }
-                    }
-                }
-                .let {
-                    JsonSchemaGenerationStep(
-                        optionalAsNonRequired = JsonSchemaGenerationStepConfig().apply(data.generatorConfig).optionalHandling == OptionalHandling.NON_REQUIRED
-                    ).generate(it)
-                }
+                .analyzeTypeUsingKotlinxSerialization()
+                .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {
-                        list
-                            .let { JsonSchemaTitleStep(TitleBuilder.BUILDER_SIMPLE).process(it) }
+                        list.withTitle(TitleBuilder.BUILDER_SIMPLE)
                     } else {
                         list
                     }
                 }
-                .let { JsonSchemaCompileReferenceRootStep(TitleBuilder.BUILDER_FULL).compile(it) }
+                .compileReferencingRoot(TitleBuilder.BUILDER_FULL)
                 .also {
                     if (it.definitions.isNotEmpty()) {
                         (it.json as JsonObject).properties["definitions"] = obj {
@@ -846,11 +811,11 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                 "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
                             },
                             "valueString": {
-                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2"
                             }
                         },
                         "definitions": {
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -894,7 +859,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                     }
                                 }
                             },
-                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0": {
+                            "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2": {
                                 "type": "object",
                                 "required": [
                                     "value"
@@ -916,7 +881,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
                                         "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField"
                                     },
                                     "valueString": {
-                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField#0"
+                                        "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField2"
                                     }
                                 }
                             }
