@@ -27,9 +27,8 @@ dependencies {
     val versionJakartaValidation: String by project
     implementation(project(":schema-kenerator-core"))
     implementation(project(":schema-kenerator-swagger"))
-    implementation("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
-    implementation("javax.validation:validation-api:$versionJavaxValidation")
-    implementation("jakarta.validation:jakarta.validation-api:$versionJakartaValidation")
+    api("javax.validation:validation-api:$versionJavaxValidation")
+    api("jakarta.validation:jakarta.validation-api:$versionJakartaValidation")
 }
 
 kotlin {

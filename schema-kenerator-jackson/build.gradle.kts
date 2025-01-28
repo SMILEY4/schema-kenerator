@@ -22,7 +22,7 @@ repositories {
 dependencies {
     val versionJackson: String by project
     implementation(project(":schema-kenerator-core"))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$versionJackson")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:$versionJackson")
 }
 
 kotlin {
