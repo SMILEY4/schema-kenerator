@@ -1,12 +1,12 @@
 package io.github.smiley4.schemakenerator.jsonschema.generator
 
-import io.github.smiley4.schemakenerator.core.typedata.MemberData
-import io.github.smiley4.schemakenerator.core.typedata.MemberKind
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.data.MemberData
+import io.github.smiley4.schemakenerator.core.data.MemberKind
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaUtils
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaUtils
 
 class DefaultJsonSchemaGeneratorModule(
     private val optionalAsNonRequired: Boolean = false

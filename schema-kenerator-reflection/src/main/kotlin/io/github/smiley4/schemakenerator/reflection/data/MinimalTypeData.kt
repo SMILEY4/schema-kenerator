@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.reflection.data
 
-import io.github.smiley4.schemakenerator.core.typedata.TypeName
-import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
+import io.github.smiley4.schemakenerator.core.data.TypeName
+import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 
 data class MinimalTypeData(
     /**

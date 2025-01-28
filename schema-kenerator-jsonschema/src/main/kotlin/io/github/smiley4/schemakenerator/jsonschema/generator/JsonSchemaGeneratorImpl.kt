@@ -3,7 +3,7 @@ package io.github.smiley4.schemakenerator.jsonschema.generator
 import io.github.smiley4.schemakenerator.core.GenericBundleStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.flatten
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 
 class JsonSchemaGeneratorImpl(private val modules: List<JsonSchemaGeneratorModule>) : GenericBundleStep<TypeData, JsonSchema>, JsonSchemaGenerator {

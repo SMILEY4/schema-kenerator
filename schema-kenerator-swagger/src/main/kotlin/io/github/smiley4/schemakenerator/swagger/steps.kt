@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.typedata.MemberData
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
+import io.github.smiley4.schemakenerator.core.data.MemberData
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
@@ -11,23 +11,6 @@ import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generator.DefaultSwaggerSchemaGenerationModule
 import io.github.smiley4.schemakenerator.swagger.generator.SwaggerSchemaGenerationModule
 import io.github.smiley4.schemakenerator.swagger.generator.SwaggerSchemaGeneratorImpl
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerMergePropertyAttributesStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileInlineStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceRootStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCompileReferenceStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDefaultStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDeprecatedStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationDescriptionStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationExamplesStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationFormatStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationOptionalAndRequiredStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTypeStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
-import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.swagger.v3.oas.models.media.Schema
 
 enum class OptionalHandling {

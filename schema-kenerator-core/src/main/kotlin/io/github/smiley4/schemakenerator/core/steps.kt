@@ -1,12 +1,7 @@
 package io.github.smiley4.schemakenerator.core
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.steps.AddDiscriminatorStep
-import io.github.smiley4.schemakenerator.core.steps.AddMissingSubtypeSupertypeRelations
-import io.github.smiley4.schemakenerator.core.steps.GettersToPropertiesStep
-import io.github.smiley4.schemakenerator.core.steps.RenameMembersStep
-import io.github.smiley4.schemakenerator.core.steps.RenameTypesStep
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeData
 
 /**
  * See [AddMissingSubtypeSupertypeRelations]
@@ -17,10 +12,10 @@ fun Bundle<TypeData>.addMissingSupertypeSubtypeRelations(): Bundle<TypeData> {
 
 
 /**
- * See [RenameTypesStep]
+ * See [HandleNameAnnotationStep]
  */
 fun Bundle<TypeData>.handleNameAnnotation(): Bundle<TypeData> {
-    return RenameTypesStep().process(this)
+    return HandleNameAnnotationStep().process(this)
 }
 
 

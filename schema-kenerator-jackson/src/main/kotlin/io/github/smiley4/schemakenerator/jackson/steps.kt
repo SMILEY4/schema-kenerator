@@ -3,13 +3,7 @@ package io.github.smiley4.schemakenerator.jackson
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnorePropertiesStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnoreStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonIgnoreTypeStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonJsonTypeInfoDiscriminatorStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonPropertyStep
-import io.github.smiley4.schemakenerator.jackson.steps.JacksonSubTypeStep
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import kotlin.reflect.KType
 
 /**

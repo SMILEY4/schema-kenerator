@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema.generator
 
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 
 interface JsonSchemaGeneratorModule {

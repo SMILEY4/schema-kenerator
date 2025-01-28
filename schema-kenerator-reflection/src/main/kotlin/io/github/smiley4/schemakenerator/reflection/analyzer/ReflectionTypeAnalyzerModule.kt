@@ -1,9 +1,9 @@
 package io.github.smiley4.schemakenerator.reflection.analyzer
 
-import io.github.smiley4.schemakenerator.core.typedata.TypeData
-import io.github.smiley4.schemakenerator.core.typedata.TypeId
-import io.github.smiley4.schemakenerator.core.typedata.TypeParameterData
-import io.github.smiley4.schemakenerator.core.typedata.WrappedTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.TypeParameterData
+import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.reflection.data.MinimalTypeData
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -19,7 +19,7 @@ interface ReflectionTypeAnalyzerModule {
         val knownTypeData: MutableList<TypeData>
     ) {
 
-        fun analyze(type: KType, clazz: KClass<*>): WrappedTypeData  {
+        fun analyze(type: KType, clazz: KClass<*>): WrappedTypeData {
             return this.analyzer.analyze(
                 type = type,
                 clazz = clazz,
