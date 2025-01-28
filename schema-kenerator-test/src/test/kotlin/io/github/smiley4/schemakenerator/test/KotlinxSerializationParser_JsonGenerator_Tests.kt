@@ -58,16 +58,6 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val schema = data.type
                 .analyzeTypeUsingKotlinxSerialization()
-//                .also { schema ->
-//                    if (schema.data.id.additionalId != null) {
-//                        additionalIds.add(schema.data.id.additionalId!!)
-//                    }
-//                    schema.supporting.forEach {
-//                        if (it.id.additionalId != null) {
-//                            additionalIds.add(it.id.additionalId!!)
-//                        }
-//                    }
-//                }
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAutoTitle) {

@@ -119,7 +119,7 @@ class SerializationTypeAnalyzerImpl(
 
         // reserve this descriptor / mark this descriptor as processed with a pending result
         // reserve type-id so that other types can already reference this type (e.g. members resulting in a reference loop)
-        val reservedTypeId = TypeId.create() // todo: now used for all, not only classes (so now also for primitives, enums, ...) -> problem ???
+        val reservedTypeId = TypeId.create()
         processedDescriptors[descriptor] = TypeData.createPlaceholder(reservedTypeId)
 
         // check type redirects
@@ -164,13 +164,12 @@ class SerializationTypeAnalyzerImpl(
                     compareIdentifyingName = true,
                     compareDescriptiveName = true,
                     compareTypeParameters = true,
-                    compareMembers = false
+                    compareMembers = true
                 )
             }
             knownTypeData.add(result.typeData)
             processedDescriptors[descriptor] = result.typeData
         }
-
     }
 
 

@@ -35,6 +35,7 @@ class MemberAnalyzer {
      * @param annotationAnalyzer function providing the annotation data for the given member
      * @return the list of members
      */
+    @Suppress("LongParameterList")
     fun analyzeMembers(
         context: ReflectionTypeAnalyzerModule.Context,
         includeGetters: Boolean,
@@ -62,6 +63,7 @@ class MemberAnalyzer {
      * @param includeStatic whether to include static members
      * @return whether the given type member should be included in the resulting type data
      */
+    @Suppress("LongParameterList")
     fun shouldIncludeMember(
         member: KCallable<*>,
         includeGetters: Boolean,

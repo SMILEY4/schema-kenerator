@@ -82,6 +82,7 @@ class DefaultReflectionTypeAnalyzerModule(
     }
 
 
+    @Suppress("LongMethod")
     override fun analyze(context: ReflectionTypeAnalyzerModule.Context, minimalTypeData: MinimalTypeData): WrappedTypeData {
 
         // determine type category, i.e. whether type is primitive, class, enum, collection, map, ...

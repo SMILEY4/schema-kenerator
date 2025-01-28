@@ -39,7 +39,9 @@ fun Bundle<TypeData>.addJsonClassDiscriminatorProperty(): Bundle<TypeData> {
 /**
  * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun KType.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+fun KType.analyzeTypeUsingKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<TypeData> {
     return KTypeInput(this).analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 
@@ -47,7 +49,9 @@ fun KType.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerialization
 /**
  * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<TypeData> {
     return SerialDescriptorInput(this).analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 
@@ -55,7 +59,9 @@ fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSe
 /**
  * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
-fun InputType.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+fun InputType.analyzeTypeUsingKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return SerializationTypeAnalyzerImpl(
         serializersModule = config.serializersModule,
@@ -69,7 +75,9 @@ fun InputType.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializa
  * See [io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzer]
  */
 @JvmName("processKotlinxSerializationKType")
-fun Bundle<KType>.analyzeTypeUsingKotlinxSerialization(configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}): Bundle<TypeData> {
+fun Bundle<KType>.analyzeTypeUsingKotlinxSerialization(
+    configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+): Bundle<TypeData> {
     return this.mapToInputType().analyzeTypeUsingKotlinxSerialization(configBlock)
 }
 

@@ -12,6 +12,11 @@ import kotlin.reflect.KType
  */
 interface ReflectionTypeAnalyzer {
 
-    fun analyze(type: KType, clazz: KClass<*>, knownTypeParameters: List<TypeParameterData>, knownTypeData: MutableList<TypeData>): WrappedTypeData
+    fun analyze(
+        type: KType,
+        clazz: KClass<*>,
+        knownTypeParameters: List<TypeParameterData>,
+        knownTypeData: MutableList<TypeData>
+    ): WrappedTypeData
 
 }

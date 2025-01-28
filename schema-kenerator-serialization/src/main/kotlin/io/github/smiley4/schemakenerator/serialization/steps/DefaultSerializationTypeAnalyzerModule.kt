@@ -37,8 +37,8 @@ class DefaultSerializationTypeAnalyzerModule(
 
     override fun applies(descriptor: SerialDescriptor) = true
 
+    @Suppress("CyclomaticComplexMethod")
     override fun analyze(context: SerializationTypeAnalyzerModule.Context): WrappedTypeData {
-
         return when (context.descriptor.fullName()) {
             Unit::class.qualifiedName -> analyzePrimitive(context, Unit::class.toTypeName())
             UByte::class.qualifiedName -> analyzePrimitive(context, UByte::class.toTypeName())

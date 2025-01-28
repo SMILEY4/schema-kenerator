@@ -115,6 +115,7 @@ class ReflectionTypeAnalyzerImpl(
      * @param knownTypeParameters already parsed type parameter data
      * @param knownTypeData the already known type data. Adds new results to this collection.
      */
+    @Suppress("LongMethod")
     private fun analyzeClass(
         type: KType,
         clazz: KClass<*>,
