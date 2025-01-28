@@ -1,17 +1,20 @@
 package io.github.smiley4.schemakenerator.core
 
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
 
-/**
- * Merges getters with their matching property;
- *  - if a matching property exists, the getter will be removed and relevant data copied to the property
- *  - if no property exists (e.g. because it is private), the getter will be removed and a new property from its data is created
- */
-class GettersToPropertiesStep : GenericBundleIndependentContentStep<TypeData>() {
+internal class GettersToPropertiesStep {
 
-    override fun process(input: TypeData) {
+    fun process(input: Bundle<TypeData>): Bundle<TypeData> {
+        return input.also { data ->
+            process(data.data)
+            data.supporting.forEach { process(it) }
+        }
+    }
+
+    private fun process(input: TypeData) {
 
         val toAdd = mutableListOf<MemberData>()
 

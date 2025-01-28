@@ -4,15 +4,9 @@ import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.TypeData
 
-/**
- * Adds missing subtype-supertype relations between the given types. Types not already present in the input are not included.
- * Example:
- * B is a subtype of A. B has A in its list of supertypes, but A not B as a subtype.
- * This step finds these missing connections and adds them.
- */
-class AddMissingSubtypeSupertypeRelations : GenericBundleStep<TypeData, TypeData> {
+internal class AddMissingSubtypeSupertypeRelations {
 
-    override fun process(input: Bundle<TypeData>): Bundle<TypeData> {
+    fun process(input: Bundle<TypeData>): Bundle<TypeData> {
         val types = input.flatten()
         return input.also { schema ->
             addMissing(schema.data, types)

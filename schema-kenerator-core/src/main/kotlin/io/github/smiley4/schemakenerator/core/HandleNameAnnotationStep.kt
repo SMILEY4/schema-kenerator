@@ -1,14 +1,19 @@
 package io.github.smiley4.schemakenerator.core
 
 import io.github.smiley4.schemakenerator.core.annotations.Name
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 
-/**
- * Changes the [TypeData.descriptiveName] to the name specified by a [Name]-annotation.
- */
-class HandleNameAnnotationStep : GenericBundleIndependentContentStep<TypeData>() {
+internal class HandleNameAnnotationStep {
 
-    override fun process(input: TypeData) {
+    fun process(input: Bundle<TypeData>): Bundle<TypeData> {
+        return input.also { data ->
+            process(data.data)
+            data.supporting.forEach { process(it) }
+        }
+    }
+
+    private fun process(input: TypeData) {
         input.annotations
             .find { it.name == Name::class.qualifiedName }
             ?.let {
