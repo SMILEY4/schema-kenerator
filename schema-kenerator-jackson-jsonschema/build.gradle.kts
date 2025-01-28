@@ -25,7 +25,6 @@ dependencies {
     implementation(project(":schema-kenerator-core"))
     implementation(project(":schema-kenerator-jackson"))
     implementation(project(":schema-kenerator-jsonschema"))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$versionJackson")
 }
 
 kotlin {
