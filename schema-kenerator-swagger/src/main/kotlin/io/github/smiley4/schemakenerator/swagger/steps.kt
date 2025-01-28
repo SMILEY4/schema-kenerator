@@ -8,6 +8,9 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.swagger.generator.DefaultSwaggerSchemaGenerationModule
+import io.github.smiley4.schemakenerator.swagger.generator.SwaggerSchemaGenerationModule
+import io.github.smiley4.schemakenerator.swagger.generator.SwaggerSchemaGeneratorImpl
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerArraySchemaAnnotationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerMergePropertyAttributesStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaAnnotationStep
@@ -23,7 +26,6 @@ import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCoreAnnotationTypeStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaCustomizeStep
-import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaGenerationStep
 import io.github.smiley4.schemakenerator.swagger.steps.SwaggerSchemaTitleStep
 import io.github.smiley4.schemakenerator.swagger.steps.TitleBuilder
 import io.swagger.v3.oas.models.media.Schema
@@ -45,6 +47,24 @@ class SwaggerSchemaGenerationStepConfig {
      * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
      */
     var optionalHandling: OptionalHandling = OptionalHandling.REQUIRED
+
+    val customModules = mutableListOf<SwaggerSchemaGenerationModule>()
+
+    internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
+        val allModules = listOf(
+            DefaultSwaggerSchemaGenerationModule(
+                optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED
+            )
+        ) + customModules
+        return allModules.reversed()
+    }
+
+    fun custom(module: SwaggerSchemaGenerationModule) {
+        customModules.add(module)
+    }
+
+    // todo: dsl for "custom"
+
 }
 
 
@@ -53,9 +73,7 @@ class SwaggerSchemaGenerationStepConfig {
  */
 fun Bundle<TypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): Bundle<SwaggerSchema> {
     val config = SwaggerSchemaGenerationStepConfig().apply(configBlock)
-    return SwaggerSchemaGenerationStep(
-        optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED,
-    ).process(this)
+    return SwaggerSchemaGeneratorImpl(config.buildCustomModules()).process(this)
 }
 
 

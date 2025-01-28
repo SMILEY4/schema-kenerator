@@ -8,6 +8,9 @@ import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.jsonschema.generator.DefaultJsonSchemaGeneratorModule
+import io.github.smiley4.schemakenerator.jsonschema.generator.JsonSchemaGeneratorImpl
+import io.github.smiley4.schemakenerator.jsonschema.generator.JsonSchemaGeneratorModule
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileInlineStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCompileReferenceRootStep
@@ -21,7 +24,6 @@ import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotati
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCoreAnnotationTypeStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaCustomizeStep
-import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaGenerationStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaTitleStep
 import io.github.smiley4.schemakenerator.jsonschema.steps.TitleBuilder
 
@@ -42,6 +44,24 @@ class JsonSchemaGenerationStepConfig {
      * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
      */
     var optionalHandling = OptionalHandling.REQUIRED
+
+    val customModules = mutableListOf<JsonSchemaGeneratorModule>()
+
+    internal fun buildCustomModules(): List<JsonSchemaGeneratorModule> {
+        val allModules = listOf(
+            DefaultJsonSchemaGeneratorModule(
+                optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED
+            )
+        ) + customModules
+        return allModules.reversed()
+    }
+
+    fun custom(module: JsonSchemaGeneratorModule) {
+        customModules.add(module)
+    }
+
+    // todo: dsl for "custom"
+
 }
 
 
@@ -50,9 +70,7 @@ class JsonSchemaGenerationStepConfig {
  */
 fun Bundle<TypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
     val config = JsonSchemaGenerationStepConfig().apply(configBlock)
-    return JsonSchemaGenerationStep(
-        optionalAsNonRequired = config.optionalHandling == OptionalHandling.NON_REQUIRED,
-    ).process(this)
+    return JsonSchemaGeneratorImpl(config.buildCustomModules()).process(this)
 }
 
 
