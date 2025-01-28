@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
@@ -14,6 +16,7 @@ import kotlin.reflect.KType
 /**
  * Finds and adds additional subtypes from jackson [JsonSubTypes]-annotation.
  * An additional step to add missing subtype-supertype relations later may be required.
+ * Add this step before any type analysis.
  * @param typeProcessing processor used to get annotation data from [KType]
  * @param maxRecursionDepth how many "levels" to search for subtypes
  */
@@ -28,6 +31,7 @@ fun KType.collectJacksonSubTypes(
 /**
  * Finds and adds additional subtypes from jackson [JsonSubTypes]-annotation.
  * An additional step to add missing subtype-supertype relations later may be required.
+ * Add this step before any type analysis.
  * @param typeProcessing processor used to get annotation data from [KType]
  * @param maxRecursionDepth how many "levels" to search for subtypes
  */
@@ -48,7 +52,8 @@ fun InputType.collectJacksonSubTypes(
  *  - adds support for jackson [JsonIgnoreType]-annotation and removes members of the annotated type
  *  - adds support for jackson [JsonIgnoreProperties]-annotation and removes specified members from the annotated types.
  *  - adds support for the jackson [JsonProperty]-annotation. Renames annotated members and modifies their nullability according to the specified values.
- *  */
+ *  Add this step after type analysis and before schema generation.
+ */
 fun Bundle<TypeData>.handleJacksonAnnotations(): Bundle<TypeData> {
     return this
         .let { JacksonIgnoreStep().process(this) }
@@ -59,7 +64,9 @@ fun Bundle<TypeData>.handleJacksonAnnotations(): Bundle<TypeData> {
 
 
 /**
- * See [JacksonJsonTypeInfoDiscriminatorStep]
+ * Handles the [JsonTypeInfo]-annotations and adds a discriminator property with the defined name and
+ * annotated with a marker annotation called [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME].
+ * Add this step after type analysis and before schema generation.
  */
 fun Bundle<TypeData>.addJacksonTypeInfoDiscriminatorProperty(): Bundle<TypeData> {
     return JacksonJsonTypeInfoDiscriminatorStep().process(this)

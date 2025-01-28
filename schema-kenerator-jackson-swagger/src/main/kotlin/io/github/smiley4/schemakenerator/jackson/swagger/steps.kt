@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
 /**
  * Adds a description to properties according to the jackson [JsonPropertyDescription]-annotation.
+ * Add this step after schema generation and before schema compilation.
  */
 fun Bundle<SwaggerSchema>.handleJacksonSwaggerAnnotations(): Bundle<SwaggerSchema> {
     return this.let { JacksonSwaggerPropertyDescriptionStep().process(this) }

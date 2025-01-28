@@ -4,10 +4,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.TypeData
 
-/**
- * Handles the [JsonTypeInfo]-annotations and adds a discriminator property with the defined name and
- * annotated with a marker annotation called [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME]
- */
 internal class JacksonJsonTypeInfoDiscriminatorStep : AbstractAddDiscriminatorStep() {
 
     override fun getDiscriminatorPropertyName(typeData: TypeData): String? {

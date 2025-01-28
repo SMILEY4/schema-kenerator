@@ -1,11 +1,12 @@
 package io.github.smiley4.schemakenerator.validation.swagger
 
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.AbstractSwaggerSchemaStep
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
+import io.github.smiley4.schemakenerator.swagger.buildTypeDataMap
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
@@ -15,18 +16,17 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
-/**
- * Adds support for the following Jakarta Validation annotations:
- * - [NotNull]
- * - [NotEmpty]
- * - [NotBlank]
- * - [Size]
- * - [Min]
- * - [Max]
- */
-class SwaggerJakartaValidationAnnotationStep : AbstractSwaggerSchemaStep() {
+internal class SwaggerJakartaValidationAnnotationStep {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
             val mergedAnnotations = propData.annotations + propTypeData.annotations
             getNotNull(mergedAnnotations)?.also { setRequiredNotNull(schema.swagger, propData.name) }
