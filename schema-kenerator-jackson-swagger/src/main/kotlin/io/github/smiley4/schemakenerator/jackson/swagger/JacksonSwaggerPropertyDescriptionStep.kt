@@ -2,18 +2,25 @@ package io.github.smiley4.schemakenerator.jackson.swagger
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.AbstractSwaggerSchemaStep
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaAnnotationUtils.iterateProperties
+import io.github.smiley4.schemakenerator.swagger.buildTypeDataMap
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 
-/**
- * Adds a description to properties according to the jackson [JsonPropertyDescription]-annotation.
- */
-class JacksonSwaggerPropertyDescriptionStep : AbstractSwaggerSchemaStep() {
+internal class JacksonSwaggerPropertyDescriptionStep {
 
-    override fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
+    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
+        val typeDataMap = bundle.buildTypeDataMap()
+        return bundle.also { schema ->
+            process(schema.data, typeDataMap)
+            schema.supporting.forEach { process(it, typeDataMap) }
+        }
+    }
+
+    private fun process(schema: SwaggerSchema, typeDataMap: Map<TypeId, TypeData>) {
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
             getDescription(propData.annotations + propTypeData.annotations)?.also { description ->
                 prop.description = description

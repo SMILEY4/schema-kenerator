@@ -18,7 +18,7 @@ import io.github.smiley4.schemakenerator.core.data.findAnnotatedWith
  * If a property with the name already exists, the marker annotation will be added to this existing property.
  * If a type already contains a property annotated with the marker annotation, no new property will be added.
  */
-internal abstract class AbstractAddDiscriminatorStep {
+abstract class AbstractAddDiscriminatorStep {
 
     companion object {
 

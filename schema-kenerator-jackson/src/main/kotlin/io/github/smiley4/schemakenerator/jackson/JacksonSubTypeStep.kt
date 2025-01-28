@@ -1,7 +1,6 @@
 package io.github.smiley4.schemakenerator.jackson
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
-import io.github.smiley4.schemakenerator.core.GenericStep
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.InputType
 import io.github.smiley4.schemakenerator.core.data.KTypeInput
@@ -10,22 +9,9 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
-/**
- * Finds additional subtypes from jackson [JsonSubTypes]-annotation.
- * An additional step to add missing subtype-supertype relations
- * later may be required - see [io.github.smiley4.schemakenerator.core.steps.AddMissingSubtypeSupertypeRelations].
- * @param maxRecursionDepth how many "levels" to search for subtypes
- * @param typeProcessing processor to get annotation data from [KType]
- */
-class JacksonSubTypeStep(
-    private val maxRecursionDepth: Int = 10,
-    val typeProcessing: (type: KType) -> Bundle<TypeData>
-) : GenericStep<InputType, Bundle<InputType>> {
+internal class JacksonSubTypeStep(private val maxRecursionDepth: Int = 10, private val typeProcessing: (type: KType) -> Bundle<TypeData>) {
 
-    /**
-     * Finds additional subtypes from jackson [JsonSubTypes]-annotation.
-     */
-    override fun process(input: InputType): Bundle<InputType> {
+    fun process(input: InputType): Bundle<InputType> {
         var depth = 0
         var countPrev = 0
         var subtypes = listOf(input)

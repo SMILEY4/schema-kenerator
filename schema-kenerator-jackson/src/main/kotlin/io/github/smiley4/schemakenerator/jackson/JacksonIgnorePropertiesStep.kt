@@ -1,16 +1,20 @@
 package io.github.smiley4.schemakenerator.jackson
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.github.smiley4.schemakenerator.core.GenericBundleIndependentContentStep
+import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 
-/**
- * Adds support for jackson [JsonIgnoreProperties]-annotation and removes specified members from the annotated types.
- */
-class JacksonIgnorePropertiesStep : GenericBundleIndependentContentStep<TypeData>() {
+internal class JacksonIgnorePropertiesStep {
 
-    override fun process(input: TypeData) {
+    fun process(input: Bundle<TypeData>): Bundle<TypeData> {
+        return input.also { data ->
+            process(data.data)
+            data.supporting.forEach { process(it) }
+        }
+    }
+
+    private fun process(input: TypeData) {
         input.members.removeIf { shouldIgnore(it, input) }
     }
 
