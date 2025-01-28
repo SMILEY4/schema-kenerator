@@ -30,7 +30,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         "... using reflection" {
             val extracted = typeOf<SimpleClass>().analyseTypeUsingReflection()
 
-            // With the "processReflection()"-step, information about the given type is extracted and stored in "BaseTypeData" using jvm reflection features.
+            // With the "analyseTypeUsingReflection()"-step, information about the given type is extracted and stored in "BaseTypeData" using jvm reflection features.
             // The result is extracted information about the type "SimpleClass" as well as other referenced types, i.e. "String" and "Int".
             // The data for the root type (i.e. "SimpleClass") is stored in "Bundle#data" and referenced types ("String", "Int") in "Bundle#supporting".
 
@@ -39,7 +39,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         }
 
         "configuring the reflection step" {
-            // The "processReflection()"-step has some parameters to configure its behavior and what information to include
+            // The "analyseTypeUsingReflection()"-step has some parameters to configure its behavior and what information to include
             typeOf<SimpleClass>().analyseTypeUsingReflection {
                 // whether to include getter functions as members of a type
                 includeGetters = false
@@ -59,17 +59,17 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         "... using kotlinx-serialization" {
             val extracted = typeOf<SimpleClass>().analyzeTypeUsingKotlinxSerialization()
 
-            // The "processKotlinxSerialization()"-step fulfills the same role as "processReflection"-step, but uses the kotlinx-serialization library.
-            // In general "processKotlinxSerialization()" has access to less/different information and the produces different results than reflection.
+            // The "analyzeTypeUsingKotlinxSerialization()"-step fulfills the same role as "analyzeTypeUsingKotlinxSerialization"-step, but uses the kotlinx-serialization library.
+            // In general "analyzeTypeUsingKotlinxSerialization()" has access to less/different information and the produces different results than reflection.
 
             println(extracted.data.descriptiveName.short)                  // -> "SimpleClass"
             println(extracted.supporting.map { it.descriptiveName.short }) // -> "[String, Int]"
         }
 
         "configuring the kotlinx-serialization step" {
-            // The "processKotlinxSerialization()"-step has parameters to configure its behavior
+            // The "analyzeTypeUsingKotlinxSerialization()"-step has parameters to configure its behavior
             typeOf<SimpleClass>().analyzeTypeUsingKotlinxSerialization {
-                // kotlinx-serialization looses some information about type parameters. Because of this, the "processKotlinxSerialization()"-step
+                // kotlinx-serialization looses some information about type parameters. Because of this, the "analyzeTypeUsingKotlinxSerialization()"-step
                 // has to treat types more carefully to avoid collisions and types overwriting other types with different type parameters.
                 // This more careful behaviour can be disabled for specific types that are known to not have any
                 // type parameters with the "markNotParameterized" configuration option.

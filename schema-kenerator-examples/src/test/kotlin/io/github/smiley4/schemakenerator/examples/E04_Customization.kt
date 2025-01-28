@@ -3,7 +3,9 @@
 
 package io.github.smiley4.schemakenerator.examples
 
+import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.renameMembers
+import io.github.smiley4.schemakenerator.core.typedata.AnnotationData
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.core.typedata.TypeName
@@ -12,6 +14,7 @@ import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.customizeTypes
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
@@ -40,7 +43,7 @@ class E04_Customization : FreeSpec({
     "custom type processing / information extraction..." - {
 
         // Custom type extraction functionality can be defined for specific types for both reflection and kotlinx-serialization.
-        // When encountering a type (at any nesting level) that has a custom processor, the output of the custom functionality will be used instead of the default.
+        // When encountering a type (at any nesting level) that has a custom analyzer, the output of the custom functionality will be used instead of the default.
 
         @Serializable
         class ClassWithLocalDateTime(
@@ -49,8 +52,8 @@ class E04_Customization : FreeSpec({
         )
 
         // Here, "ClassWithLocalDateTime" contains a field of type "LocalDateTime". When generating the final json-schema,
-        // "LocalDateTime" should be generated as a simple json-type "date". To achieve that, a custom processor for type "LocalDateTime"
-        // is registered that returns a primitive type annotated with a "JsonTypeHint"-annotation that tells a later step (i.e. "handleJsonSchemaAnnotations")
+        // "LocalDateTime" should be generated as a simple json-type "date-time". To achieve that, a custom analyzer for type "LocalDateTime"
+        // is registered that returns a primitive type annotated with a "Type"-annotation that tells a later step (i.e. "handleCoreAnnotations")
         // to set the type of this json-object to "date"
 
         "... using reflection" {
@@ -58,20 +61,29 @@ class E04_Customization : FreeSpec({
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
                 .analyseTypeUsingReflection {
 
-                    // register a custom processor for the type "LocalDateTime"
+                    // register a custom analyzer for the type "LocalDateTime"
                     custom<LocalDateTime> {
                         // Create type data for "LocalDateTime".
                         // By default, local date time would have been processed possibly as a complex object with unwanted properties.
                         TypeData(
                             id = TypeId.create(),
-                            identifyingName = TypeName("kotlin.String", "String"), // the type should be treated as if it was a string
+                            identifyingName = TypeName("kotlin.String", "String"), // the type should initially be treated as if it was a (primitive) string
                             descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
+                            annotations = mutableListOf(
+                                AnnotationData(
+                                    name = Type::class.qualifiedName!!,
+                                    values = mutableMapOf(
+                                        "type" to "date-time"
+                                    )
+                                )
+                            )
                         )
                     }
 
                 }
                 .generateJsonSchema()
                 .withTitle(TitleType.SIMPLE)
+                .handleCoreAnnotations()
                 .compileInlining()
                 .json.prettyPrint()
 
@@ -83,7 +95,7 @@ class E04_Customization : FreeSpec({
             //    "properties": {
             //       "dateTime": {
             //          "title": "LocalDateTime",
-            //          "type": "date",
+            //          "type": "date-time",
             //       }
             //    },
             // }
@@ -95,20 +107,29 @@ class E04_Customization : FreeSpec({
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
                 .analyzeTypeUsingKotlinxSerialization {
 
-                    // register a custom processor for the type "LocalDateTime"
+                    // register a custom analyzer for the type "LocalDateTime"
                     custom<LocalDateTime> {
                         // Create type data for "LocalDateTime".
                         // By default, local date time would have been processed possibly as a complex object with unwanted properties.
                         TypeData(
                             id = TypeId.create(),
-                            identifyingName = TypeName("kotlin.String", "String"), // the type should be treated as if it was a string
+                            identifyingName = TypeName("kotlin.String", "String"), // the type should initially be treated as if it was a (primitive) string
                             descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
+                            annotations = mutableListOf(
+                                AnnotationData(
+                                    name = Type::class.qualifiedName!!,
+                                    values = mutableMapOf(
+                                        "type" to "date-time"
+                                    )
+                                )
+                            )
                         )
                     }
 
                 }
                 .generateJsonSchema()
                 .withTitle(TitleType.SIMPLE)
+                .handleCoreAnnotations()
                 .compileInlining()
                 .json.prettyPrint()
 
@@ -120,7 +141,7 @@ class E04_Customization : FreeSpec({
             //    "properties": {
             //       "dateTime": {
             //          "title": "LocalDateTime",
-            //          "type": "date",
+            //          "type": "date-time",
             //       }
             //    },
             // }
@@ -130,9 +151,9 @@ class E04_Customization : FreeSpec({
 
     "type redirection" - {
 
-        // Similar to registering custom processing logic for specific types, "type redirects" can be registered at the type processing step
-        // for both reflection and kotlinx-serialization. When encountering the specified type (at any nesting level), instead of processing
-        // and extracting data from the actual type, it will be replaced with the other provided type and this one will be processed instead.
+        // Similar to registering custom analyzing logic for specific types, "type redirects" can be registered at the type analyzing step
+        // for both reflection and kotlinx-serialization. When encountering the specified type (at any nesting level), instead of analyzing
+        // and extracting data from the actual type, it will be replaced with the other provided type and this one will be analyzed instead.
 
         @Serializable
         class ClassWithLocalDateTime(

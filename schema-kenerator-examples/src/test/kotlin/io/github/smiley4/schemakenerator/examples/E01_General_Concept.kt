@@ -23,7 +23,7 @@ class E01_General_Concept : FreeSpec({
         // Steps can be added, removed or combined in different ways to produce a desired result/schema.
 
         val jsonSchema = typeOf<List<String>>()
-            .analyseTypeUsingReflection()            // step 1: extract information from the given type
+            .analyseTypeUsingReflection()   // step 1: extract information from the given type
             .generateJsonSchema()           // step 2: generate independent json-schemas for each involved type extracted in the previous step
             .withTitle(TitleType.SIMPLE)    // step 3: add the "title" property to the generated schemas with the "simple" name of the types
             .compileInlining()              // step 4: combine the independent json schemas into a single schema by inlining all referenced schemas
@@ -49,7 +49,7 @@ class E01_General_Concept : FreeSpec({
         //   - "data":          information/schema of the root type, i.e. the main type to extract data from and generate schemas for.
         //   - "supporting":    list of additional types/schemas that are referenced by the root type or any other type
 
-        // Example: output "bundle" after "processReflection" with "Map<String, Int>" as input.
+        // Example: output "bundle" after "analyseTypeUsingReflection" with "Map<String, Int>" as input.
         println(result.data.descriptiveName.short)                  // -> "Map"
         println(result.supporting.map { it.descriptiveName.short }) // -> "[String, Int]"
 
