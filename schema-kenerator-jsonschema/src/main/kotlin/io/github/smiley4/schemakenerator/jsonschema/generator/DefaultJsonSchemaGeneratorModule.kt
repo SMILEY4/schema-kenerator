@@ -1,44 +1,36 @@
-package io.github.smiley4.schemakenerator.jsonschema.steps
+package io.github.smiley4.schemakenerator.jsonschema.generator
 
-import io.github.smiley4.schemakenerator.core.GenericBundleStep
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.typedata.MemberData
 import io.github.smiley4.schemakenerator.core.typedata.MemberKind
 import io.github.smiley4.schemakenerator.core.typedata.TypeData
 import io.github.smiley4.schemakenerator.core.typedata.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
+import io.github.smiley4.schemakenerator.jsonschema.steps.JsonSchemaUtils
 
-/**
- * Generates json-schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
- * Result needs to be "compiled" to get the final json-schema.
- */
-class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = false) : GenericBundleStep<TypeData, JsonSchema> {
+class DefaultJsonSchemaGeneratorModule(
+    private val optionalAsNonRequired: Boolean = false
+) : JsonSchemaGeneratorModule {
 
     private val schemaUtils = JsonSchemaUtils()
 
-    override fun process(input: Bundle<TypeData>): Bundle<JsonSchema> {
-        val typeDataList = input.flatten()
-        return Bundle(
-            data = generate(input.data, typeDataList),
-            supporting = input.supporting.map { generate(it, typeDataList) }
-        )
-    }
 
-    private fun generate(typeData: TypeData, typeDataList: Collection<TypeData>): JsonSchema {
-        if (typeData.subtypes.isNotEmpty()) {
-            return buildWithSubtypes(typeData)
+    override fun applies(typeData: TypeData) = true
+
+    override fun generate(context: JsonSchemaGeneratorModule.Context): JsonSchema {
+        if (context.typeData.subtypes.isNotEmpty()) {
+            return buildWithSubtypes(context.typeData)
         }
         return when {
-            typeData.enumData != null -> buildEnumSchema(typeData)
-            typeData.collectionData != null -> buildCollectionSchema(typeData)
-            typeData.mapData != null -> buildMapSchema(typeData)
-            typeData.id == TypeId.WILDCARD -> buildAnySchema()
-            typeData.members.isNotEmpty() -> buildObjectSchema(typeData, typeDataList)
-            else -> buildPrimitiveSchema(typeData) ?: buildObjectSchema(typeData, typeDataList)
+            context.typeData.enumData != null -> buildEnumSchema(context.typeData)
+            context.typeData.collectionData != null -> buildCollectionSchema(context.typeData)
+            context.typeData.mapData != null -> buildMapSchema(context.typeData)
+            context.typeData.id == TypeId.WILDCARD -> buildAnySchema()
+            context.typeData.members.isNotEmpty() -> buildObjectSchema(context)
+            else -> buildPrimitiveSchema(context.typeData) ?: buildObjectSchema(context)
         }
     }
+
 
     private fun buildAnySchema(): JsonSchema {
         return JsonSchema(schemaUtils.anyObjectSchema(), TypeData.createWildcard())
@@ -160,15 +152,15 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
         )
     }
 
-    private fun buildObjectSchema(typeData: TypeData, typeDataList: Collection<TypeData>): JsonSchema {
-        if (typeData.isInlineValue) {
-            return buildInlineObjectSchema(typeData, typeDataList)
+    private fun buildObjectSchema(context: JsonSchemaGeneratorModule.Context): JsonSchema {
+        if (context.typeData.isInlineValue) {
+            return buildInlineObjectSchema(context)
         }
 
         val requiredProperties = mutableSetOf<String>()
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
-        collectMembers(typeData, typeDataList).forEach { member ->
+        collectMembers(context.typeData, context.knownTypeData).forEach { member ->
             propertySchemas[member.name] = schemaUtils.referenceSchema(member.type)
             val nullable = member.nullable
             val optional = member.optional && optionalAsNonRequired
@@ -179,18 +171,18 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
 
         return JsonSchema(
             json = schemaUtils.objectSchema(propertySchemas, requiredProperties),
-            typeData = typeData
+            typeData = context.typeData
         )
     }
 
-    private fun buildInlineObjectSchema(typeData: TypeData, typeDataList: Collection<TypeData>): JsonSchema {
-        val inlineType = typeData.members.first { it.kind == MemberKind.PROPERTY }
-        val inlineTypeData = typeDataList.find { it.id == inlineType.type }
+    private fun buildInlineObjectSchema(context: JsonSchemaGeneratorModule.Context): JsonSchema {
+        val inlineType = context.typeData.members.first { it.kind == MemberKind.PROPERTY }
+        val inlineTypeData = context.knownTypeData.find { it.id == inlineType.type }
             ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
-        val inlineTypeSchema = generate(inlineTypeData, typeDataList)
+        val inlineTypeSchema = context.generate(inlineTypeData)
         return JsonSchema(
             json = inlineTypeSchema.json,
-            typeData = typeData
+            typeData = context.typeData
         )
     }
 
@@ -204,5 +196,4 @@ class JsonSchemaGenerationStep(private val optionalAsNonRequired: Boolean = fals
             }
         }
     }
-
 }
