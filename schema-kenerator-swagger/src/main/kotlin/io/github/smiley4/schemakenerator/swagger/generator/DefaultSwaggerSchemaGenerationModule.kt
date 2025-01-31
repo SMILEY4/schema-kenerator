@@ -208,13 +208,13 @@ class DefaultSwaggerSchemaGenerationModule(
 
     private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {
         return buildList {
-            addAll(typeData.members)
             typeData.supertypes.forEach { supertypeId ->
                 val supertype = typeDataList.find { it.id == supertypeId }
                 if (supertype != null) {
                     addAll(collectMembers(supertype, typeDataList))
                 }
             }
+            addAll(typeData.members)
         }
     }
 

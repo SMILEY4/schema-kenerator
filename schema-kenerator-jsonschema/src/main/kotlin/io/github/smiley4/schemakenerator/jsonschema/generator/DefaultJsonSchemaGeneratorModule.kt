@@ -188,12 +188,12 @@ class DefaultJsonSchemaGeneratorModule(
 
     private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {
         return buildList {
-            addAll(typeData.members)
             typeData.supertypes.forEach { supertypeId ->
                 typeDataList
                     .find { it.id == supertypeId }
                     ?.also { supertype -> addAll(collectMembers(supertype, typeDataList)) }
             }
+            addAll(typeData.members)
         }
     }
 }

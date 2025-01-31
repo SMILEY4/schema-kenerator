@@ -3,12 +3,15 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.renameMembers
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.flattenToMap
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
@@ -18,6 +21,7 @@ import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -30,6 +34,8 @@ import io.github.smiley4.schemakenerator.swagger.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldHaveSize
 import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -727,6 +733,150 @@ class MiscTests : FreeSpec({
 
     }
 
+    "https://github.com/SMILEY4/schema-kenerator/issues/43" - {
+
+        "overwriting property with more specific type" {
+            val result = typeOf<Issue43IntHolder>()
+                .analyseTypeUsingReflection()
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileReferencingRoot()
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43IntHolder"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43IntHolder" to """
+                        {
+                          "type" : "object",
+                          "properties" : {
+                            "value" : {
+                              "type" : "integer",
+                              "format" : "int32",
+                              "title" : "Int"
+                            }
+                          },
+                          "required" : [ "value" ],
+                          "title" : "Issue43IntHolder"
+                        }
+                    """.trimIndent(),
+                )
+            }
+        }
+
+        "collect correct subtypes with type parameters involved" {
+            val result = typeOf<Issue43Root>()
+                .collectSubTypes()
+                .analyseTypeUsingReflection()
+                .addMissingSupertypeSubtypeRelations()
+                .also { bundle ->
+                    bundle.supporting
+                        .find { it.identifyingName.full == "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum" }!!
+                        .also { withEnum ->
+                            val supertypes = withEnum.supertypes
+                                .map { bundle.flattenToMap()[it]!! }
+                                .map { it to it.typeParameters.map { t -> bundle.flattenToMap()[t.type] } }
+                            supertypes shouldHaveSize 1
+                            supertypes.map { it.first.descriptiveName.short + " " + it.second.joinToString { t -> t!!.descriptiveName.short } } shouldContainExactlyInAnyOrder
+                                    listOf("Issue42Interface Issue43Enum")
+                        }
+                    bundle.supporting
+                        .find { it.identifyingName.full == "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt" }!!
+                        .also { withEnum ->
+                            val supertypes = withEnum.supertypes
+                                .map { bundle.flattenToMap()[it]!! }
+                                .map { it to it.typeParameters.map { t -> bundle.flattenToMap()[t.type] } }
+                            supertypes shouldHaveSize 1
+                            supertypes.map { it.first.descriptiveName.short + " " + it.second.joinToString { t -> t!!.descriptiveName.short } } shouldContainExactlyInAnyOrder
+                                    listOf("Issue42Interface Int")
+                        }
+                }
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileReferencingRoot()
+
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Root"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Root" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "withEnum": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum"
+                                }
+                              ]
+                            },
+                            "withInt": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt"
+                                }
+                              ]
+                            }
+                          },
+                          "title": "Issue43Root"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Enum"
+                            }
+                          },
+                          "required": [
+                            "data"
+                          ],
+                          "title": "WithEnum"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "type": "integer",
+                              "format": "int32",
+                              "title": "Int"
+                            }
+                          },
+                          "required": [
+                            "data"
+                          ],
+                          "title": "WithInt"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Enum" to """
+                        {
+                          "type": "string",
+                          "enum": [
+                            "Alpha",
+                            "Beta"
+                          ],
+                          "title": "Issue43Enum"
+                        }
+                    """.trimIndent(),
+                )
+            }
+        }
+    }
+
 }) {
 
     companion object {
@@ -827,6 +977,24 @@ class MiscTests : FreeSpec({
             override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
             override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
         }
+
+        interface Issue43SimpleInterface {
+            val value: Number
+        }
+        data class Issue43IntHolder(
+            override val value: Int
+        ) : Issue43SimpleInterface
+
+        data class Issue43Root(
+            val withInt: Issue42Interface.WithInt?,
+            val withEnum: Issue42Interface.WithEnum?,
+        )
+        sealed interface Issue42Interface<T> {
+            val data: T
+            data class WithInt(override val data: Int) : Issue42Interface<Int>
+            data class WithEnum(override val data: Issue43Enum) : Issue42Interface<Issue43Enum>
+        }
+        enum class Issue43Enum { Alpha, Beta, }
 
     }
 
