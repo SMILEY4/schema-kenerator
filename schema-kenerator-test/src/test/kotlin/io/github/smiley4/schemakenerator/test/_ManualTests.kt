@@ -1,22 +1,20 @@
-@file:OptIn(ExperimentalSerializationApi::class)
 @file:Suppress("ClassName")
 
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.core.connectSubTypes
+import io.github.smiley4.schemakenerator.core.handleNameAnnotation
+import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
-import io.swagger.v3.core.util.Json31
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 /**
@@ -24,28 +22,72 @@ import kotlin.reflect.typeOf
  */
 class _ManualTests : StringSpec({
 
-    "test" {
-        val result = typeOf<Generic<Int>>()
-            .processKotlinxSerialization()
-            .generateJsonSchema()
+    "test root" {
+        val result = typeOf<Root>()
+//            .collectSubTypes()
+//            .processReflection()
+//            .connectSubTypes()
+//            .handleNameAnnotation()
+//            .generateSwaggerSchema()
+//            .handleCoreAnnotations()
+//            .withTitle(TitleType.SIMPLE)
+//            .compileReferencingRoot()
+            .processReflection()
+            .generateSwaggerSchema()
             .withTitle(TitleType.SIMPLE)
-            .compileInlining()
-            .json
-            .prettyPrint()
+            .compileReferencingRoot()
+            .asPrintable()
 
-        println(result)
+        println(json.writeValueAsString(result))
+    }
+
+    "test int holder" {
+        val result = typeOf<IntHolder>()
+            .collectSubTypes()
+            .processReflection()
+            .connectSubTypes()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .withTitle(TitleType.SIMPLE)
+            .compileReferencingRoot()
+            .asPrintable()
+
+        println(json.writeValueAsString(result))
     }
 
 }) {
     companion object {
 
-        @Serializable
-        data class Parent(val data: Generic<Int>)
-
-        @Serializable
-        data class Generic<T>(
-            val item: T,
+        data class Root(
+            val withInt: MyInterface.WithInt?,
+            val withEnum: MyInterface.WithEnum?,
+            val intHolder: IntHolder,
         )
+
+        enum class MyEnum {
+            Alpha, Beta,
+        }
+
+        sealed interface MyInterface<T> {
+            val data: T
+
+            data class WithInt(
+                override val data: Int
+            ) : MyInterface<Int>
+
+            data class WithEnum(
+                override val data: MyEnum
+            ) : MyInterface<MyEnum>
+        }
+
+        interface SimpleInterface {
+            val value: Number
+        }
+
+        data class IntHolder(
+            override val value: Int
+        ) : SimpleInterface
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

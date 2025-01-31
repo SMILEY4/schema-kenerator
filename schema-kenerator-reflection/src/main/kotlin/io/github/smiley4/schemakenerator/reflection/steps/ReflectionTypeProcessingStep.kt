@@ -29,6 +29,7 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.full.withNullability
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.typeOf
@@ -196,7 +197,11 @@ class ReflectionTypeProcessingStep(
 
         // collect subtypes
         val subtypes = if (classType == TypeCategory.OBJECT) {
-            clazz.sealedSubclasses.map { parseClass(it.starProjectedType, it, typeParameters, typeData).typeData.id }
+            clazz.sealedSubclasses
+                // "clazz.sealedSubclasses" contains all subclasses ignoring type parameters.
+                // this filter step makes we only collect the actual subtypes where the type parameters also match
+                .filter { it.supertypes.any { s -> s == type.withNullability(false) } }
+                .map { parseClass(it.starProjectedType, it, typeParameters, typeData).typeData.id }
         } else {
             emptyList()
         }

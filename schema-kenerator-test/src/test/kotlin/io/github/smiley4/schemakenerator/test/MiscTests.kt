@@ -2,12 +2,13 @@
 
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.annotations.Required
+import io.github.smiley4.schemakenerator.core.connectSubTypes
 import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.ObjectTypeData
 import io.github.smiley4.schemakenerator.core.data.WildcardTypeData
+import io.github.smiley4.schemakenerator.core.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
@@ -17,6 +18,7 @@ import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
+import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.serialization.processKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameProperties
@@ -29,6 +31,7 @@ import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.swagger.v3.oas.models.media.Schema
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -236,7 +239,7 @@ class MiscTests : FreeSpec({
         }
     }
 
-    "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties"- {
+    "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties" - {
 
         "custom renameing (adding prefix)" {
             val result = typeOf<TestClassIssue18>()
@@ -307,7 +310,7 @@ class MiscTests : FreeSpec({
             .processReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
-                if(propertyData.name == "describeMe" && propertySchema is JsonObject) {
+                if (propertyData.name == "describeMe" && propertySchema is JsonObject) {
                     propertySchema.properties["description"] = JsonTextValue("test description")
                 }
             }
@@ -424,7 +427,7 @@ class MiscTests : FreeSpec({
 
     }
 
-    "copy swagger field 'type' to 'types'"- {
+    "copy swagger field 'type' to 'types'" - {
 
         "inlining" {
 
@@ -471,6 +474,146 @@ class MiscTests : FreeSpec({
 
     }
 
+    "https://github.com/SMILEY4/schema-kenerator/issues/43" - {
+
+        "overwriting property with more specific type" {
+
+            val result = typeOf<Issue43IntHolder>()
+                .processReflection()
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileReferencingRoot()
+
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43IntHolder"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43IntHolder" to """
+                        {
+                          "type" : "object",
+                          "properties" : {
+                            "value" : {
+                              "type" : "integer",
+                              "format" : "int32",
+                              "title" : "Int"
+                            }
+                          },
+                          "required" : [ "value" ],
+                          "title" : "Issue43IntHolder"
+                        }
+                    """.trimIndent(),
+                )
+            }
+        }
+
+        "collect correct subtypes with type parameters involved" {
+            val result = typeOf<Issue43Root>()
+                .collectSubTypes()
+                .processReflection()
+                .connectSubTypes()
+                .also { bundle ->
+                    bundle.supporting
+                        .find { it.qualifiedName == "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum" }
+                        .let { it as ObjectTypeData }
+                        .also { withEnum ->
+                            withEnum.supertypes.map { it.simple() } shouldContainExactlyInAnyOrder listOf("Issue42Interface<Issue43Enum>")
+                        }
+                    bundle.supporting
+                        .find { it.qualifiedName == "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt" }
+                        .let { it as ObjectTypeData }
+                        .also { withEnum ->
+                            withEnum.supertypes.map { it.simple() } shouldContainExactlyInAnyOrder listOf("Issue42Interface<Int>")
+                        }
+                }
+                .generateSwaggerSchema()
+                .withTitle(TitleType.SIMPLE)
+                .compileReferencingRoot()
+
+            (result.swagger to result.componentSchemas).shouldEqualJson {
+                mapOf(
+                    "." to """
+                        {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Root"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Root" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "withEnum": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum"
+                                }
+                              ]
+                            },
+                            "withInt": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt"
+                                }
+                              ]
+                            }
+                          },
+                          "title": "Issue43Root"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Enum"
+                            }
+                          },
+                          "required": [
+                            "data"
+                          ],
+                          "title": "WithEnum"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "type": "integer",
+                              "format": "int32",
+                              "title": "Int"
+                            }
+                          },
+                          "required": [
+                            "data"
+                          ],
+                          "title": "WithInt"
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue43Enum" to """
+                        {
+                          "type": "string",
+                          "enum": [
+                            "Alpha",
+                            "Beta"
+                          ],
+                          "title": "Issue43Enum"
+                        }
+                    """.trimIndent(),
+                )
+            }
+
+        }
+
+    }
+
 }) {
 
     companion object {
@@ -510,6 +653,7 @@ class MiscTests : FreeSpec({
             val password: String?
         )
 
+
         @Serializable
         data class TestClassIssue18(
             val nameOfPerson: String,
@@ -518,9 +662,36 @@ class MiscTests : FreeSpec({
 
         sealed class SealedClassIssue39
 
-        class AIssue39: SealedClassIssue39()
+        class AIssue39 : SealedClassIssue39()
 
         class BIssue39(val a: SealedClassIssue39?)
+
+        interface Issue43SimpleInterface {
+            val value: Number
+        }
+
+        data class Issue43IntHolder(
+            override val value: Int
+        ) : Issue43SimpleInterface
+
+        data class Issue43Root(
+            val withInt: Issue42Interface.WithInt?,
+            val withEnum: Issue42Interface.WithEnum?,
+        )
+
+        sealed interface Issue42Interface<T> {
+            val data: T
+
+            data class WithInt(
+                override val data: Int
+            ) : Issue42Interface<Int>
+
+            data class WithEnum(
+                override val data: Issue43Enum
+            ) : Issue42Interface<Issue43Enum>
+        }
+
+        enum class Issue43Enum { Alpha, Beta, }
 
     }
 

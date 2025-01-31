@@ -222,13 +222,13 @@ class SwaggerSchemaGenerationStep(private val optionalAsNonRequired: Boolean = f
 
     private fun collectMembers(typeData: ObjectTypeData, typeDataList: Collection<BaseTypeData>): List<PropertyData> {
         return buildList {
-            addAll(typeData.members)
             typeData.supertypes.forEach { supertypeId ->
                 val supertype = typeDataList.find { it.id == supertypeId }
                 if (supertype is ObjectTypeData) {
                     addAll(collectMembers(supertype, typeDataList))
                 }
             }
+            addAll(typeData.members)
         }
     }
 
