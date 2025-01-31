@@ -667,7 +667,7 @@ class MiscTests : FreeSpec({
 
             val result = typeOf<TestClassContextual>()
                 .analyzeTypeUsingKotlinxSerialization {
-                    serializersModule = json.serializersModule
+//                    serializersModule = json.serializersModule // todo
                 }
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)

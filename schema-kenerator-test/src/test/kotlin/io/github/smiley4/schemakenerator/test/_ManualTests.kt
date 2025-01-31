@@ -11,8 +11,12 @@ import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.renameMembers
+import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -41,48 +45,72 @@ class _ManualTests : StringSpec({
     "test" {
 
         val kotlinxJson = Json {
-            // todo: support all these values (that make sense)
-            encodeDefaults = true
-            ignoreUnknownKeys = true
-            isLenient = true
-            allowStructuredMapKeys = true
+            // ignore
             prettyPrint = true
-            explicitNulls = true
-            prettyPrintIndent = ""
-            coerceInputValues = true
-            useArrayPolymorphism = true
-            classDiscriminator = "type"
-            classDiscriminatorMode = ClassDiscriminatorMode.ALL_JSON_OBJECTS
-            allowSpecialFloatingPointValues = true
-            useAlternativeNames = true
-            namingStrategy = JsonNamingStrategy.KebabCase
-            decodeEnumsCaseInsensitive = true
-            allowTrailingComma = true
-            allowComments = true
+//            useArrayPolymorphism = true
+
+            // type analysis
+//            classDiscriminator = "type"
+//            classDiscriminatorMode = ClassDiscriminatorMode.ALL_JSON_OBJECTS
+//            useAlternativeNames = true
+//            namingStrategy = JsonNamingStrategy.KebabCase
+
+            // schema generation
+//            encodeDefaults = true
+//            allowStructuredMapKeys = false // see https://petnagy.medium.com/kotlinx-serialization-part2-d6c23f7839c4
+//            explicitNulls = true
+//            allowSpecialFloatingPointValues = true
+
             serializersModule = SerializersModule {
                 contextual(UUID::class, MyUUIDSerializer)
             }
         }
 
-        kotlinxJson.configuration
+//        println(kotlinxJson.encodeToString(MyData(
+//            attributes = mapOf(
+//                CombinedKey(
+//                    a = "1",
+//                    b = 1
+//                ) to 11,
+//                CombinedKey(
+//                    a = "1",
+//                    b = 1
+//                ) to 12
+//            )
+//        )))
 
-        println(kotlinxJson.encodeToString(MyData(UUID.randomUUID())))
-        println()
+
+        /*
+        todo: open questions
+        - new steps or add config to existing steps ?
+        - how to reduce amount of different steps ?
+        - overall "pipeline" config that all steps can draw from ?
+         */
 
         val result = typeOf<MyData>()
             .analyzeTypeUsingKotlinxSerialization {
+                // use
+                // * kotlinxJson.serializersModule
                 json = kotlinxJson
             }
-            .also {
-                println(it)
-            }
-            .generateJsonSchema()
-            .withTitle(TitleType.SIMPLE)
+            // use
+            // * kotlinxJson.configuration.classDiscriminator
+            // * kotlinxJson.configuration.classDiscriminatorMode
+            .addJsonClassDiscriminatorProperty()
+            // use
+            // * kotlinxJson.configuration.useAlternativeNames
+            // * kotlinxJson.configuration.namingStrategy
+            .renameMembers(TODO())
+            // use
+            // * kotlinxJson.configuration.encodeDefaults
+            // * kotlinxJson.configuration.allowStructuredMapKeys
+            // * kotlinxJson.configuration.explicitNulls
+            // * kotlinxJson.configuration.allowSpecialFloatingPointValues
+            .generateSwaggerSchema()
             .compileInlining()
-            .json
-            .prettyPrint()
+            .asPrintable()
 
-        println(result)
+        println(json.writeValueAsString(result))
     }
 
 }) {
@@ -90,8 +118,13 @@ class _ManualTests : StringSpec({
 
         @Serializable
         class MyData(
-            @Contextual
-            val myId: UUID
+            val attributes: Map<CombinedKey, Int>
+        )
+
+        @Serializable
+        data class CombinedKey(
+            val a: String,
+            val b: Int,
         )
 
         class SwaggerResult(
