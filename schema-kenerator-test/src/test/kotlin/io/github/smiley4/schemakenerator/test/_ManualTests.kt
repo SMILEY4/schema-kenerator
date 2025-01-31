@@ -25,7 +25,9 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
 import java.time.Instant
 import java.util.UUID
@@ -38,18 +40,38 @@ class _ManualTests : StringSpec({
 
     "test" {
 
-        val JSON = Json {
+        val kotlinxJson = Json {
+            // todo: support all these values (that make sense)
+            encodeDefaults = true
+            ignoreUnknownKeys = true
+            isLenient = true
+            allowStructuredMapKeys = true
+            prettyPrint = true
+            explicitNulls = true
+            prettyPrintIndent = ""
+            coerceInputValues = true
+            useArrayPolymorphism = true
+            classDiscriminator = "type"
+            classDiscriminatorMode = ClassDiscriminatorMode.ALL_JSON_OBJECTS
+            allowSpecialFloatingPointValues = true
+            useAlternativeNames = true
+            namingStrategy = JsonNamingStrategy.KebabCase
+            decodeEnumsCaseInsensitive = true
+            allowTrailingComma = true
+            allowComments = true
             serializersModule = SerializersModule {
                 contextual(UUID::class, MyUUIDSerializer)
             }
         }
 
-        println(JSON.encodeToString(MyData(UUID.randomUUID())))
+        kotlinxJson.configuration
+
+        println(kotlinxJson.encodeToString(MyData(UUID.randomUUID())))
         println()
 
         val result = typeOf<MyData>()
             .analyzeTypeUsingKotlinxSerialization {
-                serializersModule = JSON.serializersModule
+                json = kotlinxJson
             }
             .also {
                 println(it)
