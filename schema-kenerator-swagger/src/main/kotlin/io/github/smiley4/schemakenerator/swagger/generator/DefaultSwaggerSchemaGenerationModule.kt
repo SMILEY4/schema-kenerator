@@ -13,7 +13,8 @@ import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
 class DefaultSwaggerSchemaGenerationModule(
-    private val optionalAsNonRequired: Boolean = false,
+    private val optionalAsNonRequired: Boolean,
+    private val allowSpecialFloatingPointValues: Boolean,
 ) : SwaggerSchemaGenerationModule {
 
     private val schema = SwaggerSchemaUtils()
@@ -69,8 +70,8 @@ class DefaultSwaggerSchemaGenerationModule(
                 max = BigDecimal.valueOf(UInt.MAX_VALUE.toLong()),
             )
             ULong::class.qualifiedName -> schema.numberSchema(true)
-            Float::class.qualifiedName -> schema.floatSchema()
-            Double::class.qualifiedName -> schema.doubleSchema()
+            Float::class.qualifiedName -> schema.floatSchema(allowSpecialFloatingPointValues)
+            Double::class.qualifiedName -> schema.doubleSchema(allowSpecialFloatingPointValues)
             Boolean::class.qualifiedName -> schema.booleanSchema()
             Char::class.qualifiedName -> schema.stringSchema(
                 min = 1,

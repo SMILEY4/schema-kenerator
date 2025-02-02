@@ -243,11 +243,18 @@ class SwaggerSchemaGenerationStepConfig {
      */
     var optionalHandling: OptionalHandling = OptionalHandling.REQUIRED
 
+
+    /**
+     * whether to allow special values like "NaN", "Infinity", "-Infinity" for floating point types (i.e. float and Double)
+     */
+    var allowSpecialFloatingPointValues: Boolean = false
+
     val customModules = mutableListOf<SwaggerSchemaGenerationModule>()
 
     internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
         val allModules = listOf(
             DefaultSwaggerSchemaGenerationModule(
+                allowSpecialFloatingPointValues = allowSpecialFloatingPointValues,
                 optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED
             )
         ) + customModules

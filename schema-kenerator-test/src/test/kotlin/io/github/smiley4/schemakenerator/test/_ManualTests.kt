@@ -60,7 +60,7 @@ class _ManualTests : StringSpec({
             encodeDefaults = true
 //            allowStructuredMapKeys = false // see https://petnagy.medium.com/kotlinx-serialization-part2-d6c23f7839c4
             explicitNulls = true
-//            allowSpecialFloatingPointValues = true
+            allowSpecialFloatingPointValues = true
 
             serializersModule = SerializersModule {
                 contextual(UUID::class, MyUUIDSerializer)
