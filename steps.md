@@ -74,12 +74,214 @@ Analyze the type and using kotlinx-serialization and return the extracted data.
 
 # jackson
 
+### collectJacksonSubTypes
+
+Finds and adds additional subtypes from jackson [JsonSubTypes]-annotation.
+An additional step to add missing subtype-supertype relations later may be required.
+Add this step before any type analysis.
+
+
+### handleJacksonAnnotations
+
+Handles miscellaneous jackson annotations
+- adds support for jackson [JsonIgnore]-annotation and removes annotated members
+- adds support for jackson [JsonIgnoreType]-annotation and removes members of the annotated type
+- adds support for jackson [JsonIgnoreProperties]-annotation and removes specified members from the annotated types.
+- adds support for the jackson [JsonProperty]-annotation.
+Renames annotated members and modifies their nullability according to the specified values.
+Add this step after type analysis and before schema generation.
+
+
+### addJacksonTypeInfoDiscriminatorProperty
+
+Handles the [JsonTypeInfo]-annotations and adds a discriminator property with the defined name and
+annotated with a marker annotation called [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME].
+Add this step after type analysis and before schema generation.
+
+
+
 # jackson-jsonschema
+
+### handleJacksonJsonSchemaAnnotations
+
+Adds a description to properties according to the jackson [JsonPropertyDescription]-annotation.
+Add this step after schema generation and before schema compilation.
+
+
 
 # jackson-swagger
 
+### handleJacksonSwaggerAnnotations
+
+Adds a description to properties according to the jackson [JsonPropertyDescription]-annotation.
+Add this step after schema generation and before schema compilation.
+
+
+
 # validation swagger
+
+### handleJavaxValidationAnnotations
+
+Adds support for the following Javax Validation annotations:
+- [javax.validation.constraints.Max]
+- [javax.validation.constraints.Min]
+- [javax.validation.constraints.NotBlank]
+- [javax.validation.constraints.NotEmpty]
+- [javax.validation.constraints.NotNull]
+- [javax.validation.constraints.Size]
+
+### handleJakartaValidationAnnotations
+
+Adds support for the following Jakarta Validation annotations:
+- [jakarta.validation.constraints.Max]
+- [jakarta.validation.constraints.Min]
+- [jakarta.validation.constraints.NotBlank]
+- [jakarta.validation.constraints.NotEmpty]
+- [jakarta.validation.constraints.NotNull]
+- [jakarta.validation.constraints.Size]
+Add this step after schema generation and before schema compilation.
+
+
 
 # jsonschema
 
+### generateJsonSchema
+
+Generates json schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
+Result needs to be "compiled" to get the final json schema.
+
+
+### withTitle
+
+Adds an automatically determined title to schemas.
+
+
+### handleCoreAnnotations
+
+Add support for the following schema-kenerator-core annotations:
+- [io.github.smiley4.schemakenerator.core.annotations.Optional]
+- [io.github.smiley4.schemakenerator.core.annotations.Required]
+- [io.github.smiley4.schemakenerator.core.annotations.Default]
+- [io.github.smiley4.schemakenerator.core.annotations.Deprecated] and [kotlin.Deprecated]
+- [io.github.smiley4.schemakenerator.core.annotations.Description]
+- [io.github.smiley4.schemakenerator.core.annotations.Example]
+- [io.github.smiley4.schemakenerator.core.annotations.Title]
+- [io.github.smiley4.schemakenerator.core.annotations.Format]
+- [io.github.smiley4.schemakenerator.core.annotations.Type]
+Add this step after schema generation and before schema compilation.
+
+
+### compileInlining
+
+Resolves references in generated json schemas by inlining them.
+
+
+### compileReferencing
+
+Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+
+
+### compileReferencingRoot
+
+Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+
+
+### customizeTypes
+
+Provide a function that is called for each type and json schema.
+Can be used to manually manipulate the generated json schema.
+
+
+### customizeProperties
+
+Provide a function that is called for each property. Can be used to manually manipulate the generated json schema.
+
+
+
 # swagger
+
+### generateSwaggerSchema
+
+Generates swagger schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
+Result needs to be "compiled" to get the final swagger schema.
+
+
+### withTitle
+
+Adds an automatically determined title to schemas.
+
+
+### handleCoreAnnotations
+
+Add support for the following schema-kenerator-core annotations:
+- [io.github.smiley4.schemakenerator.core.annotations.Optional]
+- [io.github.smiley4.schemakenerator.core.annotations.Required]
+- [io.github.smiley4.schemakenerator.core.annotations.Default]
+- [io.github.smiley4.schemakenerator.core.annotations.Deprecated] and [kotlin.Deprecated]
+- [io.github.smiley4.schemakenerator.core.annotations.Description]
+- [io.github.smiley4.schemakenerator.core.annotations.Example]
+- [io.github.smiley4.schemakenerator.core.annotations.Title]
+- [io.github.smiley4.schemakenerator.core.annotations.Format]
+- [io.github.smiley4.schemakenerator.core.annotations.Type]
+Add this step after schema generation and before schema compilation.
+
+
+### handleSchemaAnnotations
+
+Add support for the following swagger annotations:
+- [io.swagger.v3.oas.annotations.media.Schema]
+     - on types
+          - title
+          - description
+     - on properties
+          - name
+          - title
+          - description
+          - example
+          - hidden
+          - allowableValues
+          - defaultValue
+          - accessMode
+          - minLength
+          - maxLength,
+          - format
+          - minimum
+          - maximum
+          - exclusiveMaximum
+          - exclusiveMinimum
+- [io.swagger.v3.oas.annotations.media.ArraySchema]
+     - minItems
+     - maxItems
+     - uniqueItems
+Add this step after schema generation and before schema compilation.
+
+
+### mergePropertyAttributesIntoType
+
+Merge the attributes of a property into the referenced type.
+
+
+### compileInlining
+
+Resolves references in generated swagger schemas by inlining them.
+
+
+### compileReferencing
+
+Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+
+
+### compileReferencingRoot
+
+Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+
+
+### customizeTypes
+
+Provide a function that is called for each type and swagger schema.
+Can be used to manually manipulate the generated swagger schema.
+
+
+### customizeProperties
+
+Provide a function that is called for each property. Can be used to manually manipulate the generated swagger schema.

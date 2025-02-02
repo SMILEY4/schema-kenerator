@@ -120,18 +120,24 @@ fun Bundle<SwaggerSchema>.mergePropertyAttributesIntoType(): Bundle<SwaggerSchem
 
 /**
  * Resolves references in generated swagger schemas by inlining them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  */
-fun Bundle<SwaggerSchema>.compileInlining(): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileInlineStep().compile(this)
+fun Bundle<SwaggerSchema>.compileInlining(explicitNullTypes: Boolean = true): CompiledSwaggerSchema {
+    return SwaggerSchemaCompileInlineStep(explicitNullTypes).compile(this)
 }
 
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param pathType the type of the schema reference path
  */
-fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.OPENAPI_FULL): CompiledSwaggerSchema {
+fun Bundle<SwaggerSchema>.compileReferencing(
+    explicitNullTypes: Boolean = true,
+    pathType: RefType = RefType.OPENAPI_FULL
+): CompiledSwaggerSchema {
     return compileReferencing(
+        explicitNullTypes,
         when (pathType) {
             RefType.FULL -> TitleBuilder.BUILDER_FULL
             RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -144,21 +150,28 @@ fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.OPENAPI
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param builder builds the path to reference the type, i.e. which "name" to use
  */
 fun Bundle<SwaggerSchema>.compileReferencing(
+    explicitNullTypes: Boolean = true,
     builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileReferenceStep(builder).compile(this)
+    return SwaggerSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
 }
 
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param pathType the type of the schema reference path
  */
-fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.OPENAPI_FULL): CompiledSwaggerSchema {
+fun Bundle<SwaggerSchema>.compileReferencingRoot(
+    explicitNullTypes: Boolean = true,
+    pathType: RefType = RefType.OPENAPI_FULL
+): CompiledSwaggerSchema {
     return compileReferencingRoot(
+        explicitNullTypes,
         when (pathType) {
             RefType.FULL -> TitleBuilder.BUILDER_FULL
             RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -171,12 +184,14 @@ fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.OPE
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param builder builds the path to reference the type, i.e. which "name" to use
  */
 fun Bundle<SwaggerSchema>.compileReferencingRoot(
+    explicitNullTypes: Boolean = true,
     builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileReferenceRootStep(builder).compile(this)
+    return SwaggerSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
 }
 
 

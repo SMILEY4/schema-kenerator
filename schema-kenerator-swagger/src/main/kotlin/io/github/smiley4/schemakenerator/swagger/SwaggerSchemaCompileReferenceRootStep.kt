@@ -7,7 +7,10 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.shouldReference
 
-internal class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class SwaggerSchemaCompileReferenceRootStep(
+    private val explicitNullTypes: Boolean ,
+    private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -15,7 +18,7 @@ internal class SwaggerSchemaCompileReferenceRootStep(private val pathBuilder: (t
      * Put referenced schemas into definitions and reference them
      */
     fun compile(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-        val result = SwaggerSchemaCompileReferenceStep(pathBuilder).compile(bundle)
+        val result = SwaggerSchemaCompileReferenceStep(explicitNullTypes, pathBuilder).compile(bundle)
         if (shouldReference(result.swagger)) {
             val refPath = pathBuilder(result.typeData, bundle.buildTypeDataMap())
             return CompiledSwaggerSchema(

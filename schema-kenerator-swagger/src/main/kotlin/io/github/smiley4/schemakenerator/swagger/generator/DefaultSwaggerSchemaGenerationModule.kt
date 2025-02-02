@@ -13,7 +13,7 @@ import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
 class DefaultSwaggerSchemaGenerationModule(
-    private val optionalAsNonRequired: Boolean = false
+    private val optionalAsNonRequired: Boolean = false,
 ) : SwaggerSchemaGenerationModule {
 
     private val schema = SwaggerSchemaUtils()

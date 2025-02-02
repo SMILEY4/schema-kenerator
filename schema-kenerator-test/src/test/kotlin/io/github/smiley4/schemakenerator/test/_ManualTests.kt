@@ -7,6 +7,7 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
@@ -56,9 +57,9 @@ class _ManualTests : StringSpec({
 //            namingStrategy = JsonNamingStrategy.KebabCase
 
             // schema generation
-//            encodeDefaults = true
+            encodeDefaults = true
 //            allowStructuredMapKeys = false // see https://petnagy.medium.com/kotlinx-serialization-part2-d6c23f7839c4
-//            explicitNulls = true
+            explicitNulls = true
 //            allowSpecialFloatingPointValues = true
 
             serializersModule = SerializersModule {
@@ -96,6 +97,9 @@ class _ManualTests : StringSpec({
             // use
             // * kotlinxJson.configuration.classDiscriminator
             // * kotlinxJson.configuration.classDiscriminatorMode
+            .addDiscriminatorProperty(
+                discriminatorPropertyName = kotlinxJson.configuration.classDiscriminator
+            )
             .addJsonClassDiscriminatorProperty()
             // use
             // * kotlinxJson.configuration.useAlternativeNames
