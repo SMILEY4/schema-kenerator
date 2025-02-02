@@ -120,18 +120,24 @@ fun Bundle<SwaggerSchema>.mergePropertyAttributesIntoType(): Bundle<SwaggerSchem
 
 /**
  * Resolves references in generated swagger schemas by inlining them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  */
-fun Bundle<SwaggerSchema>.compileInlining(): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileInlineStep().compile(this)
+fun Bundle<SwaggerSchema>.compileInlining(explicitNullTypes: Boolean = true): CompiledSwaggerSchema {
+    return SwaggerSchemaCompileInlineStep(explicitNullTypes).compile(this)
 }
 
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param pathType the type of the schema reference path
  */
-fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.OPENAPI_FULL): CompiledSwaggerSchema {
+fun Bundle<SwaggerSchema>.compileReferencing(
+    explicitNullTypes: Boolean = true,
+    pathType: RefType = RefType.OPENAPI_FULL
+): CompiledSwaggerSchema {
     return compileReferencing(
+        explicitNullTypes,
         when (pathType) {
             RefType.FULL -> TitleBuilder.BUILDER_FULL
             RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -144,21 +150,28 @@ fun Bundle<SwaggerSchema>.compileReferencing(pathType: RefType = RefType.OPENAPI
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param builder builds the path to reference the type, i.e. which "name" to use
  */
 fun Bundle<SwaggerSchema>.compileReferencing(
+    explicitNullTypes: Boolean = true,
     builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileReferenceStep(builder).compile(this)
+    return SwaggerSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
 }
 
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param pathType the type of the schema reference path
  */
-fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.OPENAPI_FULL): CompiledSwaggerSchema {
+fun Bundle<SwaggerSchema>.compileReferencingRoot(
+    explicitNullTypes: Boolean = true,
+    pathType: RefType = RefType.OPENAPI_FULL
+): CompiledSwaggerSchema {
     return compileReferencingRoot(
+        explicitNullTypes,
         when (pathType) {
             RefType.FULL -> TitleBuilder.BUILDER_FULL
             RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -171,12 +184,14 @@ fun Bundle<SwaggerSchema>.compileReferencingRoot(pathType: RefType = RefType.OPE
 
 /**
  * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
+ * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
  * @param builder builds the path to reference the type, i.e. which "name" to use
  */
 fun Bundle<SwaggerSchema>.compileReferencingRoot(
+    explicitNullTypes: Boolean = true,
     builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ): CompiledSwaggerSchema {
-    return SwaggerSchemaCompileReferenceRootStep(builder).compile(this)
+    return SwaggerSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
 }
 
 
@@ -201,7 +216,7 @@ fun Bundle<SwaggerSchema>.customizeProperties(
 }
 
 
-enum class OptionalHandling {
+enum class RequiredHandling {
     /**
      * Handle optional parameters as "required" in the schema
      */
@@ -223,17 +238,45 @@ class SwaggerSchemaGenerationStepConfig {
      * ```
      * class MyExample(val someValue: String = "hello")
      * ```
-     * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
-     * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
+     * - with `optionals = REQUIRED` => "someValue" is required (because is not nullable)
+     * - with `optionals = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
      */
-    var optionalHandling: OptionalHandling = OptionalHandling.REQUIRED
+    var optionals: RequiredHandling = RequiredHandling.REQUIRED
+
+
+    /**
+     * How to handle nullable parameters
+     *
+     * Example:
+     * ```
+     * class MyExample(val someValue: String?)
+     * ```
+     * - with `nullables = REQUIRED` => "someValue" is required (but can be either a string value or "null")
+     * - with `nullables = NON_REQUIRED` => "someValue" is not required (but "null" as value is still valid)
+     */
+    var nullables: RequiredHandling = RequiredHandling.NON_REQUIRED
+
+
+    /**
+     * whether to allow special values like "NaN", "Infinity", "-Infinity" for floating point types (i.e. float and Double)
+     */
+    var allowSpecialFloatingPointValues: Boolean = false
+
+
+    /**
+     * Whether to handle maps with complex key types as arrays instead. Valid array items are items of type key or value of the map.
+     */
+    var mapsWithStructuredKeysAsArrays: Boolean = false
 
     val customModules = mutableListOf<SwaggerSchemaGenerationModule>()
 
     internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
         val allModules = listOf(
             DefaultSwaggerSchemaGenerationModule(
-                optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED
+                nullableAsNonRequired = nullables == RequiredHandling.NON_REQUIRED,
+                optionalAsNonRequired = optionals == RequiredHandling.NON_REQUIRED,
+                allowSpecialFloatingPointValues = allowSpecialFloatingPointValues,
+                mapsWithStructuredKeysAsArrays = mapsWithStructuredKeysAsArrays,
             )
         ) + customModules
         return allModules.reversed()

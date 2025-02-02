@@ -1,18 +1,21 @@
 package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.copyTypeToTypes
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.shouldReference
+import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 
-internal class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class SwaggerSchemaCompileReferenceStep(
+    private val explicitNullTypes: Boolean,
+    private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+) {
 
     private val schemaUtils = SwaggerSchemaUtils()
 
@@ -116,7 +119,7 @@ internal class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type:
             newRefPath
         }
 
-        return if (refObj.nullable == true) {
+        return if (refObj.nullable == true && explicitNullTypes) {
             schemaUtils.referenceSchemaNullable(refPath, true)
         } else {
             schemaUtils.referenceSchema(refPath, true)
@@ -131,13 +134,10 @@ internal class SwaggerSchemaCompileReferenceStep(private val pathBuilder: (type:
      */
     private fun createInlineProperty(refObj: Schema<*>, schema: SwaggerSchema): Schema<*> {
         return merge(refObj, schema.swagger).also {
-            if (it.nullable == true) {
-                it.nullable = null
+            if (it.nullable == true && explicitNullTypes) {
                 it.types = setOf("null") + it.types
             }
-            if (it.nullable == false) {
-                it.nullable = null
-            }
+            it.nullable = null
         }
     }
 

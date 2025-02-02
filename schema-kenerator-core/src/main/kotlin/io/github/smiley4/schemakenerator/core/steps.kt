@@ -38,7 +38,7 @@ fun Bundle<TypeData>.renameMembers(rename: (name: String) -> String): Bundle<Typ
  * Merges getters with their matching property:
  *  - if a matching property exists, the getter will be removed and relevant data copied to the property
  *  - if no property exists (e.g. because it is private), the getter will be removed and a new property from its data is created
- *  Add this step after type analysis and before schema generation.
+ * Add this step after type analysis and before schema generation.
  */
 fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> {
     return GettersToPropertiesStep().process(this)

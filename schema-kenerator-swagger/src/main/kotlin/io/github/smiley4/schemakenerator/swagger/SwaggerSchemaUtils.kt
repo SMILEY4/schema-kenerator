@@ -46,19 +46,47 @@ class SwaggerSchemaUtils {
 
     /**
      * Schema of a floating-point number
+     * @param allowSpecialValues whether to allow special values like "NaN", "Infinity", "-Infinity"
      */
-    fun floatSchema() = Schema<Any>().also { schema ->
-        schema.types = setOf("number")
-        schema.format = "float"
+    fun floatSchema(allowSpecialValues: Boolean) = Schema<Any>().also { schema ->
+        if (allowSpecialValues) {
+            schema.anyOf(
+                listOf(
+                    Schema<Any>().also { numbers ->
+                        numbers.types = setOf("number")
+                        numbers.format = "float"
+                    },
+                    Schema<Any>().also { specials ->
+                        specials.enum = listOf("NaN", "Infinity", "-Infinity")
+                    }
+                ))
+        } else {
+            schema.types = setOf("number")
+            schema.format = "float"
+        }
     }
 
 
     /**
      * Schema of a floating-point number with double precision
+     * @param allowSpecialValues whether to allow special values like "NaN", "Infinity", "-Infinity"
      */
-    fun doubleSchema() = Schema<Any>().also { schema ->
-        schema.types = setOf("number")
-        schema.format = "double"
+    fun doubleSchema(allowSpecialValues: Boolean) = Schema<Any>().also { schema ->
+        if (allowSpecialValues) {
+            schema.anyOf(
+                listOf(
+                    Schema<Any>().also { numbers ->
+                        numbers.types = setOf("number")
+                        numbers.format = "double"
+                    },
+                    Schema<Any>().also { specials ->
+                        specials.enum = listOf("NaN", "Infinity", "-Infinity")
+                    }
+                ))
+        } else {
+            schema.types = setOf("number")
+            schema.format = "double"
+        }
     }
 
 

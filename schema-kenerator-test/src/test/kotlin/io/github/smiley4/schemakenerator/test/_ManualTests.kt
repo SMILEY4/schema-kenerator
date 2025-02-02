@@ -1,4 +1,3 @@
-@file:UseSerializers(InstantSerializer::class, MyUUIDSerializer::class)
 @file:OptIn(ExperimentalSerializationApi::class)
 @file:Suppress("ClassName")
 
@@ -6,15 +5,16 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
+import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.renameMembers
+import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.kotest.core.spec.style.StringSpec
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -26,7 +26,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
 import java.time.Instant
 import java.util.UUID
 import kotlin.reflect.typeOf
@@ -37,30 +36,6 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test" {
-
-        val JSON = Json {
-            serializersModule = SerializersModule {
-                contextual(UUID::class, MyUUIDSerializer)
-            }
-        }
-
-        println(JSON.encodeToString(MyData(UUID.randomUUID())))
-        println()
-
-        val result = typeOf<MyData>()
-            .analyzeTypeUsingKotlinxSerialization {
-                serializersModule = JSON.serializersModule
-            }
-            .also {
-                println(it)
-            }
-            .generateJsonSchema()
-            .withTitle(TitleType.SIMPLE)
-            .compileInlining()
-            .json
-            .prettyPrint()
-
-        println(result)
     }
 
 }) {
@@ -68,8 +43,18 @@ class _ManualTests : StringSpec({
 
         @Serializable
         class MyData(
-            @Contextual
-            val myId: UUID
+            val attributes: Map<CombinedKey, Int>
+        )
+
+        @Serializable
+        class MyData2(
+            val attributes: Map<Int, Int>
+        )
+
+        @Serializable
+        data class CombinedKey(
+            val a: String,
+            val b: Int,
         )
 
         class SwaggerResult(
