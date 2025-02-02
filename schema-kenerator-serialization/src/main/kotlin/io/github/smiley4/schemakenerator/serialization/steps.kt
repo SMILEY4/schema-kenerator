@@ -19,7 +19,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
@@ -80,8 +79,7 @@ fun InputType.analyzeTypeUsingKotlinxSerialization(
 ): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return SerializationTypeAnalyzerImpl(
-        json = config.json,
-//        serializersModule = config.serializersModule,
+        serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
         modules = config.buildCustomModules()
     ).analyze(this)
@@ -121,8 +119,7 @@ fun Bundle<InputType>.analyzeTypeUsingKotlinxSerialization(
 ): Bundle<TypeData> {
     val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
     return SerializationTypeAnalyzerImpl(
-        json = config.json,
-//        serializersModule = config.serializersModule,
+        serializersModule = config.serializersModule,
         typeRedirects = config.typeRedirects,
         modules = config.buildCustomModules()
     ).analyze(this)
@@ -130,13 +127,10 @@ fun Bundle<InputType>.analyzeTypeUsingKotlinxSerialization(
 
 class KotlinxSerializationTypeProcessingConfig {
 
-    // todo
-    var json: Json? = null
-
-//    /**
-//     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
-//     */
-//    var serializersModule: SerializersModule? = null
+    /**
+     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
+     */
+    var serializersModule: SerializersModule? = null
 
     var knownNotParameterized = mutableSetOf<String>()
 

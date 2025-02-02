@@ -13,7 +13,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.SimpleClass
 import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
 import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
-import io.github.smiley4.schemakenerator.swagger.OptionalHandling
+import io.github.smiley4.schemakenerator.swagger.RequiredHandling
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
@@ -175,7 +175,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 // configure how optional properties, i.e properties that are not necessarily nullable but have a default value assigned, should be treated
                 // "REQUIRED":     these properties are handled as "required"
                 // "NON_REQUIRED": these properties are handled as "not required"
-                optionalHandling = OptionalHandling.REQUIRED
+                optionals = RequiredHandling.REQUIRED
             }
 
     }

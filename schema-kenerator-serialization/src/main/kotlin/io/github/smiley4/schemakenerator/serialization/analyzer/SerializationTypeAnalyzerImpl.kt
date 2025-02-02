@@ -15,18 +15,16 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.capturedKClass
 import kotlinx.serialization.descriptors.nonNullOriginal
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializerOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
 internal class SerializationTypeAnalyzerImpl(
-    private val json: Json? = null,
-//    /**
-//     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
-//     */
-//    private val serializersModule: SerializersModule? = null,
+    /**
+     * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
+     */
+    private val serializersModule: SerializersModule? = null,
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
@@ -133,7 +131,7 @@ internal class SerializationTypeAnalyzerImpl(
         // todo: custom already here ? or here aswell ? i.e. before contextual ?
 
         // check contextual descriptors
-        val contextualByKClass = descriptor.capturedKClass?.let { json?.serializersModule?.getContextual(it)?.descriptor }
+        val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
         if (contextualByKClass != null) {
             return analyze(contextualByKClass, nullable, knownTypeData, processedDescriptors)
         }

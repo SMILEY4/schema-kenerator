@@ -15,6 +15,7 @@ import java.math.BigDecimal
 
 class DefaultSwaggerSchemaGenerationModule(
     private val optionalAsNonRequired: Boolean,
+    private val nullableAsNonRequired: Boolean,
     private val allowSpecialFloatingPointValues: Boolean,
     private val mapsWithStructuredKeysAsArrays: Boolean,
 ) : SwaggerSchemaGenerationModule {
@@ -202,7 +203,7 @@ class DefaultSwaggerSchemaGenerationModule(
                     it.nullable = member.nullable
                 }
             }
-            val nullable = member.nullable
+            val nullable = member.nullable && nullableAsNonRequired
             val optional = member.optional && optionalAsNonRequired
             if (!nullable && !optional) {
                 requiredProperties.add(member.name)

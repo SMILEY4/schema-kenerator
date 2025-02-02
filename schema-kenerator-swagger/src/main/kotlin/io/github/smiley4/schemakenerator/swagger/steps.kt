@@ -216,7 +216,7 @@ fun Bundle<SwaggerSchema>.customizeProperties(
 }
 
 
-enum class OptionalHandling {
+enum class RequiredHandling {
     /**
      * Handle optional parameters as "required" in the schema
      */
@@ -238,10 +238,23 @@ class SwaggerSchemaGenerationStepConfig {
      * ```
      * class MyExample(val someValue: String = "hello")
      * ```
-     * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
-     * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
+     * - with `optionals = REQUIRED` => "someValue" is required (because is not nullable)
+     * - with `optionals = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
      */
-    var optionalHandling: OptionalHandling = OptionalHandling.REQUIRED
+    var optionals: RequiredHandling = RequiredHandling.REQUIRED
+
+
+    /**
+     * How to handle nullable parameters
+     *
+     * Example:
+     * ```
+     * class MyExample(val someValue: String?)
+     * ```
+     * - with `nullables = REQUIRED` => "someValue" is required (but can be either a string value or "null")
+     * - with `nullables = NON_REQUIRED` => "someValue" is not required (but "null" as value is still valid)
+     */
+    var nullables: RequiredHandling = RequiredHandling.NON_REQUIRED
 
 
     /**
@@ -260,8 +273,9 @@ class SwaggerSchemaGenerationStepConfig {
     internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
         val allModules = listOf(
             DefaultSwaggerSchemaGenerationModule(
+                nullableAsNonRequired = nullables == RequiredHandling.NON_REQUIRED,
+                optionalAsNonRequired = optionals == RequiredHandling.NON_REQUIRED,
                 allowSpecialFloatingPointValues = allowSpecialFloatingPointValues,
-                optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED,
                 mapsWithStructuredKeysAsArrays = mapsWithStructuredKeysAsArrays,
             )
         ) + customModules
