@@ -70,7 +70,7 @@ class DiscriminatorTests : FreeSpec({
                     .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
-                    .compileReferencing(RefType.OPENAPI_SIMPLE)
+                    .compileReferencing(true, RefType.OPENAPI_SIMPLE)
                 (result.swagger to result.componentSchemas).shouldEqualJson {
                     mapOf(
                         "." to """
@@ -103,7 +103,7 @@ class DiscriminatorTests : FreeSpec({
                     .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
-                    .compileReferencing(RefType.OPENAPI_FULL)
+                    .compileReferencing(true, RefType.OPENAPI_FULL)
                 (result.swagger to result.componentSchemas).shouldEqualJson {
                     mapOf(
                         "." to """
@@ -136,7 +136,7 @@ class DiscriminatorTests : FreeSpec({
                     .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
-                    .compileReferencing(RefType.OPENAPI_SIMPLE)
+                    .compileReferencing(true, RefType.OPENAPI_SIMPLE)
                 (result.swagger to result.componentSchemas).shouldEqualJson {
                     mapOf(
                         "." to """
@@ -169,7 +169,7 @@ class DiscriminatorTests : FreeSpec({
                     .analyseTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
-                    .compileReferencing(RefType.FULL)
+                    .compileReferencing(true, RefType.FULL)
                 (result.swagger to result.componentSchemas).shouldEqualJson {
                     mapOf(
                         "." to """
@@ -208,7 +208,7 @@ class DiscriminatorTests : FreeSpec({
                 .analyseTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
-                .compileReferencing(RefType.OPENAPI_SIMPLE)
+                .compileReferencing(true, RefType.OPENAPI_SIMPLE)
             (result.swagger to result.componentSchemas).shouldEqualJson {
                 mapOf(
                     "." to """
@@ -241,7 +241,7 @@ class DiscriminatorTests : FreeSpec({
                 .analyseTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
-                .compileReferencing(RefType.OPENAPI_SIMPLE)
+                .compileReferencing(true, RefType.OPENAPI_SIMPLE)
             (result.swagger to result.componentSchemas).shouldEqualJson {
                 mapOf(
                     "." to """
@@ -274,7 +274,7 @@ class DiscriminatorTests : FreeSpec({
                 .analyseTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
-                .compileReferencing(RefType.OPENAPI_SIMPLE)
+                .compileReferencing(true, RefType.OPENAPI_SIMPLE)
             (result.swagger to result.componentSchemas).shouldEqualJson {
                 mapOf(
                     "." to """
@@ -309,7 +309,7 @@ class DiscriminatorTests : FreeSpec({
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .generateSwaggerSchema()
-            .compileReferencing(RefType.OPENAPI_SIMPLE)
+            .compileReferencing(true, RefType.OPENAPI_SIMPLE)
         (result.swagger to result.componentSchemas).shouldEqualJson {
             mapOf(
                 "." to """

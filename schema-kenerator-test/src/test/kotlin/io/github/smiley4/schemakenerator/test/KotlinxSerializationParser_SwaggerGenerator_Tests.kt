@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.OptionalHandling
+import io.github.smiley4.schemakenerator.swagger.RequiredHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
@@ -79,7 +79,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .compileReferencing(TitleBuilder.BUILDER_FULL)
+                .compileReferencing(true, TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,
@@ -1370,7 +1370,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as required",
                 generatorConfig = {
-                    optionalHandling = OptionalHandling.REQUIRED
+                    optionals = RequiredHandling.REQUIRED
                 },
                 expectedResultInlining = """
                     {
@@ -1455,7 +1455,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as non-required",
                 generatorConfig = {
-                    optionalHandling = OptionalHandling.NON_REQUIRED
+                    optionals = RequiredHandling.NON_REQUIRED
                 },
                 expectedResultInlining = """
                     {
