@@ -7,6 +7,7 @@ import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
+import io.github.smiley4.schemakenerator.core.data.find
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
@@ -15,6 +16,7 @@ import java.math.BigDecimal
 class DefaultSwaggerSchemaGenerationModule(
     private val optionalAsNonRequired: Boolean,
     private val allowSpecialFloatingPointValues: Boolean,
+    private val mapsWithStructuredKeysAsArrays: Boolean,
 ) : SwaggerSchemaGenerationModule {
 
     private val schema = SwaggerSchemaUtils()
@@ -28,7 +30,7 @@ class DefaultSwaggerSchemaGenerationModule(
         return when {
             context.typeData.enumData != null -> buildEnumSchema(context.typeData)
             context.typeData.collectionData != null -> buildCollectionSchema(context.typeData)
-            context.typeData.mapData != null -> buildMapSchema(context.typeData)
+            context.typeData.mapData != null -> buildMapSchema(context.typeData, context.knownTypeData)
             context.typeData.id == TypeId.WILDCARD -> buildAnySchema()
             context.typeData.members.isNotEmpty() -> buildObjectSchema(context)
             else -> buildPrimitiveSchema(context.typeData) ?: buildObjectSchema(context)
@@ -111,7 +113,24 @@ class DefaultSwaggerSchemaGenerationModule(
         )
     }
 
-    private fun buildMapSchema(typeData: TypeData): SwaggerSchema {
+    private fun buildMapSchema(typeData: TypeData, knownTypeData: List<TypeData>): SwaggerSchema {
+        if(mapsWithStructuredKeysAsArrays) {
+            val keyType = knownTypeData.find(typeData.mapData!!.keyType.type)!!
+            if(keyType.members.isNotEmpty()) {
+                return SwaggerSchema(
+                    swagger = schema.arraySchema(
+                        items = Schema<Any>().also { itemSchema ->
+                            itemSchema.anyOf = listOf(
+                                schema.referenceSchema(typeData.mapData!!.keyType.type),
+                                schema.referenceSchema(typeData.mapData!!.valueType.type),
+                            )
+                        },
+                        uniqueItems = false
+                    ),
+                    typeData = typeData
+                )
+            }
+        }
         return SwaggerSchema(
             swagger = schema.mapObjectSchema(
                 valueSchema = schema.referenceSchema(typeData.mapData!!.valueType.type)

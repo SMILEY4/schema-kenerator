@@ -1,4 +1,3 @@
-@file:UseSerializers(InstantSerializer::class, MyUUIDSerializer::class)
 @file:OptIn(ExperimentalSerializationApi::class)
 @file:Suppress("ClassName")
 
@@ -6,12 +5,9 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
@@ -19,7 +15,6 @@ import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.kotest.core.spec.style.StringSpec
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -30,10 +25,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNamingStrategy
-import kotlinx.serialization.modules.SerializersModule
 import java.time.Instant
 import java.util.UUID
 import kotlin.reflect.typeOf
@@ -57,28 +49,36 @@ class _ManualTests : StringSpec({
 //            namingStrategy = JsonNamingStrategy.KebabCase
 
             // schema generation
-            encodeDefaults = true
-//            allowStructuredMapKeys = false // see https://petnagy.medium.com/kotlinx-serialization-part2-d6c23f7839c4
-            explicitNulls = true
-            allowSpecialFloatingPointValues = true
+//            encodeDefaults = true
+            allowStructuredMapKeys = true // see https://petnagy.medium.com/kotlinx-serialization-part2-d6c23f7839c4
+//            explicitNulls = true
+//            allowSpecialFloatingPointValues = true
 
-            serializersModule = SerializersModule {
-                contextual(UUID::class, MyUUIDSerializer)
-            }
+//            serializersModule = SerializersModule {
+//                contextual(UUID::class, MyUUIDSerializer)
+//            }
         }
 
-//        println(kotlinxJson.encodeToString(MyData(
-//            attributes = mapOf(
-//                CombinedKey(
-//                    a = "1",
-//                    b = 1
-//                ) to 11,
-//                CombinedKey(
-//                    a = "1",
-//                    b = 1
-//                ) to 12
-//            )
-//        )))
+        println(kotlinxJson.encodeToString(MyData(
+            attributes = mapOf(
+                CombinedKey(
+                    a = "1",
+                    b = 1
+                ) to 11,
+                CombinedKey(
+                    a = "2",
+                    b = 2
+                ) to 12
+            )
+        )))
+
+        println(kotlinxJson.encodeToString(MyData2(
+            attributes = mapOf(
+                1 to 11,
+                2 to 12
+            )
+        )))
+
 
 
         /*
@@ -123,6 +123,11 @@ class _ManualTests : StringSpec({
         @Serializable
         class MyData(
             val attributes: Map<CombinedKey, Int>
+        )
+
+        @Serializable
+        class MyData2(
+            val attributes: Map<Int, Int>
         )
 
         @Serializable

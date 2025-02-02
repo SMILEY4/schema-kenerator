@@ -79,7 +79,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .compileReferencing(TitleBuilder.BUILDER_FULL)
+                .compileReferencing(false, TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,

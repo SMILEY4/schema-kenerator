@@ -249,13 +249,20 @@ class SwaggerSchemaGenerationStepConfig {
      */
     var allowSpecialFloatingPointValues: Boolean = false
 
+
+    /**
+     * Whether to handle maps with complex key types as arrays instead. Valid array items are items of type key or value of the map.
+     */
+    var mapsWithStructuredKeysAsArrays: Boolean = false
+
     val customModules = mutableListOf<SwaggerSchemaGenerationModule>()
 
     internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
         val allModules = listOf(
             DefaultSwaggerSchemaGenerationModule(
                 allowSpecialFloatingPointValues = allowSpecialFloatingPointValues,
-                optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED
+                optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED,
+                mapsWithStructuredKeysAsArrays = mapsWithStructuredKeysAsArrays,
             )
         ) + customModules
         return allModules.reversed()

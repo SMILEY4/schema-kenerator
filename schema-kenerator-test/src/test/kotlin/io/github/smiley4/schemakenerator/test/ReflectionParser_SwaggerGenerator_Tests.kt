@@ -90,7 +90,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .compileReferencing(TitleBuilder.BUILDER_FULL)
+                .compileReferencing(false, TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,
@@ -124,7 +124,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                         list
                     }
                 }
-                .compileReferencingRoot(TitleBuilder.BUILDER_FULL)
+                .compileReferencingRoot(false, TitleBuilder.BUILDER_FULL)
                 .let {
                     Result(
                         schema = it.swagger,
