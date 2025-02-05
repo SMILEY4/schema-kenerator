@@ -1011,9 +1011,7 @@ class MiscTests : FreeSpec({
         "without explicit null types, nullables as required" {
             val result = typeOf<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
-                .generateSwaggerSchema {
-                    nullables = RequiredHandling.REQUIRED
-                }
+                .generateSwaggerSchema { nullables = RequiredHandling.REQUIRED }
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining(explicitNullTypes = false)
             result.swagger.shouldEqualJson {

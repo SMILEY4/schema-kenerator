@@ -11,7 +11,7 @@ class SimpleSerializationTypeAnalyzerModule(
     override fun applies(descriptor: SerialDescriptor) = matcher(descriptor)
 
     override fun analyze(context: SerializationTypeAnalyzerModule.Context) = WrappedTypeData(
-        typeData = provider(),
+        typeData = provider(context.id),
         nullable = context.nullable,
     )
 }

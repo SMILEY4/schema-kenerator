@@ -268,7 +268,7 @@ class SwaggerSchemaGenerationStepConfig {
      */
     var mapsWithStructuredKeysAsArrays: Boolean = false
 
-    val customModules = mutableListOf<SwaggerSchemaGenerationModule>()
+    var customModules = mutableListOf<SwaggerSchemaGenerationModule>()
 
     internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
         val allModules = listOf(

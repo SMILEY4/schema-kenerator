@@ -90,19 +90,19 @@ fun Bundle<InputType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnal
 class ReflectionTypeAnalysisConfig {
 
     /**
-     * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind]).
+     * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind.GETTER]).
      */
     var includeGetters: Boolean = false
 
 
     /**
-     * Whether to include weak getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind]).
+     * Whether to include weak getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind.WEAK_GETTER]).
      */
     var includeWeakGetters: Boolean = false
 
 
     /**
-     * Whether to include functions as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind]).
+     * Whether to include functions as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind.FUNCTION]).
      */
     var includeFunctions: Boolean = false
 
