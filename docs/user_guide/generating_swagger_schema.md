@@ -1,0 +1,3 @@
+# Generating Swagger Schema
+
+todo
