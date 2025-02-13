@@ -2,6 +2,7 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.dokka.gradle.DokkaTask
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -49,6 +50,10 @@ tasks.withType<Detekt>().configureEach {
         txt.required.set(false)
         sarif.required.set(false)
     }
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-swagger"))
 }
 
 mavenPublishing {
