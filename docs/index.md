@@ -14,7 +14,7 @@ It is designed as a pipeline of individual steps to be highly configurable and f
 ## Features
 
 - Analyze Java and Kotlin types using reflection or [Kotlinx.Serialization](https://github.com/Kotlin/kotlinx.serialization)
-    - complex class setups
+    - complex class configurations
     - recursion
     - collections, maps, enums
     - inheritance
@@ -31,7 +31,7 @@ It is designed as a pipeline of individual steps to be highly configurable and f
 - Generate schemas
     - [JSON schema](https://json-schema.org/)
     - [Swagger schema](https://swagger.io/docs/specification/v3_0/data-models/data-models/)
-- Highly configurable and customizable schema generation pipeline by adding new processing steps
+- Highly configurable and customizable schema generation pipeline by adding new processing steps and creating own modules
 
 
 ## Example

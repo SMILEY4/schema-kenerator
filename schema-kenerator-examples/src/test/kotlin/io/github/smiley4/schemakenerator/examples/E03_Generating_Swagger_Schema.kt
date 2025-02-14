@@ -27,6 +27,7 @@ import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidat
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
 import io.swagger.util.Json
+import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.validation.constraints.Max
@@ -53,7 +54,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileInlining()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "object",
             //   "required" : [ "nested", "number" ],
@@ -87,7 +88,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileReferencing()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "object",
             //   "required" : [ "nested", "number" ],
@@ -105,7 +106,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             //   }
             // }
 
-            println(Json.pretty(swaggerSchema.componentSchemas["io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.NestedClass"]))
+            println(Json31.pretty(swaggerSchema.componentSchemas["io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.NestedClass"]))
             // {
             //   "type" : "object",
             //   "required" : [ "flag" ],
@@ -127,12 +128,12 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileReferencingRoot()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "$ref" : "#/components/schemas/io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.ExampleClass"
             // }
 
-            println(Json.pretty(swaggerSchema.componentSchemas["io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.ExampleClass"]))
+            println(Json31.pretty(swaggerSchema.componentSchemas["io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.ExampleClass"]))
             // {
             //   "type" : "object",
             //   "required" : [ "nested", "number" ],
@@ -150,7 +151,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             //   }
             // }
 
-            println(Json.pretty(swaggerSchema.componentSchemas["io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.NestedClass"]))
+            println(Json31.pretty(swaggerSchema.componentSchemas["io.github.smiley4.schemakenerator.examples.E03_Generating_Swagger_Schema.Companion.NestedClass"]))
             // {
             //   "type" : "object",
             //   "required" : [ "flag" ],
@@ -191,7 +192,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.OPENAPI_SIMPLE) // "OPENAPI_SIMPLE" takes the simple/short name of the type for the reference path and modifies it to be compatible with openapi-spec.
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "array",
             //   "items" : {
@@ -207,7 +208,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.OPENAPI_FULL) // "OPENAPI_FULL" takes the full/qualified name of the type for the reference path and modifies it to be compatible with openapi-spec.
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "array",
             //   "items" : {
@@ -223,7 +224,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.SIMPLE) // "SIMPLE" takes the simple/short name of the type for the reference path. This name may not be compatible with openapi-spec.
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "array",
             //   "items" : {
@@ -240,7 +241,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.FULL) // "FULL" takes the full/qualified name of the type for the reference path. This name may not be compatible with openapi-spec.
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "array",
             //   "items" : {
@@ -266,7 +267,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         // "TitleType.SIMPLE" takes the simple/short name of the type as the title. This name may not be compatible with openapi-spec.
         // "TitleType.FULL" takes the full/qualified name of the type for the reference path. This name may not be compatible with openapi-spec.
 
-        println(Json.pretty(swaggerSchema.swagger))
+        println(Json31.pretty(swaggerSchema.swagger))
         // {
         //   "title" : "List_GenericClass_String",
         //   "type" : "array",
@@ -299,7 +300,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .handleCoreAnnotations()
                 .compileInlining()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "title" : "Annotated Class",
             //   "type" : "object",
@@ -337,7 +338,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .handleSchemaAnnotations()
                 .compileInlining()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "title" : "Swagger Annotated Class",
             //   "description" : "some description",
@@ -383,7 +384,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .handleJacksonSwaggerAnnotations()
                 .compileInlining()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "required" : [ "value" ],
             //   "type" : "object",
@@ -411,7 +412,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
                 .handleJakartaValidationAnnotations()
                 .compileInlining()
 
-            println(Json.pretty(swaggerSchema.swagger))
+            println(Json31.pretty(swaggerSchema.swagger))
             // {
             //   "type" : "object",
             //   "required" : [ "hasSize", "minMax", "mustNotBeBlank", "mustNotBeEmpty", "mustNotBeNull" ],
