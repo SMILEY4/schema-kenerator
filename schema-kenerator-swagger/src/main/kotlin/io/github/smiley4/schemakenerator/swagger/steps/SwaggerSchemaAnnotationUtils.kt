@@ -18,9 +18,20 @@ object SwaggerSchemaAnnotationUtils {
         action: (property: Schema<*>, propertyData: PropertyData, propertyTypeData: BaseTypeData) -> Unit
     ) {
         if (schema.typeData is ObjectTypeData && schema.swagger.properties != null) {
+            val propertiesToRename = mutableListOf<Pair<String,String>>()
             schema.swagger.properties.forEach { (propKey, prop) ->
                 schema.typeData.members.find { it.name == propKey }?.also { propertyData ->
                     action(prop, propertyData, typeDataMap[propertyData.type]!!)
+                    if(!prop.name.isNullOrBlank() && prop.name != propKey) {
+                        propertiesToRename.add(propKey to prop.name)
+                    }
+                }
+            }
+            propertiesToRename.forEach {(prevName, newName) ->
+                schema.swagger.properties[newName] = schema.swagger.properties.remove(prevName)
+                if(schema.swagger.required.contains(prevName)) {
+                    schema.swagger.required.remove(prevName)
+                    schema.swagger.required.add(newName)
                 }
             }
         }
