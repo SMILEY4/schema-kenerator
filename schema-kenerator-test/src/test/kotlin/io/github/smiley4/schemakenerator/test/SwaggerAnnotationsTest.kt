@@ -46,7 +46,7 @@ class SwaggerAnnotationsTest : StringSpec({
                   "title": "My Test Class",
                   "required": [
                     "emptyAnnotation",
-                    "myValue",
+                    "someValue",
                     "someTags"
                   ],
                   "types": ["object"],
@@ -55,7 +55,7 @@ class SwaggerAnnotationsTest : StringSpec({
                       "exampleSetFlag": false,
                       "types": [ "string" ]
                     },
-                    "myValue": {
+                    "someValue": {
                       "title": "Some Value",
                       "maximum": 9,
                       "exclusiveMaximum": true,
