@@ -5,16 +5,16 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.connectSubTypes
-import io.github.smiley4.schemakenerator.core.handleNameAnnotation
-import io.github.smiley4.schemakenerator.swagger.data.TitleType
-import io.github.smiley4.schemakenerator.reflection.collectSubTypes
+import io.github.smiley4.schemakenerator.core.renameProperties
 import io.github.smiley4.schemakenerator.reflection.processReflection
-import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.kotest.core.spec.style.StringSpec
+import io.swagger.v3.oas.annotations.media.Schema
 import kotlin.reflect.typeOf
 
 /**
@@ -23,34 +23,13 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test root" {
-        val result = typeOf<Root>()
-//            .collectSubTypes()
-//            .processReflection()
-//            .connectSubTypes()
-//            .handleNameAnnotation()
-//            .generateSwaggerSchema()
-//            .handleCoreAnnotations()
-//            .withTitle(TitleType.SIMPLE)
-//            .compileReferencingRoot()
-            .processReflection()
-            .generateSwaggerSchema()
-            .withTitle(TitleType.SIMPLE)
-            .compileReferencingRoot()
-            .asPrintable()
-
-        println(json.writeValueAsString(result))
-    }
-
-    "test int holder" {
-        val result = typeOf<IntHolder>()
-            .collectSubTypes()
+        val result = typeOf<Example>()
             .processReflection()
             .connectSubTypes()
-            .handleNameAnnotation()
             .generateSwaggerSchema()
-            .handleCoreAnnotations()
             .withTitle(TitleType.SIMPLE)
-            .compileReferencingRoot()
+            .handleSchemaAnnotations()
+            .compileInlining()
             .asPrintable()
 
         println(json.writeValueAsString(result))
@@ -58,6 +37,11 @@ class _ManualTests : StringSpec({
 
 }) {
     companion object {
+
+        data class Example(
+            @Schema(allowableValues = ["Allowable values work here"], name = "This name annotation does not work")
+            val myProperty: String
+        )
 
         data class Root(
             val withInt: MyInterface.WithInt?,

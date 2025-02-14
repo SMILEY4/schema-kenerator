@@ -47,7 +47,10 @@ class SwaggerSchemaAnnotationStep : AbstractSwaggerSchemaStep() {
             getTitle(mergedAnnotations)?.also { prop.title = it }
             getDescription(mergedAnnotations)?.also { prop.description = it }
             getExample(mergedAnnotations)?.also { prop.example = it }
-            getName(mergedAnnotations)?.also { prop.name = it }
+            getName(mergedAnnotations)?.also {
+                prop.name = it
+                propData.name = it
+            }
             getAllowableValues(mergedAnnotations)?.onEach { entry ->
                 @Suppress("UNCHECKED_CAST")
                 (prop as io.swagger.v3.oas.models.media.Schema<Any>).addEnumItemObject(entry)
