@@ -1,0 +1,239 @@
+# Customization
+
+## Type Redirection
+
+Type redirection allows for specific types to be analyzed and included in schemas instead of the actual types.
+This can be used to customize or annotate classes from external libraries.
+
+"Type redirects" can be registered at the type analyzing step for both reflection and kotlinx-serialization.
+When encountering the specified type (at any nesting level), instead of analyzing and extracting data from the actual
+type, it will be replaced with the other provided type and this one will be analyzed instead.
+
+???+ example "Handling `LocalDateTime` as `String`"
+
+    === "Reflection"
+
+        ```kotlin
+        class ExampleClass(
+            val dateTime: LocalDateTime
+        )
+        ```
+        ```kotlin
+        typeOf<ExampleClass>()
+            .analyzeTypeUsingReflection {
+                redirect<LocalDateTime, String>() //(1)!
+            }
+            .generateJsonSchema()
+            .compileInlining()
+        ```
+        
+        1. Redirect the type `LocalDateTime` to `String`. Everytime the type `LocalDateTime` is encountered, it will be replaced with `String`. 
+        
+        ```json
+        {
+           "type": "object",
+           "required": [ "dateTime" ],
+           "properties": {
+              "dateTime": {
+                 "type": "string"
+              }
+           }
+        }
+        ```
+
+    === "Kotlinx.Serialization"
+
+        ```kotlin
+        @Serializable
+        class ExampleClass(
+            @Serializable(with = LocalDateTimeSerializer::class)
+            val dateTime: LocalDateTime
+        )
+        ```
+        ```kotlin
+        typeOf<ExampleClass>()
+            .analyzeTypeUsingKotlinxSerialization {
+                redirect<LocalDateTime, String>() //(1)!
+            }
+            .generateJsonSchema()
+            .compileInlining()
+        ```
+        
+        1. Redirect the type `LocalDateTime` to `String`. Everytime the type `LocalDateTime` is encountered, it will be replaced with `String`. 
+        
+        ```json
+        {
+           "title": "ExampleClass",
+           "type": "object",
+           "required": [ "dateTime" ],
+           "properties": {
+              "dateTime": {
+                 "title": "String",
+                 "type": "string"
+              }
+           }
+        }
+        ```
+
+
+## Custom Type Analyzer
+
+Custom type analysis functionality can be defined for specific types with both reflection and Kotlinx.Serialization.
+When encountering a type (at any nesting level) that has a custom analyzer registered, the output of the custom functionality will be used instead of the default result.
+This can be used to overwrite the output of specific types with custom information or own behavior.
+
+???+ Example "Custom Type Data for `LocalDateTime`"
+
+    `ExampleClass` contains a field of type `LocalDateTime`. When generating the json-schema, `LocalDateTime` should be
+    generated as a simple object with type "string" and format "date-time". To achieve that, a custom analyzer is registered for type `LocalDateTime`
+    that returns data for a string type annotated with a `@Format` annotation that tells a later step (i.e. `handleCoreAnnotations`)
+    to set the format of this json-object to "date-time".
+    
+    === "Reflection"
+    
+        ```kotlin
+        class ExampleClass(
+            val dateTime: LocalDateTime
+        )
+        ```
+        ```kotlin
+        typeOf<ExampleClass>()
+            .analyzeTypeUsingReflection {
+                custom<LocalDataTime> { //(1)!
+                    TypeData(
+                        id = TypeId.create(), //(2)!
+                        identifyingName = TypeName("kotlin.String", "String"), //(3)!
+                        descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), //(4)!
+                        annotations = mutableListOf(
+                            AnnotationData(
+                                name = "io.github.smiley4.schemakenerator.core.annotations.Format", //(5)!
+                                values = mutableMapOf(
+                                    "type" to "date-time" //(6)!
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+            .generateJsonSchema()
+            .withTitle(TitleType.SIMPLE) //(7)!
+            .handleCoreAnnotations() //(8)!
+            .compileInlining()
+        ```
+
+        1. Register custom handling for `LocalDateTime`. Types can also be registered using `LocalDateTime::class` or the qualified name of the class.
+        2. Create a new id for `LocalDateTime`. Types are identified by their id, not by their name.
+        3. The full and short name identifying this type. When generating a schema, this name will ususally be used to determine the type of the json or swagger schema object.
+        4. The "actual" full and short name of the type. This name is usually used for titles, reference paths, etc.
+        5. Add an `@Format` annotation on the type. This annotation will be handled in the `handleCoreAnnotations`-step to add the `format` property to the schema.
+        6. Set the attributes of the annotation. Here `type` to `date-time`.
+        7. Add the descriptive names of the types as titles to the schema. 
+        8. Handle (among others) `@Format` annotations to set the format property in the schemas.
+
+        ```json
+        {
+           "title": "ClassWithLocalDateTime",
+           "type": "object",
+           "required": [ "dateTime" ],
+           "properties": {
+              "dateTime": {
+                 "title": "LocalDateTime",
+                 "type": "string",
+                 "format": "date-time"
+              }
+           }
+        }
+        ```
+
+    === "Kotlinx.Serialization"
+    
+        ```kotlin
+        @Serializable
+        class ExampleClass(
+            @Serializable(with = LocalDateTimeSerializer::class)
+            val dateTime: LocalDateTime
+        )
+        ```
+        ```kotlin
+        typeOf<ExampleClass>()
+            .analyzeTypeUsingKotlinxSerialization {
+                custom<LocalDataTime> { //(1)!
+                    TypeData(
+                        id = TypeId.create(), //(2)!
+                        identifyingName = TypeName("kotlin.String", "String"), //(3)!
+                        descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), //(4)!
+                        annotations = mutableListOf(
+                            AnnotationData(
+                                name = "io.github.smiley4.schemakenerator.core.annotations.Format", //(5)!
+                                values = mutableMapOf(
+                                    "type" to "date-time" //(6)!
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+            .generateJsonSchema()
+            .withTitle(TitleType.SIMPLE) //(7)!
+            .handleCoreAnnotations() //(8)!
+            .compileInlining()
+        ```
+
+        1. Register custom handling for `LocalDateTime`. Types can also be registered using `LocalDateTime::class` or the qualified name of the class.</br> When using custom serializers, the name must match the name specified by the serializer.
+        2. Create a new id for `LocalDateTime`. Types are identified by their id, not by their name.
+        3. The full and short name identifying this type. When generating a schema, this name will ususally be used to determine the type of the json or swagger schema object.
+        4. The "actual" full and short name of the type. This name is usually used for titles, reference paths, etc.
+        5. Add an `@Format` annotation on the type. This annotation will be handled in the `handleCoreAnnotations`-step to add the `format` property to the schema.
+        6. Set the attributes of the annotation. Here `type` to `date-time`.
+        7. Add the descriptive names of the types as titles to the schema. 
+        8. Handle (among others) the `@Format` annotations to set the format property in the schemas.
+
+        ```json
+        {
+           "title": "ClassWithLocalDateTime",
+           "type": "object",
+           "required": [ "dateTime" ],
+           "properties": {
+              "dateTime": {
+                 "title": "LocalDateTime",
+                 "type": "string",
+                 "format": "date-time"
+              }
+           }
+        }
+        ```
+
+## Modifying Generated Schemas
+
+Schema-Kenerator provides utility steps to more easily modify schemas after they have been generated.
+
+- The action of the `customizeTypes`-step is called for every schema generated from a type.
+- The action of the `customizeProperties`-step is called for every property of every generated schema.
+
+???+ example "Customizing Generated JSON Schemas and Properties"
+
+    ```kotlin
+    typeOf<ExampleClass>()
+        .analyzeTypeUsingReflection()
+        .generateJsonSchema()
+        .customizeTypes { typeData, typeSchema -> //(1)!
+            if (typeData.members.any { it.name.contains("secret") }) { //(2)!
+                typeSchema.properties["description"]
+                    = JsonTextValue("Note: A secret property has been detected!") //(3)!
+            }
+        }
+        .customizeProperties { propertyData, propertySchema -> //(4)!
+            if(propertyData.name.contains("secret")) { //(5)!
+                propertySchema.properties["description"]
+                    = JsonTextValue("Note: This property was detected as a secret property!") //(6)!
+            }
+        }
+        .compileInlining()
+    ```
+    
+    1. Action is called for every schema generated from a type. The schema for the type as well as the type data from the type analysis is provided to the action.
+    2. Check if the type contains any member with a name containing "secret".
+    3. Add a "description" to the schema of the type.
+    4. Action is called for every property of every generated schema. The schema for the property as well as the member type data from the type analysis is provided to the action.
+    5. Check if the name of the property contains the string "secret".
+    6. Add a "description" to the schema of the property.

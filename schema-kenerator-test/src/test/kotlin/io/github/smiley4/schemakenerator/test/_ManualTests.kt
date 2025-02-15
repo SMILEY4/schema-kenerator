@@ -5,27 +5,22 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.renameMembers
-import io.github.smiley4.schemakenerator.swagger.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.withTitle
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.util.UUID
 import kotlin.reflect.typeOf
@@ -36,10 +31,24 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test" {
+        val jsonSchema = typeOf<MyExampleClass>()
+            .analyzeTypeUsingReflection()
+            .generateJsonSchema()
+            .withTitle(TitleType.SIMPLE)
+            .compileInlining()
+            .json
+            .prettyPrint()
+        println(jsonSchema)
     }
 
 }) {
     companion object {
+
+        class MyExampleClass(
+            val someText: String,
+            val someNullableInt: Int?,
+            val someBoolList: List<Boolean>,
+        )
 
         @Serializable
         class MyData(

@@ -46,8 +46,8 @@ fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
  * Analyze the type and using reflection and return the extracted data.
  * @param configBlock the configuration
  */
-fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-    return KTypeInput(this).analyseTypeUsingReflection(configBlock)
+fun KType.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    return KTypeInput(this).analyzeTypeUsingReflection(configBlock)
 }
 
 
@@ -55,7 +55,7 @@ fun KType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.(
  * Analyze the type and using reflection and return the extracted data.
  * @param configBlock the configuration
  */
-fun InputType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+fun InputType.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeAnalysisConfig().apply(configBlock)
     return ReflectionTypeAnalyzerImpl(
         typeRedirects = config.typeRedirects,
@@ -69,8 +69,8 @@ fun InputType.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConf
  * @param configBlock the configuration
  */
 @JvmName("analyseKTypeUsingReflection")
-fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-    return this.mapToInputType().analyseTypeUsingReflection(configBlock)
+fun Bundle<KType>.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    return this.mapToInputType().analyzeTypeUsingReflection(configBlock)
 }
 
 
@@ -78,7 +78,7 @@ fun Bundle<KType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysis
  * Analyze the type and using reflection and return the extracted data.
  * @param configBlock the configuration
  */
-fun Bundle<InputType>.analyseTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+fun Bundle<InputType>.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
     val config = ReflectionTypeAnalysisConfig().apply(configBlock)
     return ReflectionTypeAnalyzerImpl(
         typeRedirects = config.typeRedirects,

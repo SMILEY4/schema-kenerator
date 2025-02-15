@@ -34,7 +34,7 @@ internal class ReflectionAnnotationSubTypeStep(private val maxRecursionDepth: In
 
     private fun process(types: List<InputType>): Collection<TypeData> {
         return types
-            .map { it.analyseTypeUsingReflection() }
+            .map { it.analyzeTypeUsingReflection() }
             .flatMap { listOf(it.data) + it.supporting }
     }
 

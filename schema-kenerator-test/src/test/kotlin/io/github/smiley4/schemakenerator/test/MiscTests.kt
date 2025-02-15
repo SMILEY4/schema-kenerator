@@ -19,7 +19,7 @@ import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
@@ -61,7 +61,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClassIssue14a>()
-                .analyseTypeUsingReflection {
+                .analyzeTypeUsingReflection {
                     redirect<Optional<String?>, String?>()
                 }
                 .generateJsonSchema()
@@ -111,7 +111,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClassIssue16>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema {
                     optionalHandling = OptionalHandling.NON_REQUIRED
                 }
@@ -228,7 +228,7 @@ class MiscTests : FreeSpec({
 
     "https://github.com/SMILEY4/schema-kenerator/issues/20 - include annotations from constructor parameters" {
         val result = typeOf<TestClassIssue20>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
@@ -322,7 +322,7 @@ class MiscTests : FreeSpec({
         )
 
         val result = typeOf<TestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
                 if (propertyData.name == "describeMe" && propertySchema is JsonObject) {
@@ -357,7 +357,7 @@ class MiscTests : FreeSpec({
 
         "inlining" {
             val result = typeOf<BIssue39>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining()
@@ -389,7 +389,7 @@ class MiscTests : FreeSpec({
 
         "referencing" {
             val result = typeOf<BIssue39>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileReferencingRoot()
@@ -492,7 +492,7 @@ class MiscTests : FreeSpec({
     "merge property attributes with referenced type" {
 
         val result = typeOf<ClassWithAnnotatedFields>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
             .mergePropertyAttributesIntoType()
@@ -593,7 +593,7 @@ class MiscTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<GenericClass<String?>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileInlining()
             result.swagger.shouldEqualJson {
@@ -736,7 +736,7 @@ class MiscTests : FreeSpec({
 
         "overwriting property with more specific type" {
             val result = typeOf<Issue43IntHolder>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
                 .compileReferencingRoot()
@@ -768,7 +768,7 @@ class MiscTests : FreeSpec({
         "collect correct subtypes with type parameters involved" {
             val result = typeOf<Issue43Root>()
                 .collectSubTypes()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .addMissingSupertypeSubtypeRelations()
                 .also { bundle ->
                     bundle.supporting
@@ -1053,7 +1053,7 @@ class MiscTests : FreeSpec({
 
         "don't allow" {
             val result = typeOf<ClassWithNumbers>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema {
                     allowSpecialFloatingPointValues = false
                 }
@@ -1092,7 +1092,7 @@ class MiscTests : FreeSpec({
 
         "allow" {
             val result = typeOf<ClassWithNumbers>()
-                .analyseTypeUsingReflection {}
+                .analyzeTypeUsingReflection {}
                 .generateSwaggerSchema {
                     allowSpecialFloatingPointValues = true
                 }

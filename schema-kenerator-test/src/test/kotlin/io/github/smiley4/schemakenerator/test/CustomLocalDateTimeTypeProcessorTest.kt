@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
@@ -22,7 +22,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
     "reflection & jsonschema: localdatetime without custom processor" {
 
         val result = typeOf<ClassWithLocalDateTime>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .withTitle(io.github.smiley4.schemakenerator.jsonschema.TitleBuilder.BUILDER_FULL)
             .compileInlining()
@@ -51,7 +51,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
     "reflection & jsonschema: localdatetime with custom processor" {
 
         val result = typeOf<ClassWithLocalDateTime>()
-            .analyseTypeUsingReflection {
+            .analyzeTypeUsingReflection {
                 custom<LocalDateTime> {
                     TypeData(
                         id = TypeId.create(),

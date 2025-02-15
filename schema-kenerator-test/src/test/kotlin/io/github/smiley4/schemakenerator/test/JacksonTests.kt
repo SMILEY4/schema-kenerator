@@ -10,7 +10,7 @@ import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonJsonSch
 import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.kotest.core.spec.style.StringSpec
@@ -26,7 +26,7 @@ class JacksonTests : StringSpec({
 
     "@JsonIgnore" {
         val result = typeOf<JsonIgnoreTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
         result.data.members.also { members ->
             members shouldHaveSize 1
@@ -36,7 +36,7 @@ class JacksonTests : StringSpec({
 
     "@JsonIgnoreType" {
         val result = typeOf<JsonIgnoreTypeTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
         result.data.members.also { members ->
             members shouldHaveSize 1
@@ -46,7 +46,7 @@ class JacksonTests : StringSpec({
 
     "@JsonIgnoreProperties" {
         val result = typeOf<JsonIgnorePropertiesTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
         result.data.members.also { members ->
             members shouldHaveSize 1
@@ -56,7 +56,7 @@ class JacksonTests : StringSpec({
 
     "@JsonProperty" {
         val result = typeOf<JsonPropertyTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
         result.data.members.also { members ->
             members shouldHaveSize 1
@@ -67,7 +67,7 @@ class JacksonTests : StringSpec({
 
     "@JsonPropertyDescription - json-schema" {
         val result = typeOf<JsonPropertyDescriptionTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .handleJacksonJsonSchemaAnnotations()
             .compileInlining()
@@ -92,7 +92,7 @@ class JacksonTests : StringSpec({
 
     "@JsonPropertyDescription - swagger" {
         val result = typeOf<JsonPropertyDescriptionTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJacksonSwaggerAnnotations()
             .compileInlining()

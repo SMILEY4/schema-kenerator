@@ -2,7 +2,7 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
@@ -30,7 +30,7 @@ class SwaggerAnnotationsTest : StringSpec({
 
     "swagger annotations" {
         val result = typeOf<MyTestClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleSchemaAnnotations()
             .compileInlining()
@@ -93,7 +93,7 @@ class SwaggerAnnotationsTest : StringSpec({
     "partially specified class" {
         shouldNotThrowAny {
             typeOf<PartiallySpecified>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .handleSchemaAnnotations()
                 .compileInlining()
@@ -103,7 +103,7 @@ class SwaggerAnnotationsTest : StringSpec({
     "hidden fields with no required fields" {
         shouldNotThrowAny {
             typeOf<AllOptionalFields>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .handleSchemaAnnotations()
                 .compileInlining()
@@ -112,7 +112,7 @@ class SwaggerAnnotationsTest : StringSpec({
 
     "javax validations used to create schema" {
         val result = typeOf<Validated>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
             .compileInlining()
@@ -170,7 +170,7 @@ class SwaggerAnnotationsTest : StringSpec({
 
     "jakarta validations used to create schema" {
         val result = typeOf<JakartaValidated>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJakartaValidationAnnotations()
             .compileInlining()
@@ -228,7 +228,7 @@ class SwaggerAnnotationsTest : StringSpec({
 
     "javax and jakarta required annotations for all null properties" {
         var result = typeOf<NotNullWithAllNullProperties>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
             .compileInlining()
@@ -258,7 +258,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<NotEmptyWithAllNullProperties>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
             .compileInlining()
@@ -288,7 +288,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<NotBlankWithAllNullProperties>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
             .compileInlining()
@@ -318,7 +318,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<JakartaNotNullWithAllNullProperties>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJakartaValidationAnnotations()
             .compileInlining()
@@ -348,7 +348,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<JakartaNotEmptyWithAllNullProperties>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJakartaValidationAnnotations()
             .compileInlining()
@@ -378,7 +378,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<JakartaNotBlankWithAllNullProperties>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJakartaValidationAnnotations()
             .compileInlining()
@@ -408,7 +408,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<AllRequiredValidations>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJavaxValidationAnnotations()
             .compileInlining()
@@ -438,7 +438,7 @@ class SwaggerAnnotationsTest : StringSpec({
             """.trimIndent()
             }
         result = typeOf<JakartaAllRequiredValidations>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJakartaValidationAnnotations()
             .compileInlining()

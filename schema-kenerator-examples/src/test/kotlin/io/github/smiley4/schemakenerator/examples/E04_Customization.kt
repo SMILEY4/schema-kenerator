@@ -3,6 +3,7 @@
 
 package io.github.smiley4.schemakenerator.examples
 
+import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.renameMembers
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
@@ -18,7 +19,7 @@ import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.renameMembers
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -59,7 +60,11 @@ class E04_Customization : FreeSpec({
         "... using reflection" {
 
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
-                .analyseTypeUsingReflection {
+                .analyzeTypeUsingReflection {
+
+                    custom(LocalDateTime::class) {
+                        TODO()
+                    }
 
                     // register a custom analyzer for the type "LocalDateTime"
                     custom<LocalDateTime> {
@@ -71,9 +76,9 @@ class E04_Customization : FreeSpec({
                             descriptiveName = TypeName("java.time.LocalDateTime", "LocalDateTime"), // the actual name of the type should be that of LocalDateTime
                             annotations = mutableListOf(
                                 AnnotationData(
-                                    name = Type::class.qualifiedName!!,
+                                    name = Format::class.qualifiedName!!,
                                     values = mutableMapOf(
-                                        "type" to "date-time"
+                                        "format" to "date-time"
                                     )
                                 )
                             )
@@ -164,7 +169,7 @@ class E04_Customization : FreeSpec({
         "reflection" {
 
             val jsonSchema = typeOf<ClassWithLocalDateTime>()
-                .analyseTypeUsingReflection {
+                .analyzeTypeUsingReflection {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
                     redirect<LocalDateTime, String>()
                 }
@@ -232,7 +237,7 @@ class E04_Customization : FreeSpec({
             // e.g. here by adding a prefix to all properties.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .renameMembers { originalName -> "prefix_$originalName" }
                 .generateJsonSchema()
                 .compileInlining()
@@ -260,7 +265,7 @@ class E04_Customization : FreeSpec({
             // Note: schema-kenerator-serialization is required, even though this also works without using kotlinx-serialization for data extraction.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateJsonSchema()
                 .compileInlining()
@@ -303,7 +308,7 @@ class E04_Customization : FreeSpec({
         "json-schema" {
 
             val jsonSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .customizeTypes { typeData, typeSchema ->
                     if (typeData.members.any { it.name.contains("secret") } && typeSchema is JsonObject) {
@@ -343,7 +348,7 @@ class E04_Customization : FreeSpec({
         "swagger" {
 
             val swaggerSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .customizeTypes { typeData, typeSchema ->
                     if (typeData.members.any { it.name.contains("secret") }) {
