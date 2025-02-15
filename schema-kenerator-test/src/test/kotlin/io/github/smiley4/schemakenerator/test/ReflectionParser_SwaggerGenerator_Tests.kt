@@ -1,6 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.swagger.RequiredHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.swagger.compileInlining
@@ -38,7 +38,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -72,7 +72,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -106,7 +106,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         withData(TEST_DATA) { data ->
 
             val schema = data.type
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {

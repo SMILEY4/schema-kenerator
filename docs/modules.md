@@ -16,7 +16,7 @@ whether Jackson annotations need to be included.
 
     Contains base data classes, common steps and annotations to use with all type analysis and schema generation steps.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-core/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-core/index.html)
 
 </div>
 
@@ -32,7 +32,7 @@ whether Jackson annotations need to be included.
 
     Analyze types and extract information using reflection. Includes additional steps and annotations to modify and enrich extracted data.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-reflection/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-reflection/index.html)
 
 
 -   __Kotlinx.Serialization__
@@ -43,7 +43,7 @@ whether Jackson annotations need to be included.
 
     Analyze types and extract information using Kotlinx.Serialization. Includes additional steps and annotations to modify and enrich extracted data.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-serialization/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-serialization/index.html)
 
 </div>
 
@@ -60,7 +60,7 @@ whether Jackson annotations need to be included.
 
     Generate JSON schemas from analyzed types and further customize and enrich schemas with additional steps and annotations.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-jsonschema/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-jsonschema/index.html)
 
 
 -   __Swagger Schema Generation__
@@ -71,7 +71,7 @@ whether Jackson annotations need to be included.
 
     Generate Swagger schemas from analyzed types and further customize and enrich schemas with additional steps and annotations.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-swagger/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-swagger/index.html)
 
 </div>
 
@@ -87,7 +87,7 @@ whether Jackson annotations need to be included.
 
     Provides steps to support [Jackson](https://github.com/FasterXML/jackson-annotations)-annotations and enrich extracted data independent of generated schema.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-jackson/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-jackson/index.html)
 
 
 -   __Jackson JSON Schema__
@@ -98,7 +98,7 @@ whether Jackson annotations need to be included.
 
     Provides steps to support [Jackson](https://github.com/FasterXML/jackson-annotations)-annotations specific and enrich generated JSON schemas.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-jackson/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-jackson/index.html)
 
 
 -   __Jackson Swagger__
@@ -109,7 +109,7 @@ whether Jackson annotations need to be included.
 
     Provides steps to support [Jackson](https://github.com/FasterXML/jackson-annotations)-annotations specific and enrich generated Swagger schemas.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-jackson-swagger/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-jackson-swagger/index.html)
 
 
 -   __Javax/Jakarta Validations Swagger__
@@ -120,6 +120,6 @@ whether Jackson annotations need to be included.
 
     Provides steps to support [Javax](https://mvnrepository.com/artifact/javax.validation/validation-api) and [Jakarta](https://github.com/jakartaee/validation/tree/main) validation annotations when generating Swagger schemas.
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-validation-swagger/index.html)
+    [:octicons-arrow-right-24: API Reference](dokka/schema-kenerator-validation-swagger/index.html)
 
 </div>

@@ -2,7 +2,7 @@ package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.Serializable
@@ -14,7 +14,7 @@ class RedirectTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClass>()
-                .analyseTypeUsingReflection {
+                .analyzeTypeUsingReflection {
                     redirect<NestedClass, String>()
                     redirect<String, Int>()
                 }
@@ -74,7 +74,7 @@ class RedirectTests : FreeSpec({
 
         "reflection" {
             val result = typeOf<TestClass>()
-                .analyseTypeUsingReflection {
+                .analyzeTypeUsingReflection {
                     redirect<String, String?>()
                 }
                 .generateJsonSchema()

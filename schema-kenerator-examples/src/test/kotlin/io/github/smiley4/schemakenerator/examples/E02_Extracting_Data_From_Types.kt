@@ -14,7 +14,7 @@ import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.data.SubType
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
@@ -28,7 +28,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
     "extracting basic data from classes ..." - {
 
         "... using reflection" {
-            val extracted = typeOf<SimpleClass>().analyseTypeUsingReflection()
+            val extracted = typeOf<SimpleClass>().analyzeTypeUsingReflection()
 
             // With the "analyseTypeUsingReflection()"-step, information about the given type is extracted and stored in "TypeData" using jvm reflection features.
             // The result is extracted information about the type "SimpleClass" as well as other referenced types, i.e. "String" and "Int".
@@ -40,7 +40,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
 
         "configuring the reflection step" {
             // The "analyseTypeUsingReflection()"-step has some parameters to configure its behavior and what information to include
-            typeOf<SimpleClass>().analyseTypeUsingReflection {
+            typeOf<SimpleClass>().analyzeTypeUsingReflection {
                 // whether to include getter functions as members of a type
                 includeGetters = false
                 // whether to include weak getter functions (i.e. function same as getters but do not start with "get...()")  as members of a type
@@ -94,7 +94,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 //     @Serializable class ChildTwo : SealedParent()
                 // }
 
-                val extractedReflection = typeOf<SealedParent>().analyseTypeUsingReflection()
+                val extractedReflection = typeOf<SealedParent>().analyzeTypeUsingReflection()
                 val extractedKotlinx = typeOf<SealedParent>().analyzeTypeUsingKotlinxSerialization()
 
                 // Subtypes of sealed classes and interfaces are detected and extracted automatically, regardless of whether reflection or kotlinx-serialization is used.
@@ -126,7 +126,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                     )
                 )
                     // extract information from all input types individually, i.e. from "ParentManual", "ChildOne", "ChildTwo"
-                    .analyseTypeUsingReflection()
+                    .analyzeTypeUsingReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "addMissingSupertypeSubtypeRelations()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
                     .addMissingSupertypeSubtypeRelations()
@@ -151,7 +151,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 val extracted = typeOf<ParentCore>()
                     // the "collectSubTypes()"-step looks at the @SubType-annotations present on any type (recursive) and adds the referenced types to be included in the next steps.
                     .collectSubTypes()
-                    .analyseTypeUsingReflection()
+                    .analyzeTypeUsingReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
                     .addMissingSupertypeSubtypeRelations()
@@ -177,9 +177,9 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 val extracted = typeOf<ParentJackson>()
                     // the "collectJacksonSubTypes()"-step looks at the @JsonSubTypes-annotation present on any type (recursive) and adds the referenced types to be included in the next steps.
                     .collectJacksonSubTypes({
-                        it.analyseTypeUsingReflection() // this step needs to intermediate information from the types. This specifies how this information is extracted. reflection is recommended here.
+                        it.analyzeTypeUsingReflection() // this step needs to intermediate information from the types. This specifies how this information is extracted. reflection is recommended here.
                     })
-                    .analyseTypeUsingReflection()
+                    .analyzeTypeUsingReflection()
                     // "ChildOne" and "ChildTwo" reference "ParentManual" as their supertype, but "ParentManual" does not yet know about its subtypes.
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
                     .addMissingSupertypeSubtypeRelations()
@@ -263,7 +263,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                 // }
 
                 val extracted = typeOf<ParentDiscriminatorJackson>()
-                    .analyseTypeUsingReflection()
+                    .analyzeTypeUsingReflection()
                     .addJacksonTypeInfoDiscriminatorProperty() // adds a property with the name specified in @JsonTypeInfo#property to all annotated types with subtypes
 
                 val discriminatorProperty = extracted.data.members.find { it.name == "_type" }!!

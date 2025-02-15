@@ -18,7 +18,7 @@ import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.kotest.core.spec.style.FreeSpec
 import kotlin.reflect.typeOf
 
@@ -34,7 +34,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // the "compileInlining"-step takes all individual schemas and merges them into one single json-schema by inlining all referenced types.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .compileInlining()
                 .json.prettyPrint()
@@ -71,7 +71,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // the "compileReferencing"-step takes all individual schemas and only inlines all primitive or simple schemas. All other schemas are referenced.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .compileReferencing()
 
@@ -117,7 +117,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // the "compileReferencingRoot"-step takes all individual schemas and only inlines all primitive or simple schemas. All other schemas including the original root schema are referenced.
 
             val jsonSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .compileReferencingRoot()
 
@@ -169,7 +169,7 @@ class E03_Generating_JsonSchema : FreeSpec({
         // The behavior and output of the "generateJsonSchema()"-step can be configured:
 
         typeOf<SimpleClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateJsonSchema {
                 // configure how optional properties, i.e properties that are not necessarily nullable but have a default value assigned, should be treated
                 // "REQUIRED":     these properties are handled as "required"
@@ -186,7 +186,7 @@ class E03_Generating_JsonSchema : FreeSpec({
         "simple name" {
 
             val jsonSchema = typeOf<List<GenericClass<String>>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .compileReferencing(pathType = RefType.SIMPLE) // "SIMPLE" takes the simple/short name of the type for the reference path
 
@@ -203,7 +203,7 @@ class E03_Generating_JsonSchema : FreeSpec({
         "full name" {
 
             val jsonSchema = typeOf<List<GenericClass<String>>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .compileReferencing(pathType = RefType.FULL) // "FULL" takes the full/qualified name of the type for the reference path
 
@@ -223,7 +223,7 @@ class E03_Generating_JsonSchema : FreeSpec({
         // a "title" property can be automatically added to all types in the json-schema
 
         val jsonSchema = typeOf<List<GenericClass<String>>>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .withTitle(type = TitleType.SIMPLE)
             .compileInlining()
@@ -260,7 +260,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // the "handleCoreAnnotations()"-step adds information from annotations from schema-kenerator-core to the json-schema
 
             val jsonSchema = typeOf<CoreAnnotatedClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -308,7 +308,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // the "handleJacksonJsonSchemaAnnotations()"-step adds information from jackson annotations to the json-schema
 
             val jsonSchema = typeOf<JacksonAnnotatedClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .handleJacksonJsonSchemaAnnotations()
                 .compileInlining()

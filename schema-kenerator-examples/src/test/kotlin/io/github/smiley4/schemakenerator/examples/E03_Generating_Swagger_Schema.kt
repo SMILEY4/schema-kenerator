@@ -12,7 +12,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Example
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.SimpleClass
 import io.github.smiley4.schemakenerator.jackson.swagger.handleJacksonSwaggerAnnotations
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.swagger.RequiredHandling
 import io.github.smiley4.schemakenerator.swagger.compileInlining
 import io.github.smiley4.schemakenerator.swagger.compileReferencing
@@ -26,7 +26,6 @@ import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidationAnnotations
 import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
-import io.swagger.util.Json
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
@@ -50,7 +49,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // the "compileInlining"-step takes all individual schemas and merges them into one single swagger-schema by inlining all referenced types.
 
             val swaggerSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileInlining()
 
@@ -84,7 +83,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // the "compileReferencing"-step takes all individual schemas and only inlines all primitive or simple schemas. All other schemas are referenced.
 
             val swaggerSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileReferencing()
 
@@ -124,7 +123,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // the "compileReferencingRoot"-step takes all individual schemas and only inlines all primitive or simple schemas. All other schemas including the original root schema are referenced.
 
             val swaggerSchema = typeOf<ExampleClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileReferencingRoot()
 
@@ -171,7 +170,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         // The behavior and output of the "generateJsonSchema()"-step can be configured:
 
         typeOf<SimpleClass>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema {
                 // configure how optional properties, i.e properties that are not necessarily nullable but have a default value assigned, should be treated
                 // "REQUIRED":     these properties are handled as "required"
@@ -188,7 +187,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         "simple openapi name" {
 
             val swaggerSchema = typeOf<List<GenericClass<String>>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.OPENAPI_SIMPLE) // "OPENAPI_SIMPLE" takes the simple/short name of the type for the reference path and modifies it to be compatible with openapi-spec.
 
@@ -204,7 +203,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         "full openapi name" {
 
             val swaggerSchema = typeOf<List<GenericClass<String>>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.OPENAPI_FULL) // "OPENAPI_FULL" takes the full/qualified name of the type for the reference path and modifies it to be compatible with openapi-spec.
 
@@ -220,7 +219,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         "simple name" {
 
             val swaggerSchema = typeOf<List<GenericClass<String>>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.SIMPLE) // "SIMPLE" takes the simple/short name of the type for the reference path. This name may not be compatible with openapi-spec.
 
@@ -237,7 +236,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         "full name" {
 
             val swaggerSchema = typeOf<List<GenericClass<String>>>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileReferencing(pathType = RefType.FULL) // "FULL" takes the full/qualified name of the type for the reference path. This name may not be compatible with openapi-spec.
 
@@ -257,7 +256,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
         // a "title" property can be automatically added to all types in the swagger-schema
 
         val swaggerSchema = typeOf<List<GenericClass<String>>>()
-            .analyseTypeUsingReflection()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .withTitle(type = TitleType.OPENAPI_SIMPLE)
             .compileInlining()
@@ -295,7 +294,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // the "handleCoreAnnotations()"-step adds information from annotations from schema-kenerator-core to the swagger-schema
 
             val swaggerSchema = typeOf<CoreAnnotatedClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
                 .compileInlining()
@@ -333,7 +332,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // the "handleSchemaAnnotations()"-step adds information from swagger @Schema and @ArraySchema annotations to the swagger-schema
 
             val swaggerSchema = typeOf<SwaggerAnnotatedClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .handleSchemaAnnotations()
                 .compileInlining()
@@ -379,7 +378,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // the "handleJacksonSwaggerAnnotations()"-step adds information from jackson annotations to the swagger-schema
 
             val swaggerSchema = typeOf<JacksonAnnotatedClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .handleJacksonSwaggerAnnotations()
                 .compileInlining()
@@ -406,7 +405,7 @@ class E03_Generating_Swagger_Schema : FreeSpec({
             // information from javax and jackarta validation annotations to the swagger-schema
 
             val swaggerSchema = typeOf<JavaxValidatedClass>()
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .handleJavaxValidationAnnotations()
                 .handleJakartaValidationAnnotations()

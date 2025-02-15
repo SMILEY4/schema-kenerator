@@ -8,7 +8,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
 import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
@@ -30,7 +30,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_FULL)
@@ -54,7 +54,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
@@ -78,7 +78,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
             val additionalIds = mutableListOf<String>()
 
             val schema = data.type
-                .analyseTypeUsingReflection()
+                .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)

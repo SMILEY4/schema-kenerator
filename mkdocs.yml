@@ -15,7 +15,6 @@ nav:
   - Project: index.md
   - User Guide:
     - Concept: user_guide/concept.md
-    - Modules: user_guide/modules.md
     - Analyzing Types:
       - Reflection: user_guide/analyzing_types_reflection.md
       - Kotlinx.Serialization: user_guide/analyzing_types_kotlinx_serialization.md
@@ -23,6 +22,7 @@ nav:
       - JSON Schema: user_guide/generating_json_schema.md
       - Swagger Schema: user_guide/generating_swagger_schema.md
     - Customization: user_guide/customization.md
+  - Modules: modules.md
   - Changelog: changelog.md
 
 

@@ -31,7 +31,7 @@ typeOf<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
 
 ??? warning "Type Parameters"
 
-    Kotlinx.Serialization does not provide enough information to reason about type parameters forcing the analysis step treat classes more carefully to avoid collisions which may lead to unwanted side effects during schema generation.</br>
+    Kotlinx.Serialization does not provide enough information to reason about type parameters forcing the analysis step to treat classes more carefully and avoid collisions which may lead to unwanted side effects during schema generation.</br>
     This more careful behaviour can be disabled for specific types that are known to never have any type parameters with the "markNotParameterized" configuration option.</br>
     This configuration may not be required for most situations, but can be used to manually resolve issues.
 
