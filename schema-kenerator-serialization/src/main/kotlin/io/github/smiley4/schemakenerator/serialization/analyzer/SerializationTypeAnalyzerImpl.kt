@@ -118,7 +118,7 @@ internal class SerializationTypeAnalyzerImpl(
         // reserve this descriptor / mark this descriptor as processed with a pending result
         // reserve type-id so that other types can already reference this type (e.g. members resulting in a reference loop)
         val reservedTypeId = TypeId.create()
-        processedDescriptors[descriptor] = TypeData.createPlaceholder(reservedTypeId)
+        processedDescriptors[descriptor.nonNullOriginal] = TypeData.createPlaceholder(reservedTypeId)
 
         // check type redirects
         if (typeRedirects.containsKey(descriptor.redirectKey(nullable))) {
