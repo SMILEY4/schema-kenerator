@@ -2,7 +2,7 @@
 # https://www.mkdocs.org/user-guide/configuration/#project-information
 site_name: Schema Kenerator
 site_url: https://smiley4.github.io/schema-kenerator/
-site_description: Analyze kotlin types, extract information and generate schemas .
+site_description: Analyze kotlin types, extract information and generate schemas.
 
 # Repository
 repo_name: schema-kenerator
