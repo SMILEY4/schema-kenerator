@@ -9,6 +9,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.find
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaUtils
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
@@ -17,6 +18,7 @@ class DefaultSwaggerSchemaGenerationModule(
     private val nullableAsNonRequired: Boolean,
     private val allowSpecialFloatingPointValues: Boolean,
     private val mapsWithStructuredKeysAsArrays: Boolean,
+    private val strictDiscriminatorProperty: Boolean,
 ) : SwaggerSchemaGenerationModule {
 
     private val schema = SwaggerSchemaUtils()
@@ -180,6 +182,11 @@ class DefaultSwaggerSchemaGenerationModule(
             propertySchemas[member.name]?.also {
                 if (member.nullable) {
                     it.nullable = member.nullable
+                }
+                if (strictDiscriminatorProperty) {
+                    if (member.annotations.any { annotation -> annotation.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }) {
+                        (it as Schema<Any>).enum = listOf(context.typeData.descriptiveName.full)
+                    }
                 }
             }
             val nullable = member.nullable && nullableAsNonRequired
