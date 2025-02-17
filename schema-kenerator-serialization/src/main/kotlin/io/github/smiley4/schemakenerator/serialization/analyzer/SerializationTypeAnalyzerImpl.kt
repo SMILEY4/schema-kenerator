@@ -128,8 +128,6 @@ internal class SerializationTypeAnalyzerImpl(
             }
         }
 
-        // todo: custom already here ? or here aswell ? i.e. before contextual ?
-
         // check contextual descriptors
         val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
         if (contextualByKClass != null) {
