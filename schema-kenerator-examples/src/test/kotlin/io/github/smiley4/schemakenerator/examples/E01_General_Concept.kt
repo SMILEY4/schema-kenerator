@@ -5,7 +5,6 @@ package io.github.smiley4.schemakenerator.examples
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.find
-import io.github.smiley4.schemakenerator.core.data.findTypeParameter
 import io.github.smiley4.schemakenerator.jsonschema.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
@@ -57,6 +56,8 @@ class E01_General_Concept : FreeSpec({
 
     "references via type-ids" {
 
+        fun TypeData.findTypeParameter(name: String) = typeParameters.find { it.name == name }
+
         // when extracting data from classes, nested properties are flattened (stored in Bundle#supporting) and referenced via "TypeIds".
         val result = typeOf<List<String>>().analyzeTypeUsingReflection()
 
@@ -65,7 +66,6 @@ class E01_General_Concept : FreeSpec({
 
         val stringTypeData = result.supporting.find(itemTypeParameter.type)!! // find the actual data referenced by the type parameter
         println(stringTypeData.descriptiveName.full) // "kotlin.String"
-
     }
 
 })

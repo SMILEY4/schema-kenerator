@@ -96,4 +96,17 @@ data class TypeData(
 
 }
 
-fun TypeData.findTypeParameter(name: String) = typeParameters.find { it.name == name }
+/**
+ * @return whether this type data represents an enum.
+ */
+fun TypeData.isEnum(): Boolean = this.enumData != null
+
+/**
+ * @return whether this type data represents a collection.
+ */
+fun TypeData.isCollection(): Boolean = this.collectionData != null
+
+/**
+ * @return whether this type data represents a map type.
+ */
+fun TypeData.isMap(): Boolean = this.mapData != null
