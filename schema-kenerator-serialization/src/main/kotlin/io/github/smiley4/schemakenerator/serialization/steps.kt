@@ -232,6 +232,7 @@ class KotlinxSerializationTypeProcessingConfig {
 
     /**
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     * The nullability of the types/fields must match.
      */
     fun redirect(from: String, to: KType) {
         typeRedirects[from] = KTypeInput(to)
@@ -240,6 +241,7 @@ class KotlinxSerializationTypeProcessingConfig {
 
     /**
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     * The nullability of the types/fields must match.
      */
     fun redirect(from: KType, to: KType) {
         val clazz = from.classifier!! as KClass<*>
@@ -252,6 +254,7 @@ class KotlinxSerializationTypeProcessingConfig {
 
     /**
      * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+     * The nullability of the types/fields must match.
      */
     inline fun <reified FROM, reified TO> redirect() {
         redirect(typeOf<FROM>(), typeOf<TO>())

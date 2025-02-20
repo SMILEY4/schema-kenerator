@@ -1,0 +1,29 @@
+changed:
+- Type data helper functions to distinguish between "types" (enums, collections, maps, ...)
+
+TODO
+- specify redirect behaviour ?
+    - matching
+        - MATCH_NULLABILITY // whether the nullability of the "from" has to match exactly
+        - IGNORE_NULLABILITY // nullability of the "from" type is ignored when matching redirects
+    - replacing
+        - KEEP_ORIGINAL_NULLABILITY // whether the nullability of the "from" type should be kept with the replaced type
+        - REPLACE_NULLABILITY // whether the nullability is also overwritten
+
+- https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069
+
+- improve discoverability of extension functions
+
+- "concepts" wiki page: explain data structures and general uses
+    - typedata
+        * contains all extracted information about a single type / class in a generic and easy to with structure
+        * references other types by type id (members, subtypes)
+        * identifying vs descriptive name (find better names???)
+        * can have additional data specific to certain types (maps, lists, enums)
+            * map: key and value type
+            * list: item type
+            * enum: constants
+    - Bundles
+        * root vs supporting
+    - compiled schemas
+    - ...
