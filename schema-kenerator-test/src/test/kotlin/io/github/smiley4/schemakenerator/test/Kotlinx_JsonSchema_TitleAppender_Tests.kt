@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
@@ -27,7 +29,7 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_FULL)
@@ -50,18 +52,8 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
-//                .also { schema ->
-//                    if (schema.data.id.additionalId != null) {
-//                        additionalIds.add(schema.data.id.additionalId!!)
-//                    }
-//                    schema.supporting.forEach {
-//                        if (it.id.additionalId != null) {
-//                            additionalIds.add(it.id.additionalId!!)
-//                        }
-//                    }
-//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
                 .compileInlining()
@@ -83,18 +75,8 @@ class Kotlinx_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
-//                .also { schema ->
-//                    if (schema.data.id.additionalId != null) {
-//                        additionalIds.add(schema.data.id.additionalId!!)
-//                    }
-//                    schema.supporting.forEach {
-//                        if (it.id.additionalId != null) {
-//                            additionalIds.add(it.id.additionalId!!)
-//                        }
-//                    }
-//                }
                 .generateJsonSchema()
                 .withTitle(TitleBuilder.BUILDER_SIMPLE)
                 .compileReferencingRoot(TitleBuilder.BUILDER_SIMPLE)

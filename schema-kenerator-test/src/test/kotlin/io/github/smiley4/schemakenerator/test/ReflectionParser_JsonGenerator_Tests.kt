@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
@@ -35,7 +37,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
@@ -61,7 +63,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
@@ -97,7 +99,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->

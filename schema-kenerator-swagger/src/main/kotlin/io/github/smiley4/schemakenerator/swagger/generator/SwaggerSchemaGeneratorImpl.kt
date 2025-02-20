@@ -1,20 +1,28 @@
 package io.github.smiley4.schemakenerator.swagger.generator
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchemaData
+import io.swagger.v3.oas.models.media.Schema
 
 internal class SwaggerSchemaGeneratorImpl(private val modules: List<SwaggerSchemaGenerationModule>) : SwaggerSchemaGenerator {
 
-    fun process(input: Bundle<TypeData>): Bundle<SwaggerSchema> {
-        val allTypeData = listOf(input.data) + input.supporting
-        return Bundle(
-            data = generate(input.data, allTypeData),
-            supporting = input.supporting.map { generate(it, allTypeData) }
+    fun process(input: TypeDataGroup): IntermediateSwaggerSchemaData {
+        return IntermediateSwaggerSchemaData(
+            rootId = input.rootId,
+            data = input.typeData
+                .map {
+                    SwaggerSchemaData(
+                        typeData = it,
+                        swagger = generate(it, input.typeData)
+                    )
+                }
+                .associateBy { it.typeData.id }
         )
     }
 
-    override fun generate(typeData: TypeData, typeDataList: List<TypeData>): SwaggerSchema {
+    override fun generate(typeData: TypeData, typeDataList: List<TypeData>): Schema<*> {
         val module = modules.firstOrNull { it.applies(typeData) }
             ?: throw IllegalArgumentException("No swagger generator module matches the given type '${typeData.identifyingName.full}'.")
 

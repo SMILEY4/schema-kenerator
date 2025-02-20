@@ -1,11 +1,11 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.jsonschema.generator.DefaultJsonSchemaGeneratorModule
@@ -19,7 +19,7 @@ object JsonSchemaSteps {
      * Generates json schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
      * Result needs to be "compiled" to get the final json schema.
      */
-    fun Bundle<TypeData>.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): Bundle<JsonSchema> {
+    fun TypeDataGroup.generateJsonSchema(configBlock: JsonSchemaGenerationStepConfig.() -> Unit = {}): IntermediateJsonSchemaData {
         val config = JsonSchemaGenerationStepConfig().apply(configBlock)
         return JsonSchemaGeneratorImpl(config.buildCustomModules()).process(this)
     }
@@ -29,7 +29,7 @@ object JsonSchemaSteps {
      * Adds an automatically determined title to schemas.
      * @param type the type of the title
      */
-    fun Bundle<JsonSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<JsonSchema> {
+    fun IntermediateJsonSchemaData.withTitle(type: TitleType = TitleType.FULL): IntermediateJsonSchemaData {
         return withTitle(
             when (type) {
                 TitleType.FULL -> TitleBuilder.BUILDER_FULL
@@ -43,7 +43,7 @@ object JsonSchemaSteps {
      * Adds an automatically determined title to schemas.
      * @param builder the function building the title for the given type
      */
-    fun Bundle<JsonSchema>.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): Bundle<JsonSchema> {
+    fun IntermediateJsonSchemaData.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): IntermediateJsonSchemaData {
         return JsonSchemaTitleStep(builder).process(this)
     }
 
@@ -61,7 +61,7 @@ object JsonSchemaSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.Type]
      * Add this step after schema generation and before schema compilation.
      */
-    fun Bundle<JsonSchema>.handleCoreAnnotations(): Bundle<JsonSchema> {
+    fun IntermediateJsonSchemaData.handleCoreAnnotations(): IntermediateJsonSchemaData {
         return this
             .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
             .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
@@ -77,7 +77,7 @@ object JsonSchemaSteps {
     /**
      * Resolves references in generated json schemas by inlining them.
      */
-    fun Bundle<JsonSchema>.compileInlining(): CompiledJsonSchema {
+    fun IntermediateJsonSchemaData.compileInlining(): CompiledJsonSchemaData {
         return JsonSchemaCompileInlineStep().compile(this)
     }
 
@@ -86,7 +86,7 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param pathType the type of the schema reference path
      */
-    fun Bundle<JsonSchema>.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchema {
+    fun IntermediateJsonSchemaData.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchemaData {
         return compileReferencing(
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
@@ -100,7 +100,7 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
-    fun Bundle<JsonSchema>.compileReferencing(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): CompiledJsonSchema {
+    fun IntermediateJsonSchemaData.compileReferencing(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): CompiledJsonSchemaData {
         return JsonSchemaCompileReferenceStep(builder).compile(this)
     }
 
@@ -109,7 +109,7 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param pathType the type of the schema reference path
      */
-    fun Bundle<JsonSchema>.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchema {
+    fun IntermediateJsonSchemaData.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchemaData {
         return compileReferencingRoot(
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
@@ -123,9 +123,9 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
-    fun Bundle<JsonSchema>.compileReferencingRoot(
+    fun IntermediateJsonSchemaData.compileReferencingRoot(
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
-    ): CompiledJsonSchema {
+    ): CompiledJsonSchemaData {
         return JsonSchemaCompileReferenceRootStep(builder).compile(this)
     }
 
@@ -134,14 +134,14 @@ object JsonSchemaSteps {
      * Provide a function that is called for each type and json schema.
      * Can be used to manually manipulate the generated json schema.
      */
-    fun Bundle<JsonSchema>.customizeTypes(action: (typeData: TypeData, typeSchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+    fun IntermediateJsonSchemaData.customizeTypes(action: (typeData: TypeData, typeSchema: JsonNode) -> Unit): IntermediateJsonSchemaData {
         return JsonSchemaCustomizeStep().customizeTypes(this, action)
     }
 
     /**
      * Provide a function that is called for each property. Can be used to manually manipulate the generated json schema.
      */
-    fun Bundle<JsonSchema>.customizeProperties(action: (memberData: MemberData, propertySchema: JsonNode) -> Unit): Bundle<JsonSchema> {
+    fun IntermediateJsonSchemaData.customizeProperties(action: (memberData: MemberData, propertySchema: JsonNode) -> Unit): IntermediateJsonSchemaData {
         return JsonSchemaCustomizeStep().customizeProperties(this, action)
     }
 

@@ -4,13 +4,14 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.core.data.flattenToMap
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
@@ -30,7 +31,8 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSch
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.validation.swagger.ValidationSwaggerSteps.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
@@ -53,14 +55,13 @@ import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 import javax.validation.constraints.Size
-import kotlin.reflect.typeOf
 
 class MiscTests : FreeSpec({
 
     "https://github.com/SMILEY4/schema-kenerator/issues/14 - redirect to nullable types" - {
 
         "reflection" {
-            val result = typeOf<TestClassIssue14a>()
+            val result = initial<TestClassIssue14a>()
                 .analyzeTypeUsingReflection {
                     redirect<Optional<String?>, String?>()
                 }
@@ -83,7 +84,7 @@ class MiscTests : FreeSpec({
         }
 
         "kotlinx-serialization" {
-            val result = typeOf<TestClassIssue14b>()
+            val result = initial<TestClassIssue14b>()
                 .analyzeTypeUsingKotlinxSerialization {
                     redirect<Int, String?>()
                 }
@@ -110,7 +111,7 @@ class MiscTests : FreeSpec({
     "https://github.com/SMILEY4/schema-kenerator/issues/16 - field nullability handling" - {
 
         "reflection" {
-            val result = typeOf<TestClassIssue16>()
+            val result = initial<TestClassIssue16>()
                 .analyzeTypeUsingReflection()
                 .generateJsonSchema {
                     optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
@@ -138,7 +139,7 @@ class MiscTests : FreeSpec({
         }
 
         "kotlinx-serialization" {
-            val result = typeOf<TestClassIssue16>()
+            val result = initial<TestClassIssue16>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema {
                     optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
@@ -171,7 +172,7 @@ class MiscTests : FreeSpec({
     "https://github.com/SMILEY4/schema-kenerator/issues/19 - required annotation not working when all props nullable or optional" - {
 
         "json" {
-            val result = typeOf<TestClassIssue19>()
+            val result = initial<TestClassIssue19>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema()
                 .handleCoreAnnotations()
@@ -198,7 +199,7 @@ class MiscTests : FreeSpec({
         }
 
         "swagger" {
-            val result = typeOf<TestClassIssue19>()
+            val result = initial<TestClassIssue19>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema()
                 .handleCoreAnnotations()
@@ -227,7 +228,7 @@ class MiscTests : FreeSpec({
     }
 
     "https://github.com/SMILEY4/schema-kenerator/issues/20 - include annotations from constructor parameters" {
-        val result = typeOf<TestClassIssue20>()
+        val result = initial<TestClassIssue20>()
             .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
             .generateSwaggerSchema()
@@ -257,7 +258,7 @@ class MiscTests : FreeSpec({
     "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties" - {
 
         "custom renameing (adding prefix)" {
-            val result = typeOf<TestClassIssue18>()
+            val result = initial<TestClassIssue18>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .renameMembers { name -> "prefix_$name" }
                 .generateSwaggerSchema()
@@ -284,7 +285,7 @@ class MiscTests : FreeSpec({
         }
 
         "kotlinx naming strategy (snake case)" {
-            val result = typeOf<TestClassIssue18>()
+            val result = initial<TestClassIssue18>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateSwaggerSchema()
@@ -321,7 +322,7 @@ class MiscTests : FreeSpec({
             val otherProperty: String
         )
 
-        val result = typeOf<TestClass>()
+        val result = initial<TestClass>()
             .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .customizeProperties { propertyData, propertySchema ->
@@ -356,7 +357,7 @@ class MiscTests : FreeSpec({
     "https://github.com/SMILEY4/schema-kenerator/issues/39 - nullable property of sealed class" - {
 
         "inlining" {
-            val result = typeOf<BIssue39>()
+            val result = initial<BIssue39>()
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -388,7 +389,7 @@ class MiscTests : FreeSpec({
         }
 
         "referencing" {
-            val result = typeOf<BIssue39>()
+            val result = initial<BIssue39>()
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -446,14 +447,16 @@ class MiscTests : FreeSpec({
 
         "inlining" {
 
-            val result = Bundle(
-                data = SwaggerSchema(
-                    swagger = Schema<Any>().also {
-                        it.type = "myType"
-                    },
-                    typeData = TypeData.createWildcard()
-                ),
-                supporting = emptyList()
+            val result = IntermediateSwaggerSchemaData(
+                rootId = TypeId("test"),
+                data = mapOf(
+                    TypeId("test") to SwaggerSchemaData(
+                        swagger = Schema<Any>().also {
+                            it.type = "myType"
+                        },
+                        typeData = TypeData.createWildcard()
+                    )
+                )
             ).compileInlining()
 
             result.swagger.shouldEqualJson {
@@ -466,14 +469,16 @@ class MiscTests : FreeSpec({
         }
 
         "referencing" {
-            val result = Bundle(
-                data = SwaggerSchema(
-                    swagger = Schema<Any>().also {
-                        it.type = "myType"
-                    },
-                    typeData = TypeData.createWildcard()
-                ),
-                supporting = emptyList()
+            val result = IntermediateSwaggerSchemaData(
+                rootId = TypeId("test"),
+                data = mapOf(
+                    TypeId("test") to SwaggerSchemaData(
+                        swagger = Schema<Any>().also {
+                            it.type = "myType"
+                        },
+                        typeData = TypeData.createWildcard()
+                    )
+                )
             ).compileReferencingRoot()
 
             (result.swagger to result.componentSchemas).shouldEqualJson {
@@ -491,7 +496,7 @@ class MiscTests : FreeSpec({
 
     "merge property attributes with referenced type" {
 
-        val result = typeOf<ClassWithAnnotatedFields>()
+        val result = initial<ClassWithAnnotatedFields>()
             .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
@@ -592,7 +597,7 @@ class MiscTests : FreeSpec({
     "generic nested classes with nullable type parameter" - {
 
         "reflection" {
-            val result = typeOf<GenericClass<String?>>()
+            val result = initial<GenericClass<String?>>()
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .compileInlining()
@@ -622,7 +627,7 @@ class MiscTests : FreeSpec({
         }
 
         "kotlinx-serialization" {
-            val result = typeOf<GenericClass<String?>>()
+            val result = initial<GenericClass<String?>>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema()
                 .compileInlining()
@@ -664,7 +669,7 @@ class MiscTests : FreeSpec({
                 }
             }
 
-            val result = typeOf<TestClassContextual>()
+            val result = initial<TestClassContextual>()
                 .analyzeTypeUsingKotlinxSerialization {
                     serializersModule = json.serializersModule
                 }
@@ -699,7 +704,7 @@ class MiscTests : FreeSpec({
 
         "with serializers from annotation" {
 
-            val result = typeOf<TestClassSerializableWith>()
+            val result = initial<TestClassSerializableWith>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -735,7 +740,7 @@ class MiscTests : FreeSpec({
     "https://github.com/SMILEY4/schema-kenerator/issues/43" - {
 
         "overwriting property with more specific type" {
-            val result = typeOf<Issue43IntHolder>()
+            val result = initial<Issue43IntHolder>()
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -766,27 +771,27 @@ class MiscTests : FreeSpec({
         }
 
         "collect correct subtypes with type parameters involved" {
-            val result = typeOf<Issue43Root>()
+            val result = initial<Issue43Root>()
                 .collectSubTypes()
                 .analyzeTypeUsingReflection()
                 .addMissingSupertypeSubtypeRelations()
-                .also { bundle ->
-                    bundle.supporting
+                .also { data ->
+                    data.typeData
                         .find { it.identifyingName.full == "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithEnum" }!!
                         .also { withEnum ->
                             val supertypes = withEnum.supertypes
-                                .map { bundle.flattenToMap()[it]!! }
-                                .map { it to it.typeParameters.map { t -> bundle.flattenToMap()[t.type] } }
+                                .map { data[it]!! }
+                                .map { it to it.typeParameters.map { t -> data[t.type] } }
                             supertypes shouldHaveSize 1
                             supertypes.map { it.first.descriptiveName.short + " " + it.second.joinToString { t -> t!!.descriptiveName.short } } shouldContainExactlyInAnyOrder
                                     listOf("Issue42Interface Issue43Enum")
                         }
-                    bundle.supporting
+                    data.typeData
                         .find { it.identifyingName.full == "io.github.smiley4.schemakenerator.test.MiscTests.Companion.Issue42Interface.WithInt" }!!
                         .also { withEnum ->
                             val supertypes = withEnum.supertypes
-                                .map { bundle.flattenToMap()[it]!! }
-                                .map { it to it.typeParameters.map { t -> bundle.flattenToMap()[t.type] } }
+                                .map { data[it]!! }
+                                .map { it to it.typeParameters.map { t -> data[t.type] } }
                             supertypes shouldHaveSize 1
                             supertypes.map { it.first.descriptiveName.short + " " + it.second.joinToString { t -> t!!.descriptiveName.short } } shouldContainExactlyInAnyOrder
                                     listOf("Issue42Interface Int")
@@ -879,7 +884,7 @@ class MiscTests : FreeSpec({
     "nullable types" - {
 
         "with explicit null types, nullables as non-required" {
-            val result = typeOf<ClassWithNullableFields>()
+            val result = initial<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -923,7 +928,7 @@ class MiscTests : FreeSpec({
         }
 
         "without explicit null types, nullables as non-required" {
-            val result = typeOf<ClassWithNullableFields>()
+            val result = initial<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -961,7 +966,7 @@ class MiscTests : FreeSpec({
         }
 
         "with explicit null types, nullables as required" {
-            val result = typeOf<ClassWithNullableFields>()
+            val result = initial<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema {
                     nullables = SwaggerSteps.RequiredHandling.REQUIRED
@@ -1009,7 +1014,7 @@ class MiscTests : FreeSpec({
         }
 
         "without explicit null types, nullables as required" {
-            val result = typeOf<ClassWithNullableFields>()
+            val result = initial<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema { nullables = SwaggerSteps.RequiredHandling.REQUIRED }
                 .withTitle(TitleType.SIMPLE)
@@ -1052,7 +1057,7 @@ class MiscTests : FreeSpec({
     "special floating point values" - {
 
         "don't allow" {
-            val result = typeOf<ClassWithNumbers>()
+            val result = initial<ClassWithNumbers>()
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema {
                     allowSpecialFloatingPointValues = false
@@ -1091,7 +1096,7 @@ class MiscTests : FreeSpec({
         }
 
         "allow" {
-            val result = typeOf<ClassWithNumbers>()
+            val result = initial<ClassWithNumbers>()
                 .analyzeTypeUsingReflection {}
                 .generateSwaggerSchema {
                     allowSpecialFloatingPointValues = true
@@ -1155,7 +1160,7 @@ class MiscTests : FreeSpec({
     "maps with complex keys as arrays" - {
 
         "disabled" {
-            val result = typeOf<ClassWithCombinedKeyMap>()
+            val result = initial<ClassWithCombinedKeyMap>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema {
                     mapsWithStructuredKeysAsArrays = false
@@ -1183,7 +1188,7 @@ class MiscTests : FreeSpec({
         }
 
         "enabled" {
-            val result = typeOf<ClassWithCombinedKeyMap>()
+            val result = initial<ClassWithCombinedKeyMap>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema {
                     mapsWithStructuredKeysAsArrays = true

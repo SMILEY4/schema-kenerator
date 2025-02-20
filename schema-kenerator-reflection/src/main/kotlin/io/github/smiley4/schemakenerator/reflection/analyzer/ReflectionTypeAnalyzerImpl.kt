@@ -1,9 +1,8 @@
 package io.github.smiley4.schemakenerator.reflection.analyzer
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.InputType
-import io.github.smiley4.schemakenerator.core.data.KTypeInput
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
@@ -42,40 +41,19 @@ internal class ReflectionTypeAnalyzerImpl(
         )
     }
 
-
-    /**
-     * Analyze the given input type
-     */
-    fun analyze(input: InputType): Bundle<TypeData> = analyze(Bundle(input, emptyList()))
-
-
     /**
      * Analyze the given input type bundle
      */
-    fun analyze(input: Bundle<InputType>): Bundle<TypeData> {
-
+    fun analyze(input: InitialKTypeData): TypeDataGroup {
         val knownTypeData = mutableListOf<TypeData>()
 
-        // process supporting inputs
-        input.supporting.forEach {
-            when (it) {
-                is KTypeInput -> analyze(it.kType, knownTypeData)
-                else -> throw IllegalArgumentException("Unsupported input type '$it'.")
-            }
-        }
+        input.associatedTypes.forEach { analyze(it, knownTypeData) }
 
-        // process main input
-        val typeData = input.data.let {
-            when (it) {
-                is KTypeInput -> analyze(it.kType, knownTypeData)
-                else -> throw IllegalArgumentException("Unsupported input type '$it'.")
-            }
-        }
+        val root = analyze(input.type, knownTypeData)
 
-        knownTypeData.remove(typeData.typeData)
-        return Bundle(
-            data = typeData.typeData,
-            supporting = knownTypeData
+        return TypeDataGroup(
+            rootId = root.typeData.id,
+            data = knownTypeData.associateBy { it.id }
         )
     }
 

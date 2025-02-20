@@ -1,6 +1,8 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
@@ -29,7 +31,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
@@ -53,7 +55,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
@@ -77,7 +79,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()

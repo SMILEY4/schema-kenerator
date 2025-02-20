@@ -3,6 +3,7 @@
 
 package io.github.smiley4.schemakenerator.examples
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Type
@@ -59,7 +60,7 @@ class E04_Customization : FreeSpec({
 
         "... using reflection" {
 
-            val jsonSchema = typeOf<ClassWithLocalDateTime>()
+            val jsonSchema = initial<ClassWithLocalDateTime>()
                 .analyzeTypeUsingReflection {
 
                     custom(LocalDateTime::class) {
@@ -109,7 +110,7 @@ class E04_Customization : FreeSpec({
 
         "... using kotlinx-serialization" {
 
-            val jsonSchema = typeOf<ClassWithLocalDateTime>()
+            val jsonSchema = initial<ClassWithLocalDateTime>()
                 .analyzeTypeUsingKotlinxSerialization {
 
                     // register a custom analyzer for the type "LocalDateTime"
@@ -168,7 +169,7 @@ class E04_Customization : FreeSpec({
 
         "reflection" {
 
-            val jsonSchema = typeOf<ClassWithLocalDateTime>()
+            val jsonSchema = initial<ClassWithLocalDateTime>()
                 .analyzeTypeUsingReflection {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
                     redirect<LocalDateTime, String>()
@@ -195,7 +196,7 @@ class E04_Customization : FreeSpec({
 
         "kotlinx-serialization" {
 
-            val jsonSchema = typeOf<ClassWithLocalDateTime>()
+            val jsonSchema = initial<ClassWithLocalDateTime>()
                 .analyzeTypeUsingKotlinxSerialization {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
                     redirect<LocalDateTime, String>()
@@ -236,7 +237,7 @@ class E04_Customization : FreeSpec({
             // The renaming can be done manually by taking the original name of each property and outputting a new name,
             // e.g. here by adding a prefix to all properties.
 
-            val jsonSchema = typeOf<ExampleClass>()
+            val jsonSchema = initial<ExampleClass>()
                 .analyzeTypeUsingReflection()
                 .renameMembers { originalName -> "prefix_$originalName" }
                 .generateJsonSchema()
@@ -264,7 +265,7 @@ class E04_Customization : FreeSpec({
             // Properties can also be renamed by providing a "JsonNamingStrategy" from kotlinx-serialization.
             // Note: schema-kenerator-serialization is required, even though this also works without using kotlinx-serialization for data extraction.
 
-            val jsonSchema = typeOf<ExampleClass>()
+            val jsonSchema = initial<ExampleClass>()
                 .analyzeTypeUsingReflection()
                 .renameMembers(JsonNamingStrategy.SnakeCase)
                 .generateJsonSchema()
@@ -307,7 +308,7 @@ class E04_Customization : FreeSpec({
 
         "json-schema" {
 
-            val jsonSchema = typeOf<ExampleClass>()
+            val jsonSchema = initial<ExampleClass>()
                 .analyzeTypeUsingReflection()
                 .generateJsonSchema()
                 .customizeTypes { typeData, typeSchema ->
@@ -347,7 +348,7 @@ class E04_Customization : FreeSpec({
 
         "swagger" {
 
-            val swaggerSchema = typeOf<ExampleClass>()
+            val swaggerSchema = initial<ExampleClass>()
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema()
                 .customizeTypes { typeData, typeSchema ->

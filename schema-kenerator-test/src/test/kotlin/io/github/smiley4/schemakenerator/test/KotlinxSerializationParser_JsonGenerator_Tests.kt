@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.JsonSchemaGenerationStepConfig
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
@@ -36,7 +38,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
@@ -57,7 +59,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
@@ -96,7 +98,7 @@ class KotlinxSerializationParser_JsonGenerator_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->

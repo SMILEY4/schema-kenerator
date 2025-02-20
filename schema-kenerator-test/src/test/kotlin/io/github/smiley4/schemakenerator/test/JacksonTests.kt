@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jackson.jsonschema.JacksonJsonSchemaSteps.handleJacksonJsonSchemaAnnotations
 import io.github.smiley4.schemakenerator.jackson.swagger.JacksonSwaggerSteps.handleJacksonSwaggerAnnotations
@@ -16,7 +18,6 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSch
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import kotlin.reflect.typeOf
 
 class JacksonTests : StringSpec({
 
@@ -25,40 +26,40 @@ class JacksonTests : StringSpec({
     }
 
     "@JsonIgnore" {
-        val result = typeOf<JsonIgnoreTestClass>()
+        val result = initial<JsonIgnoreTestClass>()
             .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
-        result.data.members.also { members ->
+        result.root.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
         }
     }
 
     "@JsonIgnoreType" {
-        val result = typeOf<JsonIgnoreTypeTestClass>()
+        val result = initial<JsonIgnoreTypeTestClass>()
             .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
-        result.data.members.also { members ->
+        result.root.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
         }
     }
 
     "@JsonIgnoreProperties" {
-        val result = typeOf<JsonIgnorePropertiesTestClass>()
+        val result = initial<JsonIgnorePropertiesTestClass>()
             .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
-        result.data.members.also { members ->
+        result.root.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
         }
     }
 
     "@JsonProperty" {
-        val result = typeOf<JsonPropertyTestClass>()
+        val result = initial<JsonPropertyTestClass>()
             .analyzeTypeUsingReflection()
             .handleJacksonAnnotations()
-        result.data.members.also { members ->
+        result.root.members.also { members ->
             members shouldHaveSize 1
             members.first().name shouldBe "someValue"
             members.first().nullable shouldBe false
@@ -66,7 +67,7 @@ class JacksonTests : StringSpec({
     }
 
     "@JsonPropertyDescription - json-schema" {
-        val result = typeOf<JsonPropertyDescriptionTestClass>()
+        val result = initial<JsonPropertyDescriptionTestClass>()
             .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .handleJacksonJsonSchemaAnnotations()
@@ -91,7 +92,7 @@ class JacksonTests : StringSpec({
     }
 
     "@JsonPropertyDescription - swagger" {
-        val result = typeOf<JsonPropertyDescriptionTestClass>()
+        val result = initial<JsonPropertyDescriptionTestClass>()
             .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
             .handleJacksonSwaggerAnnotations()

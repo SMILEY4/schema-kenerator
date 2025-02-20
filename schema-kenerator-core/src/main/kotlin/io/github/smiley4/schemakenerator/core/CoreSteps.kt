@@ -1,10 +1,35 @@
 package io.github.smiley4.schemakenerator.core
 
 import io.github.smiley4.schemakenerator.core.annotations.Name
-import io.github.smiley4.schemakenerator.core.data.Bundle
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 object CoreSteps {
+
+    /**
+     * Create a new [InitialKTypeData] for the given type.
+     * @param T the initial (root) type
+     * @param associatedTypes list of additional type associated with the given root type
+     */
+    inline fun <reified T> initial(associatedTypes: List<KType> = emptyList()) = InitialKTypeData(
+        type = typeOf<T>(),
+        associatedTypes = associatedTypes
+    )
+
+
+    /**
+     * Create a new [InitialKTypeData] for the given type.
+     * @param type the initial (root) type
+     * @param associatedTypes list of additional type associated with the given root type
+     */
+    fun initial(type: KType, associatedTypes: List<KType> = emptyList()) = InitialKTypeData(
+        type = type,
+        associatedTypes = associatedTypes
+    )
+
 
     /**
      * Adds missing subtype-supertype relations between the given types. Types not already present in the input are not included.
@@ -13,7 +38,7 @@ object CoreSteps {
      * This step finds these missing connections and adds them.
      * Add this step after type analysis and before schema generation.
      */
-    fun Bundle<TypeData>.addMissingSupertypeSubtypeRelations(): Bundle<TypeData> {
+    fun TypeDataGroup.addMissingSupertypeSubtypeRelations(): TypeDataGroup {
         return AddMissingSubtypeSupertypeRelations().process(this)
     }
 
@@ -22,7 +47,7 @@ object CoreSteps {
      * Changes the [TypeData.descriptiveName] to the name specified by a [Name]-annotation.
      * Add this step after type analysis and before schema generation.
      */
-    fun Bundle<TypeData>.handleNameAnnotation(): Bundle<TypeData> {
+    fun TypeDataGroup.handleNameAnnotation(): TypeDataGroup {
         return HandleNameAnnotationStep().process(this)
     }
 
@@ -31,7 +56,7 @@ object CoreSteps {
      * Renames members of types according to the given function.
      * Add this step after type analysis and before schema generation.
      */
-    fun Bundle<TypeData>.renameMembers(rename: (name: String) -> String): Bundle<TypeData> {
+    fun TypeDataGroup.renameMembers(rename: (name: String) -> String): TypeDataGroup {
         return RenameMembersStep(rename).process(this)
     }
 
@@ -42,7 +67,7 @@ object CoreSteps {
      *  - if no property exists (e.g. because it is private), the getter will be removed and a new property from its data is created
      * Add this step after type analysis and before schema generation.
      */
-    fun Bundle<TypeData>.gettersToProperties(): Bundle<TypeData> {
+    fun TypeDataGroup.gettersToProperties(): TypeDataGroup {
         return GettersToPropertiesStep().process(this)
     }
 
@@ -54,7 +79,7 @@ object CoreSteps {
      * Add this step after type analysis and before schema generation.
      * @param discriminatorPropertyName the name of the property to add. The type will always be [String].
      */
-    fun Bundle<TypeData>.addDiscriminatorProperty(discriminatorPropertyName: String = "type"): Bundle<TypeData> {
+    fun TypeDataGroup.addDiscriminatorProperty(discriminatorPropertyName: String = "type"): TypeDataGroup {
         return AddDiscriminatorStep(discriminatorPropertyName).process(this)
     }
 

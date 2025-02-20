@@ -1,15 +1,14 @@
 package io.github.smiley4.schemakenerator.swagger
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.copyTypeToTypes
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.merge
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaCompileUtils.shouldReference
-import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchemaData
 import io.swagger.v3.oas.models.media.Schema
 
 internal class SwaggerSchemaCompileReferenceStep(
@@ -23,7 +22,7 @@ internal class SwaggerSchemaCompileReferenceStep(
         /**
          * all known input swagger schemas
          */
-        val knownSchemas: List<SwaggerSchema>,
+        val knownSchemas: List<SwaggerSchemaData>,
         /**
          * all known input types
          */
@@ -42,9 +41,9 @@ internal class SwaggerSchemaCompileReferenceStep(
         val refPathMapping: MutableMap<TypeId, String>,
     ) {
         companion object {
-            fun from(bundle: Bundle<SwaggerSchema>) = Context(
-                bundle.flatten(),
-                bundle.buildTypeDataMap(),
+            fun from(data: IntermediateSwaggerSchemaData) = Context(
+                data.entries,
+                data.typeDataById,
                 mutableMapOf(),
                 mutableMapOf(),
                 mutableMapOf(),
@@ -56,19 +55,19 @@ internal class SwaggerSchemaCompileReferenceStep(
     /**
      * Put referenced schemas into definitions and reference them
      */
-    fun compile(bundle: Bundle<SwaggerSchema>): CompiledSwaggerSchema {
-        val context = Context.from(bundle)
+    fun compile(input: IntermediateSwaggerSchemaData): CompiledSwaggerSchemaData {
+        val context = Context.from(input)
 
         copyTypeToTypes(context.knownSchemas)
 
-        val root = resolveReferences(bundle.data.swagger) { refObj ->
+        val root = resolveReferences(input.rootSchema) { refObj ->
             resolveReference(refObj, context)
         }
 
         handleDiscriminatorMappings(root, context.components, context.knownTypeData)
 
-        return CompiledSwaggerSchema(
-            typeData = bundle.data.typeData,
+        return CompiledSwaggerSchemaData(
+            typeData = input.rootTypeData,
             swagger = root,
             componentSchemas = context.components
         )
@@ -81,7 +80,7 @@ internal class SwaggerSchemaCompileReferenceStep(
      * @param context the current compile context with data about input schemas and type data as well as current produced information
      */
     private fun resolveReference(refObj: Schema<*>, context: Context): Schema<*> {
-        val referencedSchema = context.knownSchemas.find(TypeId(refObj.`$ref`))
+        val referencedSchema = context.knownSchemas.find { it.typeData.id ==  TypeId(refObj.`$ref`) }
         return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.swagger)) {
                 createRefProperty(refObj, referencedSchema, context)
@@ -102,7 +101,7 @@ internal class SwaggerSchemaCompileReferenceStep(
      */
     private fun createRefProperty(
         refObj: Schema<*>,
-        schema: SwaggerSchema,
+        schema: SwaggerSchemaData,
         context: Context,
     ): Schema<*> {
         val refPath = if (context.refPathMapping.containsKey(schema.typeData.id)) {
@@ -132,7 +131,7 @@ internal class SwaggerSchemaCompileReferenceStep(
      * @param refObj the schema containing the reference
      * @param schema the schema referenced by [refObj]
      */
-    private fun createInlineProperty(refObj: Schema<*>, schema: SwaggerSchema): Schema<*> {
+    private fun createInlineProperty(refObj: Schema<*>, schema: SwaggerSchemaData): Schema<*> {
         return merge(refObj, schema.swagger).also {
             if (it.nullable == true && explicitNullTypes) {
                 it.types = setOf("null") + it.types
@@ -178,11 +177,5 @@ internal class SwaggerSchemaCompileReferenceStep(
      * @return a placeholder schema object
      */
     private fun placeholder() = Schema<Any>()
-
-
-    /**
-     * @return the [SwaggerSchema] for the given [TypeId]
-     */
-    private fun Collection<SwaggerSchema>.find(id: TypeId): SwaggerSchema? = this.find { it.typeData.id == id }
 
 }

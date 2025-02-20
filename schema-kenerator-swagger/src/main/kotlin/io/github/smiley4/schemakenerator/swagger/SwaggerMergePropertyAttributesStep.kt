@@ -1,41 +1,41 @@
 package io.github.smiley4.schemakenerator.swagger
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchemaData
 
 internal class SwaggerMergePropertyAttributesStep {
 
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        val open = bundle.flatten().toMutableList()
-        val content = bundle.flatten().toMutableList()
+    fun process(input: IntermediateSwaggerSchemaData): IntermediateSwaggerSchemaData {
+        val open = input.entries.toMutableList()
+        val content = input.data.toMutableMap()
 
         while (open.isNotEmpty()) {
             val current = open.removeFirst()
-            val newSchemas = process(current, content)
-            content.addAll(newSchemas)
-            open.addAll(newSchemas)
+            process(current, content).forEach {
+                content[it.typeData.id] = it
+                open.add(it)
+            }
         }
 
-        return Bundle(
-            data = bundle.data,
-            supporting = content.also { it.remove(bundle.data) },
+        return IntermediateSwaggerSchemaData(
+            rootId = input.rootId,
+            data = content
         )
     }
 
-    private fun process(schema: SwaggerSchema, schemas: List<SwaggerSchema>): List<SwaggerSchema> {
-        val resultingSchemas = mutableListOf<SwaggerSchema>()
+    private fun process(schema: SwaggerSchemaData, schemas: Map<TypeId, SwaggerSchemaData>): List<SwaggerSchemaData> {
+        val resultingSchemas = mutableListOf<SwaggerSchemaData>()
         schema.swagger.properties?.values
             ?.filter { it.`$ref` != null }
             ?.forEach { property ->
-                val propertyData = schemas.find { it.typeData.id.id == property.`$ref` }
+                val propertyData = schemas[TypeId(property.`$ref`)]
                 if (propertyData != null) {
                     val derivedId = TypeId.create()
                     val derivedPropertyTypeData = propertyData.typeData.copy(derivedId)
                     val derivedPropertySchema = SwaggerSchemaCompileUtils.copy(propertyData.swagger)
                     SwaggerSchemaCompileUtils.mergeInto(property, derivedPropertySchema)
-                    resultingSchemas.add(SwaggerSchema(derivedPropertySchema, derivedPropertyTypeData))
+                    resultingSchemas.add(SwaggerSchemaData(derivedPropertySchema, derivedPropertyTypeData))
                     property.`raw$ref`(derivedId.id)
                 }
             }

@@ -1,11 +1,8 @@
 package io.github.smiley4.schemakenerator.serialization
 
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.InputType
-import io.github.smiley4.schemakenerator.core.data.KTypeInput
-import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.core.data.mapToInputType
+import io.github.smiley4.schemakenerator.core.data.InitialTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.serialization.analyzer.DefaultSerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.analyzer.KotlinxSerializationCustomProvider
 import io.github.smiley4.schemakenerator.serialization.analyzer.KotlinxSerializationTypeMatcher
@@ -13,8 +10,8 @@ import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTyp
 import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.analyzer.SimpleSerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.analyzer.fullName
-import io.github.smiley4.schemakenerator.serialization.data.SerialDescriptorInput
-import io.github.smiley4.schemakenerator.serialization.data.mapToInputType
+import io.github.smiley4.schemakenerator.serialization.analyzer.getSerializerFor
+import io.github.smiley4.schemakenerator.serialization.data.InitialSerialDescriptorTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -29,10 +26,18 @@ import kotlin.reflect.typeOf
 object SerializationSteps {
 
     /**
+     * Create a new [InitialSerialDescriptorTypeData] for the given type.
+     * @param type the initial (root) type
+     */
+    fun initial(type: SerialDescriptor) = InitialSerialDescriptorTypeData(
+        type = type,
+    )
+
+    /**
      * Handles the [JsonClassDiscriminator]-annotations and adds a discriminator property with the defined name and
      * annotated with a marker annotation called [io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME]
      */
-    fun Bundle<TypeData>.addJsonClassDiscriminatorProperty(): Bundle<TypeData> {
+    fun TypeDataGroup.addJsonClassDiscriminatorProperty(): TypeDataGroup {
         return HandleJsonClassDiscriminatorStep().process(this)
     }
 
@@ -42,7 +47,7 @@ object SerializationSteps {
      * Add this step after type analysis and before schema generation.
      */
     @OptIn(ExperimentalSerializationApi::class)
-    fun Bundle<TypeData>.renameMembers(strategy: JsonNamingStrategy): Bundle<TypeData> {
+    fun TypeDataGroup.renameMembers(strategy: JsonNamingStrategy): TypeDataGroup {
         return this.renameMembers { name ->
             strategy.serialNameForJson(PrimitiveSerialDescriptor("?", PrimitiveKind.BYTE), 0, name)
         }
@@ -53,71 +58,9 @@ object SerializationSteps {
      * Analyze the type and using kotlinx-serialization and return the extracted data.
      * @param configBlock the configuration
      */
-    fun KType.analyzeTypeUsingKotlinxSerialization(
+    fun InitialTypeData.analyzeTypeUsingKotlinxSerialization(
         configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-    ): Bundle<TypeData> {
-        return KTypeInput(this).analyzeTypeUsingKotlinxSerialization(configBlock)
-    }
-
-
-    /**
-     * Analyze the type and using kotlinx-serialization and return the extracted data.
-     * @param configBlock the configuration
-     */
-    fun SerialDescriptor.analyzeTypeUsingKotlinxSerialization(
-        configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-    ): Bundle<TypeData> {
-        return SerialDescriptorInput(this).analyzeTypeUsingKotlinxSerialization(configBlock)
-    }
-
-
-    /**
-     * Analyze the type and using kotlinx-serialization and return the extracted data.
-     * @param configBlock the configuration
-     */
-    fun InputType.analyzeTypeUsingKotlinxSerialization(
-        configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-    ): Bundle<TypeData> {
-        val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
-        return SerializationTypeAnalyzerImpl(
-            serializersModule = config.serializersModule,
-            typeRedirects = config.typeRedirects,
-            modules = config.buildCustomModules()
-        ).analyze(this)
-    }
-
-
-    /**
-     * Analyze the type and using kotlinx-serialization and return the extracted data.
-     * @param configBlock the configuration
-     */
-    @JvmName("processKotlinxSerializationKType")
-    fun Bundle<KType>.analyzeTypeUsingKotlinxSerialization(
-        configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-    ): Bundle<TypeData> {
-        return this.mapToInputType().analyzeTypeUsingKotlinxSerialization(configBlock)
-    }
-
-
-    /**
-     * Analyze the type and using kotlinx-serialization and return the extracted data.
-     * @param configBlock the configuration
-     */
-    @JvmName("processKotlinxSerializationSerialDescriptor")
-    fun Bundle<SerialDescriptor>.analyzeTypeUsingKotlinxSerialization(
-        configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-    ): Bundle<TypeData> {
-        return this.mapToInputType().analyzeTypeUsingKotlinxSerialization(configBlock)
-    }
-
-
-    /**
-     * Analyze the type and using kotlinx-serialization and return the extracted data.
-     * @param configBlock the configuration
-     */
-    fun Bundle<InputType>.analyzeTypeUsingKotlinxSerialization(
-        configBlock: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
-    ): Bundle<TypeData> {
+    ): TypeDataGroup {
         val config = KotlinxSerializationTypeProcessingConfig().apply(configBlock)
         return SerializationTypeAnalyzerImpl(
             serializersModule = config.serializersModule,
@@ -228,7 +171,16 @@ object SerializationSteps {
         }
 
 
-        var typeRedirects = mutableMapOf<String, InputType>()
+        var typeRedirects = mutableMapOf<String, SerialDescriptor>()
+
+
+        /**
+         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+         * The nullability of the types/fields must match.
+         */
+        fun redirect(from: String, to: SerialDescriptor) {
+            typeRedirects[from] = to
+        }
 
 
         /**
@@ -236,7 +188,8 @@ object SerializationSteps {
          * The nullability of the types/fields must match.
          */
         fun redirect(from: String, to: KType) {
-            typeRedirects[from] = KTypeInput(to)
+            typeRedirects[from] = getSerializerFor(to)?.descriptor
+                ?: throw IllegalArgumentException("Could not get serial descriptor for type ${to::class.qualifiedName}")
         }
 
 
@@ -249,7 +202,8 @@ object SerializationSteps {
             val idFrom = (clazz.qualifiedName ?: clazz.java.name).let {
                 it + if (from.isMarkedNullable) "?" else ""
             }
-            typeRedirects[idFrom] = KTypeInput(to)
+            typeRedirects[idFrom] = getSerializerFor(to)?.descriptor
+                ?: throw IllegalArgumentException("Could not get serial descriptor for type ${to::class.qualifiedName}")
         }
 
 

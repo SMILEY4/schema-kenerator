@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
@@ -21,7 +23,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime without custom processor" {
 
-        val result = typeOf<ClassWithLocalDateTime>()
+        val result = initial<ClassWithLocalDateTime>()
             .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .withTitle(io.github.smiley4.schemakenerator.jsonschema.TitleBuilder.BUILDER_FULL)
@@ -50,7 +52,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime with custom processor" {
 
-        val result = typeOf<ClassWithLocalDateTime>()
+        val result = initial<ClassWithLocalDateTime>()
             .analyzeTypeUsingReflection {
                 custom<LocalDateTime> {
                     TypeData(
@@ -97,7 +99,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime without custom processor" {
 
-        val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = initial<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .analyzeTypeUsingKotlinxSerialization()
             .generateSwaggerSchema()
             .withTitle(TitleBuilder.BUILDER_FULL)
@@ -125,7 +127,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime with custom processor" {
 
-        val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = initial<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .analyzeTypeUsingKotlinxSerialization {
                 custom<LocalDateTime> {
                     TypeData(

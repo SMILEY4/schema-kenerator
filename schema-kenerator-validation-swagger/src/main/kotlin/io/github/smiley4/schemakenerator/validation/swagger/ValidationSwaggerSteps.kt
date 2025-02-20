@@ -1,7 +1,7 @@
 package io.github.smiley4.schemakenerator.validation.swagger
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
+
 
 object ValidationSwaggerSteps {
 
@@ -15,7 +15,7 @@ object ValidationSwaggerSteps {
      * - [javax.validation.constraints.Size]
      * Add this step after schema generation and before schema compilation.
      */
-    fun Bundle<SwaggerSchema>.handleJavaxValidationAnnotations(): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.handleJavaxValidationAnnotations(): IntermediateSwaggerSchemaData {
         return this.let { SwaggerJavaxValidationAnnotationStep().process(it) }
     }
 
@@ -30,7 +30,7 @@ object ValidationSwaggerSteps {
      * - [jakarta.validation.constraints.Size]
      * Add this step after schema generation and before schema compilation.
      */
-    fun Bundle<SwaggerSchema>.handleJakartaValidationAnnotations(): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.handleJakartaValidationAnnotations(): IntermediateSwaggerSchemaData {
         return this.let { SwaggerJakartaValidationAnnotationStep().process(it) }
     }
 

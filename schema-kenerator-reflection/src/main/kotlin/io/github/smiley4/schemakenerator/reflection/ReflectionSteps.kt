@@ -1,10 +1,7 @@
 package io.github.smiley4.schemakenerator.reflection
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.InputType
-import io.github.smiley4.schemakenerator.core.data.KTypeInput
-import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.core.data.mapToInputType
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.reflection.analyzer.DefaultReflectionTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionCustomProvider
 import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeAnalyzerImpl
@@ -22,22 +19,11 @@ object ReflectionSteps {
 
     /**
      * Finds additional subtypes from [SubType]-annotation.
-     * An additional step to add missing subtype-supertype relations .later may be required
-     * Add this step before type analysis.
-     * @param maxRecursionDepth how many "levels" to search for subtypes
-     */
-    fun KType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
-        return KTypeInput(this).collectSubTypes(maxRecursionDepth)
-    }
-
-
-    /**
-     * Finds additional subtypes from [SubType]-annotation.
      * An additional step to add missing subtype-supertype relations later may be required.
      * Add this step before type analysis.
      * @param maxRecursionDepth how many "levels" to search for subtypes
      */
-    fun InputType.collectSubTypes(maxRecursionDepth: Int = 10): Bundle<InputType> {
+    fun InitialKTypeData.collectSubTypes(maxRecursionDepth: Int = 10): InitialKTypeData {
         return ReflectionAnnotationSubTypeStep(
             maxRecursionDepth = maxRecursionDepth
         ).process(this)
@@ -48,46 +34,13 @@ object ReflectionSteps {
      * Analyze the type and using reflection and return the extracted data.
      * @param configBlock the configuration
      */
-    fun KType.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-        return KTypeInput(this).analyzeTypeUsingReflection(configBlock)
-    }
-
-
-    /**
-     * Analyze the type and using reflection and return the extracted data.
-     * @param configBlock the configuration
-     */
-    fun InputType.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
+    fun InitialKTypeData.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): TypeDataGroup {
         val config = ReflectionTypeAnalysisConfig().apply(configBlock)
         return ReflectionTypeAnalyzerImpl(
             typeRedirects = config.typeRedirects,
             modules = config.buildCustomModules()
         ).analyze(this)
     }
-
-
-    /**
-     * Analyze the type and using reflection and return the extracted data.
-     * @param configBlock the configuration
-     */
-    @JvmName("analyseKTypeUsingReflection")
-    fun Bundle<KType>.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-        return this.mapToInputType().analyzeTypeUsingReflection(configBlock)
-    }
-
-
-    /**
-     * Analyze the type and using reflection and return the extracted data.
-     * @param configBlock the configuration
-     */
-    fun Bundle<InputType>.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): Bundle<TypeData> {
-        val config = ReflectionTypeAnalysisConfig().apply(configBlock)
-        return ReflectionTypeAnalyzerImpl(
-            typeRedirects = config.typeRedirects,
-            modules = config.buildCustomModules()
-        ).analyze(this)
-    }
-
 
     class ReflectionTypeAnalysisConfig {
 

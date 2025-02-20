@@ -1,5 +1,11 @@
-changed:
+CHANGELOG
+
 - Type data helper functions to distinguish between "types" (enums, collections, maps, ...)
+
+- reworked/replaced bundles & overhauled step input data classes to make flow of data and order of step more clear
+    - generic bundles replaced with specific classes "InitialTypeData", "TypeDataGroup", "IntermediateXYSchemaData", "CompiledXYSchemaData"
+    - start of pipeline changed from extension functions on raw kotlin types (e.g. typeOf<T>, T::class, etc.) to initial<T>, initial(T::clas), etc.
+
 
 TODO
 - specify redirect behaviour ?
@@ -29,3 +35,5 @@ TODO
     - ...
 
 - "modules" wiki page: link to root api reference AND steps api reference
+
+- "schema generation" wiki pages: explain + short examples for compileInlining vs referencing vs referencing root

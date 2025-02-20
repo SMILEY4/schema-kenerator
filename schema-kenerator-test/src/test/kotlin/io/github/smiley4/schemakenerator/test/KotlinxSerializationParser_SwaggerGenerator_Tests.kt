@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.SwaggerSchemaGenerationStepConfig
@@ -24,7 +26,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -51,7 +53,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -83,7 +85,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->

@@ -1,12 +1,12 @@
 package io.github.smiley4.schemakenerator.swagger
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.RefType
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generator.DefaultSwaggerSchemaGenerationModule
 import io.github.smiley4.schemakenerator.swagger.generator.SwaggerSchemaGenerationModule
@@ -19,7 +19,7 @@ object SwaggerSteps {
      * Generates swagger schemas from the given type data. All types in the schema are provisionally referenced by the full type-id.
      * Result needs to be "compiled" to get the final swagger schema.
      */
-    fun Bundle<TypeData>.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): Bundle<SwaggerSchema> {
+    fun TypeDataGroup.generateSwaggerSchema(configBlock: SwaggerSchemaGenerationStepConfig.() -> Unit = {}): IntermediateSwaggerSchemaData {
         val config = SwaggerSchemaGenerationStepConfig().apply(configBlock)
         return SwaggerSchemaGeneratorImpl(config.buildCustomModules()).process(this)
     }
@@ -29,7 +29,7 @@ object SwaggerSteps {
      * Adds an automatically determined title to schemas.
      * @param type the type of the title
      */
-    fun Bundle<SwaggerSchema>.withTitle(type: TitleType = TitleType.FULL): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.withTitle(type: TitleType = TitleType.FULL): IntermediateSwaggerSchemaData {
         return withTitle(
             when (type) {
                 TitleType.FULL -> TitleBuilder.BUILDER_FULL
@@ -45,7 +45,7 @@ object SwaggerSteps {
      * Adds an automatically determined title to schemas.
      * @param builder the function building the title for the given type
      */
-    fun Bundle<SwaggerSchema>.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): IntermediateSwaggerSchemaData {
         return SwaggerSchemaTitleStep(builder).process(this)
     }
 
@@ -63,7 +63,7 @@ object SwaggerSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.Type]
      * Add this step after schema generation and before schema compilation.
      */
-    fun Bundle<SwaggerSchema>.handleCoreAnnotations(): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.handleCoreAnnotations(): IntermediateSwaggerSchemaData {
         return this
             .let { SwaggerSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
             .let { SwaggerSchemaCoreAnnotationDefaultStep().process(this) }
@@ -104,7 +104,7 @@ object SwaggerSteps {
      *      - uniqueItems
      * Add this step after schema generation and before schema compilation.
      */
-    fun Bundle<SwaggerSchema>.handleSchemaAnnotations(): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.handleSchemaAnnotations(): IntermediateSwaggerSchemaData {
         return this
             .let { SwaggerSchemaAnnotationStep().process(this) }
             .let { SwaggerArraySchemaAnnotationStep().process(this) }
@@ -114,7 +114,7 @@ object SwaggerSteps {
     /**
      * Merge the attributes of a property into the referenced type.
      */
-    fun Bundle<SwaggerSchema>.mergePropertyAttributesIntoType(): Bundle<SwaggerSchema> {
+    fun IntermediateSwaggerSchemaData.mergePropertyAttributesIntoType(): IntermediateSwaggerSchemaData {
         return SwaggerMergePropertyAttributesStep().process(this)
     }
 
@@ -123,7 +123,7 @@ object SwaggerSteps {
      * Resolves references in generated swagger schemas by inlining them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      */
-    fun Bundle<SwaggerSchema>.compileInlining(explicitNullTypes: Boolean = true): CompiledSwaggerSchema {
+    fun IntermediateSwaggerSchemaData.compileInlining(explicitNullTypes: Boolean = true): CompiledSwaggerSchemaData {
         return SwaggerSchemaCompileInlineStep(explicitNullTypes).compile(this)
     }
 
@@ -133,10 +133,10 @@ object SwaggerSteps {
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
      */
-    fun Bundle<SwaggerSchema>.compileReferencing(
+    fun IntermediateSwaggerSchemaData.compileReferencing(
         explicitNullTypes: Boolean = true,
         pathType: RefType = RefType.OPENAPI_FULL
-    ): CompiledSwaggerSchema {
+    ): CompiledSwaggerSchemaData {
         return compileReferencing(
             explicitNullTypes,
             when (pathType) {
@@ -154,10 +154,10 @@ object SwaggerSteps {
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
-    fun Bundle<SwaggerSchema>.compileReferencing(
+    fun IntermediateSwaggerSchemaData.compileReferencing(
         explicitNullTypes: Boolean = true,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
-    ): CompiledSwaggerSchema {
+    ): CompiledSwaggerSchemaData {
         return SwaggerSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
     }
 
@@ -167,10 +167,10 @@ object SwaggerSteps {
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
      */
-    fun Bundle<SwaggerSchema>.compileReferencingRoot(
+    fun IntermediateSwaggerSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
         pathType: RefType = RefType.OPENAPI_FULL
-    ): CompiledSwaggerSchema {
+    ): CompiledSwaggerSchemaData {
         return compileReferencingRoot(
             explicitNullTypes,
             when (pathType) {
@@ -188,10 +188,10 @@ object SwaggerSteps {
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
-    fun Bundle<SwaggerSchema>.compileReferencingRoot(
+    fun IntermediateSwaggerSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
-    ): CompiledSwaggerSchema {
+    ): CompiledSwaggerSchemaData {
         return SwaggerSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
     }
 
@@ -200,9 +200,9 @@ object SwaggerSteps {
      * Provide a function that is called for each type and swagger schema.
      * Can be used to manually manipulate the generated swagger schema.
      */
-    fun Bundle<SwaggerSchema>.customizeTypes(
+    fun IntermediateSwaggerSchemaData.customizeTypes(
         action: (typeData: TypeData, typeSchema: Schema<*>) -> Unit
-    ): Bundle<SwaggerSchema> {
+    ): IntermediateSwaggerSchemaData {
         return SwaggerSchemaCustomizeStep().customizeTypes(this, action)
     }
 
@@ -210,9 +210,9 @@ object SwaggerSteps {
     /**
      * Provide a function that is called for each property. Can be used to manually manipulate the generated swagger schema.
      */
-    fun Bundle<SwaggerSchema>.customizeProperties(
+    fun IntermediateSwaggerSchemaData.customizeProperties(
         action: (propertyData: MemberData, propertySchema: Schema<*>) -> Unit
-    ): Bundle<SwaggerSchema> {
+    ): IntermediateSwaggerSchemaData {
         return SwaggerSchemaCustomizeStep().customizeProperties(this, action)
     }
 

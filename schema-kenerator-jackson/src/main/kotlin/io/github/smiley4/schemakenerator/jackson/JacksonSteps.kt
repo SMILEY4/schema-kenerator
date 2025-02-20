@@ -7,10 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.InputType
-import io.github.smiley4.schemakenerator.core.data.KTypeInput
-import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import kotlin.reflect.KType
 
 object JacksonSteps {
@@ -22,25 +20,10 @@ object JacksonSteps {
      * @param typeProcessing processor used to get annotation data from [KType]
      * @param maxRecursionDepth how many "levels" to search for subtypes
      */
-    fun KType.collectJacksonSubTypes(
-        typeProcessing: (type: KType) -> Bundle<TypeData>,
+    fun InitialKTypeData.collectJacksonSubTypes(
+        typeProcessing: (type: InitialKTypeData) -> TypeDataGroup,
         maxRecursionDepth: Int = 10
-    ): Bundle<InputType> {
-        return KTypeInput(this).collectJacksonSubTypes(typeProcessing, maxRecursionDepth)
-    }
-
-
-    /**
-     * Finds and adds additional subtypes from jackson [JsonSubTypes]-annotation.
-     * An additional step to add missing subtype-supertype relations later may be required.
-     * Add this step before any type analysis.
-     * @param typeProcessing processor used to get annotation data from [KType]
-     * @param maxRecursionDepth how many "levels" to search for subtypes
-     */
-    fun InputType.collectJacksonSubTypes(
-        typeProcessing: (type: KType) -> Bundle<TypeData>,
-        maxRecursionDepth: Int = 10
-    ): Bundle<InputType> {
+    ): InitialKTypeData {
         return JacksonSubTypeStep(
             typeProcessing = typeProcessing,
             maxRecursionDepth = maxRecursionDepth
@@ -57,7 +40,7 @@ object JacksonSteps {
      *  Renames annotated members and modifies their nullability according to the specified values.
      *  Add this step after type analysis and before schema generation.
      */
-    fun Bundle<TypeData>.handleJacksonAnnotations(): Bundle<TypeData> {
+    fun TypeDataGroup.handleJacksonAnnotations(): TypeDataGroup {
         return this
             .let { JacksonIgnoreStep().process(this) }
             .let { JacksonIgnoreTypeStep().process(this) }
@@ -71,7 +54,7 @@ object JacksonSteps {
      * annotated with a marker annotation called [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME].
      * Add this step after type analysis and before schema generation.
      */
-    fun Bundle<TypeData>.addJacksonTypeInfoDiscriminatorProperty(): Bundle<TypeData> {
+    fun TypeDataGroup.addJacksonTypeInfoDiscriminatorProperty(): TypeDataGroup {
         return JacksonJsonTypeInfoDiscriminatorStep().process(this)
     }
 
