@@ -5,18 +5,18 @@ package io.github.smiley4.schemakenerator.examples
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.CoreSteps.addDiscriminatorProperty
+import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.find
-import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
-import io.github.smiley4.schemakenerator.jackson.collectJacksonSubTypes
-import io.github.smiley4.schemakenerator.reflection.collectSubTypes
+import io.github.smiley4.schemakenerator.jackson.JacksonSteps.addJacksonTypeInfoDiscriminatorProperty
+import io.github.smiley4.schemakenerator.jackson.JacksonSteps.collectJacksonSubTypes
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.reflection.data.SubType
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -99,7 +99,11 @@ class E02_Extracting_Data_From_Types : FreeSpec({
 
                 // Subtypes of sealed classes and interfaces are detected and extracted automatically, regardless of whether reflection or kotlinx-serialization is used.
 
-                println(extractedReflection.data.descriptiveName.short + ": " + extractedReflection.data.subtypes.map { extractedReflection.find(it)!!.descriptiveName.short })  // -> "SealedParent: [ChildOne, ChildTwo]"
+                println(extractedReflection.data.descriptiveName.short + ": " + extractedReflection.data.subtypes.map {
+                    extractedReflection.find(
+                        it
+                    )!!.descriptiveName.short
+                })  // -> "SealedParent: [ChildOne, ChildTwo]"
                 println(extractedKotlinx.data.descriptiveName.short + ": " + extractedKotlinx.data.subtypes.map { extractedKotlinx.find(it)!!.descriptiveName.short })        // -> "SealedParent: [ChildOne, ChildTwo]"
 
                 // The detected subtypes are added to Bundle#supporting and are referenced by the parent-type via their ids
@@ -156,7 +160,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
                     // The "connectSubTypes()"-step finds and fills in these missing connections, i.e. adds "ChildOne" and "ChildTwo" to the subtypes of "ParentManual".
                     .addMissingSupertypeSubtypeRelations()
 
-                println(extracted.data.descriptiveName.short+ ": " + extracted.data.subtypes.map { extracted.find(it)!!.descriptiveName.short }) // -> "ParentCore: [ChildOne, ChildTwo]"
+                println(extracted.data.descriptiveName.short + ": " + extracted.data.subtypes.map { extracted.find(it)!!.descriptiveName.short }) // -> "ParentCore: [ChildOne, ChildTwo]"
                 extracted.supporting.forEach { supporting -> println(supporting.supertypes.map { extracted.find(it)!!.descriptiveName.short }) } // -> "[ParentCore]", "[ParentCore]"
             }
 
@@ -290,10 +294,13 @@ class E02_Extracting_Data_From_Types : FreeSpec({
             val number: Int?
         )
 
+
         @Serializable
         sealed class SealedParent {
             @Serializable
             class ChildOne : SealedParent()
+
+
             @Serializable
             class ChildTwo : SealedParent()
         }
@@ -327,6 +334,8 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         sealed class ParentDiscriminatorKotlinx {
             @Serializable
             class ChildOne : ParentDiscriminatorKotlinx()
+
+
             @Serializable
             class ChildTwo : ParentDiscriminatorKotlinx()
         }

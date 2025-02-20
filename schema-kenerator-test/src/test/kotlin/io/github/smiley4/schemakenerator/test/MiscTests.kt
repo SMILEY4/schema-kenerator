@@ -3,36 +3,36 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.smiley4.schemakenerator.core.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.flattenToMap
-import io.github.smiley4.schemakenerator.core.renameMembers
-import io.github.smiley4.schemakenerator.jackson.handleJacksonAnnotations
-import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.customizeProperties
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
+import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.customizeProperties
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.reflection.collectSubTypes
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.renameMembers
-import io.github.smiley4.schemakenerator.swagger.RequiredHandling
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.renameMembers
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.swagger.mergePropertyAttributesIntoType
-import io.github.smiley4.schemakenerator.swagger.withTitle
-import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.ValidationSwaggerSteps.handleJavaxValidationAnnotations
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
@@ -113,7 +113,7 @@ class MiscTests : FreeSpec({
             val result = typeOf<TestClassIssue16>()
                 .analyzeTypeUsingReflection()
                 .generateJsonSchema {
-                    optionalHandling = OptionalHandling.NON_REQUIRED
+                    optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
                 }
                 .compileInlining()
 
@@ -141,7 +141,7 @@ class MiscTests : FreeSpec({
             val result = typeOf<TestClassIssue16>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateJsonSchema {
-                    optionalHandling = OptionalHandling.NON_REQUIRED
+                    optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
                 }
                 .compileInlining()
 
@@ -964,7 +964,7 @@ class MiscTests : FreeSpec({
             val result = typeOf<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
                 .generateSwaggerSchema {
-                    nullables = RequiredHandling.REQUIRED
+                    nullables = SwaggerSteps.RequiredHandling.REQUIRED
                 }
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining(explicitNullTypes = true)
@@ -1011,7 +1011,7 @@ class MiscTests : FreeSpec({
         "without explicit null types, nullables as required" {
             val result = typeOf<ClassWithNullableFields>()
                 .analyzeTypeUsingKotlinxSerialization {}
-                .generateSwaggerSchema { nullables = RequiredHandling.REQUIRED }
+                .generateSwaggerSchema { nullables = SwaggerSteps.RequiredHandling.REQUIRED }
                 .withTitle(TitleType.SIMPLE)
                 .compileInlining(explicitNullTypes = false)
             result.swagger.shouldEqualJson {

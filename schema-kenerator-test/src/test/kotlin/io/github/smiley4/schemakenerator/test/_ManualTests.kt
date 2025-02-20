@@ -6,12 +6,12 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer

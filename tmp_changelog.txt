@@ -12,7 +12,7 @@ TODO
 
 - https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069
 
-- improve discoverability of extension functions
+- improve discoverability of step extension functions
 
 - "concepts" wiki page: explain data structures and general uses
     - typedata
@@ -27,3 +27,5 @@ TODO
         * root vs supporting
     - compiled schemas
     - ...
+
+- "modules" wiki page: link to root api reference AND steps api reference

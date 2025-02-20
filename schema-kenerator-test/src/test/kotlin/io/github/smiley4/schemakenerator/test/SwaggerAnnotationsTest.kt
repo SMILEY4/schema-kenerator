@@ -2,12 +2,12 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
-import io.github.smiley4.schemakenerator.validation.swagger.handleJakartaValidationAnnotations
-import io.github.smiley4.schemakenerator.validation.swagger.handleJavaxValidationAnnotations
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.ValidationSwaggerSteps.handleJakartaValidationAnnotations
+import io.github.smiley4.schemakenerator.validation.swagger.ValidationSwaggerSteps.handleJavaxValidationAnnotations
 import io.kotest.assertions.json.ArrayOrder
 import io.kotest.assertions.json.FieldComparison
 import io.kotest.assertions.json.NumberFormat

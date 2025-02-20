@@ -8,17 +8,18 @@ import io.github.smiley4.schemakenerator.core.annotations.Deprecated
 import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Example
 import io.github.smiley4.schemakenerator.core.annotations.Title
-import io.github.smiley4.schemakenerator.jackson.jsonschema.handleJacksonJsonSchemaAnnotations
-import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.compileReferencing
-import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jackson.jsonschema.JacksonJsonSchemaSteps.handleJacksonJsonSchemaAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.OptionalHandling
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.kotest.core.spec.style.FreeSpec
 import kotlin.reflect.typeOf
 
