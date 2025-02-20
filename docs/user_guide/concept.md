@@ -75,3 +75,6 @@ allow for easier modification of the schema during generation, for example addin
     [:octicons-arrow-right-24: Generating Swagger Schema](generating_swagger_schema.md)
 
     [:octicons-arrow-right-24: Customization Options](customization.md)
+
+
+![Steps Overview with Input Classes](../assets/img.png)

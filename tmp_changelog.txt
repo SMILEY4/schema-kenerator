@@ -6,8 +6,14 @@ CHANGELOG
     - generic bundles replaced with specific classes "InitialTypeData", "TypeDataGroup", "IntermediateXYSchemaData", "CompiledXYSchemaData"
     - start of pipeline changed from extension functions on raw kotlin types (e.g. typeOf<T>, T::class, etc.) to initial<T>, initial(T::clas), etc.
 
+- config option `strictDiscriminatorProperty` for swagger schema generation
+    - restricts present discriminator properties to the name of the type
+
+
+
 
 TODO
+
 - specify redirect behaviour ?
     - matching
         - MATCH_NULLABILITY // whether the nullability of the "from" has to match exactly
@@ -16,9 +22,12 @@ TODO
         - KEEP_ORIGINAL_NULLABILITY // whether the nullability of the "from" type should be kept with the replaced type
         - REPLACE_NULLABILITY // whether the nullability is also overwritten
 
-- https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069
+    redirect()
+        .from<FROM>(MATCH_NULLABILITY)
+        .to<TO>(REPLACE_NULLABILITY)
 
-- improve discoverability of step extension functions
+
+- https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069
 
 - "concepts" wiki page: explain data structures and general uses
     - typedata

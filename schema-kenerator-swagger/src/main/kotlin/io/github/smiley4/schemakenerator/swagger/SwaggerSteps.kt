@@ -269,6 +269,12 @@ object SwaggerSteps {
          */
         var mapsWithStructuredKeysAsArrays: Boolean = false
 
+
+        /**
+         * Whether the values of discriminator properties should be restricted to the full name of the types.
+         */
+        var strictDiscriminatorProperty: Boolean = false
+
         var customModules = mutableListOf<SwaggerSchemaGenerationModule>()
 
         internal fun buildCustomModules(): List<SwaggerSchemaGenerationModule> {
@@ -278,6 +284,7 @@ object SwaggerSteps {
                     optionalAsNonRequired = optionals == RequiredHandling.NON_REQUIRED,
                     allowSpecialFloatingPointValues = allowSpecialFloatingPointValues,
                     mapsWithStructuredKeysAsArrays = mapsWithStructuredKeysAsArrays,
+                    strictDiscriminatorProperty = strictDiscriminatorProperty,
                 )
             ) + customModules
             return allModules.reversed()

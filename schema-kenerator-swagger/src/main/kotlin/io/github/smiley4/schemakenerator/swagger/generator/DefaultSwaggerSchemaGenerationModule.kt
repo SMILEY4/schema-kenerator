@@ -9,7 +9,6 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.find
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaUtils
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
 
@@ -185,6 +184,7 @@ class DefaultSwaggerSchemaGenerationModule(
                 }
                 if (strictDiscriminatorProperty) {
                     if (member.annotations.any { annotation -> annotation.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }) {
+                        @Suppress("UNCHECKED_CAST")
                         (it as Schema<Any>).enum = listOf(context.typeData.descriptiveName.full)
                     }
                 }
