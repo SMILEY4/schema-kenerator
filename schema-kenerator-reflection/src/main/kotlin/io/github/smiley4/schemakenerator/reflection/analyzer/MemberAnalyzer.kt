@@ -168,7 +168,7 @@ class MemberAnalyzer {
         return MemberData(
             name = member.name,
             type = type.id,
-            nullable = member.returnType.isMarkedNullable || type.nullable,
+            nullable = type.nullable,
             optional = isOptional,
             annotations = annotationAnalyzer(member, context).toMutableList(),
             kind = MemberKind.PROPERTY,

@@ -10,6 +10,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.core.data.matches
 import io.github.smiley4.schemakenerator.serialization.data.InitialSerialDescriptorTypeData
+import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.capturedKClass
@@ -25,7 +26,7 @@ internal class SerializationTypeAnalyzerImpl(
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
-    private val typeRedirects: Map<String, SerialDescriptor> = emptyMap(),
+    private val typeRedirects: List<TypeRedirect>,
     /**
      * List of modules for type analysis. First matching module is used to analyze a given type.
      */
@@ -96,11 +97,18 @@ internal class SerializationTypeAnalyzerImpl(
         val reservedTypeId = TypeId.create()
         processedDescriptors[descriptor.nonNullOriginal] = TypeData.createPlaceholder(reservedTypeId)
 
-        // check type redirects
-        if (typeRedirects.containsKey(descriptor.redirectKey(nullable))) {
-            val redirectTo = typeRedirects[descriptor.redirectKey(nullable)]!!
-            return analyze(redirectTo, knownTypeData).also {
-                processedDescriptors[descriptor] = it.typeData
+        // check type redirects todo bug: overwritten by early processedDescriptors that ignore nullability
+        val matchingRedirect = typeRedirects.findLast { it.matches(descriptor, nullable) }
+        if(matchingRedirect != null) {
+            val (targetDescriptor, targetType) = matchingRedirect.buildTargetType(descriptor, nullable)
+            return if(targetDescriptor != null) {
+                analyze(targetDescriptor, knownTypeData).also {
+                    processedDescriptors[descriptor] = it.typeData
+                }
+            } else {
+                analyze(targetType!!, knownTypeData).also {
+                    processedDescriptors[descriptor] = it.typeData
+                }
             }
         }
 

@@ -63,7 +63,10 @@ class MiscTests : FreeSpec({
         "reflection" {
             val result = initial<TestClassIssue14a>()
                 .analyzeTypeUsingReflection {
-                    redirect<Optional<String?>, String?>()
+                    redirect {
+                        from<Optional<String?>>()
+                        to<String?>()
+                    }
                 }
                 .generateJsonSchema()
                 .compileInlining()
@@ -86,7 +89,10 @@ class MiscTests : FreeSpec({
         "kotlinx-serialization" {
             val result = initial<TestClassIssue14b>()
                 .analyzeTypeUsingKotlinxSerialization {
-                    redirect<Int, String?>()
+                    redirect {
+                        from<Int>()
+                        to<String?>()
+                    }
                 }
                 .generateJsonSchema()
                 .compileInlining()

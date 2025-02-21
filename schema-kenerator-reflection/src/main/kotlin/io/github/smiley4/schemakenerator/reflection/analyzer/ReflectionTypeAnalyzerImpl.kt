@@ -7,6 +7,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import io.github.smiley4.schemakenerator.core.data.matches
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -15,7 +16,7 @@ internal class ReflectionTypeAnalyzerImpl(
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
-    private val typeRedirects: Map<KType, KType> = DEFAULT_REDIRECTS,
+    private val typeRedirects: List<TypeRedirect>,
     /**
      * List of modules for type analysis. First matching module is used to analyze a given type.
      */
@@ -64,9 +65,9 @@ internal class ReflectionTypeAnalyzerImpl(
      * @param knownTypeData the already known type data. Adds new results to this collection.
      */
     private fun analyze(type: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
-        return if (typeRedirects.containsKey(type)) {
-            analyze(typeRedirects[type]!!, knownTypeData)
-        } else if (type.classifier is KClass<*>) {
+//        return if (typeRedirects.containsKey(type)) {
+//            analyze(typeRedirects[type]!!, knownTypeData)
+        return if (type.classifier is KClass<*>) {
             analyzeClass(type, type.classifier as KClass<*>, emptyList(), knownTypeData)
         } else {
             throw IllegalArgumentException("Type is not a class: '${type.classifier}'.")
@@ -100,8 +101,9 @@ internal class ReflectionTypeAnalyzerImpl(
     ): WrappedTypeData {
 
         // check type redirects
-        if (typeRedirects.containsKey(type)) {
-            return analyze(typeRedirects[type]!!, knownTypeData)
+        val matchingRedirect = typeRedirects.findLast { it.matches(type) }
+        if(matchingRedirect != null) {
+            return analyze(matchingRedirect.buildTargetType(type), knownTypeData)
         }
 
         // find matching analyzer module for type

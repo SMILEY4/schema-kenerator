@@ -10,8 +10,8 @@ import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTyp
 import io.github.smiley4.schemakenerator.serialization.analyzer.SerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.analyzer.SimpleSerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.analyzer.fullName
-import io.github.smiley4.schemakenerator.serialization.analyzer.getSerializerFor
 import io.github.smiley4.schemakenerator.serialization.data.InitialSerialDescriptorTypeData
+import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -32,6 +32,7 @@ object SerializationSteps {
     fun initial(type: SerialDescriptor) = InitialSerialDescriptorTypeData(
         type = type,
     )
+
 
     /**
      * Handles the [JsonClassDiscriminator]-annotations and adds a discriminator property with the defined name and
@@ -171,48 +172,110 @@ object SerializationSteps {
         }
 
 
-        var typeRedirects = mutableMapOf<String, SerialDescriptor>()
+        /**
+         * list of configured type redirects.
+         */
+        var typeRedirects = mutableListOf<TypeRedirect>()
 
 
         /**
-         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-         * The nullability of the types/fields must match.
+         * Redirect from a given type to another given type, i.e. if the specified type is encountered, replace it with the provided type.
          */
-        fun redirect(from: String, to: SerialDescriptor) {
-            typeRedirects[from] = to
+        fun redirect(config: RedirectConfig.() -> Unit) {
+            typeRedirects.add(RedirectConfig().apply(config).build())
         }
 
+        class RedirectConfig {
 
-        /**
-         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-         * The nullability of the types/fields must match.
-         */
-        fun redirect(from: String, to: KType) {
-            typeRedirects[from] = getSerializerFor(to)?.descriptor
-                ?: throw IllegalArgumentException("Could not get serial descriptor for type ${to::class.qualifiedName}")
-        }
+            private var fromType: String? = null
+            private var fromTypeNullable: Boolean = false
+            private var fromNullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE
+            private var toType: Pair<SerialDescriptor?, KType?>? = null
+            private var toNullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP
 
 
-        /**
-         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-         * The nullability of the types/fields must match.
-         */
-        fun redirect(from: KType, to: KType) {
-            val clazz = from.classifier!! as KClass<*>
-            val idFrom = (clazz.qualifiedName ?: clazz.java.name).let {
-                it + if (from.isMarkedNullable) "?" else ""
+            /**
+             * Specify the original type to replace.
+             * @param T the type to replace
+             * @param nullability specify the behavior how to handle the nullability of the original type
+             */
+            inline fun <reified T> from(nullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE) {
+                from(typeOf<T>(), nullability)
             }
-            typeRedirects[idFrom] = getSerializerFor(to)?.descriptor
-                ?: throw IllegalArgumentException("Could not get serial descriptor for type ${to::class.qualifiedName}")
-        }
 
 
-        /**
-         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-         * The nullability of the types/fields must match.
-         */
-        inline fun <reified FROM, reified TO> redirect() {
-            redirect(typeOf<FROM>(), typeOf<TO>())
+            /**
+             * Specify the original type to replace.
+             * @param type the type to replace
+             * @param nullability specify the behavior how to handle the nullability of the original type
+             */
+            fun from(type: KType, nullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE) {
+                val clazz = type.classifier!! as KClass<*>
+                val name = clazz.qualifiedName ?: clazz.java.name
+                from(name, type.isMarkedNullable, nullability)
+            }
+
+
+            /**
+             * Specify the original type to replace.
+             * @param type the qualified name of the type or serial descriptor to replace
+             * @param nullable whether the [type] is nullable
+             * @param nullability specify the behavior how to handle the nullability of the original type
+             */
+            fun from(
+                type: String,
+                nullable: Boolean = false,
+                nullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE
+            ) {
+                fromType = type
+                fromTypeNullable = nullable
+                fromNullability = nullability
+            }
+
+            /**
+             * Specify the target type.
+             * @param T the type to replace with
+             * @param nullability specify the behavior how to handle the nullability of the target type
+             */
+            inline fun <reified T> to(nullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP) {
+                to(typeOf<T>(), nullability)
+            }
+
+            /**
+             * Specify the target type.
+             * @param type the type to replace with
+             * @param nullability specify the behavior how to handle the nullability of the target type
+             */
+            fun to(type: KType, nullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP) {
+                toType = null to type
+                toNullability = nullability
+            }
+
+
+            /**
+             * Specify the target type.
+             * @param type the type to replace with
+             * @param nullability specify the behavior how to handle the nullability of the target type
+             */
+            fun to(type: SerialDescriptor, nullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP) {
+                toType = type to null
+                toNullability = nullability
+            }
+
+
+            /**
+             * Creates the final [TypeRedirect] from this config.
+             */
+            internal fun build(): TypeRedirect {
+                return TypeRedirect(
+                    fromType = fromType ?: throw IllegalArgumentException("Redirect configuration is missing 'from' type."),
+                    fromTypeNullable = fromTypeNullable,
+                    toType = toType ?: throw IllegalArgumentException("Redirect configuration is missing 'from' type."),
+                    fromNullability = fromNullability,
+                    toNullability = toNullability
+                )
+            }
+
         }
 
     }

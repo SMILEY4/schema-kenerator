@@ -10,6 +10,7 @@ import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeMatch
 import io.github.smiley4.schemakenerator.reflection.analyzer.SimpleTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.Companion.DEFAULT_PRIMITIVE_TYPES
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import io.github.smiley4.schemakenerator.reflection.data.SubType
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -149,31 +150,79 @@ object ReflectionSteps {
         /**
          * list of configured type redirects.
          */
-        var typeRedirects = mutableMapOf<KType, KType>().also { it.putAll(ReflectionTypeAnalyzerImpl.DEFAULT_REDIRECTS) }
-
-
-        /**
-         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
-         */
-        fun redirect(from: KType, to: KType) {
-            typeRedirects[from] = to
-        }
-
+        var typeRedirects = mutableListOf<TypeRedirect>() // todo: add defaults
 
         /**
-         * Redirect from the given type to the other given type, i.e. when the "from" type is processed, the "to" type is used instead.
+         * Redirect from a given type to another given type, i.e. if the specified type is encountered, replace it with the provided type.
          */
-        inline fun <reified FROM, reified TO> redirect() {
-            redirect(typeOf<FROM>(), typeOf<TO>())
+        fun redirect(config: RedirectConfig.() -> Unit) {
+            typeRedirects.add(RedirectConfig().apply(config).build())
         }
 
+        class RedirectConfig {
 
-        /**
-         * Redirect from the given types to the other given types, i.e. when a type is processed, the associated type is used instead.
-         */
-        fun redirect(redirects: Map<KType, KType>) {
-            typeRedirects.putAll(redirects)
+            private var fromType: KType? = null
+            private var fromNullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE
+            private var toType: KType? = null
+            private var toNullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP
+
+
+            /**
+             * Specify the original type to replace.
+             * @param nullability specify the behavior how to handle the nullability of the original type
+             * @param T the type to replace
+             */
+            inline fun <reified T> from(nullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE) {
+                from(typeOf<T>(), nullability)
+            }
+
+
+            /**
+             * Specify the original type to replace.
+             * @param type the type to replace
+             * @param nullability specify the behavior how to handle the nullability of the original type
+             */
+            fun from(type: KType, nullability: TypeRedirect.FromNullability = TypeRedirect.FromNullability.IGNORE) {
+                fromType = type
+                fromNullability = nullability
+            }
+
+
+            /**
+             * Specify the target type.
+             * @param nullability specify the behavior how to handle the nullability of the target type
+             * @param T the type to replace with
+             */
+            inline fun <reified T> to(nullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP) {
+                to(typeOf<T>(), nullability)
+            }
+
+
+            /**
+             * Specify the target type.
+             * @param type the type to replace with
+             * @param nullability specify the behavior how to handle the nullability of the target type
+             */
+            fun to(type: KType, nullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP) {
+                toType = type
+                toNullability = nullability
+            }
+
+
+            /**
+             * Creates the final [TypeRedirect] from this config.
+             */
+            internal fun build(): TypeRedirect {
+                return TypeRedirect(
+                    fromType = fromType ?: throw IllegalArgumentException("Redirect configuration is missing 'from' type."),
+                    toType = toType ?: throw IllegalArgumentException("Redirect configuration is missing 'from' type."),
+                    fromNullability = fromNullability,
+                    toNullability = toNullability
+                )
+            }
+
         }
+
     }
 
 }
