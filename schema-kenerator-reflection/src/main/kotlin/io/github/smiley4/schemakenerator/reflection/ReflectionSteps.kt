@@ -10,8 +10,8 @@ import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionTypeMatch
 import io.github.smiley4.schemakenerator.reflection.analyzer.SimpleTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.reflection.analyzer.TypeCategoryAnalyzer.Companion.DEFAULT_PRIMITIVE_TYPES
 import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
-import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import io.github.smiley4.schemakenerator.reflection.data.SubType
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -44,6 +44,88 @@ object ReflectionSteps {
     }
 
     class ReflectionTypeAnalysisConfig {
+
+        companion object {
+            /**
+             * List of default type redirects
+             */
+            @OptIn(ExperimentalUnsignedTypes::class)
+            val DEFAULT_TYPE_REDIRECTS = mapOf(
+                typeOf<BooleanArray>() to TypeRedirect(
+                    fromType = typeOf<BooleanArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Boolean>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<ByteArray>() to TypeRedirect(
+                    fromType = typeOf<ByteArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Byte>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<UByteArray>() to TypeRedirect(
+                    fromType = typeOf<UByteArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<UByte>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<ShortArray>() to TypeRedirect(
+                    fromType = typeOf<ShortArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Short>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<UShortArray>() to TypeRedirect(
+                    fromType = typeOf<UShortArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<UShort>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<CharArray>() to TypeRedirect(
+                    fromType = typeOf<CharArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Char>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<IntArray>() to TypeRedirect(
+                    fromType = typeOf<IntArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Int>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<UIntArray>() to TypeRedirect(
+                    fromType = typeOf<UIntArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<UInt>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<LongArray>() to TypeRedirect(
+                    fromType = typeOf<LongArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Long>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<ULongArray>() to TypeRedirect(
+                    fromType = typeOf<ULongArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<ULong>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<FloatArray>() to TypeRedirect(
+                    fromType = typeOf<FloatArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Float>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+                typeOf<DoubleArray>() to TypeRedirect(
+                    fromType = typeOf<DoubleArray>(),
+                    fromNullability = TypeRedirect.FromNullability.IGNORE,
+                    toType = typeOf<Array<Double>>(),
+                    toNullability = TypeRedirect.ToNullability.KEEP,
+                ),
+            )
+        }
+
 
         /**
          * Whether to include getters as members of classes (see [io.github.smiley4.schemakenerator.core.data.MemberKind.GETTER]).
@@ -150,7 +232,10 @@ object ReflectionSteps {
         /**
          * list of configured type redirects.
          */
-        var typeRedirects = mutableListOf<TypeRedirect>() // todo: add defaults
+        var typeRedirects = mutableListOf<TypeRedirect>().also {
+            DEFAULT_TYPE_REDIRECTS.forEach { (_, value) -> it.add(value) }
+        }
+
 
         /**
          * Redirect from a given type to another given type, i.e. if the specified type is encountered, replace it with the provided type.

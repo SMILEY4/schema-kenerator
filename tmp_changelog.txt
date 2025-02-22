@@ -9,6 +9,15 @@ CHANGELOG
 - config option `strictDiscriminatorProperty` for swagger schema generation
     - restricts present discriminator properties to the name of the type
 
+- overhauled type redirection
+    - enhance configuration dsl
+    - more options to define exact behavior
+        - matching
+            - MATCH_NULLABILITY // whether the nullability of the "from" has to match exactly
+            - IGNORE_NULLABILITY // nullability of the "from" type is ignored when matching redirects
+        - replacing
+            - KEEP_ORIGINAL_NULLABILITY // whether the nullability of the "from" type should be kept with the replaced type
+            - REPLACE_NULLABILITY // whether the nullability is also overwritten
 
 
 
@@ -22,9 +31,6 @@ TODO
         - KEEP_ORIGINAL_NULLABILITY // whether the nullability of the "from" type should be kept with the replaced type
         - REPLACE_NULLABILITY // whether the nullability is also overwritten
 
-    redirect()
-        .from<FROM>(MATCH_NULLABILITY)
-        .to<TO>(REPLACE_NULLABILITY)
 
 
 - https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069

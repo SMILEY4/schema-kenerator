@@ -11,12 +11,26 @@ class TypeRedirect(
 ) {
 
     enum class FromNullability {
+        /**
+         * The nullability of a potential type to replace must match the specified type.
+         */
         MATCH,
+
+
+        /**
+         * The nullability of a potential type to replace is ignored when matching.
+         */
         IGNORE
     }
 
     enum class ToNullability {
+        /**
+         * The nullability of the original replaced type is kept, i.e. only the type is replaced, not the nullability
+         */
         KEEP,
+        /**
+         * The nullability of the original replaced type is overwritten, i.e. the type and nullability is replaced
+         */
         REPLACE
     }
 

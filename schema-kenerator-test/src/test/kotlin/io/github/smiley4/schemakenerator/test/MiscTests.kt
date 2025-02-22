@@ -22,6 +22,7 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.renameMembers
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
@@ -65,7 +66,7 @@ class MiscTests : FreeSpec({
                 .analyzeTypeUsingReflection {
                     redirect {
                         from<Optional<String?>>()
-                        to<String?>()
+                        to<String?>(TypeRedirect.ToNullability.REPLACE)
                     }
                 }
                 .generateJsonSchema()
@@ -91,7 +92,7 @@ class MiscTests : FreeSpec({
                 .analyzeTypeUsingKotlinxSerialization {
                     redirect {
                         from<Int>()
-                        to<String?>()
+                        to<String?>(io.github.smiley4.schemakenerator.serialization.data.TypeRedirect.ToNullability.REPLACE)
                     }
                 }
                 .generateJsonSchema()
