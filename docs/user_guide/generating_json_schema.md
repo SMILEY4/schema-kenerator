@@ -144,7 +144,7 @@ class NestedClass(
 
 ??? info "Configuration Options"
 
-    [:octicons-arrow-right-24: API Reference for `generateJsonSchema`](../dokka/schema-kenerator-jsonschema/schema-kenerator-jsonschema/io.github.smiley4.schemakenerator.jsonschema/generate-json-schema.html)
+    [:octicons-arrow-right-24: API Reference for `generateJsonSchema`](../dokka/schema-kenerator-jsonschema/schema-kenerator-jsonschema/io.github.smiley4.schemakenerator.jsonschema/-json-schema-steps/-json-schema-generation-step-config/index.html)
 
 ??? info "Required Dependencies"
 

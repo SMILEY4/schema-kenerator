@@ -30,7 +30,7 @@ initial<ExampleClass>().analyseTypeUsingReflection {
 
 ??? info "Configuration Options"
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-reflection/schema-kenerator-reflection/io.github.smiley4.schemakenerator.reflection/-reflection-type-analysis-config/index.html)
+    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-reflection/schema-kenerator-reflection/io.github.smiley4.schemakenerator.reflection/-reflection-steps/-reflection-type-analysis-config/index.html)
 
 ??? info "Required Dependencies"
 

@@ -46,7 +46,7 @@ initial<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
 
 ??? info "Configuration Options"
 
-    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-serialization/schema-kenerator-serialization/io.github.smiley4.schemakenerator.serialization/-kotlinx-serialization-type-processing-config/index.html)
+    [:octicons-arrow-right-24: API Reference](../dokka/schema-kenerator-serialization/schema-kenerator-serialization/io.github.smiley4.schemakenerator.serialization/-serialization-steps/-kotlinx-serialization-type-processing-config/index.html)
 
 ??? info "Required Dependencies"
 

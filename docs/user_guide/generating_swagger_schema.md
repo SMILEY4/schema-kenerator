@@ -138,7 +138,7 @@ class NestedClass(
 
 ??? info "Configuration Options"
 
-    [:octicons-arrow-right-24: API Reference for `generateSwaggerSchema`](../dokka/schema-kenerator-swagger/schema-kenerator-swagger/io.github.smiley4.schemakenerator.swagger/-swagger-schema-generation-step-config/index.html)
+    [:octicons-arrow-right-24: API Reference for `generateSwaggerSchema`](../dokka/schema-kenerator-swagger/schema-kenerator-swagger/io.github.smiley4.schemakenerator.swagger/-swagger-steps/-swagger-schema-generation-step-config/index.html)
 
 ??? info "Required Dependencies"
 
