@@ -21,6 +21,17 @@ jobs:
                     distribution: 'temurin'
                     cache: 'gradle'
 
+            -   name: Cache Python
+                uses: actions/cache@v4
+                env:
+                    cache-name: "cache-python"
+                with:
+                    path: '.gradle/python'
+                    key: 'python'
+
+            -   name: Setup Python
+                run: ./gradlew pipInstall
+
             -   name: Dokka
                 run: ./gradlew dokkaHtml
 
