@@ -43,7 +43,9 @@ object JsonSchemaSteps {
      * Adds an automatically determined title to schemas.
      * @param builder the function building the title for the given type
      */
-    fun IntermediateJsonSchemaData.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): IntermediateJsonSchemaData {
+    fun IntermediateJsonSchemaData.withTitle(
+        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+    ): IntermediateJsonSchemaData {
         return JsonSchemaTitleStep(builder).process(this)
     }
 
@@ -100,7 +102,9 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
-    fun IntermediateJsonSchemaData.compileReferencing(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): CompiledJsonSchemaData {
+    fun IntermediateJsonSchemaData.compileReferencing(
+        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+    ): CompiledJsonSchemaData {
         return JsonSchemaCompileReferenceStep(builder).compile(this)
     }
 
@@ -141,7 +145,9 @@ object JsonSchemaSteps {
     /**
      * Provide a function that is called for each property. Can be used to manually manipulate the generated json schema.
      */
-    fun IntermediateJsonSchemaData.customizeProperties(action: (memberData: MemberData, propertySchema: JsonNode) -> Unit): IntermediateJsonSchemaData {
+    fun IntermediateJsonSchemaData.customizeProperties(
+        action: (memberData: MemberData, propertySchema: JsonNode) -> Unit
+    ): IntermediateJsonSchemaData {
         return JsonSchemaCustomizeStep().customizeProperties(this, action)
     }
 

@@ -45,7 +45,9 @@ object SwaggerSteps {
      * Adds an automatically determined title to schemas.
      * @param builder the function building the title for the given type
      */
-    fun IntermediateSwaggerSchemaData.withTitle(builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String): IntermediateSwaggerSchemaData {
+    fun IntermediateSwaggerSchemaData.withTitle(
+        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+    ): IntermediateSwaggerSchemaData {
         return SwaggerSchemaTitleStep(builder).process(this)
     }
 

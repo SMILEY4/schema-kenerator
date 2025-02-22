@@ -13,7 +13,7 @@ Type analysis is the first step to generating a schema. The step looks at all in
 class ExampleClass(
     val text: String,
     val number: Int?
-)
+)../
 ```
 
 With the `analyseTypeUsingReflection()`-step, information about a given input type is extracted and resulting
