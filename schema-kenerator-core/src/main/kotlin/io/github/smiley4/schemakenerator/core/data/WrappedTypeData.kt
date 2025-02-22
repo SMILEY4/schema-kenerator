@@ -12,4 +12,14 @@ data class WrappedTypeData(
      * Whether the type can be null
      */
     var nullable: Boolean,
-)
+) {
+
+    /**
+     * Convert this [WrappedTypeData] into a [WrappedTypeId].
+     */
+    fun toWrappedTypeId() = WrappedTypeId(
+        id = this.typeData.id,
+        nullable = this.nullable,
+    )
+
+}

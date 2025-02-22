@@ -8,12 +8,12 @@ import io.github.smiley4.schemakenerator.core.data.MapData
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.matches
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.core.data.matches
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -34,6 +34,7 @@ class DefaultSerializationTypeAnalyzerModule(
     private val annotationAnalyzer = AnnotationAnalyzer()
 
     override fun applies(descriptor: SerialDescriptor) = true
+
 
     @Suppress("CyclomaticComplexMethod")
     override fun analyze(context: SerializationTypeAnalyzerModule.Context): WrappedTypeData {

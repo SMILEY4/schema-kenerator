@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.core.data.matches
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.matches
 import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import kotlin.reflect.KClass
 import kotlin.reflect.KType

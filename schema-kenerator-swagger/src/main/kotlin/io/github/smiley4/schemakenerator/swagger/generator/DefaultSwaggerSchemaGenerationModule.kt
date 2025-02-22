@@ -6,8 +6,8 @@ import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.find
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.find
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
@@ -92,42 +92,42 @@ class DefaultSwaggerSchemaGenerationModule(
 
     private fun buildEnumSchema(typeData: TypeData): Schema<*> {
         return schema.enumSchema(
-                values = typeData.enumData?.constants ?: emptyList()
-            )
+            values = typeData.enumData?.constants ?: emptyList()
+        )
     }
 
     private fun buildCollectionSchema(typeData: TypeData): Schema<*> {
         return schema.arraySchema(
-                items = schema.referenceSchema(typeData.collectionData!!.itemType.type),
-                uniqueItems = typeData.collectionData!!.unique
+            items = schema.referenceSchema(typeData.collectionData!!.itemType.type),
+            uniqueItems = typeData.collectionData!!.unique
         )
     }
 
     private fun buildMapSchema(typeData: TypeData, knownTypeData: List<TypeData>): Schema<*> {
-        if(mapsWithStructuredKeysAsArrays) {
+        if (mapsWithStructuredKeysAsArrays) {
             val keyType = knownTypeData.find(typeData.mapData!!.keyType.type)!!
-            if(keyType.members.isNotEmpty()) {
+            if (keyType.members.isNotEmpty()) {
                 return schema.arraySchema(
-                        items = Schema<Any>().also { itemSchema ->
-                            itemSchema.anyOf = listOf(
-                                schema.referenceSchema(typeData.mapData!!.keyType.type),
-                                schema.referenceSchema(typeData.mapData!!.valueType.type),
-                            )
-                        },
-                        uniqueItems = false
+                    items = Schema<Any>().also { itemSchema ->
+                        itemSchema.anyOf = listOf(
+                            schema.referenceSchema(typeData.mapData!!.keyType.type),
+                            schema.referenceSchema(typeData.mapData!!.valueType.type),
+                        )
+                    },
+                    uniqueItems = false
                 )
             }
         }
         return schema.mapObjectSchema(
-                valueSchema = schema.referenceSchema(typeData.mapData!!.valueType.type)
+            valueSchema = schema.referenceSchema(typeData.mapData!!.valueType.type)
         )
     }
 
     private fun buildWithSubtypes(typeData: TypeData, typeDataList: Collection<TypeData>): Schema<*> {
         return schema.subtypesSchema(
-                subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
-                discriminator = getDiscriminatorName(typeData),
-                discriminatorMapping = discriminatorMapping(typeData, typeDataList)
+            subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
+            discriminator = getDiscriminatorName(typeData),
+            discriminatorMapping = discriminatorMapping(typeData, typeDataList)
         )
     }
 

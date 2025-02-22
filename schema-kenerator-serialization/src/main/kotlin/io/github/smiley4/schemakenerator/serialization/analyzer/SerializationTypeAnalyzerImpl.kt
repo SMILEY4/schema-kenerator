@@ -6,15 +6,14 @@ import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.matches
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.core.data.matches
 import io.github.smiley4.schemakenerator.serialization.data.InitialSerialDescriptorTypeData
 import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.capturedKClass
-import kotlinx.serialization.descriptors.nonNullOriginal
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KType
 
@@ -78,9 +77,9 @@ internal class SerializationTypeAnalyzerImpl(
 
         // check type redirects
         val matchingRedirect = typeRedirects.findLast { it.matches(descriptor) }
-        if(matchingRedirect != null) {
+        if (matchingRedirect != null) {
             val (targetDescriptor, targetType) = matchingRedirect.buildTargetType(descriptor)
-            return if(targetDescriptor != null) {
+            return if (targetDescriptor != null) {
                 analyze(targetDescriptor, knownTypeData)
             } else {
                 analyze(targetType!!, knownTypeData)
@@ -137,6 +136,7 @@ internal class SerializationTypeAnalyzerImpl(
             cache[descriptor] = result.typeData
         }
     }
+
 
     /**
      * @return the type data with the given id or null
