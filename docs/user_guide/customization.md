@@ -21,13 +21,17 @@ type, it will be replaced with the other provided type and this one will be anal
         ```kotlin
         initial<ExampleClass>()
             .analyzeTypeUsingReflection {
-                redirect<LocalDateTime, String>() //(1)!
+                redirect {
+                    from<LocalDateTime>(TypeRedirect.FromNullability.IGNORE) //(1)!
+                    to<String>(TypeRedirect.ToNullability.KEEP) //(2)!
+                }
             }
             .generateJsonSchema()
             .compileInlining()
         ```
         
-        1. Redirect the type `LocalDateTime` to `String`. Everytime the type `LocalDateTime` is encountered, it will be replaced with `String`. 
+        1. Replace the type `LocalDateTime` while ignoring nullability, i.e. replace every instance of `LocalDateTime` and `LocalDateTime?`.
+        2. Replace `LocalDateTime` with type `String` while keeping the nullability of the original property / type.
         
         ```json
         {
@@ -53,13 +57,17 @@ type, it will be replaced with the other provided type and this one will be anal
         ```kotlin
         initial<ExampleClass>()
             .analyzeTypeUsingKotlinxSerialization {
-                redirect<LocalDateTime, String>() //(1)!
+                redirect {
+                    from<LocalDateTime>(TypeRedirect.FromNullability.IGNORE) //(1)!
+                    to<String>(TypeRedirect.ToNullability.KEEP)  //(2)!
+                }
             }
             .generateJsonSchema()
             .compileInlining()
         ```
         
-        1. Redirect the type `LocalDateTime` to `String`. Everytime the type `LocalDateTime` is encountered, it will be replaced with `String`. 
+        1. Replace the type `LocalDateTime` while ignoring nullability, i.e. replace every instance of `LocalDateTime` and `LocalDateTime?`.
+        2. Replace `LocalDateTime` with type `String` while keeping the nullability of the original property / type.
         
         ```json
         {
@@ -74,6 +82,20 @@ type, it will be replaced with the other provided type and this one will be anal
            }
         }
         ```
+
+**Handling nullability while matching types to replace** 
+
+Whether the nullability of a type should be considered while matching types to replace can be defined using `TypeRedirect.FromNullability`.
+
+- `TypeRedirect.FromNullability.IGNORE` - Ignore nullability of types when matching, e.g. when redirecting from type `Int`, all instances of `Int` and `Int?` get replaced by the specified new type.
+- `TypeRedirect.FromNullability.MATCH` - Match nullability exactly, e.g. when redirecting from type `Int?`, only instances of `Int?` get replaced and those of type `Int` stay untouched.
+
+**Handling nullability when replacing**
+
+Whether the type after replacing should keep the original nullability or if it should be replaced as well can be specified using `TypeRedirect.ToNullability`.
+
+- `TypeRedirect.ToNullability.KEEP` - keep the original nullability of the member, e.g. when redirecting from `LocalDateTime` to `String`, a nullable field of `LocalDateTime?` will stay nullable and become `String?`. 
+- `TypeRedirect.ToNullability.REPLACE` - replace the original nullability of the member with the nullability of the specified "to" type, e.g. when redirecting from `OptionalInt` to `Int?`, all non-nullable fields `OptionalInt` will become nullable `Int?`.
 
 
 ## Custom Type Analyzer
