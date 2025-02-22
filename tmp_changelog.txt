@@ -39,4 +39,6 @@ TODO
     - compiled schemas
     - ...
 
+- wiki update type redirection & "initial" step
+
 - "schema generation" wiki pages: explain + short examples for compileInlining vs referencing vs referencing root
