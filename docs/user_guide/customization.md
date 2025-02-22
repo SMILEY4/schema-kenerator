@@ -19,7 +19,7 @@ type, it will be replaced with the other provided type and this one will be anal
         )
         ```
         ```kotlin
-        typeOf<ExampleClass>()
+        initial<ExampleClass>()
             .analyzeTypeUsingReflection {
                 redirect<LocalDateTime, String>() //(1)!
             }
@@ -51,7 +51,7 @@ type, it will be replaced with the other provided type and this one will be anal
         )
         ```
         ```kotlin
-        typeOf<ExampleClass>()
+        initial<ExampleClass>()
             .analyzeTypeUsingKotlinxSerialization {
                 redirect<LocalDateTime, String>() //(1)!
             }
@@ -97,7 +97,7 @@ This can be used to overwrite the output of specific types with custom informati
         )
         ```
         ```kotlin
-        typeOf<ExampleClass>()
+        initial<ExampleClass>()
             .analyzeTypeUsingReflection {
                 custom<LocalDataTime> { //(1)!
                     TypeData(
@@ -155,7 +155,7 @@ This can be used to overwrite the output of specific types with custom informati
         )
         ```
         ```kotlin
-        typeOf<ExampleClass>()
+        initial<ExampleClass>()
             .analyzeTypeUsingKotlinxSerialization {
                 custom<LocalDataTime> { //(1)!
                     TypeData(
@@ -213,7 +213,7 @@ Schema-Kenerator provides utility steps to more easily modify schemas after they
 ???+ example "Customizing Generated JSON Schemas and Properties"
 
     ```kotlin
-    typeOf<ExampleClass>()
+    initial<ExampleClass>()
         .analyzeTypeUsingReflection()
         .generateJsonSchema()
         .customizeTypes { typeData, typeSchema -> //(1)!

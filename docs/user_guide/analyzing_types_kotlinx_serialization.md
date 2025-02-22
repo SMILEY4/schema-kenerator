@@ -24,7 +24,7 @@ for further steps.
 The step can be configured to specify which information should be included in the output and in what format.
 
 ```kotlin
-typeOf<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
+initial<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
     //...
 }
 ```
@@ -37,7 +37,7 @@ typeOf<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
 
 
     ```kotlin
-    typeOf<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
+    initial<ExampleClass>().analyzeTypeUsingKotlinxSerialization {
         markNotParameterized<SimpleClass>()
         markNotParameterized(typeOf<SimpleClass>())
         markNotParameterized("example.types.MySimpleClass")
@@ -83,7 +83,7 @@ sealed class SealedParent { //(1)!
 1. Sealed class `SealedParent` with two subtypes `ChildOne` and `ChildTwo`.
 
 ```kotlin
-typeOf<SealedParent>().analyzeTypeUsingKotlinxSerialization()
+initial<SealedParent>().analyzeTypeUsingKotlinxSerialization()
 ```
 
 ??? info "Required Dependencies"
@@ -126,7 +126,7 @@ sealed class SealedParent { //(1)!
 1. Class `SealedParent` with two subtypes `ChildOne` and `ChildTwo` to differentiate between.
 
 ```kotlin
-typeOf<SealedParent>()
+initial<SealedParent>()
     .analyzeTypeUsingKotlinxSerialization()
     .addDiscriminatorProperty("_type") //(1)!
 ```

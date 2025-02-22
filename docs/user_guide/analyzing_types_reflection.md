@@ -23,7 +23,7 @@ for further steps.
 The step can be configured to specify which information should be included in the output and in what format.
 
 ```kotlin
-typeOf<ExampleClass>().analyseTypeUsingReflection {
+initial<ExampleClass>().analyseTypeUsingReflection {
     //...
 }
 ```
@@ -69,7 +69,7 @@ sealed class SealedParent { //(1)!
 1. Sealed class `SealedParent` with two subtypes `ChildOne` and `ChildTwo`.
 
 ```kotlin
-typeOf<SealedParent>().analyseTypeUsingReflection()
+initial<SealedParent>().analyseTypeUsingReflection()
 ```
 
 ??? info "Required Dependencies"
@@ -107,15 +107,12 @@ open class ParentManual { //(1)!
 1. Class `ParentManual` with two subtypes `ChildOne` and `ChildTwo`.
 
 ```kotlin
-val inputTypes = Bundle(
-    data = typeOf<ParentManual>(), //(1)!
-    supporting = listOf(
+initial<ParentManual>( //(1)!
+    listOf(
         typeOf<ParentManual.ChildOne>(), //(2)!
         typeOf<ParentManual.ChildTwo>()
     )
 )
-
-inputTypes
     .analyseTypeUsingReflection() //(3)!
     .addMissingSupertypeSubtypeRelations() //(4)!
 ```
@@ -177,7 +174,7 @@ open class ParentCore { //(2)!
 
 
 ```kotlin
-typeOf<ParentCore>()
+initial<ParentCore>()
     .collectSubTypes() //(1)!
     .analyseTypeUsingReflection()
     .addMissingSupertypeSubtypeRelations() //(2)!
@@ -240,7 +237,7 @@ open class ParentJackson { //(2)!
 
 
 ```kotlin
-typeOf<ParentJackson>()
+initial<ParentJackson>()
     .collectJacksonSubTypes({ //(1)!
         it.analyseTypeUsingReflection() //(2)!
     })
@@ -305,7 +302,7 @@ sealed class SealedParent { //(1)!
 1. Class `SealedParent` with two subtypes `ChildOne` and `ChildTwo` to differentiate between.
 
 ```kotlin
-typeOf<SealedParent>()
+initial<SealedParent>()
     .analyseTypeUsingReflection()
     .addDiscriminatorProperty("_type") //(1)!
 ```
@@ -372,7 +369,7 @@ sealed class ParentDiscriminatorJackson { //(3)!
 3. Class `ParentDiscriminatorJackson` with two subtypes `ChildOne` and `ChildTwo` to differentiate between.
 
 ```kotlin
-typeOf<ParentDiscriminatorJackson>()
+initial<ParentDiscriminatorJackson>()
     .analyseTypeUsingReflection()
     .addJacksonTypeInfoDiscriminatorProperty() //(1)!
 ```

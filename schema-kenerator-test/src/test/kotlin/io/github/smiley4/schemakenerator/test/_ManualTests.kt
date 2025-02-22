@@ -51,14 +51,14 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        @SubType(MySubClass::class)
+        @SubType(MyExampleSubClass::class)
         open class MyExampleClass(
             val someText: String,
             val someNullableInt: Int?,
             val someBoolList: List<Boolean>,
         )
 
-        class MySubClass() : MyExampleClass("", null, listOf())
+        class MyExampleSubClass() : MyExampleClass("", null, listOf())
 
 
         @Serializable
