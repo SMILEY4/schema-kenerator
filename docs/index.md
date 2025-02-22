@@ -44,7 +44,7 @@ class MyExampleClass(
 )
 ```
 ```kotlin
-val jsonSchema = typeOf<String>()
+val jsonSchema = initial<String>()
     .analyseTypeUsingReflection() //(1)!
     .generateJsonSchema() //(2)!
     .withTitle(TitleType.SIMPLE) //(3)!

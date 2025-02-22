@@ -7,12 +7,13 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.reflection.data.SubType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -32,6 +33,11 @@ import java.util.UUID
 class _ManualTests : StringSpec({
 
     "test" {
+
+        initial<MyExampleClass>()
+            .collectSubTypes()
+            //...
+
         val jsonSchema = initial<MyExampleClass>()
             .analyzeTypeUsingReflection()
             .generateJsonSchema()
@@ -45,11 +51,15 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        class MyExampleClass(
+        @SubType(MyExampleSubClass::class)
+        open class MyExampleClass(
             val someText: String,
             val someNullableInt: Int?,
             val someBoolList: List<Boolean>,
         )
+
+        class MyExampleSubClass() : MyExampleClass("", null, listOf())
+
 
         @Serializable
         class MyData(
