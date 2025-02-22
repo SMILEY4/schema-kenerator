@@ -28,7 +28,7 @@ class NestedClass(
         .compileInlining()
         .swagger
     ```
-    Resulting Schema:
+    Resulting Root Schema:
     ```json
     {
       "type" : "object",
@@ -66,7 +66,7 @@ class NestedClass(
         .compileReferencing()
         .swagger
     ```
-    Resulting Schema:
+    Resulting Root Schema:
     ```json
     {
       "type" : "object",
@@ -110,7 +110,7 @@ class NestedClass(
         .compileReferencingRoot()
         .json
     ```
-    Resulting Schema:
+    Resulting Root Schema:
     ```json
     {
        "$ref": "#/components/schemas/examples.ExampleClass

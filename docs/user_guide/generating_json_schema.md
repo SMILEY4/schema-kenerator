@@ -28,7 +28,7 @@ class NestedClass(
         .compileInlining()
         .json
     ```
-    Resulting JSON Schema:
+    Resulting Root JSON Schema:
     ```json
     {
        "type": "object",
@@ -67,7 +67,7 @@ class NestedClass(
         .compileReferencing()
         .json
     ```
-    Resulting JSON Schema:
+    Resulting Root JSON Schema:
     ```json
     {
        "type": "object",
@@ -112,7 +112,7 @@ class NestedClass(
         .compileReferencingRoot()
         .json
     ```
-    Resulting JSON Schema:
+    Resulting Root JSON Schema:
     ```json
     {
        "$ref": "#/definitions/examples.ExampleClass
