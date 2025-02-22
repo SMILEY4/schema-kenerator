@@ -1,0 +1,8 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:io.github.smiley4.schemakenerator.validation.swagger////PointingToDeclaration/schema-kenerator-validation-swagger/io.github.smiley4.schemakenerator.validation.swagger/index.html
+$dokka.location:io.github.smiley4.schemakenerator.validation.swagger/ValidationSwaggerSteps///PointingToDeclaration/schema-kenerator-validation-swagger/io.github.smiley4.schemakenerator.validation.swagger/-validation-swagger-steps/index.html
+$dokka.location:io.github.smiley4.schemakenerator.validation.swagger/ValidationSwaggerSteps/handleJakartaValidationAnnotations/io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData#/PointingToDeclaration/schema-kenerator-validation-swagger/io.github.smiley4.schemakenerator.validation.swagger/-validation-swagger-steps/handle-jakarta-validation-annotations.html
+$dokka.location:io.github.smiley4.schemakenerator.validation.swagger/ValidationSwaggerSteps/handleJavaxValidationAnnotations/io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData#/PointingToDeclaration/schema-kenerator-validation-swagger/io.github.smiley4.schemakenerator.validation.swagger/-validation-swagger-steps/handle-javax-validation-annotations.html
+io.github.smiley4.schemakenerator.validation.swagger
+
