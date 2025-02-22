@@ -12,14 +12,14 @@ interface SerializationTypeAnalyzerModule {
         val id: TypeId,
         val descriptor: SerialDescriptor,
         val knownTypeData: MutableList<TypeData>,
-        val processedDescriptors: MutableMap<SerialDescriptor, TypeData>
+        val cache: TypeDataCache
     ) {
 
         fun analyze(descriptor: SerialDescriptor): WrappedTypeData {
             return this.analyzer.analyze(
                 descriptor = descriptor,
                 knownTypeData = knownTypeData,
-                processedDescriptors = processedDescriptors,
+                cache = cache,
             )
         }
 

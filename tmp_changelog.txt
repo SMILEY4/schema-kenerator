@@ -23,16 +23,6 @@ CHANGELOG
 
 TODO
 
-- specify redirect behaviour ?
-    - matching
-        - MATCH_NULLABILITY // whether the nullability of the "from" has to match exactly
-        - IGNORE_NULLABILITY // nullability of the "from" type is ignored when matching redirects
-    - replacing
-        - KEEP_ORIGINAL_NULLABILITY // whether the nullability of the "from" type should be kept with the replaced type
-        - REPLACE_NULLABILITY // whether the nullability is also overwritten
-
-
-
 - https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069
 
 - "concepts" wiki page: explain data structures and general uses
