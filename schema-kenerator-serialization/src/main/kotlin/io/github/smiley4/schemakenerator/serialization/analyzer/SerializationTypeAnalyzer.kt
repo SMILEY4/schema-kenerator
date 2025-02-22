@@ -11,7 +11,6 @@ interface SerializationTypeAnalyzer {
 
     fun analyze(
         descriptor: SerialDescriptor,
-        nullable: Boolean,
         knownTypeData: MutableList<TypeData>,
         processedDescriptors: MutableMap<SerialDescriptor, TypeData>
     ): WrappedTypeData

@@ -65,7 +65,7 @@ class DefaultSerializationTypeAnalyzerModule(
         }.let {
             WrappedTypeData(
                 typeData = it,
-                nullable = context.nullable || context.descriptor.isNullable
+                nullable = context.descriptor.isNullable
             )
         }
     }

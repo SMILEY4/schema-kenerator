@@ -59,7 +59,7 @@ internal class SerializationTypeAnalyzerImpl(
 
     private fun analyze(input: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
         return getSerializerFor(input)
-            ?.let { serializer -> analyze(serializer.descriptor, input.isMarkedNullable, knownTypeData, mutableMapOf()) }
+            ?.let { serializer -> analyze(serializer.descriptor, knownTypeData, mutableMapOf()) }
             ?: WrappedTypeData(
                 typeData = knownTypeData.find(TypeId.createWildcard()) ?: TypeData.createWildcard().also { knownTypeData.add(it) },
                 nullable = false
@@ -67,7 +67,7 @@ internal class SerializationTypeAnalyzerImpl(
     }
 
     private fun analyze(input: SerialDescriptor, knownTypeData: MutableList<TypeData>): WrappedTypeData {
-        return analyze(input, input.isNullable, knownTypeData, mutableMapOf())
+        return analyze(input, knownTypeData, mutableMapOf())
     }
 
     /**
@@ -79,7 +79,6 @@ internal class SerializationTypeAnalyzerImpl(
      */
     override fun analyze(
         descriptor: SerialDescriptor,
-        nullable: Boolean,
         knownTypeData: MutableList<TypeData>,
         processedDescriptors: MutableMap<SerialDescriptor, TypeData>
     ): WrappedTypeData {
@@ -98,9 +97,9 @@ internal class SerializationTypeAnalyzerImpl(
         processedDescriptors[descriptor.nonNullOriginal] = TypeData.createPlaceholder(reservedTypeId)
 
         // check type redirects todo bug: overwritten by early processedDescriptors that ignore nullability
-        val matchingRedirect = typeRedirects.findLast { it.matches(descriptor, nullable) }
+        val matchingRedirect = typeRedirects.findLast { it.matches(descriptor) }
         if(matchingRedirect != null) {
-            val (targetDescriptor, targetType) = matchingRedirect.buildTargetType(descriptor, nullable)
+            val (targetDescriptor, targetType) = matchingRedirect.buildTargetType(descriptor)
             return if(targetDescriptor != null) {
                 analyze(targetDescriptor, knownTypeData).also {
                     processedDescriptors[descriptor] = it.typeData
@@ -115,7 +114,7 @@ internal class SerializationTypeAnalyzerImpl(
         // check contextual descriptors
         val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
         if (contextualByKClass != null) {
-            return analyze(contextualByKClass, nullable, knownTypeData, processedDescriptors)
+            return analyze(contextualByKClass, knownTypeData, processedDescriptors)
         }
 
         // find matching analyzer module for type
@@ -128,7 +127,6 @@ internal class SerializationTypeAnalyzerImpl(
                 analyzer = this,
                 id = reservedTypeId,
                 descriptor = descriptor,
-                nullable = nullable,
                 knownTypeData = knownTypeData,
                 processedDescriptors = processedDescriptors
             )

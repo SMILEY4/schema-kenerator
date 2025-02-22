@@ -26,18 +26,18 @@ class TypeRedirect(
         REPLACE
     }
 
-    fun matches(original: SerialDescriptor, originalNullable: Boolean): Boolean {
+    fun matches(original: SerialDescriptor): Boolean {
         val typeMatches = original.nonNullOriginal.serialName == fromType
-        val nullabilityMatches = (original.isNullable || originalNullable) == fromTypeNullable
+        val nullabilityMatches = original.isNullable == fromTypeNullable
         return when(fromNullability) {
             FromNullability.MATCH -> typeMatches && nullabilityMatches
             FromNullability.IGNORE -> typeMatches
         }
     }
 
-    fun buildTargetType(original: SerialDescriptor, originalNullable: Boolean): Pair<SerialDescriptor?, KType?> {
+    fun buildTargetType(original: SerialDescriptor): Pair<SerialDescriptor?, KType?> {
         return when(toNullability) {
-            ToNullability.KEEP -> if(original.isNullable || originalNullable) {
+            ToNullability.KEEP -> if(original.isNullable) {
                 return toType.first.let { it?.nullable } to toType.second.let { it?.withNullability(true) }
             } else {
                 return toType.first.let { it?.nonNullOriginal } to toType.second.let { it?.withNullability(false) }
