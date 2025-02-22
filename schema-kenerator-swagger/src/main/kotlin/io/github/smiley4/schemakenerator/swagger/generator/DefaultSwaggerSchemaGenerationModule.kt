@@ -6,9 +6,8 @@ import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.find
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.find
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaUtils
 import io.swagger.v3.oas.models.media.Schema
 import java.math.BigDecimal
@@ -18,13 +17,14 @@ class DefaultSwaggerSchemaGenerationModule(
     private val nullableAsNonRequired: Boolean,
     private val allowSpecialFloatingPointValues: Boolean,
     private val mapsWithStructuredKeysAsArrays: Boolean,
+    private val strictDiscriminatorProperty: Boolean,
 ) : SwaggerSchemaGenerationModule {
 
     private val schema = SwaggerSchemaUtils()
 
     override fun applies(typeData: TypeData) = true
 
-    override fun generate(context: SwaggerSchemaGenerationModule.Context): SwaggerSchema {
+    override fun generate(context: SwaggerSchemaGenerationModule.Context): Schema<*> {
         if (context.typeData.subtypes.isNotEmpty()) {
             return buildWithSubtypes(context.typeData, context.knownTypeData)
         }
@@ -38,11 +38,11 @@ class DefaultSwaggerSchemaGenerationModule(
         }
     }
 
-    private fun buildAnySchema(): SwaggerSchema {
-        return SwaggerSchema(schema.anyObjectSchema(), TypeData.createWildcard())
+    private fun buildAnySchema(): Schema<*> {
+        return schema.anyObjectSchema()
     }
 
-    private fun buildPrimitiveSchema(typeData: TypeData): SwaggerSchema? {
+    private fun buildPrimitiveSchema(typeData: TypeData): Schema<*>? {
         return when (typeData.identifyingName.full) {
             Number::class.qualifiedName -> schema.numberSchema(false)
             Byte::class.qualifiedName -> schema.numericSchema(
@@ -87,67 +87,47 @@ class DefaultSwaggerSchemaGenerationModule(
             Any::class.qualifiedName -> schema.anyObjectSchema()
             Unit::class.qualifiedName -> schema.nullSchema()
             else -> null
-        }?.let {
-            SwaggerSchema(
-                swagger = it,
-                typeData = typeData
-            )
         }
     }
 
-    private fun buildEnumSchema(typeData: TypeData): SwaggerSchema {
-        return SwaggerSchema(
-            swagger = schema.enumSchema(
-                values = typeData.enumData?.constants ?: emptyList()
-            ),
-            typeData = typeData
+    private fun buildEnumSchema(typeData: TypeData): Schema<*> {
+        return schema.enumSchema(
+            values = typeData.enumData?.constants ?: emptyList()
         )
     }
 
-    private fun buildCollectionSchema(typeData: TypeData): SwaggerSchema {
-        return SwaggerSchema(
-            swagger = schema.arraySchema(
-                items = schema.referenceSchema(typeData.collectionData!!.itemType.type),
-                uniqueItems = typeData.collectionData!!.unique
-            ),
-            typeData = typeData
+    private fun buildCollectionSchema(typeData: TypeData): Schema<*> {
+        return schema.arraySchema(
+            items = schema.referenceSchema(typeData.collectionData!!.itemType.type),
+            uniqueItems = typeData.collectionData!!.unique
         )
     }
 
-    private fun buildMapSchema(typeData: TypeData, knownTypeData: List<TypeData>): SwaggerSchema {
-        if(mapsWithStructuredKeysAsArrays) {
+    private fun buildMapSchema(typeData: TypeData, knownTypeData: List<TypeData>): Schema<*> {
+        if (mapsWithStructuredKeysAsArrays) {
             val keyType = knownTypeData.find(typeData.mapData!!.keyType.type)!!
-            if(keyType.members.isNotEmpty()) {
-                return SwaggerSchema(
-                    swagger = schema.arraySchema(
-                        items = Schema<Any>().also { itemSchema ->
-                            itemSchema.anyOf = listOf(
-                                schema.referenceSchema(typeData.mapData!!.keyType.type),
-                                schema.referenceSchema(typeData.mapData!!.valueType.type),
-                            )
-                        },
-                        uniqueItems = false
-                    ),
-                    typeData = typeData
+            if (keyType.members.isNotEmpty()) {
+                return schema.arraySchema(
+                    items = Schema<Any>().also { itemSchema ->
+                        itemSchema.anyOf = listOf(
+                            schema.referenceSchema(typeData.mapData!!.keyType.type),
+                            schema.referenceSchema(typeData.mapData!!.valueType.type),
+                        )
+                    },
+                    uniqueItems = false
                 )
             }
         }
-        return SwaggerSchema(
-            swagger = schema.mapObjectSchema(
-                valueSchema = schema.referenceSchema(typeData.mapData!!.valueType.type)
-            ),
-            typeData = typeData
+        return schema.mapObjectSchema(
+            valueSchema = schema.referenceSchema(typeData.mapData!!.valueType.type)
         )
     }
 
-    private fun buildWithSubtypes(typeData: TypeData, typeDataList: Collection<TypeData>): SwaggerSchema {
-        return SwaggerSchema(
-            swagger = schema.subtypesSchema(
-                subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
-                discriminator = getDiscriminatorName(typeData),
-                discriminatorMapping = discriminatorMapping(typeData, typeDataList)
-            ),
-            typeData = typeData
+    private fun buildWithSubtypes(typeData: TypeData, typeDataList: Collection<TypeData>): Schema<*> {
+        return schema.subtypesSchema(
+            subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
+            discriminator = getDiscriminatorName(typeData),
+            discriminatorMapping = discriminatorMapping(typeData, typeDataList)
         )
     }
 
@@ -188,7 +168,7 @@ class DefaultSwaggerSchemaGenerationModule(
     }
 
 
-    private fun buildObjectSchema(context: SwaggerSchemaGenerationModule.Context): SwaggerSchema {
+    private fun buildObjectSchema(context: SwaggerSchemaGenerationModule.Context): Schema<*> {
         if (context.typeData.isInlineValue) {
             return buildInlineObjectSchema(context)
         }
@@ -202,6 +182,12 @@ class DefaultSwaggerSchemaGenerationModule(
                 if (member.nullable) {
                     it.nullable = member.nullable
                 }
+                if (strictDiscriminatorProperty) {
+                    if (member.annotations.any { annotation -> annotation.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }) {
+                        @Suppress("UNCHECKED_CAST")
+                        (it as Schema<Any>).enum = listOf(context.typeData.descriptiveName.full)
+                    }
+                }
             }
             val nullable = member.nullable && nullableAsNonRequired
             val optional = member.optional && optionalAsNonRequired
@@ -210,21 +196,14 @@ class DefaultSwaggerSchemaGenerationModule(
             }
         }
 
-        return SwaggerSchema(
-            swagger = schema.objectSchema(propertySchemas, requiredProperties),
-            typeData = context.typeData
-        )
+        return schema.objectSchema(propertySchemas, requiredProperties)
     }
 
-    private fun buildInlineObjectSchema(context: SwaggerSchemaGenerationModule.Context): SwaggerSchema {
+    private fun buildInlineObjectSchema(context: SwaggerSchemaGenerationModule.Context): Schema<*> {
         val inlineType = context.typeData.members.first { it.kind == MemberKind.PROPERTY }
         val inlineTypeData = context.knownTypeData.find { it.id == inlineType.type }
             ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
-        val inlineTypeSchema = context.generate(inlineTypeData)
-        return SwaggerSchema(
-            swagger = inlineTypeSchema.swagger,
-            typeData = context.typeData
-        )
+        return context.generate(inlineTypeData)
     }
 
     private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {

@@ -1,33 +1,31 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.resolveReferences
+import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.resolveReferences
 
 internal class JsonSchemaCompileInlineStep {
 
     /**
      * Inline all referenced schema
      */
-    fun compile(bundle: Bundle<JsonSchema>): CompiledJsonSchema {
-        val schemaList = bundle.flatten()
-        val root = resolveReferences(bundle.data.json) { refObj ->
-            val referencedSchema = schemaList.find(TypeId((refObj.properties["\$ref"] as JsonTextValue).value))
+    fun compile(input: IntermediateJsonSchemaData): CompiledJsonSchemaData {
+        val root = resolveReferences(input.rootSchema) { refObj ->
+            val referencedSchema = input[TypeId((refObj.properties["\$ref"] as JsonTextValue).value)]
             if (referencedSchema == null) {
                 refObj
             } else {
                 createInlining(refObj, referencedSchema)
             }
         }
-        return CompiledJsonSchema(
+        return CompiledJsonSchemaData(
+            typeData = input.rootTypeData,
             json = root,
-            typeData = bundle.data.typeData,
             definitions = emptyMap()
         )
     }
@@ -38,7 +36,7 @@ internal class JsonSchemaCompileInlineStep {
      * @param refObj the schema containing the reference
      * @param schema the schema referenced by [refObj]
      */
-    private fun createInlining(refObj: JsonObject, schema: JsonSchema): JsonNode {
+    private fun createInlining(refObj: JsonObject, schema: JsonSchemaData): JsonNode {
         return schema.json.copyNode().also {
             if (it is JsonObject) {
                 it.properties.putAll(buildMap {
@@ -48,11 +46,5 @@ internal class JsonSchemaCompileInlineStep {
             }
         }
     }
-
-
-    /**
-     * @return the [JsonSchema] for the given [TypeId]
-     */
-    private fun Collection<JsonSchema>.find(id: TypeId): JsonSchema? = this.find { it.typeData.id == id }
 
 }

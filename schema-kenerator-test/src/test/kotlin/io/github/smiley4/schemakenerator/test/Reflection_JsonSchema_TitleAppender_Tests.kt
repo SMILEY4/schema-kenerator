@@ -1,14 +1,16 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.core.handleNameAnnotation
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWIthDifferentGenerics
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
 import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
@@ -29,7 +31,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
@@ -53,7 +55,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()
@@ -77,7 +79,7 @@ class Reflection_JsonSchema_TitleAppender_Tests : FunSpec({
 
             val additionalIds = mutableListOf<String>()
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .handleNameAnnotation()
                 .generateJsonSchema()

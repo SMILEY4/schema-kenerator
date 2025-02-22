@@ -1,16 +1,17 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.swagger.RequiredHandling
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.compileReferencing
-import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencing
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.TitleBuilder
-import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
-import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithAnnotatedValueClass
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
@@ -37,7 +38,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -71,7 +72,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -105,7 +106,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingReflection()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -148,7 +149,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
-            val generatorConfig: SwaggerSchemaGenerationStepConfig.() -> Unit = {},
+            val generatorConfig: SwaggerSteps.SwaggerSchemaGenerationStepConfig.() -> Unit = {},
             val withAnnotations: Boolean = false,
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
@@ -1444,7 +1445,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as required",
                 generatorConfig = {
-                    optionals = RequiredHandling.REQUIRED
+                    optionals = SwaggerSteps.RequiredHandling.REQUIRED
                 },
                 expectedResultInlining = """
                     {
@@ -1529,7 +1530,7 @@ class ReflectionParser_SwaggerGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as non-required",
                 generatorConfig = {
-                    optionals = RequiredHandling.NON_REQUIRED
+                    optionals = SwaggerSteps.RequiredHandling.NON_REQUIRED
                 },
                 expectedResultInlining = """
                     {

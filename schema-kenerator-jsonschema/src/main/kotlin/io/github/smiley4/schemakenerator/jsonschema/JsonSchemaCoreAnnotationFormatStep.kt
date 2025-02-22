@@ -2,25 +2,22 @@ package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
+import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
 
 internal class JsonSchemaCoreAnnotationFormatStep {
 
-    fun process(bundle: Bundle<JsonSchema>): Bundle<JsonSchema> {
-        val typeDataMap = bundle.buildTypeDataMap()
-        return bundle.also { schema ->
-            process(schema.data, typeDataMap)
-            schema.supporting.forEach { process(it, typeDataMap) }
-        }
+    fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {
+        input.entries.forEach { process(it, input.typeDataById) }
+        return input
     }
 
-    private fun process(schema: JsonSchema, typeDataMap: Map<TypeId, TypeData>) {
+    private fun process(schema: JsonSchemaData, typeDataMap: Map<TypeId, TypeData>) {
         if (schema.json is JsonObject && schema.json.properties["format"] == null) {
             determineFormat(schema.typeData.annotations)?.also { format ->
                 schema.json.properties["format"] = JsonTextValue(format)

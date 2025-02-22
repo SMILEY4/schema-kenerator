@@ -6,7 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.Visibility
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeId
-import io.github.smiley4.schemakenerator.core.data.findOrThrow
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.findOrThrow
 import io.github.smiley4.schemakenerator.core.data.toWrappedTypeId
 import java.lang.reflect.Modifier
 import kotlin.reflect.KCallable
@@ -168,7 +168,7 @@ class MemberAnalyzer {
         return MemberData(
             name = member.name,
             type = type.id,
-            nullable = member.returnType.isMarkedNullable || type.nullable,
+            nullable = type.nullable,
             optional = isOptional,
             annotations = annotationAnalyzer(member, context).toMutableList(),
             kind = MemberKind.PROPERTY,

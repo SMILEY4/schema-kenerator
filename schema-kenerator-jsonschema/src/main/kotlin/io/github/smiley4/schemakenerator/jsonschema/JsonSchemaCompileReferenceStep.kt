@@ -1,17 +1,16 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.shouldReference
+import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 
 internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
@@ -21,7 +20,7 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
         /**
          * all known input json schemas
          */
-        val knownSchemas: List<JsonSchema>,
+        val knownSchemas: List<JsonSchemaData>,
         /**
          * all known input types
          */
@@ -40,9 +39,9 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
         val refPathMapping: MutableMap<TypeId, String>,
     ) {
         companion object {
-            fun from(bundle: Bundle<JsonSchema>) = Context(
-                bundle.flatten(),
-                bundle.buildTypeDataMap(),
+            fun from(data: IntermediateJsonSchemaData) = Context(
+                data.entries,
+                data.typeDataById,
                 mutableMapOf(),
                 mutableMapOf(),
                 mutableMapOf(),
@@ -53,13 +52,13 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
     /**
      * Put referenced schemas into definitions and reference them
      */
-    fun compile(bundle: Bundle<JsonSchema>): CompiledJsonSchema {
-        val context = Context.from(bundle)
-        val root = resolveReferences(bundle.data.json) { refObj ->
+    fun compile(input: IntermediateJsonSchemaData): CompiledJsonSchemaData {
+        val context = Context.from(input)
+        val root = resolveReferences(input.rootSchema) { refObj ->
             resolveReference(refObj, context)
         }
-        return CompiledJsonSchema(
-            typeData = bundle.data.typeData,
+        return CompiledJsonSchemaData(
+            typeData = input.rootTypeData,
             json = root,
             definitions = context.definitions
         )
@@ -72,15 +71,15 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
      * @param context the current compile context with data about input schemas and type data as well as current produced information
      */
     private fun resolveReference(refObj: JsonObject, context: Context): JsonNode {
-        val referencedSchema = context.knownSchemas.find(TypeId((refObj.properties["\$ref"] as JsonTextValue).value))
-        return if (referencedSchema == null) {
-            refObj
-        } else {
+        val referencedSchema = context.knownSchemas.find { it.typeData.id == TypeId((refObj.properties["\$ref"] as JsonTextValue).value) }
+        return if (referencedSchema != null) {
             if (shouldReference(referencedSchema.json)) {
                 createRefProperty(referencedSchema, context)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
+        } else {
+            refObj
         }
     }
 
@@ -90,7 +89,7 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
      * @param schema the referenced schema
      * @param context the current compile context with data about input schemas and type data as well as current produced information
      */
-    private fun createRefProperty(schema: JsonSchema, context: Context): JsonNode {
+    private fun createRefProperty(schema: JsonSchemaData, context: Context): JsonNode {
         val refPath = if(context.refPathMapping.containsKey(schema.typeData.id)) {
             context.refPathMapping[schema.typeData.id]!!
         } else {
@@ -113,7 +112,7 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
      * @param refObj the schema containing the reference
      * @param schema the schema referenced by [refObj]
      */
-    private fun createInlineProperty(refObj: JsonObject, schema: JsonSchema): JsonNode {
+    private fun createInlineProperty(refObj: JsonObject, schema: JsonSchemaData): JsonNode {
         return schema.json.copyNode().also {
             if (it is JsonObject) {
                 it.properties.putAll(buildMap {
@@ -129,11 +128,5 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
      * @return a placeholder json object
      */
     private fun placeholder() = obj { }
-
-
-    /**
-     * @return the [JsonSchema] for the given [TypeId]
-     */
-    private fun Collection<JsonSchema>.find(id: TypeId): JsonSchema? = this.find { it.typeData.id == id }
 
 }

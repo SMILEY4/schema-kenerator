@@ -1,0 +1,44 @@
+CHANGELOG
+
+- Type data helper functions to distinguish between "types" (enums, collections, maps, ...)
+
+- reworked/replaced bundles & overhauled step input data classes to make flow of data and order of step more clear
+    - generic bundles replaced with specific classes "InitialTypeData", "TypeDataGroup", "IntermediateXYSchemaData", "CompiledXYSchemaData"
+    - start of pipeline changed from extension functions on raw kotlin types (e.g. typeOf<T>, T::class, etc.) to initial<T>, initial(T::clas), etc.
+
+- config option `strictDiscriminatorProperty` for swagger schema generation
+    - restricts present discriminator properties to the name of the type
+
+- overhauled type redirection
+    - enhance configuration dsl
+    - more options to define exact behavior
+        - matching
+            - MATCH_NULLABILITY // whether the nullability of the "from" has to match exactly
+            - IGNORE_NULLABILITY // nullability of the "from" type is ignored when matching redirects
+        - replacing
+            - KEEP_ORIGINAL_NULLABILITY // whether the nullability of the "from" type should be kept with the replaced type
+            - REPLACE_NULLABILITY // whether the nullability is also overwritten
+
+
+
+TODO
+
+- https://github.com/SMILEY4/schema-kenerator/issues/45#issuecomment-2671154069
+
+- "concepts" wiki page: explain data structures and general uses
+    - typedata
+        * contains all extracted information about a single type / class in a generic and easy to with structure
+        * references other types by type id (members, subtypes)
+        * identifying vs descriptive name (find better names???)
+        * can have additional data specific to certain types (maps, lists, enums)
+            * map: key and value type
+            * list: item type
+            * enum: constants
+    - Bundles
+        * root vs supporting
+    - compiled schemas
+    - ...
+
+- "modules" wiki page: link to root api reference AND steps api reference
+
+- "schema generation" wiki pages: explain + short examples for compileInlining vs referencing vs referencing root

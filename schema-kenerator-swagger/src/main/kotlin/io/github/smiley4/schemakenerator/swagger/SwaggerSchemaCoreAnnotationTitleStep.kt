@@ -1,20 +1,18 @@
 package io.github.smiley4.schemakenerator.swagger
 
 import io.github.smiley4.schemakenerator.core.annotations.Title
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchemaData
 
 internal class SwaggerSchemaCoreAnnotationTitleStep {
 
-    fun process(bundle: Bundle<SwaggerSchema>): Bundle<SwaggerSchema> {
-        return bundle.also { schema ->
-            process(schema.data)
-            schema.supporting.forEach { process(it) }
-        }
+    fun process(input: IntermediateSwaggerSchemaData): IntermediateSwaggerSchemaData {
+        input.entries.forEach { process(it) }
+        return input
     }
 
-    private fun process(schema: SwaggerSchema) {
+    private fun process(schema: SwaggerSchemaData) {
         if (schema.swagger.title == null) {
             determineTitle(schema.typeData)?.also { title ->
                 schema.swagger.title = title

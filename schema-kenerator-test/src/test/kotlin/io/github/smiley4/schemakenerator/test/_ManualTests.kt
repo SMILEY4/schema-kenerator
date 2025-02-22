@@ -6,12 +6,14 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -23,7 +25,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.time.Instant
 import java.util.UUID
-import kotlin.reflect.typeOf
 
 /**
  * internal / manual tests only
@@ -31,7 +32,7 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test" {
-        val jsonSchema = typeOf<MyExampleClass>()
+        val jsonSchema = initial<MyExampleClass>()
             .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .withTitle(TitleType.SIMPLE)
@@ -71,7 +72,7 @@ class _ManualTests : StringSpec({
             val componentSchemas: Map<String, io.swagger.v3.oas.models.media.Schema<*>>
         )
 
-        fun CompiledSwaggerSchema.asPrintable(): SwaggerResult {
+        fun CompiledSwaggerSchemaData.asPrintable(): SwaggerResult {
             return SwaggerResult(
                 root = this.swagger,
                 componentSchemas = this.componentSchemas

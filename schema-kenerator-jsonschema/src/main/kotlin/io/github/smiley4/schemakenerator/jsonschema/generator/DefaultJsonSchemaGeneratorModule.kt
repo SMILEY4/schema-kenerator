@@ -4,7 +4,6 @@ import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaUtils
 
@@ -17,7 +16,7 @@ class DefaultJsonSchemaGeneratorModule(
 
     override fun applies(typeData: TypeData) = true
 
-    override fun generate(context: JsonSchemaGeneratorModule.Context): JsonSchema {
+    override fun generate(context: JsonSchemaGeneratorModule.Context): JsonNode {
         if (context.typeData.subtypes.isNotEmpty()) {
             return buildWithSubtypes(context.typeData)
         }
@@ -32,13 +31,13 @@ class DefaultJsonSchemaGeneratorModule(
     }
 
 
-    private fun buildAnySchema(): JsonSchema {
-        return JsonSchema(schemaUtils.anyObjectSchema(), TypeData.createWildcard())
+    private fun buildAnySchema(): JsonNode {
+        return schemaUtils.anyObjectSchema()
     }
 
 
     @Suppress("LongMethod")
-    private fun buildPrimitiveSchema(typeData: TypeData): JsonSchema? {
+    private fun buildPrimitiveSchema(typeData: TypeData): JsonNode? {
         return when (typeData.identifyingName.full) {
             Number::class.qualifiedName -> schemaUtils.numericSchema(
                 integer = false,
@@ -107,52 +106,35 @@ class DefaultJsonSchemaGeneratorModule(
             Any::class.qualifiedName -> schemaUtils.anyObjectSchema()
             Unit::class.qualifiedName -> schemaUtils.nullSchema()
             else -> null
-        }?.let {
-            JsonSchema(
-                json = it,
-                typeData = typeData
-            )
         }
     }
 
-    private fun buildEnumSchema(typeData: TypeData): JsonSchema {
-        return JsonSchema(
-            json = schemaUtils.enumSchema(
-                values = typeData.enumData?.constants ?: emptyList()
-            ),
-            typeData = typeData
+    private fun buildEnumSchema(typeData: TypeData): JsonNode {
+        return schemaUtils.enumSchema(
+            values = typeData.enumData?.constants ?: emptyList()
         )
     }
 
-    private fun buildCollectionSchema(typeData: TypeData): JsonSchema {
-        return JsonSchema(
-            json = schemaUtils.arraySchema(
-                items = schemaUtils.referenceSchema(typeData.collectionData!!.itemType.type),
-                uniqueItems = typeData.collectionData?.unique ?: false
-            ),
-            typeData = typeData
+    private fun buildCollectionSchema(typeData: TypeData): JsonNode {
+        return schemaUtils.arraySchema(
+            items = schemaUtils.referenceSchema(typeData.collectionData!!.itemType.type),
+            uniqueItems = typeData.collectionData?.unique ?: false
         )
     }
 
-    private fun buildMapSchema(typeData: TypeData): JsonSchema {
-        return JsonSchema(
-            json = schemaUtils.mapObjectSchema(
-                values = schemaUtils.referenceSchema(typeData.mapData!!.valueType.type)
-            ),
-            typeData = typeData
+    private fun buildMapSchema(typeData: TypeData): JsonNode {
+        return schemaUtils.mapObjectSchema(
+            values = schemaUtils.referenceSchema(typeData.mapData!!.valueType.type)
         )
     }
 
-    private fun buildWithSubtypes(typeData: TypeData): JsonSchema {
-        return JsonSchema(
-            json = schemaUtils.subtypesSchema(
-                subtypes = typeData.subtypes.map { schemaUtils.referenceSchema(it) }
-            ),
-            typeData = typeData
+    private fun buildWithSubtypes(typeData: TypeData): JsonNode {
+        return schemaUtils.subtypesSchema(
+            subtypes = typeData.subtypes.map { schemaUtils.referenceSchema(it) }
         )
     }
 
-    private fun buildObjectSchema(context: JsonSchemaGeneratorModule.Context): JsonSchema {
+    private fun buildObjectSchema(context: JsonSchemaGeneratorModule.Context): JsonNode {
         if (context.typeData.isInlineValue) {
             return buildInlineObjectSchema(context)
         }
@@ -169,21 +151,14 @@ class DefaultJsonSchemaGeneratorModule(
             }
         }
 
-        return JsonSchema(
-            json = schemaUtils.objectSchema(propertySchemas, requiredProperties),
-            typeData = context.typeData
-        )
+        return schemaUtils.objectSchema(propertySchemas, requiredProperties)
     }
 
-    private fun buildInlineObjectSchema(context: JsonSchemaGeneratorModule.Context): JsonSchema {
+    private fun buildInlineObjectSchema(context: JsonSchemaGeneratorModule.Context): JsonNode {
         val inlineType = context.typeData.members.first { it.kind == MemberKind.PROPERTY }
         val inlineTypeData = context.knownTypeData.find { it.id == inlineType.type }
             ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
-        val inlineTypeSchema = context.generate(inlineTypeData)
-        return JsonSchema(
-            json = inlineTypeSchema.json,
-            typeData = context.typeData
-        )
+        return context.generate(inlineTypeData)
     }
 
     private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {

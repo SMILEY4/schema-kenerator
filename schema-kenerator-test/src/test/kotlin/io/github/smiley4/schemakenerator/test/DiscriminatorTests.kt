@@ -2,15 +2,17 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.jackson.addJacksonTypeInfoDiscriminatorProperty
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.compileReferencing
+import io.github.smiley4.schemakenerator.core.CoreSteps.addDiscriminatorProperty
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.jackson.JacksonSteps.addJacksonTypeInfoDiscriminatorProperty
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencing
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.data.RefType
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -23,7 +25,7 @@ class DiscriminatorTests : FreeSpec({
     "core only" - {
 
         "inlining" {
-            val result = typeOf<TestClass>()
+            val result = initial<TestClass>()
                 .analyzeTypeUsingReflection()
                 .addDiscriminatorProperty("_type")
                 .generateSwaggerSchema()
@@ -66,7 +68,7 @@ class DiscriminatorTests : FreeSpec({
         "referencing" - {
 
             "openapi simple path" {
-                val result = typeOf<TestClass>()
+                val result = initial<TestClass>()
                     .analyzeTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
@@ -99,7 +101,7 @@ class DiscriminatorTests : FreeSpec({
             }
 
             "openapi full path" {
-                val result = typeOf<TestClass>()
+                val result = initial<TestClass>()
                     .analyzeTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
@@ -132,7 +134,7 @@ class DiscriminatorTests : FreeSpec({
             }
 
             "simple path" {
-                val result = typeOf<TestClass>()
+                val result = initial<TestClass>()
                     .analyzeTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
@@ -165,7 +167,7 @@ class DiscriminatorTests : FreeSpec({
             }
 
             "full path" {
-                val result = typeOf<TestClass>()
+                val result = initial<TestClass>()
                     .analyzeTypeUsingReflection()
                     .addDiscriminatorProperty("_type")
                     .generateSwaggerSchema()
@@ -204,7 +206,7 @@ class DiscriminatorTests : FreeSpec({
     "with jackson annotations" - {
 
         "use class" {
-            val result = typeOf<JacksonUseClassTestClass>()
+            val result = initial<JacksonUseClassTestClass>()
                 .analyzeTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
@@ -237,7 +239,7 @@ class DiscriminatorTests : FreeSpec({
         }
 
         "use name" {
-            val result = typeOf<JacksonUseNameTestClass>()
+            val result = initial<JacksonUseNameTestClass>()
                 .analyzeTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
@@ -270,7 +272,7 @@ class DiscriminatorTests : FreeSpec({
         }
 
         "use simple name" {
-            val result = typeOf<JacksonUseSimpleNameTestClass>()
+            val result = initial<JacksonUseSimpleNameTestClass>()
                 .analyzeTypeUsingReflection()
                 .addJacksonTypeInfoDiscriminatorProperty()
                 .generateSwaggerSchema()
@@ -305,7 +307,7 @@ class DiscriminatorTests : FreeSpec({
     }
 
     "kotlinx-serialization" {
-        val result = typeOf<KotlinxTestClass>()
+        val result = initial<KotlinxTestClass>()
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .generateSwaggerSchema()

@@ -1,27 +1,27 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.gettersToProperties
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.annotations.Description
-import io.github.smiley4.schemakenerator.core.gettersToProperties
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.Visibility
-import io.github.smiley4.schemakenerator.reflection.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import kotlin.reflect.typeOf
 
 class MergeGettersTest : StringSpec({
 
     "merge getter" {
 
-        val result = typeOf<MyTestClass>()
+        val result = initial<MyTestClass>()
             .analyzeTypeUsingReflection {
                 includeGetters = true
                 includeHidden = true
             }
             .gettersToProperties()
-            .data
+            .root
 
         result.members.also { members ->
 

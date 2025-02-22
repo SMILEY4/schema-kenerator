@@ -3,10 +3,7 @@ package io.github.smiley4.schemakenerator.jsonschema.data
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 
-/**
- * A root json-schema of a type together with all referenced other schemas in the definitions or already inlined in the root schema.
- */
-class CompiledJsonSchema(
+class CompiledJsonSchemaData(
     /**
      * the original type data
      */

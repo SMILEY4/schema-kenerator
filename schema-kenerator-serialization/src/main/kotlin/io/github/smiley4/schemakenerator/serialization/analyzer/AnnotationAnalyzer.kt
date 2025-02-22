@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.serialization.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.SerialDescriptor
 import java.lang.reflect.Modifier
 import kotlin.reflect.KProperty
@@ -15,6 +16,7 @@ class AnnotationAnalyzer {
      * Analyze the annotations on the given serial descriptor.
      * @return the list of resulting annotation data
      */
+    @OptIn(ExperimentalSerializationApi::class)
     fun analyzeAnnotations(descriptor: SerialDescriptor): MutableList<AnnotationData> {
         return analyzeAnnotations(descriptor.annotations)
     }
