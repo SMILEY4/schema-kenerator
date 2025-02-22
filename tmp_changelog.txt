@@ -39,6 +39,4 @@ TODO
     - compiled schemas
     - ...
 
-- "modules" wiki page: link to root api reference AND steps api reference
-
 - "schema generation" wiki pages: explain + short examples for compileInlining vs referencing vs referencing root

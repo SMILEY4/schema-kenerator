@@ -53,7 +53,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-jsonschema"))
+    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-jackson-jsonschema"))
 }
 
 mavenPublishing {
