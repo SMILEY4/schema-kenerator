@@ -15,7 +15,7 @@ mkdocs {
     updateSiteUrl = true
     publish {
         branch = "gh-pages"
-        version = "2.x"
+        version = "2.x-test.1"
         rootRedirect = true
         rootRedirectTo = "latest"
         setVersionAliases("latest")
