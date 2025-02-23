@@ -38,7 +38,6 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonNamingStrategy
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.reflect.typeOf
 
 class E04_Customization : FreeSpec({
 
@@ -172,7 +171,10 @@ class E04_Customization : FreeSpec({
             val jsonSchema = initial<ClassWithLocalDateTime>()
                 .analyzeTypeUsingReflection {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
-                    redirect<LocalDateTime, String>()
+                    redirect {
+                        from<LocalDateTime>()
+                        to<String>()
+                    }
                 }
                 .generateJsonSchema()
                 .withTitle(TitleType.SIMPLE)
@@ -199,7 +201,10 @@ class E04_Customization : FreeSpec({
             val jsonSchema = initial<ClassWithLocalDateTime>()
                 .analyzeTypeUsingKotlinxSerialization {
                     // redirect the type "LocalDateTime" to "String". Everytime the type "LocalDateTime" is encountered, it will be replaced with "String".
-                    redirect<LocalDateTime, String>()
+                    redirect {
+                        from<LocalDateTime>()
+                        to<String>()
+                    }
                 }
                 .generateJsonSchema()
                 .withTitle(TitleType.SIMPLE)

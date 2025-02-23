@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.CoreSteps.addDiscriminatorProperty
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.core.data.find
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.addJacksonTypeInfoDiscriminatorProperty
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.collectJacksonSubTypes
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
