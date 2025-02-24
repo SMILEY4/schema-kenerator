@@ -1,0 +1,1331 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Analyze kotlin types, extract information and generate schemas.">
+      
+      
+      
+        <link rel="canonical" href="https://smiley4.github.io/schema-kenerator/2.x/user_guide/analyzing_types_reflection/">
+      
+      
+        <link rel="prev" href="../concept/">
+      
+      
+        <link rel="next" href="../analyzing_types_kotlinx_serialization/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Reflection - Schema Kenerator</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analyzing-types-reflection" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Schema Kenerator" class="md-header__button md-logo" aria-label="Schema Kenerator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Schema Kenerator
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Reflection
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/SMILEY4/schema-kenerator" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    schema-kenerator
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Project
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../concept/" class="md-tabs__link">
+          
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../modules/" class="md-tabs__link">
+        
+  
+    
+  
+  Modules
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../changelog/" class="md-tabs__link">
+        
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Schema Kenerator" class="md-nav__button md-logo" aria-label="Schema Kenerator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Schema Kenerator
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/SMILEY4/schema-kenerator" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    schema-kenerator
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concept/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Concept
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Analyzing Types
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Analyzing Types
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Reflection
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Reflection
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basics
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inheritance-and-subtypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Inheritance and Subtypes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inheritance and Subtypes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sealed-class-and-interfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sealed Class and Interfaces
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manually-including-subtypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manually Including Subtypes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-subtype-annotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core @Subtype-Annotation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jackson-jsonsubtypes-annotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jackson @JsonSubTypes-Annotation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#discriminator-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Discriminator Properties
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Discriminator Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-property" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default Property
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jackson-jsontypeinfo-annotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jackson @JsonTypeInfo-annotation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analyzing_types_kotlinx_serialization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kotlinx.Serialization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Generating Schemas
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Generating Schemas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generating_json_schema/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JSON Schema
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generating_swagger_schema/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Swagger Schema
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Customization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modules
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="analyzing-types-reflection">Analyzing Types (Reflection)</h1>
+<p>Type analysis is the first step to generating a schema. The step looks at all involved Kotlin or Java types and extracts information about methods, fields, subtypes, supertypes, type parameters and more.</p>
+<details class="tip">
+<summary>Using Kotlinx.Serialization</summary>
+<p><a href="../analyzing_types_kotlinx_serialization/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/></svg></span> Information</a> about type analysis using Kotlinx.Serialization</p>
+</details>
+<h2 id="basics">Basics</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">ExampleClass</span><span class="p">(</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">text</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">number</span><span class="p">:</span><span class="w"> </span><span class="kt">Int?</span>
+<span class="p">)..</span><span class="o">/</span>
+</code></pre></div>
+<p>With the <code>analyseTypeUsingReflection()</code>-step, information about a given input type is extracted and resulting
+information about the type as well as other referenced types, e.g. "ExampleClass", "String" and "Int" is returned to be used as inputs
+for further steps.</p>
+<p>The step can be configured to specify which information should be included in the output and in what format.</p>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">ExampleClass</span><span class="o">&gt;</span><span class="p">().</span><span class="na">analyseTypeUsingReflection</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">//...</span>
+<span class="p">}</span>
+</code></pre></div>
+<details class="info">
+<summary>Configuration Options</summary>
+<p><a href="../../dokka/schema-kenerator-reflection/schema-kenerator-reflection/io.github.smiley4.schemakenerator.reflection/-reflection-steps/-reflection-type-analysis-config/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/></svg></span> API Reference</a></p>
+</details>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Gradle (Kotlin)</label><label for="__tabbed_1_2">Gradle</label><label for="__tabbed_1_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+</details>
+<h2 id="inheritance-and-subtypes">Inheritance and Subtypes</h2>
+<h3 id="sealed-class-and-interfaces">Sealed Class and Interfaces</h3>
+<p>Subtypes of sealed classes and interfaces are detected and included automatically.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">sealed</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">SealedParent</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildOne</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">SealedParent</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildTwo</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">SealedParent</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Sealed class <code>SealedParent</code> with two subtypes <code>ChildOne</code> and <code>ChildTwo</code>.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">SealedParent</span><span class="o">&gt;</span><span class="p">().</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span>
+</code></pre></div>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Gradle (Kotlin)</label><label for="__tabbed_2_2">Gradle</label><label for="__tabbed_2_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+</details>
+<h3 id="manually-including-subtypes">Manually Including Subtypes</h3>
+<p>When using classes that are not "sealed", subtypes are not automatically detected and have to be added as input types for them to be respected in the analysis.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">open</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ParentManual</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildOne</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ParentManual</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildTwo</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ParentManual</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Class <code>ParentManual</code> with two subtypes <code>ChildOne</code> and <code>ChildTwo</code>.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">ParentManual</span><span class="o">&gt;</span><span class="p">(</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="n">listOf</span><span class="p">(</span>
+<span class="w">        </span><span class="n">typeOf</span><span class="o">&lt;</span><span class="n">ParentManual</span><span class="p">.</span><span class="na">ChildOne</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="c1">//(2)!</span>
+<span class="w">        </span><span class="n">typeOf</span><span class="o">&lt;</span><span class="n">ParentManual</span><span class="p">.</span><span class="na">ChildTwo</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span><span class="w"> </span><span class="c1">//(3)!</span>
+<span class="w">    </span><span class="p">.</span><span class="na">addMissingSupertypeSubtypeRelations</span><span class="p">()</span><span class="w"> </span><span class="c1">//(4)!</span>
+</code></pre></div>
+<ol>
+<li>The main type we want to analyze and get information for.</li>
+<li>Additional types we want to include when extracting information.</li>
+<li>Extract information from all input types individually, i.e. from <code>ParentManual</code>, <code>ChildOne</code>, <code>ChildTwo</code></li>
+<li><code>ChildOne</code> and <code>ChildTwo</code> reference <code>ParentManual</code> as their supertype, but <code>ParentManual</code> does not yet know about its subtypes.</br>This step finds and fills in these missing connections, i.e. adds <code>ChildOne</code> and <code>ChildTwo</code> to the subtypes of <code>ParentManual</code>.</li>
+</ol>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Gradle (Kotlin)</label><label for="__tabbed_3_2">Gradle</label><label for="__tabbed_3_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-core:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-core:$version&#39;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></p>
+</div>
+</div>
+</div>
+</details>
+<h3 id="core-subtype-annotation">Core @Subtype-Annotation</h3>
+<p>Instead of adding the possible subtypes to the input manually, they can be connected automatically using the <code>schema-kenerator-core</code> <code>@SubType</code>-annotation.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@SubType</span><span class="p">(</span><span class="n">ParentCore</span><span class="p">.</span><span class="na">ChildOne</span><span class="o">::</span><span class="n">class</span><span class="p">)</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="nd">@SubType</span><span class="p">(</span><span class="n">ParentCore</span><span class="p">.</span><span class="na">ChildTwo</span><span class="o">::</span><span class="n">class</span><span class="p">)</span>
+<span class="kd">open</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ParentCore</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">//(2)!</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildOne</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ParentCore</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildTwo</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ParentCore</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>All subtypes defined on the parent class using <code>@SubType</code>-annotations.</li>
+<li>Class <code>ParentManual</code> with two subtypes <code>ChildOne</code> and <code>ChildTwo</code>.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">ParentCore</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">collectSubTypes</span><span class="p">()</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">addMissingSupertypeSubtypeRelations</span><span class="p">()</span><span class="w"> </span><span class="c1">//(2)!</span>
+</code></pre></div>
+<ol>
+<li>This step looks at the <code>@SubType</code>-annotations present on any input type (recursive) and adds the referenced types to be included as inputs in the next steps.</li>
+<li><code>ChildOne</code> and <code>ChildTwo</code> reference <code>ParentCore</code> as their supertype, but <code>ParentCore</code> does not yet know about its subtypes.</br>This step finds and fills in these missing connections, i.e. adds <code>ChildOne</code> and <code>ChildTwo</code> to the subtypes of <code>ParentCore</code>.</li>
+</ol>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Gradle (Kotlin)</label><label for="__tabbed_4_2">Gradle</label><label for="__tabbed_4_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-core:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-core:$version&#39;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></p>
+</div>
+</div>
+</div>
+</details>
+<h3 id="jackson-jsonsubtypes-annotation">Jackson @JsonSubTypes-Annotation</h3>
+<p>Instead of adding the possible subtypes to the input manually, they can also be connected automatically using the <a href="https://github.com/FasterXML/jackson">Jackson</a> <code>@JsonSubTypes</code>-annotation.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@JsonSubTypes</span><span class="p">(</span>
+<span class="w">    </span><span class="n">JsonSubTypes</span><span class="p">.</span><span class="na">Type</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParentJackson</span><span class="p">.</span><span class="na">ChildOne</span><span class="o">::</span><span class="n">class</span><span class="p">),</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="n">JsonSubTypes</span><span class="p">.</span><span class="na">Type</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParentJackson</span><span class="p">.</span><span class="na">ChildTwo</span><span class="o">::</span><span class="n">class</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="kd">open</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ParentJackson</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">//(2)!</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildOne</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ParentJackson</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildTwo</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ParentJackson</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>All subtypes defined on the parent class using <code>@JsonSubTypes</code>-annotation.</li>
+<li>Class <code>ParentJackson</code> with two subtypes <code>ChildOne</code> and <code>ChildTwo</code>.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">ParentJackson</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">collectJacksonSubTypes</span><span class="p">({</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">        </span><span class="nb">it</span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span><span class="w"> </span><span class="c1">//(2)!</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">addMissingSupertypeSubtypeRelations</span><span class="p">()</span><span class="w"> </span><span class="c1">//(3)!</span>
+</code></pre></div>
+<ol>
+<li>The "collectJacksonSubTypes()"-step looks at the @JsonSubTypes-annotation present on any type (recursive) and adds the referenced types to be included in the next steps.</li>
+<li>this step needs to intermediate information from the types. This specifies how this information is extracted. reflection is recommended here.</li>
+<li><code>ChildOne</code> and <code>ChildTwo</code> reference <code>ParentJackson</code> as their supertype, but <code>ParentJackson</code> does not yet know about its subtypes.</br>This step finds and fills in these missing connections, i.e. adds <code>ChildOne</code> and <code>ChildTwo</code> to the subtypes of <code>ParentJackson</code>.</li>
+</ol>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Gradle (Kotlin)</label><label for="__tabbed_5_2">Gradle</label><label for="__tabbed_5_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-jackson:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-jackson:$version&#39;</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-jackson<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></p>
+</div>
+</div>
+</div>
+</details>
+<h2 id="discriminator-properties">Discriminator Properties</h2>
+<p>A discriminator is used to differentiate between subtypes when (de-)serializing types, i.e. to know which subtype we are dealing with.
+This property is often times not included as a field in the class itself, but configured e.g. via an annotation.
+This property can also be added to the type information, e.g. to be later included in generated schemas.</p>
+<h3 id="default-property">Default Property</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">sealed</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">SealedParent</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildOne</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">SealedParent</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildTwo</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">SealedParent</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Class <code>SealedParent</code> with two subtypes <code>ChildOne</code> and <code>ChildTwo</code> to differentiate between.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">SealedParent</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">addDiscriminatorProperty</span><span class="p">(</span><span class="s">&quot;_type&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">//(1)!</span>
+</code></pre></div>
+<ol>
+<li>Makes sure a property <code>_type</code> exists for all types that have subtypes.</li>
+</ol>
+<p>An "annotation" with name <code>discriminator_marker</code> is added to the property to mark it and make it possible to find it later, e.g. when generating schemas.</br>
+If a property with the name already exists, the maker annotation is added to this property instead.</br>
+If a (different) property with marked with the annotation is already present, the step will NOT add the new specified property.</p>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Gradle (Kotlin)</label><label for="__tabbed_6_2">Gradle</label><label for="__tabbed_6_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-core:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-core:$version&#39;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></p>
+</div>
+</div>
+</div>
+</details>
+<h3 id="jackson-jsontypeinfo-annotation">Jackson @JsonTypeInfo-annotation</h3>
+<p>A discriminator property with a name specified with the <a href="https://github.com/FasterXML/jackson">Jackson</a> <code>@JsonClassDiscriminator</code>-annotation can be added to all types that have known subtypes.
+Only @JsonTypeInfo#include "PROPERTY" and "EXISTING_PROPERTY" is supported.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@JsonTypeInfo</span><span class="p">(</span>
+<span class="w">    </span><span class="n">use</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonTypeInfo</span><span class="p">.</span><span class="na">Id</span><span class="p">.</span><span class="na">NAME</span><span class="p">,</span>
+<span class="w">    </span><span class="n">include</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JsonTypeInfo</span><span class="p">.</span><span class="na">As</span><span class="p">.</span><span class="na">PROPERTY</span><span class="p">,</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="n">property</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;_type&quot;</span><span class="w"> </span><span class="c1">//(2)!</span>
+<span class="p">)</span>
+<span class="kd">sealed</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ParentDiscriminatorJackson</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">//(3)!</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildOne</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">SealedParent</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildTwo</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">SealedParent</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Specify how to include the (new) property. Only <code>PROPERTY</code> and <code>EXISTING_PROPERTY</code> are currently supported.</li>
+<li>Specify the name of the (new) property.</li>
+<li>Class <code>ParentDiscriminatorJackson</code> with two subtypes <code>ChildOne</code> and <code>ChildTwo</code> to differentiate between.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">ParentDiscriminatorJackson</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">addJacksonTypeInfoDiscriminatorProperty</span><span class="p">()</span><span class="w"> </span><span class="c1">//(1)!</span>
+</code></pre></div>
+<ol>
+<li>Adds a property with the name specified in <code>@JsonTypeInfo#property</code> to all annotated types with subtypes.</li>
+</ol>
+<p>An "annotation" with name <code>discriminator_marker</code> is added to the property to mark it and make it possible to find it later, e.g. when generating schemas.</br>
+If a property with the name already exists, the maker annotation is added to this property instead.</br>
+If a (different) property with marked with the annotation is already present, the step will NOT add the new specified property.</p>
+<details class="info">
+<summary>Required Dependencies</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:3"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><input id="__tabbed_7_3" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Gradle (Kotlin)</label><label for="__tabbed_7_2">Gradle</label><label for="__tabbed_7_3">Maven</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-reflection:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-jackson:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-reflection:$version&#39;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="w"> </span><span class="s1">&#39;io.github.smiley4:schema-kenerator-jackson:$version&#39;</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-reflection<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>io.github.smiley4<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>schema-kenerator-jackson<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>${version}<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></p>
+</div>
+</div>
+</div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../concept/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Concept">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Concept
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../analyzing_types_kotlinx_serialization/" class="md-footer__link md-footer__link--next" aria-label="Next: Kotlinx.Serialization">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Kotlinx.Serialization
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.expand", "navigation.indexes", "navigation.footer", "toc.integrate", "search.suggest", "search.share", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>

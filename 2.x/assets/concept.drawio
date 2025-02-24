@@ -1,0 +1,118 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.9 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.9">
+  <diagram name="Page-1" id="uKw3dtDTi4BIDKzpuho6">
+    <mxGraphModel dx="3191" dy="1845" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-1" value="specify initial type(s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="600" y="160" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-2" value="collect additional subtypes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="600" y="220" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-3" value="analyze types" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="600" y="280" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-4" value="modify resulting type data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="600" y="340" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-5" value="generate schema(s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="600" y="400" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-6" value="modify resulting schema(s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="600" y="460" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-7" value="compile schema" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="600" y="520" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-8" value="InitialTypeData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="810" y="160" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-9" value="TypeDataGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="810" y="310" width="170" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-10" value="IntermediateXYSchemaData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="810" y="430" width="170" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-11" value="CompiledXYSchemaData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="810" y="550" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-13" value="1.&lt;div&gt;Initial Type Collection&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="470" y="160" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-14" value="2.&lt;div&gt;Type Analysis&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="470" y="280" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-15" value="3.&lt;div&gt;Schema Generation&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="470" y="400" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-16" value="4.&lt;div&gt;Schema Compilation&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="470" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-19" value="PHASE" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="470" y="120" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-20" value="STEPS" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="600" y="120" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZWXz2T4Ym8SCMf7NVbt_-22" value="IN / OUT DATA CLASSES" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="810" y="120" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-20" value="specify initial type(s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003366;strokeColor=#6c8ebf;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="160" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-21" value="collect additional subtypes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003366;strokeColor=#6c8ebf;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="220" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-22" value="analyze types" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#006633;strokeColor=#82b366;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="280" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-23" value="modify resulting type data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#006633;strokeColor=#82b366;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="340" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-24" value="generate schema(s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#663300;strokeColor=#d79b00;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="400" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-25" value="modify resulting schema(s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#663300;strokeColor=#d79b00;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="460" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-26" value="compile schema" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#660033;strokeColor=#b85450;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="520" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-27" value="InitialTypeData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003366;strokeColor=#6c8ebf;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="160" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-28" value="TypeDataGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#006633;strokeColor=#82b366;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="310" width="170" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-29" value="IntermediateXYSchemaData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#663300;strokeColor=#d79b00;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="430" width="170" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-30" value="CompiledXYSchemaData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#660033;strokeColor=#b85450;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="550" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-31" value="1.&lt;div&gt;Initial Type Collection&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003366;strokeColor=#6c8ebf;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="160" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-32" value="2.&lt;div&gt;Type Analysis&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#006633;strokeColor=#82b366;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="280" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-33" value="3.&lt;div&gt;Schema Generation&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#663300;strokeColor=#d79b00;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="400" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-34" value="4.&lt;div&gt;Schema Compilation&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#660033;strokeColor=#b85450;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-35" value="PHASE" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#4D4D4D;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="120" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-36" value="STEPS" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#4D4D4D;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="120" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="R0T2DeRrLzjQYP7Ox5QJ-37" value="IN / OUT DATA CLASSES" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=none;fillColor=#4D4D4D;fontColor=#E6E6E6;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="120" width="170" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
