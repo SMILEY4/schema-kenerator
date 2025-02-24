@@ -1,27 +1,18 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.RequiredHandling
-import io.github.smiley4.schemakenerator.swagger.SwaggerSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.compileReferencing
-import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.SwaggerSchemaGenerationStepConfig
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencing
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.TitleBuilder
-import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.swagger.withTitle
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassDirectSelfReferencing
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithCollections
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithDeepGeneric
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithGenericField
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithNestedClass
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithOptionalParameters
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithSimpleFields
-import io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithValueClass
-import io.github.smiley4.schemakenerator.test.models.kotlinx.CoreAnnotatedClass
-import io.github.smiley4.schemakenerator.test.models.kotlinx.SealedClass
-import io.github.smiley4.schemakenerator.test.models.kotlinx.SubClassA
-import io.github.smiley4.schemakenerator.test.models.kotlinx.TestEnum
+import io.github.smiley4.schemakenerator.test.models.kotlinx.*
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -35,7 +26,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -62,7 +53,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -94,7 +85,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
+            val schema = initial(data.type)
                 .analyzeTypeUsingKotlinxSerialization()
                 .generateSwaggerSchema(data.generatorConfig)
                 .let { list ->
@@ -1370,7 +1361,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as required",
                 generatorConfig = {
-                    optionals = RequiredHandling.REQUIRED
+                    optionals = SwaggerSteps.RequiredHandling.REQUIRED
                 },
                 expectedResultInlining = """
                     {
@@ -1455,7 +1446,7 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as non-required",
                 generatorConfig = {
-                    optionals = RequiredHandling.NON_REQUIRED
+                    optionals = SwaggerSteps.RequiredHandling.NON_REQUIRED
                 },
                 expectedResultInlining = """
                     {
@@ -1600,8 +1591,237 @@ class KotlinxSerializationParser_SwaggerGenerator_Tests : FunSpec({
                     """.trimIndent()
                 )
             ),
+            TestData(
+                type = typeOf<NullableClasses.NullableFirst>(),
+                testName = "class with nullable first",
+                generatorConfig = { nullables = SwaggerSteps.RequiredHandling.REQUIRED },
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "t1": {
+                          "type": [
+                            "null",
+                            "object"
+                          ],
+                          "properties": {
+                            "count": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "required": [
+                            "count"
+                          ]
+                        },
+                        "t2": {
+                          "type": "object",
+                          "properties": {
+                            "count": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "required": [
+                            "count"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "t1",
+                        "t2"
+                      ]
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "t1": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                                }
+                              ]
+                            },
+                            "t2": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                            }
+                          },
+                          "required": [
+                            "t1",
+                            "t2"
+                          ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test" to "..."
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.NullableFirst"
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.NullableFirst" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "t1": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                                }
+                              ]
+                            },
+                            "t2": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                            }
+                          },
+                          "required": [
+                            "t1",
+                            "t2"
+                          ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "count": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "required": [
+                            "count"
+                          ]
+                        }
+                    """.trimIndent()
+                )
+            ),
+            TestData(
+                type = typeOf<NullableClasses.NullableSecond>(),
+                testName = "class with nullable second",
+                generatorConfig = { nullables = SwaggerSteps.RequiredHandling.REQUIRED },
+                expectedResultInlining = """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "t1": {
+                          "type": "object",
+                          "properties": {
+                            "count": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "required": [
+                            "count"
+                          ]
+                        },
+                        "t2": {
+                          "type": [
+                            "null",
+                            "object"
+                          ],
+                          "properties": {
+                            "count": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "required": [
+                            "count"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "t1",
+                        "t2"
+                      ]
+                    }
+                """.trimIndent(),
+                expectedResultReferencing = mapOf(
+                    "." to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "t1": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                            },
+                            "t2": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "t1",
+                            "t2"
+                          ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test" to "..."
+                ),
+                expectedResultReferencingRoot = mapOf(
+                    "." to """
+                      {
+                        "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.NullableSecond"
+                      }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.NullableSecond" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "t1": {
+                              "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                            },
+                            "t2": {
+                              "oneOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "t1",
+                            "t2"
+                          ]
+                        }
+                    """.trimIndent(),
+                    "io.github.smiley4.schemakenerator.test.models.kotlinx.NullableClasses.Test" to """
+                        {
+                          "type": "object",
+                          "properties": {
+                            "count": {
+                              "type": "integer",
+                              "format": "int32"
+                            }
+                          },
+                          "required": [
+                            "count"
+                          ]
+                        }
+                    """.trimIndent()
+                )
+            ),
         )
-
     }
 
 }

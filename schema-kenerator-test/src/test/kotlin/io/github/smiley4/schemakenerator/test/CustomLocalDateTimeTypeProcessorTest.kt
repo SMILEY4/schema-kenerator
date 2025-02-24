@@ -1,17 +1,19 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.TitleBuilder
-import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
 import io.kotest.core.spec.style.StringSpec
 import java.time.LocalDateTime
@@ -21,8 +23,8 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime without custom processor" {
 
-        val result = typeOf<ClassWithLocalDateTime>()
-            .analyseTypeUsingReflection()
+        val result = initial<ClassWithLocalDateTime>()
+            .analyzeTypeUsingReflection()
             .generateJsonSchema()
             .withTitle(io.github.smiley4.schemakenerator.jsonschema.TitleBuilder.BUILDER_FULL)
             .compileInlining()
@@ -50,8 +52,8 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "reflection & jsonschema: localdatetime with custom processor" {
 
-        val result = typeOf<ClassWithLocalDateTime>()
-            .analyseTypeUsingReflection {
+        val result = initial<ClassWithLocalDateTime>()
+            .analyzeTypeUsingReflection {
                 custom<LocalDateTime> {
                     TypeData(
                         id = TypeId.create(),
@@ -97,7 +99,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime without custom processor" {
 
-        val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = initial<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .analyzeTypeUsingKotlinxSerialization()
             .generateSwaggerSchema()
             .withTitle(TitleBuilder.BUILDER_FULL)
@@ -125,7 +127,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime with custom processor" {
 
-        val result = typeOf<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = initial<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
             .analyzeTypeUsingKotlinxSerialization {
                 custom<LocalDateTime> {
                     TypeData(

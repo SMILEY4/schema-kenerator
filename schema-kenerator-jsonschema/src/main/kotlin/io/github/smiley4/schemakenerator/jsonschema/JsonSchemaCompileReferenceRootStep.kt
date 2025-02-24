@@ -1,11 +1,10 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.shouldReference
+import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 
 internal class JsonSchemaCompileReferenceRootStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
@@ -15,11 +14,11 @@ internal class JsonSchemaCompileReferenceRootStep(private val pathBuilder: (type
     /**
      * Put referenced schemas into definitions and reference them
      */
-    fun compile(bundle: Bundle<JsonSchema>): CompiledJsonSchema {
-        val result = JsonSchemaCompileReferenceStep(pathBuilder).compile(bundle)
+    fun compile(input: IntermediateJsonSchemaData): CompiledJsonSchemaData {
+        val result = JsonSchemaCompileReferenceStep(pathBuilder).compile(input)
         if (shouldReference(result.json)) {
-            val refPath = pathBuilder(result.typeData, bundle.buildTypeDataMap())
-            return CompiledJsonSchema(
+            val refPath = pathBuilder(result.typeData, input.typeDataById)
+            return CompiledJsonSchemaData(
                 typeData = result.typeData,
                 json = schemaUtils.referenceSchema(refPath, true),
                 definitions = buildMap {
@@ -28,7 +27,7 @@ internal class JsonSchemaCompileReferenceRootStep(private val pathBuilder: (type
                 }
             )
         } else {
-            return CompiledJsonSchema(
+            return CompiledJsonSchemaData(
                 typeData = result.typeData,
                 json = result.json,
                 definitions = result.definitions

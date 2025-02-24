@@ -5,30 +5,27 @@
 package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.core.addDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.addJsonClassDiscriminatorProperty
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.serialization.renameMembers
-import io.github.smiley4.schemakenerator.swagger.compileInlining
-import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.reflection.data.SubType
+import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.util.UUID
-import kotlin.reflect.typeOf
 
 /**
  * internal / manual tests only
@@ -36,10 +33,33 @@ import kotlin.reflect.typeOf
 class _ManualTests : StringSpec({
 
     "test" {
+
+        initial<MyExampleClass>()
+            .collectSubTypes()
+            //...
+
+        val jsonSchema = initial<MyExampleClass>()
+            .analyzeTypeUsingReflection()
+            .generateJsonSchema()
+            .withTitle(TitleType.SIMPLE)
+            .compileInlining()
+            .json
+            .prettyPrint()
+        println(jsonSchema)
     }
 
 }) {
     companion object {
+
+        @SubType(MyExampleSubClass::class)
+        open class MyExampleClass(
+            val someText: String,
+            val someNullableInt: Int?,
+            val someBoolList: List<Boolean>,
+        )
+
+        class MyExampleSubClass() : MyExampleClass("", null, listOf())
+
 
         @Serializable
         class MyData(
@@ -62,7 +82,7 @@ class _ManualTests : StringSpec({
             val componentSchemas: Map<String, io.swagger.v3.oas.models.media.Schema<*>>
         )
 
-        fun CompiledSwaggerSchema.asPrintable(): SwaggerResult {
+        fun CompiledSwaggerSchemaData.asPrintable(): SwaggerResult {
             return SwaggerResult(
                 root = this.swagger,
                 componentSchemas = this.componentSchemas

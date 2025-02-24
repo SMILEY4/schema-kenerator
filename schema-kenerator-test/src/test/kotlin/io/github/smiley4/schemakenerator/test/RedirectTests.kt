@@ -1,81 +1,252 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect as ReflectionTypeRedirect
+import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect as SerializationTypeRedirect
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.Serializable
-import kotlin.reflect.typeOf
 
 class RedirectTests : FreeSpec({
 
-    "recursive redirects" - {
+    "nullability" - {
 
-        "reflection" {
-            val result = typeOf<TestClass>()
-                .analyseTypeUsingReflection {
-                    redirect<NestedClass, String>()
-                    redirect<String, Int>()
-                }
-                .generateJsonSchema()
-                .compileInlining()
+        "reflection" - {
 
-            result.json.shouldEqualJson {
-                """
-                    {
-                       "type": "object",
-                       "required": [
-                          "data"
-                       ],
-                       "properties": {
-                          "data": {
-                             "type": "integer",
-                             "minimum": -2147483648,
-                             "maximum": 2147483647
-                          }
-                       }
+            fun run(from: ReflectionTypeRedirect.FromNullability, to: ReflectionTypeRedirect.ToNullability, expected: () -> String) {
+                val result = initial<SimpleTestClass>()
+                    .analyzeTypeUsingReflection {
+                        redirect {
+                            from<String>(from)
+                            to<Int?>(to)
+                        }
                     }
-                """.trimIndent()
+                    .generateJsonSchema()
+                    .compileInlining()
+                result.json.shouldEqualJson { expected() }
             }
+
+            "match, keep" {
+                run(ReflectionTypeRedirect.FromNullability.MATCH, ReflectionTypeRedirect.ToNullability.KEEP) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [
+                            "requiredText"
+                          ],
+                          "properties": {
+                            "nullableText": {
+                              "type": "string"
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
+            "match, replace" {
+                run(ReflectionTypeRedirect.FromNullability.MATCH, ReflectionTypeRedirect.ToNullability.REPLACE) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "nullableText": {
+                              "type": "string"
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
+            "ignore, keep" {
+                run(ReflectionTypeRedirect.FromNullability.IGNORE, ReflectionTypeRedirect.ToNullability.KEEP) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [
+                            "requiredText"
+                          ],
+                          "properties": {
+                            "nullableText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
+            "ignore, replace" {
+                run(ReflectionTypeRedirect.FromNullability.IGNORE, ReflectionTypeRedirect.ToNullability.REPLACE) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "nullableText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
         }
 
-        "kotlinx-serialization" {
-            val result = typeOf<TestClass>()
-                .analyzeTypeUsingKotlinxSerialization {
-                    redirect<NestedClass, String>()
-                    redirect<String, Int>()
-                }
-                .generateJsonSchema()
-                .compileInlining()
+        "kotlinx" - {
 
-            result.json.shouldEqualJson {
-                """
-                    {
-                       "type": "object",
-                       "required": [
-                          "data"
-                       ],
-                       "properties": {
-                          "data": {
-                             "type": "integer",
-                             "minimum": -2147483648,
-                             "maximum": 2147483647
-                          }
-                       }
+            fun run(from: SerializationTypeRedirect.FromNullability, to: SerializationTypeRedirect.ToNullability, expected: () -> String) {
+                val result = initial<SimpleTestClass>()
+                    .analyzeTypeUsingKotlinxSerialization {
+                        redirect {
+                            from<String>(from)
+                            to<Int?>(to)
+                        }
                     }
-                """.trimIndent()
+                    .generateJsonSchema()
+                    .compileInlining()
+                result.json.shouldEqualJson { expected() }
             }
+
+            "match, keep" {
+                run(SerializationTypeRedirect.FromNullability.MATCH, SerializationTypeRedirect.ToNullability.KEEP) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [
+                            "requiredText"
+                          ],
+                          "properties": {
+                            "nullableText": {
+                              "type": "string"
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
+            "match, replace" {
+                run(SerializationTypeRedirect.FromNullability.MATCH, SerializationTypeRedirect.ToNullability.REPLACE) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "nullableText": {
+                              "type": "string"
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
+            "ignore, keep" {
+                run(SerializationTypeRedirect.FromNullability.IGNORE, SerializationTypeRedirect.ToNullability.KEEP) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [
+                            "requiredText"
+                          ],
+                          "properties": {
+                            "nullableText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
+            "ignore, replace" {
+                run(SerializationTypeRedirect.FromNullability.IGNORE, SerializationTypeRedirect.ToNullability.REPLACE) {
+                    """
+                        {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "nullableText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            },
+                            "requiredText": {
+                              "type": "integer",
+                              "minimum": -2147483648,
+                              "maximum": 2147483647
+                            }
+                          }
+                        }
+                    """.trimIndent()
+                }
+            }
+
         }
 
     }
 
-    "redirect to nullable" - {
+    "recursive redirects" - {
 
         "reflection" {
-            val result = typeOf<TestClass>()
-                .analyseTypeUsingReflection {
-                    redirect<String, String?>()
+            val result = initial<TestClass>()
+                .analyzeTypeUsingReflection {
+                    redirect {
+                        from<NestedClass>()
+                        to<String>()
+                    }
+                    redirect {
+                        from<String>()
+                        to<Int>()
+                    }
                 }
                 .generateJsonSchema()
                 .compileInlining()
@@ -83,37 +254,31 @@ class RedirectTests : FreeSpec({
             result.json.shouldEqualJson {
                 """
                     {
-                      "type": "object",
-                      "required": [
-                        "data"
-                      ],
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "required": [
-                            "someNumber"
-                          ],
-                          "properties": {
-                            "someNumber": {
-                              "type": "integer",
-                              "minimum": -2147483648,
-                              "maximum": 2147483647
-                            },
-                            "someText": {
-                              "type": "string"
-                            }
+                       "type": "object",
+                       "required": [],
+                       "properties": {
+                          "data": {
+                             "type": "integer",
+                             "minimum": -2147483648,
+                             "maximum": 2147483647
                           }
-                        }
-                      }
+                       }
                     }
                 """.trimIndent()
             }
         }
 
         "kotlinx-serialization" {
-            val result = typeOf<TestClass>()
+            val result = initial<TestClass>()
                 .analyzeTypeUsingKotlinxSerialization {
-                    redirect<String, String?>()
+                    redirect {
+                        from<NestedClass>()
+                        to<String>()
+                    }
+                    redirect {
+                        from<String>()
+                        to<Int>()
+                    }
                 }
                 .generateJsonSchema()
                 .compileInlining()
@@ -121,28 +286,15 @@ class RedirectTests : FreeSpec({
             result.json.shouldEqualJson {
                 """
                     {
-                      "type": "object",
-                      "required": [
-                        "data"
-                      ],
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "required": [
-                            "someNumber"
-                          ],
-                          "properties": {
-                            "someNumber": {
-                              "type": "integer",
-                              "minimum": -2147483648,
-                              "maximum": 2147483647
-                            },
-                            "someText": {
-                              "type": "string"
-                            }
+                       "type": "object",
+                       "required": [],
+                       "properties": {
+                          "data": {
+                             "type": "integer",
+                             "minimum": -2147483648,
+                             "maximum": 2147483647
                           }
-                        }
-                      }
+                       }
                     }
                 """.trimIndent()
             }
@@ -155,9 +307,17 @@ class RedirectTests : FreeSpec({
     companion object {
 
         @Serializable
-        class TestClass(
-            val data: NestedClass
+        class SimpleTestClass(
+            val requiredText: String,
+            val nullableText: String?,
         )
+
+
+        @Serializable
+        class TestClass(
+            val data: NestedClass?
+        )
+
 
         @Serializable
         class NestedClass(

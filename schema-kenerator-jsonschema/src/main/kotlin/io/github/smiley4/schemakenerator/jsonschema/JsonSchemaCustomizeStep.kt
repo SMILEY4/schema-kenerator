@@ -1,12 +1,12 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
+import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 
 internal class JsonSchemaCustomizeStep {
 
@@ -14,16 +14,14 @@ internal class JsonSchemaCustomizeStep {
      * Provide a function that is called for each type and json-schema. Can be used to manually manipulate the generated json-schema.
      */
     fun customizeTypes(
-        bundle: Bundle<JsonSchema>,
+        input: IntermediateJsonSchemaData,
         action: (typeData: TypeData, typeSchema: JsonNode) -> Unit
-    ): Bundle<JsonSchema> {
-        return bundle.also { schema ->
-            processTypes(schema.data, action)
-            schema.supporting.forEach { processTypes(it, action) }
-        }
+    ): IntermediateJsonSchemaData {
+        input.entries.forEach { processTypes(it, action) }
+        return input
     }
 
-    private fun processTypes(schema: JsonSchema, action: (typeData: TypeData, typeSchema: JsonNode) -> Unit) {
+    private fun processTypes(schema: JsonSchemaData, action: (typeData: TypeData, typeSchema: JsonNode) -> Unit) {
         action(schema.typeData, schema.json)
     }
 
@@ -32,18 +30,15 @@ internal class JsonSchemaCustomizeStep {
      * Provide a function that is called for each property. Can be used to manually manipulate the generated json-schema.
      */
     fun customizeProperties(
-        bundle: Bundle<JsonSchema>,
+        input: IntermediateJsonSchemaData,
         action: (propertyData: MemberData, propertySchema: JsonNode) -> Unit
-    ): Bundle<JsonSchema> {
-        val typeDataMap = bundle.buildTypeDataMap()
-        return bundle.also { schema ->
-            processProperties(schema.data, typeDataMap, action)
-            schema.supporting.forEach { processProperties(it, typeDataMap, action) }
-        }
+    ): IntermediateJsonSchemaData {
+        input.entries.forEach { processProperties(it, input.typeDataById, action) }
+        return input
     }
 
     private fun processProperties(
-        schema: JsonSchema,
+        schema: JsonSchemaData,
         typeDataMap: Map<TypeId, TypeData>,
         action: (typeData: MemberData, typeSchema: JsonNode) -> Unit
     ) {
@@ -57,18 +52,15 @@ internal class JsonSchemaCustomizeStep {
      * Provide a function that is called for each property. Can be used to manually manipulate the generated json-schema.
      */
     fun customizeProperties(
-        bundle: Bundle<JsonSchema>,
+        input: IntermediateJsonSchemaData,
         action: (memberData: MemberData, memberTypeData: TypeData, propertySchema: JsonNode) -> Unit
-    ): Bundle<JsonSchema> {
-        val typeDataMap = bundle.buildTypeDataMap()
-        return bundle.also { schema ->
-            processMembers(schema.data, typeDataMap, action)
-            schema.supporting.forEach { processMembers(it, typeDataMap, action) }
-        }
+    ): IntermediateJsonSchemaData {
+        input.entries.forEach { processMembers(it, input.typeDataById, action) }
+        return input
     }
 
     private fun processMembers(
-        schema: JsonSchema,
+        schema: JsonSchemaData,
         typeDataMap: Map<TypeId, TypeData>,
         action: (typeData: MemberData, memberTypeData: TypeData, typeSchema: JsonNode) -> Unit
     ) {

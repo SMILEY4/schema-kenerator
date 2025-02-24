@@ -1,9 +1,11 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.WithDataTestName
 import io.kotest.datatest.withData
@@ -17,8 +19,8 @@ class ReflectionParser_PropertyFilterTests : FunSpec({
     context("filter properties") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
-                .analyseTypeUsingReflection {
+            val schema = initial(data.type)
+                .analyzeTypeUsingReflection {
                     includeFunctions = false
                     includeGetters = data.includeGetters
                     includeWeakGetters = data.includeWeakGetters

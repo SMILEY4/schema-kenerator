@@ -9,15 +9,25 @@ data class TypeData(
      */
     val id: TypeId,
     /**
-     * the name of this type.
+     * The name of this type. This identifies the general type/classification of this type.
+     *
+     * Example:
+     *    Type data for a UUID-class: the type data should have the "UUID" as name of the class but generally classify it as a "String.
+     *    In this example `identifyingName` would be representing "String" and `descriptiveName` is "UUID".
+     *    In most cases however, both names are the same.
      */
     val identifyingName: TypeName,
     /**
-     * A possibly more descriptive name of this type.
+     * A possibly more specific or descriptive name of this type.
+     *
+     * Example:
+     *    Type data for a UUID-class: the type data should have the "UUID" as name of the class but generally classify it as a "String.
+     *    In this example `identifyingName` would be representing "String" and `descriptiveName` is "UUID".
+     *    In most cases however, both names are the same.
      */
     val descriptiveName: TypeName,
     /**
-     * the type parameters (i.e. generics) of this type
+     * the type parameters of this (generic) type
      */
     val typeParameters: MutableList<TypeParameterData> = mutableListOf(),
     /**
@@ -56,6 +66,9 @@ data class TypeData(
 
     companion object {
 
+        /**
+         * Create a new [TypeData] representing a wildcard / any / *
+         */
         fun createWildcard() = TypeData(
             id = TypeId.createWildcard(),
             identifyingName = TypeName("*", "*"),
@@ -71,8 +84,16 @@ data class TypeData(
             mapData = null
         )
 
+
+        /**
+         * Create a new placeholder [TypeData]. This data is usually just temporary and will get replaced by the actual data.
+         */
         fun createPlaceholder(id: TypeId) = createPlaceholder(id, TypeName("*", "*"), TypeName("*", "*"), emptyList())
 
+
+        /**
+         * Create a new placeholder [TypeData]. This data is usually just temporary and will get replaced by the actual data.
+         */
         fun createPlaceholder(
             id: TypeId,
             identifyingName: TypeName,
@@ -94,6 +115,22 @@ data class TypeData(
         )
     }
 
-}
 
-fun TypeData.findTypeParameter(name: String) = typeParameters.find { it.name == name }
+    /**
+     * whether this type data (most likely) represents an enum.
+     */
+    val isEnum: Boolean get() = this.enumData != null
+
+
+    /**
+     * whether this type data (most likely) represents a collection type (i.e. list, sets, ...).
+     */
+    val isCollection: Boolean get() = this.collectionData != null
+
+
+    /**
+     * whether this type data (most likely) represents a map type.
+     */
+    val isMap: Boolean get() = this.mapData != null
+
+}

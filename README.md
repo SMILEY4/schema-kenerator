@@ -1,67 +1,50 @@
-# Schema-Kenerator
+# Schema Kenerator
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.smiley4/schema-kenerator-core/badge.svg)](https://search.maven.org/search?q=g:io.github.smiley4%20a:schema-kenerator-*)
-[![Checks Passing](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml/badge.svg?branch=develop)](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml)
+[![Version](https://img.shields.io/maven-central/v/io.github.smiley4/schema-kenerator-core?style=flat&color=blue&logo=apachemaven)](https://search.maven.org/search?q=g:io.github.smiley4%20a:schema-kenerator-*)
+[![Checks Passing](https://img.shields.io/github/actions/workflow/status/SMILEY4/schema-kenerator/checks.yml?style=flat&logo=github)](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml)
+[![License](https://img.shields.io/github/license/SMILEY4/schema-kenerator?style=flat&color=teal)](https://github.com/SMILEY4/schema-kenerator/blob/develop/LICENSE)
 
 
-Kotlin library to extract information from classes using reflection or kotlinx-serialization and generate schemas like json-schema or swagger-schemas from the resulting information.
+The schema-kenerator project consists of multiple artifacts that are used together with the goal to extract information from types and generate different schemas.
+It is designed as a pipeline of individual steps to be highly configurable and flexible to match any situation.
 
 
 ## Features
 
-- extract information from classes using reflection or kotlinx-serialization
-- supports nested types, inheritance, generics, annotations
-- generate json-schema or [swagger](https://github.com/swagger-api/swagger-parser)-schema
-- add metadata using additional annotations (title, description, deprecation, subtypes, ...)
-- supports annotations from Jackson, Swagger, Javax-Validations and Jakarta-Validations
-- customizable and extendable
-
-
-## Installation
-
-```kotlin
-dependencies {
-    implementation("io.github.smiley4:schema-kenerator-core:<VERSION>")
-    // only for using reflection
-    implementation("io.github.smiley4:schema-kenerator-reflection:<VERSION>")
-    // only for using kotlinx-serialization
-    implementation("io.github.smiley4:schema-kenerator-serialization:<VERSION>")
-    // only for generating json-schemas
-    implementation("io.github.smiley4:schema-kenerator-jsonschema:<VERSION>")
-    // only for generating swagger-schemas
-    implementation("io.github.smiley4:schema-kenerator-swagger:<VERSION>")
-    // only for support of Jackson-annotations
-    implementation("io.github.smiley4:schema-kenerator-jackson:<VERSION>")
-   // only for support of javax and jakarta validation-annotations for swagger-schemas
-   implementation("io.github.smiley4:schema-kenerator-validations-swagger:<VERSION>")
-}
-```
+- Analyze Java and Kotlin types using reflection or [Kotlinx.Serialization](https://github.com/Kotlin/kotlinx.serialization)
+   - complex class configurations
+   - recursion
+   - collections, maps, enums
+   - inheritance
+   - type parameters
+   - annotations
+   - nullability and default values
+   - inline types
+   - ...
+- Enhance types with additional information
+   - [Jackson](https://github.com/FasterXML/jackson) annotations
+   - [Swagger](https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations) annotations
+   - Javax/Jakarta validation annotations
+   - ...
+- Generate schemas
+   - [JSON schema](https://json-schema.org/)
+   - [Swagger schema](https://swagger.io/docs/specification/v3_0/data-models/data-models/)
+- Highly configurable and customizable schema generation pipeline by adding new processing steps and creating own modules
 
 
 ## Documentation
 
+A wiki with documentation is available [here](https://smiley4.github.io/schema-kenerator/latest).
+
 Examples showcasing and explaining the functionalities and use cases of this project can be found [here](https://github.com/SMILEY4/schema-kenerator/tree/develop/schema-kenerator-examples/src/test/kotlin/io/github/smiley4/schemakenerator/examples).
 
-A wiki with documentation is available [here](https://github.com/SMILEY4/schema-kenerator/wiki).
+
+## Installation
+
+See [modules](https://smiley4.github.io/schema-kenerator/latest/modules/) wiki page for installation instructions.
 
 
-## Concept Overview
-
-Data extraction and schema generation happens in several steps that can be grouped into the following phases:
-
-1. Information extraction
-   1. collect relevant types that need to be analyzed
-   2. process types, i.e. extract information from each type and nested types 
-   3. enrich and modify extracted type data, e.g. with annotations
-2. Schema generation
-   1. generate individual schema for each type (and nested type)
-   2. enrich and modify generated schemas, e.g. using annotations
-   3. compile individual schemas into one final schema, either inlining all types or properly referencing them
-
-Schema-Kenerator provides independent steps for each phase that can be chained together to achieve the desired result. 
-
-
-## Example (json-schema & reflection)
+## Example
 
 ```kotlin
 class MyExampleClass(
@@ -70,103 +53,41 @@ class MyExampleClass(
     val someBoolList: List<Boolean>,
 )
 ```
-
 ```kotlin
-val jsonSchema = typeOf<MyExampleClass>()
-    .processReflection()
+val jsonSchema = initial<String>()
+    // Analyze the type using reflection and extract information
+    .analyseTypeUsingReflection()
+    // Generate (independent) json schemas for each associated type (here: `MyExampleClass`, `Int`, `Boolean` and `List<Boolean>`)
     .generateJsonSchema()
+    // Add the simple/short name of the type as the title to the schema
     .withTitle(TitleType.SIMPLE)
+    // Combine the individual schemas into a single schema for `MyExampleClass` by inlining all referenced types.
     .compileInlining()
-    .json
-    .prettyPrint()
 ```
-
 ```json
 {
-   "type": "object",
-   "title": "MyExampleClass",
-   "required": [ "someBoolList", "someText" ],
-   "properties": {
-     "someBoolList": {
-       "type": "array",
-       "title": "List<Boolean>",
-       "items": {
-         "type": "boolean",
-         "title": "Boolean"
-       }
-     },
-     "someNullableInt": {
-       "type": "integer",
-       "title": "Int",
-       "minimum": -2147483648,
-       "maximum": 2147483647
-     },
-     "someText": {
-       "type": "string",
-       "title": "String"
-     }
-   }
-}
-```
-
-
-
-## Example (swagger & kotlinx-serialization)
-
-```kotlin
-dependencies {
-    implementation("io.github.smiley4:schema-kenerator-core:<VERSION>")
-    implementation("io.github.smiley4:schema-kenerator-serialization:<VERSION>")
-    implementation("io.github.smiley4:schema-kenerator-swagger:<VERSION>")
-}
-```
-
-```kotlin
-@Serializable
-class MyExampleClass(
-    val someText: String,
-    val someNullableInt: Int?,
-    val someBoolList: List<Boolean>,
-)
-```
-
-```kotlin
-val swaggerSchema: Schema<*> = typeOf<ClassWithSimpleFields>()
-    .processKotlinxSerialization()
-    .generateSwaggerSchema()
-    .withTitle(TitleType.SIMPLE)
-    .compileInlining()
-    .swagger
-```
-
-```json
-{
-  "title" : "MyExampleClass",
-  "required" : [ "someBoolList", "someText" ],
-  "type" : "object",
-  "properties" : {
-    "someText" : {
-      "title" : "String",
-      "type" : "string",
-      "exampleSetFlag" : false
-    },
-    "someNullableInt" : {
-      "title" : "Int",
-      "type" : "integer",
-      "format" : "int32",
-      "exampleSetFlag" : false
-    },
-    "someBoolList" : {
-      "title" : "ArrayList<Boolean>",
-      "type" : "array",
-      "exampleSetFlag" : false,
-      "items" : {
-        "title" : "Boolean",
-        "type" : "boolean",
-        "exampleSetFlag" : false
+  "title": "MyExampleClass",
+  "type": "object",
+  "required": ["someBoolList", "someText"],
+  "properties": {
+    "someBoolList": {
+      "title": "List<Boolean>",
+      "type": "array",
+      "items": {
+        "title": "Boolean",
+        "type": "boolean"
       }
+    },
+    "someNullableInt": {
+      "title": "Int",
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    },
+    "someText": {
+      "title": "String",
+      "type": "string"
     }
-  },
-  "exampleSetFlag" : false
+  }
 }
 ```

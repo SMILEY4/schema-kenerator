@@ -13,8 +13,3 @@ data class WrappedTypeId(
      */
     var nullable: Boolean,
 )
-
-fun WrappedTypeData.toWrappedTypeId() = WrappedTypeId(
-    id = this.typeData.id,
-    nullable = this.nullable,
-)

@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.serialization.analyzer
 
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeId
 import kotlinx.serialization.descriptors.SerialDescriptor
 
 /**
@@ -11,4 +12,4 @@ typealias KotlinxSerializationTypeMatcher = (descriptor: SerialDescriptor) -> Bo
 /**
  * Provide type data for a matched descriptor
  */
-typealias KotlinxSerializationCustomProvider = () -> TypeData
+typealias KotlinxSerializationCustomProvider = (id: TypeId) -> TypeData

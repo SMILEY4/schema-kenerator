@@ -1,18 +1,18 @@
 package io.github.smiley4.schemakenerator.test
 
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaGenerationStepConfig
-import io.github.smiley4.schemakenerator.jsonschema.OptionalHandling
-import io.github.smiley4.schemakenerator.jsonschema.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.compileReferencing
-import io.github.smiley4.schemakenerator.jsonschema.compileReferencingRoot
-import io.github.smiley4.schemakenerator.jsonschema.generateJsonSchema
+import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.TitleBuilder
-import io.github.smiley4.schemakenerator.jsonschema.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.jsonschema.withTitle
-import io.github.smiley4.schemakenerator.reflection.analyseTypeUsingReflection
-import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithCollections
 import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithDeepGeneric
@@ -37,8 +37,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
     context("generator: inlining") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
-                .analyseTypeUsingReflection()
+            val schema = initial(data.type)
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -63,8 +63,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
     context("generator: referencing") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
-                .analyseTypeUsingReflection()
+            val schema = initial(data.type)
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -99,8 +99,8 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
     context("generator: referencing-root") {
         withData(TEST_DATA) { data ->
 
-            val schema = data.type
-                .analyseTypeUsingReflection()
+            val schema = initial(data.type)
+                .analyzeTypeUsingReflection()
                 .generateJsonSchema(data.generatorConfig)
                 .let { list ->
                     if (data.withAnnotations) {
@@ -138,7 +138,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
         private class TestData(
             val testName: String,
             val type: KType,
-            val generatorConfig: JsonSchemaGenerationStepConfig.() -> Unit = {},
+            val generatorConfig: JsonSchemaSteps.JsonSchemaGenerationStepConfig.() -> Unit = {},
             val withAnnotations: Boolean = false,
             val withAutoTitle: Boolean = false,
             val expectedResultInlining: String,
@@ -1310,7 +1310,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as required",
                 generatorConfig = {
-                    optionalHandling = OptionalHandling.REQUIRED
+                    optionalHandling = JsonSchemaSteps.OptionalHandling.REQUIRED
                 },
                 expectedResultInlining = """
                     {
@@ -1391,7 +1391,7 @@ class ReflectionParser_JsonGenerator_Tests : FunSpec({
                 type = typeOf<ClassWithOptionalParameters>(),
                 testName = "optional parameters as non-required",
                 generatorConfig = {
-                    optionalHandling = OptionalHandling.NON_REQUIRED
+                    optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
                 },
                 expectedResultInlining = """
                     {

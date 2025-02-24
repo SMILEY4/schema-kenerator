@@ -1,16 +1,15 @@
 package io.github.smiley4.schemakenerator.core
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.flatten
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.find
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.findAnnotatedWith
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.Visibility
-import io.github.smiley4.schemakenerator.core.data.find
-import io.github.smiley4.schemakenerator.core.data.findAnnotatedWith
 
 /**
  * Adds properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.
@@ -51,11 +50,10 @@ abstract class AbstractAddDiscriminatorStep {
 
     }
 
-    fun process(input: Bundle<TypeData>): Bundle<TypeData> {
+    fun process(input: TypeDataGroup): TypeDataGroup {
         val (bundleWithDiscriminatorType, discriminatorTypeId) = ensureDiscriminatorTypeExistence(input)
         bundleWithDiscriminatorType
-            .flatten()
-            .asSequence()
+            .typeData
             .filter { it.subtypes.isNotEmpty() }
             .forEach { addDiscriminator(it, discriminatorTypeId) }
         return bundleWithDiscriminatorType
@@ -65,14 +63,17 @@ abstract class AbstractAddDiscriminatorStep {
     /**
      * Ensures that the bundle contains a valid type for the discriminator property. Adds one if necessary and returns it as a new bundle.
      */
-    private fun ensureDiscriminatorTypeExistence(bundle: Bundle<TypeData>): Pair<Bundle<TypeData>, TypeId> {
-        val discriminatorType = bundle.flatten().find { it.id == DISCRIMINATOR_TYPE.id }
+    private fun ensureDiscriminatorTypeExistence(typeDataGroup: TypeDataGroup): Pair<TypeDataGroup, TypeId> {
+        val discriminatorType = typeDataGroup[DISCRIMINATOR_TYPE.id]
         return if (discriminatorType != null) {
-            bundle to discriminatorType.id
+            typeDataGroup to discriminatorType.id
         } else {
-            Bundle(
-                data = bundle.data,
-                supporting = bundle.supporting + listOf(DISCRIMINATOR_TYPE)
+            TypeDataGroup(
+                rootId = typeDataGroup.rootId,
+                data = buildMap {
+                    putAll(typeDataGroup.data)
+                    put(DISCRIMINATOR_TYPE.id, DISCRIMINATOR_TYPE)
+                }
             ) to DISCRIMINATOR_TYPE.id
         }
     }

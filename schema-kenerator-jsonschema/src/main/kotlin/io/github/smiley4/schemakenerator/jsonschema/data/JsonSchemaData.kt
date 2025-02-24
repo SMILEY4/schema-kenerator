@@ -3,16 +3,7 @@ package io.github.smiley4.schemakenerator.jsonschema.data
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 
-/**
- * A json-schema of a type.
- */
-class JsonSchema(
-    /**
-     * the json schema
-     */
+data class JsonSchemaData(
     val json: JsonNode,
-    /**
-     * the original type data
-     */
     val typeData: TypeData
 )

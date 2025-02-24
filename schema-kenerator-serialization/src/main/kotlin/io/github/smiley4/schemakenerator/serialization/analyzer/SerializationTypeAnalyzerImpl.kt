@@ -2,22 +2,19 @@
 
 package io.github.smiley4.schemakenerator.serialization.analyzer
 
-import io.github.smiley4.schemakenerator.core.data.Bundle
-import io.github.smiley4.schemakenerator.core.data.InputType
-import io.github.smiley4.schemakenerator.core.data.KTypeInput
+import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.matches
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
-import io.github.smiley4.schemakenerator.core.data.matches
-import io.github.smiley4.schemakenerator.serialization.data.SerialDescriptorInput
+import io.github.smiley4.schemakenerator.serialization.data.InitialSerialDescriptorTypeData
+import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.capturedKClass
-import kotlinx.serialization.descriptors.nonNullOriginal
 import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.serializerOrNull
-import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
 internal class SerializationTypeAnalyzerImpl(
@@ -28,7 +25,7 @@ internal class SerializationTypeAnalyzerImpl(
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
-    private val typeRedirects: Map<String, InputType> = emptyMap(),
+    private val typeRedirects: List<TypeRedirect>,
     /**
      * List of modules for type analysis. First matching module is used to analyze a given type.
      */
@@ -36,110 +33,81 @@ internal class SerializationTypeAnalyzerImpl(
 ) : SerializationTypeAnalyzer {
 
     /**
-     * Analyzes the given input type
-     */
-    fun analyze(input: InputType): Bundle<TypeData> = analyze(Bundle(input, emptyList()))
-
-
-    /**
      * Analyzes the given input type bundle
      */
-    fun analyze(input: Bundle<InputType>): Bundle<TypeData> {
+    fun analyze(input: InitialTypeData): TypeDataGroup {
 
         val knownTypeData = mutableListOf<TypeData>()
 
-        // process supporting inputs
-        input.supporting.forEach {
-            analyze(it, knownTypeData)
+        val root = when (input) {
+            is InitialKTypeData -> {
+                input.associatedTypes.forEach { analyze(it, knownTypeData) }
+                analyze(input.type, knownTypeData)
+            }
+            is InitialSerialDescriptorTypeData -> {
+                analyze(input.type, knownTypeData)
+            }
+            else -> throw IllegalArgumentException("Unsupported input type: ${input::class.qualifiedName}")
         }
 
-        // process main input
-        val typeData = analyze(input.data, knownTypeData)
-
-        knownTypeData.remove(typeData.typeData)
-        return Bundle(
-            data = typeData.typeData,
-            supporting = knownTypeData
+        return TypeDataGroup(
+            rootId = root.typeData.id,
+            data = knownTypeData.associateBy { it.id },
         )
     }
 
-    private fun analyze(input: InputType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
-        return when (input) {
-            is KTypeInput -> getSerializer(input.kType)
-                ?.let { serializer -> analyze(serializer.descriptor, input.kType.isMarkedNullable, knownTypeData, mutableMapOf()) }
-                ?: WrappedTypeData(
-                    typeData = knownTypeData.find(TypeId.createWildcard()) ?: TypeData.createWildcard(),
-                    nullable = false
-                )
-            is SerialDescriptorInput -> analyze(input.descriptor, input.descriptor.isNullable, knownTypeData, mutableMapOf())
-            else -> throw IllegalArgumentException("Unsupported input type '$input'.")
-        }
+    private fun analyze(input: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
+        return getSerializerFor(input)
+            ?.let { serializer -> analyze(serializer.descriptor, knownTypeData, TypeDataCache()) }
+            ?: WrappedTypeData(
+                typeData = knownTypeData.find(TypeId.createWildcard()) ?: TypeData.createWildcard().also { knownTypeData.add(it) },
+                nullable = false
+            )
     }
 
-
-    /**
-     * Get the serializer (or null) for the given type
-     */
-    private fun getSerializer(type: KType): KSerializer<Any?>? {
-        return if (type.classifier is KClass<*>) {
-            try {
-                serializerOrNull(type)
-            } catch (ignore: IllegalArgumentException) {
-                null
-            }
-        } else {
-            throw IllegalArgumentException("Type '$type' is not a class.")
-        }
+    private fun analyze(input: SerialDescriptor, knownTypeData: MutableList<TypeData>): WrappedTypeData {
+        return analyze(input, knownTypeData, TypeDataCache())
     }
 
-
-    /**
-     * Analyses the given descriptor and adds the results to the given collection
-     * @param descriptor the input descriptor to parse
-     * @param nullable whether the input descriptor is (externally) marked as nullable
-     * @param knownTypeData the already known type data. Adds new results to this collection.
-     * @param processedDescriptors already processed descriptors with their type data. Adds new results to this map.
-     */
     override fun analyze(
         descriptor: SerialDescriptor,
-        nullable: Boolean,
         knownTypeData: MutableList<TypeData>,
-        processedDescriptors: MutableMap<SerialDescriptor, TypeData>
+        cache: TypeDataCache
     ): WrappedTypeData {
 
+        // check type redirects
+        val matchingRedirect = typeRedirects.findLast { it.matches(descriptor) }
+        if (matchingRedirect != null) {
+            val (targetDescriptor, targetType) = matchingRedirect.buildTargetType(descriptor)
+            return if (targetDescriptor != null) {
+                analyze(targetDescriptor, knownTypeData)
+            } else {
+                analyze(targetType!!, knownTypeData)
+            }
+        }
+
         // input serial descriptor has already been parsed before (or is currently being parsed) -> break out of infinite loops
-        if (processedDescriptors.containsKey(descriptor.nonNullOriginal)) {
-            return WrappedTypeData(
-                typeData = processedDescriptors[descriptor.nonNullOriginal]!!,
-                nullable = descriptor != descriptor.nonNullOriginal
+        cache[descriptor]?.also {
+            return@analyze WrappedTypeData(
+                typeData = it,
+                nullable = descriptor.isNullable
             )
         }
 
         // reserve this descriptor / mark this descriptor as processed with a pending result
         // reserve type-id so that other types can already reference this type (e.g. members resulting in a reference loop)
         val reservedTypeId = TypeId.create()
-        processedDescriptors[descriptor] = TypeData.createPlaceholder(reservedTypeId)
-
-        // check type redirects
-        if (typeRedirects.containsKey(descriptor.redirectKey(nullable))) {
-            val redirectTo = typeRedirects[descriptor.redirectKey(nullable)]!!
-            return analyze(redirectTo, knownTypeData).also {
-                processedDescriptors[descriptor] = it.typeData
-            }
-        }
-
-        // todo: custom already here ? or here aswell ? i.e. before contextual ?
+        cache[descriptor] = TypeData.createPlaceholder(reservedTypeId)
 
         // check contextual descriptors
         val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
         if (contextualByKClass != null) {
-            return analyze(contextualByKClass, nullable, knownTypeData, processedDescriptors)
+            return analyze(contextualByKClass, knownTypeData, cache)
         }
 
         // find matching analyzer module for type
         val module = modules.firstOrNull { it.applies(descriptor) }
             ?: throw IllegalArgumentException("No analysis module matches the given serial descriptor '$descriptor'.")
-
 
         // analyze type
         val wrappedTypeData = module.analyze(
@@ -147,9 +115,8 @@ internal class SerializationTypeAnalyzerImpl(
                 analyzer = this,
                 id = reservedTypeId,
                 descriptor = descriptor,
-                nullable = nullable,
                 knownTypeData = knownTypeData,
-                processedDescriptors = processedDescriptors
+                cache = cache
             )
         )
 
@@ -166,15 +133,9 @@ internal class SerializationTypeAnalyzerImpl(
                 )
             }
             knownTypeData.add(result.typeData)
-            processedDescriptors[descriptor] = result.typeData
+            cache[descriptor] = result.typeData
         }
     }
-
-
-    /**
-     * @return a key used to match redirect types
-     */
-    private fun SerialDescriptor.redirectKey(nullable: Boolean) = fullName() + if (nullable || this.isNullable) "?" else ""
 
 
     /**

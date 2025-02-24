@@ -23,7 +23,7 @@ class SimpleTypeAnalyzerModule(
     }
 
     override fun analyze(context: ReflectionTypeAnalyzerModule.Context, minimalTypeData: MinimalTypeData) = WrappedTypeData(
-        typeData = provider(),
+        typeData = provider(context.id),
         nullable = context.type.isMarkedNullable
     )
 
