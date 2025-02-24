@@ -18,3 +18,5 @@ CHANGELOG
         - replacing
             - KEEP: whether the nullability of the "from" type should be kept with the replaced type
             - REPLACE: whether the nullability is also overwritten
+
+# fixed renaming swagger schema properties (issue #44)

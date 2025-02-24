@@ -5,6 +5,47 @@ search:
 
 # Changelog
 
+## 2.0.0
+
+- re-structured reflection and kotlinx-serialization type analysis
+    - allow more powerful custom type analyzers
+    - open up more internals for custom processors while still being able to re-use common functions
+- re-structures swagger and json schema generation
+    - allow more powerful custom schema generators
+- reworked/replaced bundles & overhauled input data classes for steps to make flow of data and order of steps more clear
+    - generic bundles replaced with specific classes "InitialTypeData", "TypeDataGroup", "IntermediateXYSchemaData", "CompiledXYSchemaData"
+    - start of pipeline changed from extension functions on raw kotlin types (e.g. typeOf<T>, T::class, etc.) to initial<T>, initial(T::clas), etc.
+- overhauled type redirection
+    - enhance configuration dsl
+    - more options to define exact behavior
+        - matching
+            - MATCH: whether the nullability of the "from" has to match exactly
+            - IGNORE: nullability of the "from" type is ignored when matching redirects
+        - replacing
+            - KEEP: whether the nullability of the "from" type should be kept with the replaced type
+            - REPLACE: whether the nullability is also overwritten
+- reworked base data models to better fit requirements and make them more flexible
+- added option to enable/disable explicit "null"-types for properties (e.g. `.compileInlining(explicitNullTypes = true)`
+- added option to allow special float values (i.e. "NaN", "Infinity", "-Infinity") for Float and Double (e.g. `.generateSwaggerSchema { allowSpecialFloatingPointValues = true }`)
+- added option to generate schemas for maps with complex keys as array with the map key and map values as valid item types (e.g. `.generateSwaggerSchema { mapsWithStructuredKeysAsArrays = true }`)
+- added option to swagger schema generation to restrict values of discriminator properties to the name of the type (`strictDiscriminatorProperty`))
+- option to handle nullable properties as required or non-required (e.g. `.generateSwaggerSchema { nullables = RequiredHandling.REQUIRED }`)
+- added support for kotlinx-serialization `@Contextual` annotation and `@Serializable(with = ...)`
+- improved support for annotations on fields that modify the type/schema (e.g. `@Format` on properties)
+- renamed steps to better reflect their function and purpose:
+    - `connectSubTypes` to `addMissingSupertypeSubtypeRelations`
+    - `mergeGetters` to `gettersToProperties`
+    - `renameProperties` to `renameMembers`
+    - `processReflection` to `analyseTypeUsingReflection`
+    - `processSerialization` to `analyseTypeUsingKotlinxSerialization`
+- removed deprecated "withAutoTitle" step
+- shortened & simplified package structure
+- make classes "internal" to reduce namespace pollution
+- simplified and removed unnecessary dependencies, opened up transitive dependencies to library consumers
+- fixed bug: type parameter nullability information was lost
+- fixed bug: `@Type`-annotation not handled correctly
+- fixed renaming swagger schema properties [#44](https://github.com/SMILEY4/schema-kenerator/issues/44)
+
 ## 1.6.4
 
 - fixed bug: when using reflection to analyze generic types, too many interfaces might be detected as subtypes [#43](https://github.com/SMILEY4/schema-kenerator/issues/43)

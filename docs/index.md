@@ -34,6 +34,11 @@ It is designed as a pipeline of individual steps to be highly configurable and f
 - Highly configurable and customizable schema generation pipeline by adding new processing steps and creating own modules
 
 
+## Installation
+
+For installation instructions, see the [modules](modules.md) overview page.
+
+
 ## Example
 
 ```kotlin
