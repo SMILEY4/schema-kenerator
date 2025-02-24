@@ -834,7 +834,7 @@ It is designed as a pipeline of individual steps to be highly configurable and f
 <span class="p">)</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">jsonSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">initial</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">()</span>
-<span class="w">    </span><span class="p">.</span><span class="na">analyseTypeUsingReflection</span><span class="p">()</span><span class="w"> </span><span class="c1">//(1)!</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyzeTypeUsingReflection</span><span class="p">()</span><span class="w"> </span><span class="c1">//(1)!</span>
 <span class="w">    </span><span class="p">.</span><span class="na">generateJsonSchema</span><span class="p">()</span><span class="w"> </span><span class="c1">//(2)!</span>
 <span class="w">    </span><span class="p">.</span><span class="na">withTitle</span><span class="p">(</span><span class="n">TitleType</span><span class="p">.</span><span class="na">SIMPLE</span><span class="p">)</span><span class="w"> </span><span class="c1">//(3)!</span>
 <span class="w">    </span><span class="p">.</span><span class="na">compileInlining</span><span class="p">()</span><span class="w"> </span><span class="c1">//(4)!</span>
