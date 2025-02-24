@@ -1,7 +1,0 @@
-$dokka.format:html-v1
-$dokka.linkExtension:html
-$dokka.location:io.github.smiley4.schemakenerator.jackson.jsonschema////PointingToDeclaration/schema-kenerator-jackson-jsonschema/io.github.smiley4.schemakenerator.jackson.jsonschema/index.html
-$dokka.location:io.github.smiley4.schemakenerator.jackson.jsonschema/JacksonJsonSchemaSteps///PointingToDeclaration/schema-kenerator-jackson-jsonschema/io.github.smiley4.schemakenerator.jackson.jsonschema/-jackson-json-schema-steps/index.html
-$dokka.location:io.github.smiley4.schemakenerator.jackson.jsonschema/JacksonJsonSchemaSteps/handleJacksonJsonSchemaAnnotations/io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData#/PointingToDeclaration/schema-kenerator-jackson-jsonschema/io.github.smiley4.schemakenerator.jackson.jsonschema/-jackson-json-schema-steps/handle-jackson-json-schema-annotations.html
-io.github.smiley4.schemakenerator.jackson.jsonschema
-
