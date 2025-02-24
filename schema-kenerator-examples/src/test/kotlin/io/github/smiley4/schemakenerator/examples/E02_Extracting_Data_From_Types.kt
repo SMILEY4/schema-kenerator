@@ -29,7 +29,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         "... using reflection" {
             val extracted = initial<SimpleClass>().analyzeTypeUsingReflection()
 
-            // With the "analyseTypeUsingReflection()"-step, information about the given type is extracted and stored in "TypeData" using jvm reflection features.
+            // With the "analyzeTypeUsingReflection()"-step, information about the given type is extracted and stored in "TypeData" using jvm reflection features.
             // The result is extracted information about the type "SimpleClass" as well as other referenced types, i.e. "String" and "Int".
             // The data for the root type (i.e. "SimpleClass") is stored in "Bundle#data" and referenced types ("String", "Int") in "Bundle#supporting".
 
@@ -38,7 +38,7 @@ class E02_Extracting_Data_From_Types : FreeSpec({
         }
 
         "configuring the reflection step" {
-            // The "analyseTypeUsingReflection()"-step has some parameters to configure its behavior and what information to include
+            // The "analyzeTypeUsingReflection()"-step has some parameters to configure its behavior and what information to include
             initial<SimpleClass>().analyzeTypeUsingReflection {
                 // whether to include getter functions as members of a type
                 includeGetters = false

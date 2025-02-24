@@ -56,7 +56,7 @@ class MyExampleClass(
 ```kotlin
 val jsonSchema = initial<String>()
     // Analyze the type using reflection and extract information
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     // Generate (independent) json schemas for each associated type (here: `MyExampleClass`, `Int`, `Boolean` and `List<Boolean>`)
     .generateJsonSchema()
     // Add the simple/short name of the type as the title to the schema
