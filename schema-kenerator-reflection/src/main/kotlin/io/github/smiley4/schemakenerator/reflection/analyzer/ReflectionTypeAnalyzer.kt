@@ -8,7 +8,7 @@ import kotlin.reflect.KType
 
 
 /**
- * Analyses the given type and returns the resulting [TypeData] (with additional nullability information)
+ * Analyzes the given type and returns the resulting [TypeData] (with additional nullability information)
  */
 interface ReflectionTypeAnalyzer {
 

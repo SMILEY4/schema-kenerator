@@ -16,14 +16,14 @@ class ExampleClass(
 )../
 ```
 
-With the `analyseTypeUsingReflection()`-step, information about a given input type is extracted and resulting
+With the `analyzeTypeUsingReflection()`-step, information about a given input type is extracted and resulting
 information about the type as well as other referenced types, e.g. "ExampleClass", "String" and "Int" is returned to be used as inputs
 for further steps.
 
 The step can be configured to specify which information should be included in the output and in what format.
 
 ```kotlin
-initial<ExampleClass>().analyseTypeUsingReflection {
+initial<ExampleClass>().analyzeTypeUsingReflection {
     //...
 }
 ```
@@ -69,7 +69,7 @@ sealed class SealedParent { //(1)!
 1. Sealed class `SealedParent` with two subtypes `ChildOne` and `ChildTwo`.
 
 ```kotlin
-initial<SealedParent>().analyseTypeUsingReflection()
+initial<SealedParent>().analyzeTypeUsingReflection()
 ```
 
 ??? info "Required Dependencies"
@@ -113,7 +113,7 @@ initial<ParentManual>( //(1)!
         typeOf<ParentManual.ChildTwo>()
     )
 )
-    .analyseTypeUsingReflection() //(3)!
+    .analyzeTypeUsingReflection() //(3)!
     .addMissingSupertypeSubtypeRelations() //(4)!
 ```
 
@@ -176,7 +176,7 @@ open class ParentCore { //(2)!
 ```kotlin
 initial<ParentCore>()
     .collectSubTypes() //(1)!
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .addMissingSupertypeSubtypeRelations() //(2)!
 ```
 
@@ -239,9 +239,9 @@ open class ParentJackson { //(2)!
 ```kotlin
 initial<ParentJackson>()
     .collectJacksonSubTypes({ //(1)!
-        it.analyseTypeUsingReflection() //(2)!
+        it.analyzeTypeUsingReflection() //(2)!
     })
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .addMissingSupertypeSubtypeRelations() //(3)!
 ```
 
@@ -303,7 +303,7 @@ sealed class SealedParent { //(1)!
 
 ```kotlin
 initial<SealedParent>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .addDiscriminatorProperty("_type") //(1)!
 ```
 
@@ -370,7 +370,7 @@ sealed class ParentDiscriminatorJackson { //(3)!
 
 ```kotlin
 initial<ParentDiscriminatorJackson>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .addJacksonTypeInfoDiscriminatorProperty() //(1)!
 ```
 

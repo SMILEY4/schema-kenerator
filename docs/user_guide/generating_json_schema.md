@@ -23,7 +23,7 @@ class NestedClass(
 
     ```kotlin
     initial<ExampleClass>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateJsonSchema()
         .compileInlining()
         .json
@@ -62,7 +62,7 @@ class NestedClass(
 
     ```kotlin
     initial<ExampleClass>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateJsonSchema()
         .compileReferencing()
         .json
@@ -107,7 +107,7 @@ class NestedClass(
 
     ```kotlin
     initial<ExampleClass>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateJsonSchema()
         .compileReferencingRoot()
         .json
@@ -178,7 +178,7 @@ Schemas can be referenced using different paths or "ids" when using `compileRefe
 
     ```kotlin
     initial<List<GenericClass<String>>>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateJsonSchema()
         .compileReferencing(pathType = RefType.SIMPLE)
     ```
@@ -218,7 +218,7 @@ A "title" property can be automatically added to all types in the JSON Schema.
 
 ```kotlin
 initial<List<GenericClass<String>>>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateJsonSchema()
     .withTitle(type = TitleType.SIMPLE)
     .compileInlining()
@@ -290,7 +290,7 @@ class CoreAnnotatedClass(
 ```
 ```kotlin
 initial<CoreAnnotatedClass>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateJsonSchema()
     .handleCoreAnnotations()
     .compileInlining()
@@ -369,7 +369,7 @@ class JacksonAnnotatedClass(
 ```
 ```kotlin
 initial<JacksonAnnotatedClass>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateJsonSchema()
     .handleJacksonJsonSchemaAnnotations()
     .compileInlining()

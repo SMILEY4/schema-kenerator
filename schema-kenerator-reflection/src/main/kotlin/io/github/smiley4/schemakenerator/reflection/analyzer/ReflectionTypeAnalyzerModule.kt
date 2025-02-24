@@ -41,7 +41,7 @@ interface ReflectionTypeAnalyzerModule {
 
     /**
      * A quick pre-analysis step with all input data in the given context.
-     * @param context the input context with the current type to analyse
+     * @param context the input context with the current type to analyze
      * @return [MinimalTypeData] with some basic information
      */
     fun preAnalyze(context: Context): MinimalTypeData
@@ -49,7 +49,7 @@ interface ReflectionTypeAnalyzerModule {
 
     /**
      * The full type analysis.
-     * @param context the input context with the current type to analyse and currently known additional data
+     * @param context the input context with the current type to analyze and currently known additional data
      * @return [TypeData] with additional nullability information
      */
     fun analyze(context: Context, minimalTypeData: MinimalTypeData): WrappedTypeData
