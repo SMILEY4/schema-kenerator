@@ -1,6 +1,7 @@
 package io.github.smiley4.schemakenerator.reflection
 
 import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.reflection.analyzer.DefaultReflectionTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.reflection.analyzer.ReflectionCustomProvider
@@ -24,10 +25,15 @@ object ReflectionSteps {
      * Add this step before type analysis.
      * @param maxRecursionDepth how many "levels" to search for subtypes
      */
-    fun InitialKTypeData.collectSubTypes(maxRecursionDepth: Int = 10): InitialKTypeData {
-        return ReflectionAnnotationSubTypeStep(
-            maxRecursionDepth = maxRecursionDepth
-        ).process(this)
+    fun InitialTypeData.collectSubTypes(maxRecursionDepth: Int = 10): InitialKTypeData {
+        return when (this) {
+            is InitialKTypeData -> {
+                ReflectionAnnotationSubTypeStep(
+                    maxRecursionDepth = maxRecursionDepth
+                ).process(this)
+            }
+            else -> throw IllegalArgumentException("Initial type data '${this::class.simpleName}' is not supported by this step.'")
+        }
     }
 
 
@@ -35,12 +41,17 @@ object ReflectionSteps {
      * Analyze the type and using reflection and return the extracted data.
      * @param configBlock the configuration
      */
-    fun InitialKTypeData.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): TypeDataGroup {
-        val config = ReflectionTypeAnalysisConfig().apply(configBlock)
-        return ReflectionTypeAnalyzerImpl(
-            typeRedirects = config.typeRedirects,
-            modules = config.buildCustomModules()
-        ).analyze(this)
+    fun InitialTypeData.analyzeTypeUsingReflection(configBlock: ReflectionTypeAnalysisConfig.() -> Unit = {}): TypeDataGroup {
+        return when (this) {
+            is InitialKTypeData -> {
+                val config = ReflectionTypeAnalysisConfig().apply(configBlock)
+                ReflectionTypeAnalyzerImpl(
+                    typeRedirects = config.typeRedirects,
+                    modules = config.buildCustomModules()
+                ).analyze(this)
+            }
+            else -> throw IllegalArgumentException("Initial type data '${this::class.simpleName}' is not supported by this step.'")
+        }
     }
 
     class ReflectionTypeAnalysisConfig {

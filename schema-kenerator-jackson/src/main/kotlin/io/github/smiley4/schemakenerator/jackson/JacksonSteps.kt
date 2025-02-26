@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
+import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import kotlin.reflect.KType
 
@@ -20,14 +21,19 @@ object JacksonSteps {
      * @param typeProcessing processor used to get annotation data from [KType]
      * @param maxRecursionDepth how many "levels" to search for subtypes
      */
-    fun InitialKTypeData.collectJacksonSubTypes(
+    fun InitialTypeData.collectJacksonSubTypes(
         typeProcessing: (type: InitialKTypeData) -> TypeDataGroup,
         maxRecursionDepth: Int = 10
     ): InitialKTypeData {
-        return JacksonSubTypeStep(
-            typeProcessing = typeProcessing,
-            maxRecursionDepth = maxRecursionDepth
-        ).process(this)
+        return when(this) {
+            is InitialKTypeData -> {
+                JacksonSubTypeStep(
+                    typeProcessing = typeProcessing,
+                    maxRecursionDepth = maxRecursionDepth
+                ).process(this)
+            }
+            else -> throw IllegalArgumentException("Initial type data '${this::class.simpleName}' is not supported by this step.'")
+        }
     }
 
 
