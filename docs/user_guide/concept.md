@@ -53,7 +53,7 @@ Resulting data can be further modified or added to with additional steps, e.g. a
     )
 
     initial<MyExampleClass>()
-        .analyseTypeUsingReflection() //(1)!
+        .analyzeTypeUsingReflection() //(1)!
         .addDiscriminatorProperty("_type") //(2)!
         //...
     ```

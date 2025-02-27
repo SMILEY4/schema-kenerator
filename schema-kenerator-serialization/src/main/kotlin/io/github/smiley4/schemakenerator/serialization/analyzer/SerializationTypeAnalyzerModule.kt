@@ -34,7 +34,7 @@ interface SerializationTypeAnalyzerModule {
 
     /**
      * The type analysis.
-     * @param context the input context with the current type to analyse and currently known additional data
+     * @param context the input context with the current type to analyze and currently known additional data
      * @return [TypeData] with additional nullability information
      */
     fun analyze(context: Context): WrappedTypeData

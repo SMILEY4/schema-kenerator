@@ -23,7 +23,7 @@ class NestedClass(
 
     ```kotlin
     initial<ExampleClass>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateSwaggerSchema()
         .compileInlining()
         .swagger
@@ -61,7 +61,7 @@ class NestedClass(
 
     ```kotlin
     initial<ExampleClass>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateSwaggerSchema()
         .compileReferencing()
         .swagger
@@ -105,7 +105,7 @@ class NestedClass(
 
     ```kotlin
     initial<ExampleClass>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateSwaggerSchema()
         .compileReferencingRoot()
         .json
@@ -174,7 +174,7 @@ Schemas can be referenced using different paths or "ids" when using `compileRefe
 
     ```kotlin
     initial<List<GenericClass<String>>>()
-        .analyseTypeUsingReflection()
+        .analyzeTypeUsingReflection()
         .generateJsonSchema()
         .compileReferencing(pathType = RefType.OPENAPI_SIMPLE)
     ```
@@ -214,7 +214,7 @@ A "title" property can be automatically added to all types in the schema.
 
 ```kotlin
 initial<List<GenericClass<String>>>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateSwaggerSchema()
     .withTitle(type = TitleType.SIMPLE)
     .compileInlining()
@@ -288,7 +288,7 @@ class CoreAnnotatedClass(
 ```
 ```kotlin
 initial<CoreAnnotatedClass>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateSwaggerSchema()
     .handleCoreAnnotations()
     .compileInlining()
@@ -366,7 +366,7 @@ class JacksonAnnotatedClass(
 ```
 ```kotlin
 initial<JacksonAnnotatedClass>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateJsonSchema()
     .handleJacksonSwaggerAnnotations()
     .compileInlining()
@@ -456,7 +456,7 @@ private class SwaggerAnnotatedClass(
 ```
 ```kotlin
 initial<JacksonAnnotatedClass>()
-    .analyseTypeUsingReflection()
+    .analyzeTypeUsingReflection()
     .generateJsonSchema()
     .handleSchemaAnnotations()
     .compileInlining()

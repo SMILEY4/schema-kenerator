@@ -36,8 +36,8 @@ search:
     - `connectSubTypes` to `addMissingSupertypeSubtypeRelations`
     - `mergeGetters` to `gettersToProperties`
     - `renameProperties` to `renameMembers`
-    - `processReflection` to `analyseTypeUsingReflection`
-    - `processSerialization` to `analyseTypeUsingKotlinxSerialization`
+    - `processReflection` to `analyzeTypeUsingReflection`
+    - `processSerialization` to `analyzeTypeUsingKotlinxSerialization`
 - removed deprecated "withAutoTitle" step
 - shortened & simplified package structure
 - make classes "internal" to reduce namespace pollution

@@ -50,7 +50,7 @@ class MyExampleClass(
 ```
 ```kotlin
 val jsonSchema = initial<String>()
-    .analyseTypeUsingReflection() //(1)!
+    .analyzeTypeUsingReflection() //(1)!
     .generateJsonSchema() //(2)!
     .withTitle(TitleType.SIMPLE) //(3)!
     .compileInlining() //(4)!
