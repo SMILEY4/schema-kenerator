@@ -5,6 +5,14 @@ search:
 
 # Changelog
 
+## 2.1.1
+
+- fix infinite loop in `mergePropertyAttributesIntoType`-step ([#50](https://github.com/SMILEY4/schema-kenerator/issues/50), [#51](https://github.com/SMILEY4/schema-kenerator/issues/51))
+
+## 2.1.0
+
+- add initial step extension functions to all InitialTypeData instead of specific subclasses
+
 ## 2.0.0
 
 - re-structured reflection and kotlinx-serialization type analysis
