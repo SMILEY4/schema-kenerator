@@ -7,6 +7,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.find
 import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.findAnnotatedWith
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.matches
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.Visibility
@@ -64,7 +65,16 @@ abstract class AbstractAddDiscriminatorStep {
      * Ensures that the bundle contains a valid type for the discriminator property. Adds one if necessary and returns it as a new bundle.
      */
     private fun ensureDiscriminatorTypeExistence(typeDataGroup: TypeDataGroup): Pair<TypeDataGroup, TypeId> {
-        val discriminatorType = typeDataGroup[DISCRIMINATOR_TYPE.id]
+        val discriminatorType = typeDataGroup.typeData.find {
+            it.matches(
+                other = DISCRIMINATOR_TYPE,
+                compareId = false,
+                compareIdentifyingName = true,
+                compareDescriptiveName = true,
+                compareTypeParameters = true,
+                compareMembers = true
+            )
+        }
         return if (discriminatorType != null) {
             typeDataGroup to discriminatorType.id
         } else {
