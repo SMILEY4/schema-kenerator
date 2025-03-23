@@ -6,29 +6,19 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.core.annotations.Format
-import io.github.smiley4.schemakenerator.core.annotations.Title
-import io.github.smiley4.schemakenerator.core.annotations.Type
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
-import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
-import io.github.smiley4.schemakenerator.reflection.data.SubType
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.kotest.core.spec.style.StringSpec
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -44,10 +34,15 @@ import java.util.UUID
 class _ManualTests : StringSpec({
 
     "test" {
-        val jsonSchema = initial<Foo>()
-            .analyzeTypeUsingKotlinxSerialization()
+        val jsonSchema = initial<Config>()
+            .analyzeTypeUsingKotlinxSerialization {
+                markNotParameterized<TooltipModel>()
+            }
+            .addJsonClassDiscriminatorProperty()
+            .handleNameAnnotation()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
+            .handleSchemaAnnotations()
             .mergePropertyAttributesIntoType()
             .compileReferencingRoot()
             .asPrintable()
@@ -58,18 +53,16 @@ class _ManualTests : StringSpec({
     companion object {
 
         @Serializable
-        data class Foo(
-            val id: Int,
-            @Type("test")
-            val owner: Bar,
+        data class Config(
+            val emptyState: TooltipModel? = null,
+            val tooltip: TooltipModel? = null,
         )
+
 
         @Serializable
-        data class Bar(
-            val id: Int,
-            val yes: Foo
+        data class TooltipModel(
+            val description: String
         )
-
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,
@@ -87,7 +80,6 @@ class _ManualTests : StringSpec({
 
     }
 }
-
 
 
 object InstantSerializer : KSerializer<Instant> {

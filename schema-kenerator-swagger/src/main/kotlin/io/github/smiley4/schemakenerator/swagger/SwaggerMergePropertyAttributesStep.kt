@@ -13,8 +13,7 @@ internal class SwaggerMergePropertyAttributesStep {
 
         while (open.isNotEmpty()) {
             val current = open.removeFirst()
-            println("process: ${current.typeData.identifyingName.full}")
-            process(current, content).also { println("  " + it.map { x -> x.typeData.identifyingName.full }) }.forEach {
+            process(current, content).forEach {
                 content[it.typeData.id] = it
                 open.add(it)
             }
