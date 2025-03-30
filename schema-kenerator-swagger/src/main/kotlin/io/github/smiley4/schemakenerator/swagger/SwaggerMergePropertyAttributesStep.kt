@@ -75,7 +75,6 @@ internal class SwaggerMergePropertyAttributesStep {
         if(property.multipleOf != null && property.multipleOf != schema.multipleOf) return true
         if(property.name != null && property.name != schema.name) return true
         if(property.not != null) return true
-        if(property.nullable != null && property.nullable != schema.nullable) return true
         if(property.oneOf != null) return true
         if(property.pattern != null && property.pattern != schema.pattern) return true
         if(property.properties != null) return true
