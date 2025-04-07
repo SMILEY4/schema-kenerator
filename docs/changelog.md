@@ -5,6 +5,11 @@ search:
 
 # Changelog
 
+## 2.1.2
+
+- fixed bug: duplicate "string" type added by type discriminator handling
+- fixed bug: incorrect comparison check in "mergePropertyAttributesIntoType" step caused infinite loop
+
 ## 2.1.1
 
 - fix infinite loop in `mergePropertyAttributesIntoType`-step ([#50](https://github.com/SMILEY4/schema-kenerator/issues/50), [#51](https://github.com/SMILEY4/schema-kenerator/issues/51))
