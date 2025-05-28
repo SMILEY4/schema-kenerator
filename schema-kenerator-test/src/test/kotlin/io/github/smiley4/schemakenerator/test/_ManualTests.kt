@@ -6,20 +6,14 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.RequiredHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
-import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.kotest.core.spec.style.StringSpec
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -28,6 +22,9 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import java.time.Instant
 import java.util.UUID
 
@@ -37,17 +34,42 @@ import java.util.UUID
 class _ManualTests : StringSpec({
 
     "test" {
-        val jsonSchema = initial<ClassDirectSelfReferencing>()
-            .analyzeTypeUsingReflection()
-            .generateSwaggerSchema()
-            .mergePropertyAttributesIntoType()
+
+        val jsonSerializersModule = SerializersModule {
+            contextual(InstantSerializer)
+        }
+
+        val jsonConfig = Json {
+            encodeDefaults = true
+            explicitNulls = false
+            serializersModule = jsonSerializersModule
+        }
+
+        val schema = initial<TestResponse>()
+            .analyzeTypeUsingKotlinxSerialization {
+                serializersModule = jsonConfig.serializersModule
+            }
+            .also {
+                println(it)
+            }
+            .generateSwaggerSchema {
+                nullables = if (jsonConfig.configuration.explicitNulls) RequiredHandling.REQUIRED else RequiredHandling.NON_REQUIRED
+            }
             .compileInlining()
             .asPrintable()
-        println(json.writeValueAsString(jsonSchema))
+        println(json.writeValueAsString(schema))
     }
 
 }) {
     companion object {
+
+        @Serializable
+        data class TestResponse(
+            val name: String,
+            val age: Int? = null,
+            val createdAt: @Contextual Instant? = null,
+            val modifiedAt: @Contextual Instant? = null,
+        )
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,
