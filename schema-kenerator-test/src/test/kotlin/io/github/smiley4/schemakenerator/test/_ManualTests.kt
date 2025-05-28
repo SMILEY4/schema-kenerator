@@ -8,14 +8,17 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
+import io.github.smiley4.schemakenerator.test.models.reflection.ClassDirectSelfReferencing
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -34,35 +37,17 @@ import java.util.UUID
 class _ManualTests : StringSpec({
 
     "test" {
-        val jsonSchema = initial<Config>()
-            .analyzeTypeUsingKotlinxSerialization {
-                markNotParameterized<TooltipModel>()
-            }
-            .addJsonClassDiscriminatorProperty()
-            .handleNameAnnotation()
+        val jsonSchema = initial<ClassDirectSelfReferencing>()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
-            .handleCoreAnnotations()
-            .handleSchemaAnnotations()
             .mergePropertyAttributesIntoType()
-            .compileReferencingRoot()
+            .compileInlining()
             .asPrintable()
         println(json.writeValueAsString(jsonSchema))
     }
 
 }) {
     companion object {
-
-        @Serializable
-        data class Config(
-            val emptyState: TooltipModel? = null,
-            val tooltip: TooltipModel? = null,
-        )
-
-
-        @Serializable
-        data class TooltipModel(
-            val description: String
-        )
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

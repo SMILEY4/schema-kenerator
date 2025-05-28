@@ -10,7 +10,6 @@ import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
-import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps

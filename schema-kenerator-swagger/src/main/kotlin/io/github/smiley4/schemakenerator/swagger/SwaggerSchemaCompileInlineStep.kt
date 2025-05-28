@@ -24,6 +24,8 @@ internal class SwaggerSchemaCompileInlineStep(private val explicitNullTypes: Boo
             val referencedSchema = input[TypeId(refObj.`$ref`)]
             if (referencedSchema == null) {
                 refObj
+            } else if(referencedSchema.typeData.id == input.rootId) {
+                schemaUtils.referenceSelf()
             } else {
                 createInlining(refObj, referencedSchema)
             }
