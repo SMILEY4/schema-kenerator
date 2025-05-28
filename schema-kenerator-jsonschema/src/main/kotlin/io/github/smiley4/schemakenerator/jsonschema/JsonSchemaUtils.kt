@@ -146,6 +146,10 @@ class JsonSchemaUtils {
 
     //=====  REFERENCE ==============================
 
+    fun referenceSelf(): JsonObject {
+        return referenceSchema("#", false)
+    }
+
     fun referenceSchema(type: TypeId, prefixDefinitions: Boolean = false): JsonObject {
         return referenceSchema(type.id, prefixDefinitions)
     }
