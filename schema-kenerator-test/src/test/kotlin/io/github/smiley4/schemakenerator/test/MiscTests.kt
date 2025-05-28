@@ -5,11 +5,11 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
@@ -51,6 +51,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import java.time.Instant
 import java.util.Optional
 import java.util.UUID
@@ -1241,7 +1242,40 @@ class MiscTests : FreeSpec({
             }
         }
 
+    }
 
+    "class with multiple @Contextual annotations" - {
+        val result = initial<ClassMultipleContextuals>()
+            .analyzeTypeUsingKotlinxSerialization {
+                serializersModule = SerializersModule {
+                    contextual(MyInstantSerializer)
+                }
+            }
+            .generateSwaggerSchema()
+            .compileInlining()
+        result.swagger.shouldEqualJson {
+            """
+                {
+                  "type": "object",
+                  "properties": {
+                    "fieldA": {
+                      "type": [
+                        "null",
+                        "integer"
+                      ],
+                      "format": "int64"
+                    },
+                    "fieldB": {
+                      "type": [
+                        "null",
+                        "integer"
+                      ],
+                      "format": "int64"
+                    }
+                  }
+                }
+            """.trimIndent()
+        }
     }
 
 }) {
@@ -1383,12 +1417,21 @@ class MiscTests : FreeSpec({
             val numberValue: Number,
         )
 
+
         @Serializable
         data class CombinedKey(val a: String, val b: Int)
+
 
         @Serializable
         data class ClassWithCombinedKeyMap(
             val map: Map<CombinedKey, Int>
+        )
+
+
+        @Serializable
+        data class ClassMultipleContextuals(
+            val fieldA: @Contextual Instant? = null,
+            val fieldB: @Contextual Instant? = null,
         )
 
     }

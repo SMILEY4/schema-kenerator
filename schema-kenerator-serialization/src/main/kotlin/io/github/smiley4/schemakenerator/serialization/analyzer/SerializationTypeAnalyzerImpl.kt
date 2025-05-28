@@ -86,6 +86,12 @@ internal class SerializationTypeAnalyzerImpl(
             }
         }
 
+        // check contextual descriptors
+        val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
+        if (contextualByKClass != null) {
+            return analyze(contextualByKClass, knownTypeData, cache)
+        }
+
         // input serial descriptor has already been parsed before (or is currently being parsed) -> break out of infinite loops
         cache[descriptor]?.also {
             return@analyze WrappedTypeData(
@@ -98,12 +104,6 @@ internal class SerializationTypeAnalyzerImpl(
         // reserve type-id so that other types can already reference this type (e.g. members resulting in a reference loop)
         val reservedTypeId = TypeId.create()
         cache[descriptor] = TypeData.createPlaceholder(reservedTypeId)
-
-        // check contextual descriptors
-        val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
-        if (contextualByKClass != null) {
-            return analyze(contextualByKClass, knownTypeData, cache)
-        }
 
         // find matching analyzer module for type
         val module = modules.firstOrNull { it.applies(descriptor) }
