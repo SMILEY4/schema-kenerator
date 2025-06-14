@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
+import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
@@ -1278,6 +1279,55 @@ class MiscTests : FreeSpec({
         }
     }
 
+    "description on property and class - https://github.com/SMILEY4/ktor-openapi-tools/issues/200" {
+
+        val result = initial<ClassWithPropertyDescriptions>()
+            .analyzeTypeUsingReflection()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot()
+
+        (result.swagger to result.componentSchemas).shouldEqualJson {
+            mapOf(
+                "." to """
+                    {
+                      "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithPropertyDescriptions"
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithPropertyDescriptions" to """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "someProp": {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithDescription",
+                          "description": "description on property"
+                        }
+                      },
+                      "required": [
+                        "someProp"
+                      ]
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithDescription" to """
+                    {
+                      "type": "object",
+                      "description": "description on class",
+                      "properties": {
+                        "value": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    }
+                """.trimIndent(),
+            )
+        }
+    }
+
 }) {
 
     companion object {
@@ -1400,6 +1450,17 @@ class MiscTests : FreeSpec({
         }
 
         enum class Issue43Enum { Alpha, Beta, }
+
+
+        class ClassWithPropertyDescriptions(
+            @Description("description on property") val someProp: ClassWithDescription
+        )
+
+
+        @Description("description on class")
+        class ClassWithDescription(
+            val value: Int
+        )
 
 
         @Serializable

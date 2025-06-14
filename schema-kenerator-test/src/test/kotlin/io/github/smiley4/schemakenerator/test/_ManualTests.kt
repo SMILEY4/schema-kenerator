@@ -6,11 +6,21 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.annotations.Description
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.RequiredHandling
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.kotest.core.spec.style.StringSpec
 import kotlinx.serialization.Contextual
@@ -22,9 +32,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
 import java.time.Instant
 import java.util.UUID
 
@@ -33,29 +40,37 @@ import java.util.UUID
  */
 class _ManualTests : StringSpec({
 
-    "test" {
-
-        val jsonSerializersModule = SerializersModule {
-            contextual(InstantSerializer)
-        }
-
-        val jsonConfig = Json {
-            encodeDefaults = true
-            explicitNulls = false
-            serializersModule = jsonSerializersModule
-        }
-
-        val schema = initial<TestResponse>()
-            .analyzeTypeUsingKotlinxSerialization {
-                serializersModule = jsonConfig.serializersModule
-            }
+    "reflection" {
+        val schema = initial<Foo>()
+            .collectSubTypes()
+            .analyzeTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
             .also {
                 println(it)
             }
-            .generateSwaggerSchema {
-                nullables = if (jsonConfig.configuration.explicitNulls) RequiredHandling.REQUIRED else RequiredHandling.NON_REQUIRED
+            .mergePropertyAttributesIntoType()
+            .also {
+                println(it)
             }
-            .compileInlining()
+            .compileReferencingRoot()
+            .asPrintable()
+        println(json.writeValueAsString(schema))
+    }
+
+    "kotlinx" {
+        val schema = initial<Foo>()
+            .analyzeTypeUsingKotlinxSerialization()
+            .addJsonClassDiscriminatorProperty()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot()
             .asPrintable()
         println(json.writeValueAsString(schema))
     }
@@ -64,12 +79,24 @@ class _ManualTests : StringSpec({
     companion object {
 
         @Serializable
-        data class TestResponse(
-            val name: String,
-            val age: Int? = null,
-            val createdAt: @Contextual Instant? = null,
-            val modifiedAt: @Contextual Instant? = null,
+        @Description("enum1 desc")
+        enum class Enum1 { A, B, C }
+
+        @Serializable
+        @Description("enum2 desc")
+        enum class Enum2 { A, B, C }
+
+        @Serializable
+        @Description("foo desc")
+        data class Foo(
+            @Description("desc from Foo") val e: Enum1,
+            @Description("desc from Foo 1") val bar1: Bar,
+            @Description("desc from Foo 2") val bar2: Bar
         )
+
+        @Serializable
+        @Description("bar desc")
+        data class Bar(val value: Int)
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

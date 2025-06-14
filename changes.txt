@@ -1,0 +1,29 @@
+since 2.1.2
+===========
+
+
+Improve Inlined Cycles
+----------------------
+
+branch: improved-cyclic-ref-handling
+issues:
+    - https://github.com/SMILEY4/schema-kenerator/issues/53
+    - https://github.com/SMILEY4/ktor-openapi-tools/issues/193
+
+
+
+NPE when using multiple contextual annotations
+---------------------------------------------------
+
+branch: fix-198-failurre-with-multiple-contextuals
+issues:
+    - https://github.com/SMILEY4/ktor-openapi-tools/issues/198
+
+
+
+Duplicates schemas with incorrect description
+---------------------------------------------
+
+branch: fix-200-duplicate-schemas-with-incorrect-description
+issues:
+    - https://github.com/SMILEY4/ktor-openapi-tools/issues/200

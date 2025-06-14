@@ -80,13 +80,21 @@ internal class SwaggerSchemaCompileReferenceStep(
      * @param context the current compile context with data about input schemas and type data as well as current produced information
      */
     private fun resolveReference(refObj: Schema<*>, context: Context): Schema<*> {
-        val referencedSchema = context.knownSchemas.find { it.typeData.id ==  TypeId(refObj.`$ref`) }
+        // find actual schema data
+        val referencedSchema = context.knownSchemas.find { it.typeData.id == TypeId(refObj.`$ref`) }
         return if (referencedSchema != null) {
-            if (shouldReference(referencedSchema.swagger)) {
+            // create swagger property with correct reference path (and add actual schema to context)
+            val property = if (shouldReference(referencedSchema.swagger)) {
                 createRefProperty(refObj, referencedSchema, context)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
+            // add back some information to property
+            if(!refObj.description.isNullOrEmpty()) {
+                property.description = refObj.description
+            }
+            // return
+            property
         } else {
             refObj
         }

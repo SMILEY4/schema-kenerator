@@ -50,7 +50,6 @@ internal class SwaggerMergePropertyAttributesStep {
         if(property.anyOf != null) return true
         if(property.contains != null) return true
         if(property.deprecated != null && property.deprecated != schema.deprecated) return true
-        if(property.description != null && property.description != schema.description) return true
         if(property.discriminator != null) return true
         if(property.enum != null && property.enum != schema.enum) return true
         if(property.example != null && property.example != schema.example) return true
