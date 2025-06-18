@@ -12,7 +12,6 @@ import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNullValue
-import jdk.internal.joptsimple.internal.Strings.isNullOrEmpty
 
 internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
