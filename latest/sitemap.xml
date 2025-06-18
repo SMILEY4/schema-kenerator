@@ -2,47 +2,47 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/changelog/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/modules/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/user_guide/analyzing_types_kotlinx_serialization/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/user_guide/analyzing_types_reflection/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/user_guide/concept/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/user_guide/customization/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/user_guide/generating_json_schema/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://smiley4.github.io/schema-kenerator/2.x/user_guide/generating_swagger_schema/</loc>
-         <lastmod>2025-04-07</lastmod>
+         <lastmod>2025-06-18</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

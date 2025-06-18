@@ -739,6 +739,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#213" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1.3
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#212" class="md-nav__link">
     <span class="md-ellipsis">
       2.1.2
@@ -1017,6 +1026,12 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="213">2.1.3</h2>
+<ul>
+<li>improved handling of recursion with inlined schemas: if the root type of a schema is used recursively, it is referenced instead of inlined.</li>
+<li>fixed: null pointer exception when using multiple <code>@Contextual</code> annotations</li>
+<li>fixed: fixed handling of <code>@Description</code> annotation when added to properties and classes</li>
+</ul>
 <h2 id="212">2.1.2</h2>
 <ul>
 <li>fixed bug: duplicate "string" type added by type discriminator handling</li>
