@@ -11,6 +11,7 @@ import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.shoul
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNullValue
 
 internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
 
@@ -71,13 +72,21 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
      * @param context the current compile context with data about input schemas and type data as well as current produced information
      */
     private fun resolveReference(refObj: JsonObject, context: Context): JsonNode {
+        // find actual schema data
         val referencedSchema = context.knownSchemas.find { it.typeData.id == TypeId((refObj.properties["\$ref"] as JsonTextValue).value) }
         return if (referencedSchema != null) {
-            if (shouldReference(referencedSchema.json)) {
+            // create swagger property with correct reference path (and add actual schema to context)
+            val property = if (shouldReference(referencedSchema.json)) {
                 createRefProperty(referencedSchema, context)
             } else {
                 createInlineProperty(refObj, referencedSchema)
             }
+            // add back some information to property
+            if(refObj.properties.containsKey("description") && property is JsonObject) {
+                property.properties["description"] = refObj.properties["description"] ?: JsonNullValue()
+            }
+            // return
+            property
         } else {
             refObj
         }

@@ -227,4 +227,7 @@ class SwaggerSchemaUtils {
         }
     }
 
+    fun referenceSelf(): Schema<*> {
+        return referenceSchema("#", false)
+    }
 }

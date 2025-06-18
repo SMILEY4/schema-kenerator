@@ -11,6 +11,8 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
 internal class JsonSchemaCompileInlineStep {
 
+    private val schemaUtils = JsonSchemaUtils()
+
     /**
      * Inline all referenced schema
      */
@@ -19,6 +21,8 @@ internal class JsonSchemaCompileInlineStep {
             val referencedSchema = input[TypeId((refObj.properties["\$ref"] as JsonTextValue).value)]
             if (referencedSchema == null) {
                 refObj
+            } else if(referencedSchema.typeData.id == input.rootId) {
+                schemaUtils.referenceSelf()
             } else {
                 createInlining(refObj, referencedSchema)
             }

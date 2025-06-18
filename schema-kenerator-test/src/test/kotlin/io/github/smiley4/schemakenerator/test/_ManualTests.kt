@@ -6,10 +6,16 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.annotations.Description
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.RequiredHandling
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
@@ -17,6 +23,7 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnota
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.kotest.core.spec.style.StringSpec
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -33,11 +40,30 @@ import java.util.UUID
  */
 class _ManualTests : StringSpec({
 
-    "test" {
-        val jsonSchema = initial<Config>()
-            .analyzeTypeUsingKotlinxSerialization {
-                markNotParameterized<TooltipModel>()
+    "reflection" {
+        val schema = initial<Foo>()
+            .collectSubTypes()
+            .analyzeTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
+            .also {
+                println(it)
             }
+            .mergePropertyAttributesIntoType()
+            .also {
+                println(it)
+            }
+            .compileReferencingRoot()
+            .asPrintable()
+        println(json.writeValueAsString(schema))
+    }
+
+    "kotlinx" {
+        val schema = initial<Foo>()
+            .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
             .generateSwaggerSchema()
@@ -46,23 +72,31 @@ class _ManualTests : StringSpec({
             .mergePropertyAttributesIntoType()
             .compileReferencingRoot()
             .asPrintable()
-        println(json.writeValueAsString(jsonSchema))
+        println(json.writeValueAsString(schema))
     }
 
 }) {
     companion object {
 
         @Serializable
-        data class Config(
-            val emptyState: TooltipModel? = null,
-            val tooltip: TooltipModel? = null,
-        )
-
+        @Description("enum1 desc")
+        enum class Enum1 { A, B, C }
 
         @Serializable
-        data class TooltipModel(
-            val description: String
+        @Description("enum2 desc")
+        enum class Enum2 { A, B, C }
+
+        @Serializable
+        @Description("foo desc")
+        data class Foo(
+            @Description("desc from Foo") val e: Enum1,
+            @Description("desc from Foo 1") val bar1: Bar,
+            @Description("desc from Foo 2") val bar2: Bar
         )
+
+        @Serializable
+        @Description("bar desc")
+        data class Bar(val value: Int)
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

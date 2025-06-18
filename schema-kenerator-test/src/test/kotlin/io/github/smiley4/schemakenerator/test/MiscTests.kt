@@ -5,12 +5,12 @@ package io.github.smiley4.schemakenerator.test
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
+import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
-import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
@@ -52,6 +52,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import java.time.Instant
 import java.util.Optional
 import java.util.UUID
@@ -1242,7 +1243,89 @@ class MiscTests : FreeSpec({
             }
         }
 
+    }
 
+    "class with multiple @Contextual annotations" - {
+        val result = initial<ClassMultipleContextuals>()
+            .analyzeTypeUsingKotlinxSerialization {
+                serializersModule = SerializersModule {
+                    contextual(MyInstantSerializer)
+                }
+            }
+            .generateSwaggerSchema()
+            .compileInlining()
+        result.swagger.shouldEqualJson {
+            """
+                {
+                  "type": "object",
+                  "properties": {
+                    "fieldA": {
+                      "type": [
+                        "null",
+                        "integer"
+                      ],
+                      "format": "int64"
+                    },
+                    "fieldB": {
+                      "type": [
+                        "null",
+                        "integer"
+                      ],
+                      "format": "int64"
+                    }
+                  }
+                }
+            """.trimIndent()
+        }
+    }
+
+    "description on property and class - https://github.com/SMILEY4/ktor-openapi-tools/issues/200" {
+
+        val result = initial<ClassWithPropertyDescriptions>()
+            .analyzeTypeUsingReflection()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot()
+
+        (result.swagger to result.componentSchemas).shouldEqualJson {
+            mapOf(
+                "." to """
+                    {
+                      "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithPropertyDescriptions"
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithPropertyDescriptions" to """
+                    {
+                      "type": "object",
+                      "properties": {
+                        "someProp": {
+                          "${'$'}ref": "#/components/schemas/io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithDescription",
+                          "description": "description on property"
+                        }
+                      },
+                      "required": [
+                        "someProp"
+                      ]
+                    }
+                """.trimIndent(),
+                "io.github.smiley4.schemakenerator.test.MiscTests.Companion.ClassWithDescription" to """
+                    {
+                      "type": "object",
+                      "description": "description on class",
+                      "properties": {
+                        "value": {
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "required": [
+                        "value"
+                      ]
+                    }
+                """.trimIndent(),
+            )
+        }
     }
 
 }) {
@@ -1369,6 +1452,17 @@ class MiscTests : FreeSpec({
         enum class Issue43Enum { Alpha, Beta, }
 
 
+        class ClassWithPropertyDescriptions(
+            @Description("description on property") val someProp: ClassWithDescription
+        )
+
+
+        @Description("description on class")
+        class ClassWithDescription(
+            val value: Int
+        )
+
+
         @Serializable
         data class ClassWithNullableFields(
             val nonNull: String,
@@ -1384,12 +1478,21 @@ class MiscTests : FreeSpec({
             val numberValue: Number,
         )
 
+
         @Serializable
         data class CombinedKey(val a: String, val b: Int)
+
 
         @Serializable
         data class ClassWithCombinedKeyMap(
             val map: Map<CombinedKey, Int>
+        )
+
+
+        @Serializable
+        data class ClassMultipleContextuals(
+            val fieldA: @Contextual Instant? = null,
+            val fieldB: @Contextual Instant? = null,
         )
 
     }
