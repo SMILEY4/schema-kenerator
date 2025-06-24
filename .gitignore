@@ -47,3 +47,6 @@ bin/
 
 # Dokka
 docs/dokka/
+
+# misc
+*.local
