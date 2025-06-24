@@ -22,6 +22,11 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:$versionJackson")
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$versionKotlinxSerializationJson")
     testImplementation("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
+    constraints {
+        testImplementation("commons-codec:commons-codec:1.13") {
+            because("Version 1.11 has a known vulnerability (pulled in via 'io.swagger.parser.v3:swagger-parser').")
+        }
+    }
     testImplementation("javax.validation:validation-api:$versionJavaxValidation")
     testImplementation("jakarta.validation:jakarta.validation-api:$versionJakartaValidation")
     testImplementation(project(":schema-kenerator-core"))

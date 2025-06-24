@@ -26,6 +26,11 @@ dependencies {
     val versionSwaggerParser: String by project
     implementation(project(":schema-kenerator-core"))
     api("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
+    constraints {
+        api("commons-codec:commons-codec:1.13") {
+            because("Version 1.11 has a known vulnerability (pulled in via 'io.swagger.parser.v3:swagger-parser').")
+        }
+    }
 }
 
 kotlin {
