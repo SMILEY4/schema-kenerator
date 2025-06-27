@@ -74,7 +74,7 @@ mavenPublishing {
     val projectDeveloperUrl: String by project
 
     configure(KotlinJvm(JavadocJar.Dokka("dokkaHtml"), true))
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral()
     signAllPublications()
     coordinates(projectGroupId, "$projectArtifactIdBase-validation-swagger", projectVersion)
     pom {

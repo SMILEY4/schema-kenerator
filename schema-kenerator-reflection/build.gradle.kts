@@ -66,7 +66,7 @@ mavenPublishing {
     val projectDeveloperName: String by project
     val projectDeveloperUrl: String by project
 
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral()
     signAllPublications()
     coordinates(projectGroupId, "$projectArtifactIdBase-reflection", projectVersion)
     pom {
