@@ -1,4 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.dokka.gradle.DokkaTask
 
@@ -70,7 +69,7 @@ mavenPublishing {
     val projectDeveloperName: String by project
     val projectDeveloperUrl: String by project
 
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
     coordinates(projectGroupId, "$projectArtifactIdBase-jackson-swagger", projectVersion)
     pom {
