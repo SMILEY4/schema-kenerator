@@ -10,30 +10,26 @@ import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubty
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.annotations.Description
+import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.RequiredHandling
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.kotest.core.spec.style.StringSpec
-import kotlinx.serialization.Contextual
+import io.swagger.v3.core.util.Json31
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.Paths
+import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import java.time.Instant
-import java.util.UUID
 
 /**
  * internal / manual tests only
@@ -41,7 +37,7 @@ import java.util.UUID
 class _ManualTests : StringSpec({
 
     "reflection" {
-        val schema = initial<Foo>()
+        val schema = initial<ParentClass>()
             .collectSubTypes()
             .analyzeTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
@@ -49,20 +45,15 @@ class _ManualTests : StringSpec({
             .generateSwaggerSchema()
             .handleCoreAnnotations()
             .handleSchemaAnnotations()
-            .also {
-                println(it)
-            }
             .mergePropertyAttributesIntoType()
-            .also {
-                println(it)
-            }
-            .compileReferencingRoot()
-            .asPrintable()
-        println(json.writeValueAsString(schema))
+            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+
+            // println(json.writeValueAsString(schema.asPrintable()))
+            println(schema.asOpenApiJson())
     }
 
     "kotlinx" {
-        val schema = initial<Foo>()
+        val schema = initial<ParentClass>()
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
@@ -78,25 +69,12 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        @Serializable
-        @Description("enum1 desc")
-        enum class Enum1 { A, B, C }
-
-        @Serializable
-        @Description("enum2 desc")
-        enum class Enum2 { A, B, C }
-
-        @Serializable
-        @Description("foo desc")
-        data class Foo(
-            @Description("desc from Foo") val e: Enum1,
-            @Description("desc from Foo 1") val bar1: Bar,
-            @Description("desc from Foo 2") val bar2: Bar
+        class ParentClass(
+            @Type("string")
+            val b: ChildClass
         )
 
-        @Serializable
-        @Description("bar desc")
-        data class Bar(val value: Int)
+        class ChildClass
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,
@@ -110,20 +88,28 @@ class _ManualTests : StringSpec({
             )
         }
 
+
+        fun CompiledSwaggerSchemaData.asOpenApiJson(): String {
+            val openApi = OpenAPI().also { openAPI ->
+                openAPI.info = Info().also { info ->
+                    info.title = "Test"
+                    info.version = "0.0"
+                }
+                openAPI.paths = Paths()
+                openAPI.components = Components().also { components ->
+                    components.schemas = buildMap {
+                        this["root"] = this@asOpenApiJson.swagger
+                        this@asOpenApiJson.componentSchemas.forEach { (name, schema) ->
+                            this[name] = schema
+                        }
+                    }
+                }
+            }
+
+            return Json31.pretty(openApi)
+        }
+
         private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
     }
-}
-
-
-object InstantSerializer : KSerializer<Instant> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("java.time.Instant", PrimitiveKind.STRING)
-    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
-    override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
-}
-
-object MyUUIDSerializer : KSerializer<UUID> {
-    override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
-    override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
-    override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
 }
