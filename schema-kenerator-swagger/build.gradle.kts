@@ -1,6 +1,5 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
-import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.dokka.gradle.DokkaTask
 
@@ -75,7 +74,7 @@ mavenPublishing {
     val projectDeveloperUrl: String by project
 
     configure(KotlinJvm(JavadocJar.Dokka("dokkaHtml"), true))
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
     coordinates(projectGroupId, "$projectArtifactIdBase-swagger", projectVersion)
     pom {

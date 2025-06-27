@@ -26,8 +26,7 @@ jobs:
 
             -   name: Publish
                 run: |
-                    ./gradlew publishAllPublicationsToMavenCentral --no-configuration-cache
-                    ./gradlew releaseRepository
+                    ./gradlew publishToMavenCentral --no-configuration-cache
                 env:
                     SONATYPE_CONNECT_TIMEOUT_SECONDS: 180
                     SONATYPE_CLOSE_TIMEOUT_SECONDS: 900
