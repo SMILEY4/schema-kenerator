@@ -1,7 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
@@ -14,10 +13,15 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.TitleBuilder
-import io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime
 import io.kotest.core.spec.style.StringSpec
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDateTime
-import kotlin.reflect.typeOf
+import java.time.format.DateTimeFormatter
 
 class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
@@ -33,7 +37,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             """
                 {
                     "type": "object",
-                    "title": "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime",
+                    "title": "io.github.smiley4.schemakenerator.test.CustomLocalDateTimeTypeProcessorTest.Companion.ClassWithLocalDateTime",
                     "required": [
                         "dateTime"
                     ],
@@ -75,6 +79,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .withTitle(io.github.smiley4.schemakenerator.jsonschema.TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
+        // language=json
         result.json.shouldEqualJson {
             """
                 {
@@ -88,7 +93,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
                             "title": "java.time.LocalDateTime"
                         }
                     },
-                    "title": "io.github.smiley4.schemakenerator.test.models.reflection.ClassWithLocalDateTime"
+                    "title": "io.github.smiley4.schemakenerator.test.CustomLocalDateTimeTypeProcessorTest.Companion.ClassWithLocalDateTime"
                 }
             """.trimIndent()
         }
@@ -99,16 +104,17 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime without custom processor" {
 
-        val result = initial<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = initial<ClassWithLocalDateTime>()
             .analyzeTypeUsingKotlinxSerialization()
             .generateSwaggerSchema()
             .withTitle(TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
+        // language=json
         result.swagger.shouldEqualJson {
             """
                 {
-                  "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime",
+                  "title": "io.github.smiley4.schemakenerator.test.CustomLocalDateTimeTypeProcessorTest.Companion.ClassWithLocalDateTime",
                   "type": "object",
                   "properties": {
                     "dateTime": {
@@ -127,7 +133,7 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
 
     "kotlinx-serialization & swagger: localdatetime with custom processor" {
 
-        val result = initial<io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime>()
+        val result = initial<ClassWithLocalDateTime>()
             .analyzeTypeUsingKotlinxSerialization {
                 custom<LocalDateTime> {
                     TypeData(
@@ -150,10 +156,11 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
             .withTitle(TitleBuilder.BUILDER_FULL)
             .compileInlining()
 
+        // language=json
         result.swagger.shouldEqualJson {
             """
                 {
-                  "title": "io.github.smiley4.schemakenerator.test.models.kotlinx.ClassWithLocalDateTime",
+                  "title": "io.github.smiley4.schemakenerator.test.CustomLocalDateTimeTypeProcessorTest.Companion.ClassWithLocalDateTime",
                   "type": "object",
                   "properties": {
                     "dateTime": {
@@ -169,4 +176,29 @@ class CustomLocalDateTimeTypeProcessorTest : StringSpec({
         }
 
     }
-})
+}) {
+    companion object {
+
+        @Serializable
+        class ClassWithLocalDateTime(
+            @Serializable(with = LocalDateTimeSerializer::class)
+            val dateTime: LocalDateTime
+        )
+
+
+        @OptIn(ExperimentalSerializationApi::class)
+        @Serializer(forClass = LocalDateTime::class)
+        object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
+            private val formatter = DateTimeFormatter.ISO_LOCAL_DATE
+
+            override fun serialize(encoder: Encoder, value: LocalDateTime) {
+                encoder.encodeString(value.format(formatter))
+            }
+
+            override fun deserialize(decoder: Decoder): LocalDateTime {
+                return LocalDateTime.parse(decoder.decodeString(), formatter)
+            }
+        }
+
+    }
+}

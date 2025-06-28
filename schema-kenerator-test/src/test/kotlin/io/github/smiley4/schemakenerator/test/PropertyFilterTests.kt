@@ -1,7 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -13,8 +12,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-@Suppress("ClassName")
-class ReflectionParser_PropertyFilterTests : FunSpec({
+class PropertyFilterTests : FunSpec({
 
     context("filter properties") {
         withData(TEST_DATA) { data ->

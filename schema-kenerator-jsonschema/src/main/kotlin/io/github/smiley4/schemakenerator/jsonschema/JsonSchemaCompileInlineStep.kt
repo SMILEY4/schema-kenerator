@@ -18,7 +18,7 @@ internal class JsonSchemaCompileInlineStep {
      */
     fun compile(input: IntermediateJsonSchemaData): CompiledJsonSchemaData {
         val root = resolveReferences(input.rootSchema) { refObj ->
-            val referencedSchema = input[TypeId((refObj.properties["\$ref"] as JsonTextValue).value)]
+            val referencedSchema = input[TypeId((refObj.getText("\$ref")))]
             if (referencedSchema == null) {
                 refObj
             } else if(referencedSchema.typeData.id == input.rootId) {
