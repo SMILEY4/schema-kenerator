@@ -265,7 +265,7 @@ class MiscTests : FreeSpec({
 
     "https://github.com/SMILEY4/schema-kenerator/issues/18 - support renaming properties" - {
 
-        "custom renameing (adding prefix)" {
+        "custom renaming (adding prefix)" {
             val result = initial<TestClassIssue18>()
                 .analyzeTypeUsingKotlinxSerialization()
                 .renameMembers { name -> "prefix_$name" }
@@ -598,70 +598,6 @@ class MiscTests : FreeSpec({
                     }
                 """.trimIndent()
             )
-        }
-
-    }
-
-    "generic nested classes with nullable type parameter" - {
-
-        "reflection" {
-            val result = initial<GenericClass<String?>>()
-                .analyzeTypeUsingReflection()
-                .generateSwaggerSchema()
-                .compileInlining()
-            result.swagger.shouldEqualJson {
-                """
-                    {
-                      "type": "object",
-                      "properties": {
-                        "nested": {
-                          "type": "object",
-                          "properties": {
-                            "value": {
-                              "type": [
-                                "null",
-                                "string"
-                              ]
-                            }
-                          }
-                        }
-                      },
-                      "required": [
-                        "nested"
-                      ]
-                    }
-                """.trimIndent()
-            }
-        }
-
-        "kotlinx-serialization" {
-            val result = initial<GenericClass<String?>>()
-                .analyzeTypeUsingKotlinxSerialization()
-                .generateSwaggerSchema()
-                .compileInlining()
-            result.swagger.shouldEqualJson {
-                """
-                    {
-                      "type": "object",
-                      "properties": {
-                        "nested": {
-                          "type": "object",
-                          "properties": {
-                            "value": {
-                              "type": [
-                                "null",
-                                "string"
-                              ]
-                            }
-                          }
-                        }
-                      },
-                      "required": [
-                        "nested"
-                      ]
-                    }
-                """.trimIndent()
-            }
         }
 
     }

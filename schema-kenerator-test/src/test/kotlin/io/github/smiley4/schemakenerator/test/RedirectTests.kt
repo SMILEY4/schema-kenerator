@@ -4,11 +4,13 @@ import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
-import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect as ReflectionTypeRedirect
-import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect as SerializationTypeRedirect
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.kotest.core.spec.style.FreeSpec
 import kotlinx.serialization.Serializable
+import java.util.Optional
+import io.github.smiley4.schemakenerator.reflection.data.TypeRedirect as ReflectionTypeRedirect
+import io.github.smiley4.schemakenerator.serialization.data.TypeRedirect as SerializationTypeRedirect
 
 class RedirectTests : FreeSpec({
 
@@ -31,6 +33,7 @@ class RedirectTests : FreeSpec({
 
             "match, keep" {
                 run(ReflectionTypeRedirect.FromNullability.MATCH, ReflectionTypeRedirect.ToNullability.KEEP) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -54,6 +57,7 @@ class RedirectTests : FreeSpec({
 
             "match, replace" {
                 run(ReflectionTypeRedirect.FromNullability.MATCH, ReflectionTypeRedirect.ToNullability.REPLACE) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -75,6 +79,7 @@ class RedirectTests : FreeSpec({
 
             "ignore, keep" {
                 run(ReflectionTypeRedirect.FromNullability.IGNORE, ReflectionTypeRedirect.ToNullability.KEEP) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -100,6 +105,7 @@ class RedirectTests : FreeSpec({
 
             "ignore, replace" {
                 run(ReflectionTypeRedirect.FromNullability.IGNORE, ReflectionTypeRedirect.ToNullability.REPLACE) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -140,6 +146,7 @@ class RedirectTests : FreeSpec({
 
             "match, keep" {
                 run(SerializationTypeRedirect.FromNullability.MATCH, SerializationTypeRedirect.ToNullability.KEEP) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -163,6 +170,7 @@ class RedirectTests : FreeSpec({
 
             "match, replace" {
                 run(SerializationTypeRedirect.FromNullability.MATCH, SerializationTypeRedirect.ToNullability.REPLACE) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -184,6 +192,7 @@ class RedirectTests : FreeSpec({
 
             "ignore, keep" {
                 run(SerializationTypeRedirect.FromNullability.IGNORE, SerializationTypeRedirect.ToNullability.KEEP) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -209,6 +218,7 @@ class RedirectTests : FreeSpec({
 
             "ignore, replace" {
                 run(SerializationTypeRedirect.FromNullability.IGNORE, SerializationTypeRedirect.ToNullability.REPLACE) {
+                    // language=json
                     """
                         {
                           "type": "object",
@@ -252,6 +262,7 @@ class RedirectTests : FreeSpec({
                 .compileInlining()
 
             result.json.shouldEqualJson {
+                // language=json
                 """
                     {
                        "type": "object",
@@ -284,6 +295,7 @@ class RedirectTests : FreeSpec({
                 .compileInlining()
 
             result.json.shouldEqualJson {
+                // language=json
                 """
                     {
                        "type": "object",
@@ -302,27 +314,62 @@ class RedirectTests : FreeSpec({
 
     }
 
+
+    "optional" {
+        // https://github.com/SMILEY4/schema-kenerator/issues/14
+
+        val result = initial<TestClassOptional>()
+            .analyzeTypeUsingReflection {
+                redirect {
+                    from<Optional<String?>>()
+                    to<String?>(TypeRedirect.ToNullability.REPLACE)
+                }
+            }
+            .generateJsonSchema()
+            .compileInlining()
+
+        result.json.shouldEqualJson {
+            // language=json
+            """
+                {
+                  "type": "object",
+                  "required": [],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+            """.trimIndent()
+        }
+
+    }
+
 }) {
 
     companion object {
 
         @Serializable
-        class SimpleTestClass(
+        private class SimpleTestClass(
             val requiredText: String,
             val nullableText: String?,
         )
 
 
         @Serializable
-        class TestClass(
+        private class TestClass(
             val data: NestedClass?
         )
 
 
         @Serializable
-        class NestedClass(
+        private class NestedClass(
             val someText: String,
             val someNumber: Int
+        )
+
+        private class TestClassOptional(
+            val name: Optional<String?>
         )
 
     }
