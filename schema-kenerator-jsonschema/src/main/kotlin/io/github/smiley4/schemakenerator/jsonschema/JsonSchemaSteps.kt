@@ -78,18 +78,24 @@ object JsonSchemaSteps {
 
     /**
      * Resolves references in generated json schemas by inlining them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      */
-    fun IntermediateJsonSchemaData.compileInlining(): CompiledJsonSchemaData {
-        return JsonSchemaCompileInlineStep().compile(this)
+    fun IntermediateJsonSchemaData.compileInlining(explicitNullTypes: Boolean = true): CompiledJsonSchemaData {
+        return JsonSchemaCompileInlineStep(explicitNullTypes).compile(this)
     }
 
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
      */
-    fun IntermediateJsonSchemaData.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchemaData {
+    fun IntermediateJsonSchemaData.compileReferencing(
+        explicitNullTypes: Boolean = true,
+        pathType: RefType = RefType.FULL
+    ): CompiledJsonSchemaData {
         return compileReferencing(
+            explicitNullTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -100,21 +106,28 @@ object JsonSchemaSteps {
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
     fun IntermediateJsonSchemaData.compileReferencing(
+        explicitNullTypes: Boolean = true,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
     ): CompiledJsonSchemaData {
-        return JsonSchemaCompileReferenceStep(builder).compile(this)
+        return JsonSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
     }
 
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
      */
-    fun IntermediateJsonSchemaData.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchemaData {
+    fun IntermediateJsonSchemaData.compileReferencingRoot(
+        explicitNullTypes: Boolean = true,
+        pathType: RefType = RefType.FULL
+    ): CompiledJsonSchemaData {
         return compileReferencingRoot(
+            explicitNullTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -125,12 +138,14 @@ object JsonSchemaSteps {
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
     fun IntermediateJsonSchemaData.compileReferencingRoot(
+        explicitNullTypes: Boolean = true,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
     ): CompiledJsonSchemaData {
-        return JsonSchemaCompileReferenceRootStep(builder).compile(this)
+        return JsonSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
     }
 
 

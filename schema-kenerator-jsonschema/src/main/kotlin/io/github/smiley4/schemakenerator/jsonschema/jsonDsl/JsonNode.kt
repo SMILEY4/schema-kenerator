@@ -50,6 +50,24 @@ data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
         }
     }
 
+    fun getArray(propertyName: String): JsonArray {
+        val prop = properties[propertyName]
+        if(prop is JsonArray) {
+            return prop
+        } else {
+            throw Exception("Property '$propertyName' is not a ${JsonArray::class.simpleName}")
+        }
+    }
+
+    fun getObject(propertyName: String): JsonObject {
+        val prop = properties[propertyName]
+        if(prop is JsonObject) {
+            return prop
+        } else {
+            throw Exception("Property '$propertyName' is not a ${JsonObject::class.simpleName}")
+        }
+    }
+
     override fun prettyPrint(level: Int): String {
         if (properties.isEmpty()) {
             return "{}"

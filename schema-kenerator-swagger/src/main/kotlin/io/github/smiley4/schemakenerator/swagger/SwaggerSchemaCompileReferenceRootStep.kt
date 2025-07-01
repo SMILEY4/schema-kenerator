@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
 
 internal class SwaggerSchemaCompileReferenceRootStep(
-    private val explicitNullTypes: Boolean ,
+    private val explicitNullTypes: Boolean,
     private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ) {
 
