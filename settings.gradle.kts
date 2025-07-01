@@ -14,8 +14,8 @@ include("schema-kenerator-jackson-swagger")
 
 include("schema-kenerator-validation-swagger")
 
-include("schema-kenerator-test")
-include("schema-kenerator-examples")
+include("tests")
+include("examples")
 
 
 pluginManagement {

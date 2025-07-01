@@ -23,6 +23,33 @@ sealed interface JsonNode {
  */
 data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
 
+    fun getText(propertyName: String): String {
+        val prop = properties[propertyName]
+        if(prop is JsonTextValue) {
+            return prop.value
+        } else {
+            throw Exception("Property '$propertyName' is not a ${JsonTextValue::class.simpleName}")
+        }
+    }
+
+    fun getNumber(propertyName: String): Number {
+        val prop = properties[propertyName]
+        if(prop is JsonNumericValue) {
+            return prop.value
+        } else {
+            throw Exception("Property '$propertyName' is not a ${JsonNumericValue::class.simpleName}")
+        }
+    }
+
+    fun getBool(propertyName: String): Boolean {
+        val prop = properties[propertyName]
+        if(prop is JsonBooleanValue) {
+            return prop.value
+        } else {
+            throw Exception("Property '$propertyName' is not a ${JsonBooleanValue::class.simpleName}")
+        }
+    }
+
     override fun prettyPrint(level: Int): String {
         if (properties.isEmpty()) {
             return "{}"
