@@ -943,7 +943,8 @@ object BasicTestCases {
                  "value": {
                    "type": ["string", "null"]
                  }
-               }
+               },
+               "required": []
              }
         """.trimIndent()
     }
@@ -1199,10 +1200,10 @@ object BasicTestCases {
                   "type": "object",
                   "properties": {
                     "valueInt": {
-                      "${'$'}ref": "#/components/schemas/ClassWithGenericField<Int>"
+                      "${'$'}ref": "#/components/schemas/ClassWithGenericField_Int"
                     },
                     "valueString": {
-                      "${'$'}ref": "#/components/schemas/ClassWithGenericField<String>"
+                      "${'$'}ref": "#/components/schemas/ClassWithGenericField_String"
                     }
                   },
                   "required": [
@@ -1210,7 +1211,7 @@ object BasicTestCases {
                     "valueString"
                   ]
                 },
-                "ClassWithGenericField<Int>": {
+                "ClassWithGenericField_Int": {
                   "type": "object",
                   "properties": {
                     "value": {
@@ -1222,7 +1223,7 @@ object BasicTestCases {
                     "value"
                   ]
                 },
-                "ClassWithGenericField<String>": {
+                "ClassWithGenericField_String": {
                   "type": "object",
                   "properties": {
                     "value": {
@@ -1237,8 +1238,8 @@ object BasicTestCases {
             }
         """.trimIndent()
         expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference
-            ?.replace("ClassWithGenericField<Int>", "ClassWithGenericField")
-            ?.replace("ClassWithGenericField<String>", "ClassWithGenericField2")
+            ?.replace("ClassWithGenericField_Int", "ClassWithGenericField")
+            ?.replace("ClassWithGenericField_String", "ClassWithGenericField2")
         // language=json
         expectedJsonInline = """
             {
