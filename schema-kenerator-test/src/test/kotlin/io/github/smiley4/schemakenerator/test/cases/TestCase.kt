@@ -3,6 +3,9 @@ package io.github.smiley4.schemakenerator.test.cases
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.ReflectionTypeAnalysisConfig
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.KotlinxSerializationTypeProcessingConfig
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
 import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
 import io.kotest.datatest.WithDataTestName
@@ -16,6 +19,8 @@ class TestCase(
     val type: KType,
     val withReflection: Boolean,
     val withKotlinxSerialization: Boolean,
+    val reflectionConfig: ReflectionTypeAnalysisConfig.() -> Unit,
+    val kotlinxSerializationConfig: KotlinxSerializationTypeProcessingConfig.() -> Unit,
     val swaggerGeneratorConfig: SwaggerSteps.SwaggerSchemaGenerationStepConfig.() -> Unit,
     val jsonGeneratorConfig: JsonSchemaSteps.JsonSchemaGenerationStepConfig.() -> Unit,
     val postAnalyze: TypeDataGroup.() -> TypeDataGroup,
@@ -55,6 +60,9 @@ class TestCaseBuilder {
     var withReflection: Boolean = true
     var withKotlinxSerialization: Boolean = true
 
+    var reflectionConfig: ReflectionTypeAnalysisConfig.() -> Unit = {}
+    var kotlinxSerializationConfig: KotlinxSerializationTypeProcessingConfig.() -> Unit = {}
+
     var swaggerConfig: SwaggerSteps.SwaggerSchemaGenerationStepConfig.() -> Unit = {}
     var jsonConfig: JsonSchemaSteps.JsonSchemaGenerationStepConfig.() -> Unit = {}
 
@@ -89,6 +97,8 @@ class TestCaseBuilder {
             type = type!!,
             withReflection = withReflection,
             withKotlinxSerialization = withKotlinxSerialization,
+            reflectionConfig = reflectionConfig,
+            kotlinxSerializationConfig = kotlinxSerializationConfig,
             swaggerGeneratorConfig = swaggerConfig,
             jsonGeneratorConfig = jsonConfig,
             postAnalyze = postAnalyze,

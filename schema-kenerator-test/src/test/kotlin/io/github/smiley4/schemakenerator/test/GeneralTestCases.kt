@@ -20,12 +20,21 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
 import io.github.smiley4.schemakenerator.test.cases.BasicTestCases
 import io.github.smiley4.schemakenerator.test.cases.CoreAnnotationTestCases
+import io.github.smiley4.schemakenerator.test.cases.CustomTypeProcessingTestCases
 import io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases
 import io.github.smiley4.schemakenerator.test.cases.JacksonAnnotationTestCases
 import io.github.smiley4.schemakenerator.test.cases.JavaxJackartaAnnotationTestCases
+import io.github.smiley4.schemakenerator.test.cases.MiscTestCases
+import io.github.smiley4.schemakenerator.test.cases.RedirectTypeTestCases
 import io.github.smiley4.schemakenerator.test.cases.SwaggerAnnotationTestCases
 import io.github.smiley4.schemakenerator.test.cases.TestCase
 import io.github.smiley4.schemakenerator.test.cases.TitleTestCases
+import io.kotest.assertions.json.ArrayOrder
+import io.kotest.assertions.json.FieldComparison
+import io.kotest.assertions.json.NumberFormat
+import io.kotest.assertions.json.PropertyOrder
+import io.kotest.assertions.json.TypeCoercion
+import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import io.kotest.core.spec.style.scopes.FunSpecRootScope
@@ -100,7 +109,36 @@ class GeneralTestCases : FunSpec({
 
             SwaggerAnnotationTestCases.basics,
             SwaggerAnnotationTestCases.partiallySpecified,
-            SwaggerAnnotationTestCases.hiddenFields
+            SwaggerAnnotationTestCases.hiddenFields,
+
+            CustomTypeProcessingTestCases.localDateTimeWithoutConfig,
+            CustomTypeProcessingTestCases.localDateTimeWithCustomProcessor,
+
+            RedirectTypeTestCases.matchFromKeepTo,
+            RedirectTypeTestCases.matchFromReplaceTo,
+            RedirectTypeTestCases.ignoreFromKeepTo,
+            RedirectTypeTestCases.ignoreFromReplaceTo,
+            RedirectTypeTestCases.chain,
+            RedirectTypeTestCases.optional,
+
+            MiscTestCases.requiredAnnotationAllPropsNullableOrOptional,
+            MiscTestCases.includeAnnotationsFromConstructorParameters,
+            MiscTestCases.renamePropertiesAddPrefix,
+            MiscTestCases.renamePropertiesSnakeCase,
+            MiscTestCases.renamePropertiesKebabCase,
+            MiscTestCases.customizePropertyWithSharedType,
+            MiscTestCases.nullablePropertyOfSealedClass,
+            MiscTestCases.mergePropertyAttributesIntoType,
+            MiscTestCases.kotlinxContextualFromConfig,
+            MiscTestCases.kotlinxContextualFromAnnotationWith,
+            MiscTestCases.kotlinxMultipleContextualAnnotationsSameType,
+            MiscTestCases.overwritingTypeWithMoreSpecificType,
+            MiscTestCases.collectCorrectSubtypesWithTypeParametersInvolved,
+            MiscTestCases.specialFloatingPointValuesDontAllow,
+            MiscTestCases.specialFloatingPointValuesAllow,
+            MiscTestCases.mapsWithComplexKeysAsArraysDisabled,
+            MiscTestCases.mapsWithComplexKeysAsArraysEnabled,
+            MiscTestCases.descriptionOnPropertyAndType
         )
     )
 
@@ -132,7 +170,7 @@ class GeneralTestCases : FunSpec({
                             this
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
-                                .analyzeTypeUsingReflection()
+                                .analyzeTypeUsingReflection(case.reflectionConfig)
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -143,8 +181,14 @@ class GeneralTestCases : FunSpec({
                             }
                             .shouldEqualJsonLenient(case.expectedSwaggerInline!!)
                     }
-                    runTestPart("kotlinx-serialization", (case.expectedSwaggerInline != null || case.expectedSwaggerInlineKotlinxSerialization != null) && case.withKotlinxSerialization) {
-                        swaggerSchemaInlined(case.type, case) { this.analyzeTypeUsingKotlinxSerialization() }
+                    runTestPart(
+                        "kotlinx-serialization",
+                        (case.expectedSwaggerInline != null || case.expectedSwaggerInlineKotlinxSerialization != null) && case.withKotlinxSerialization
+                    ) {
+                        swaggerSchemaInlined(case.type, case) {
+                            this
+                                .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                        }
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -164,7 +208,7 @@ class GeneralTestCases : FunSpec({
                             this
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
-                                .analyzeTypeUsingReflection()
+                                .analyzeTypeUsingReflection(case.reflectionConfig)
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -175,8 +219,14 @@ class GeneralTestCases : FunSpec({
                             }
                             .shouldEqualJsonLenient(case.expectedSwaggerReference!!)
                     }
-                    runTestPart("kotlinx-serialization", (case.expectedSwaggerReference != null || case.expectedSwaggerReferenceKotlinxSerialization != null) && case.withKotlinxSerialization) {
-                        swaggerSchemaReferenced(case.type, case) { this.analyzeTypeUsingKotlinxSerialization() }
+                    runTestPart(
+                        "kotlinx-serialization",
+                        (case.expectedSwaggerReference != null || case.expectedSwaggerReferenceKotlinxSerialization != null) && case.withKotlinxSerialization
+                    ) {
+                        swaggerSchemaReferenced(case.type, case) {
+                            this
+                                .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                        }
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -196,7 +246,7 @@ class GeneralTestCases : FunSpec({
                             this
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
-                                .analyzeTypeUsingReflection()
+                                .analyzeTypeUsingReflection(case.reflectionConfig)
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -207,8 +257,14 @@ class GeneralTestCases : FunSpec({
                             }
                             .shouldEqualJsonLenient(case.expectedJsonInline!!)
                     }
-                    runTestPart("kotlinx-serialization", (case.expectedJsonInline != null || case.expectedJsonInlineKotlinxSerialization != null) && case.withKotlinxSerialization) {
-                        jsonSchemaInlined(case.type, case) { this.analyzeTypeUsingKotlinxSerialization() }
+                    runTestPart(
+                        "kotlinx-serialization",
+                        (case.expectedJsonInline != null || case.expectedJsonInlineKotlinxSerialization != null) && case.withKotlinxSerialization
+                    ) {
+                        jsonSchemaInlined(case.type, case) {
+                            this
+                                .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                        }
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -227,7 +283,7 @@ class GeneralTestCases : FunSpec({
                             this
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
-                                .analyzeTypeUsingReflection()
+                                .analyzeTypeUsingReflection(case.reflectionConfig)
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -238,8 +294,14 @@ class GeneralTestCases : FunSpec({
                             }
                             .shouldEqualJsonLenient(case.expectedJsonReference!!)
                     }
-                    runTestPart("kotlinx-serialization", (case.expectedJsonReference != null || case.expectedJsonReferenceKotlinxSerialization != null) && case.withKotlinxSerialization) {
-                        jsonSchemaReferenced(case.type, case) { this.analyzeTypeUsingKotlinxSerialization() }
+                    runTestPart(
+                        "kotlinx-serialization",
+                        (case.expectedJsonReference != null || case.expectedJsonReferenceKotlinxSerialization != null) && case.withKotlinxSerialization
+                    ) {
+                        jsonSchemaReferenced(case.type, case) {
+                            this
+                                .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                        }
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -332,6 +394,18 @@ class GeneralTestCases : FunSpec({
 
             return mergedSchema.prettyPrint()
         }
+
+        private fun String.shouldEqualJsonLenient(expected: String): String {
+            return this.shouldEqualJson {
+                propertyOrder = PropertyOrder.Lenient
+                arrayOrder = ArrayOrder.Lenient
+                fieldComparison = FieldComparison.Strict
+                numberFormat = NumberFormat.Lenient
+                typeCoercion = TypeCoercion.Disabled
+                expected
+            }
+        }
+
     }
 
 }
