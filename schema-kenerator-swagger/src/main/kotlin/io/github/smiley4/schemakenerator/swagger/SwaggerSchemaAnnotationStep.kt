@@ -31,10 +31,6 @@ internal class SwaggerSchemaAnnotationStep {
             getTitle(mergedAnnotations)?.also { prop.title = it }
             getDescription(mergedAnnotations)?.also { prop.description = it }
             getExample(mergedAnnotations)?.also { prop.example = it }
-            getName(mergedAnnotations)?.also {
-                prop.name = it
-                propData.name = it
-            }
             getAllowableValues(mergedAnnotations)?.onEach { entry ->
                 @Suppress("UNCHECKED_CAST")
                 (prop as io.swagger.v3.oas.models.media.Schema<Any>).addEnumItemObject(entry)
@@ -51,6 +47,19 @@ internal class SwaggerSchemaAnnotationStep {
                     }
                 }
             }
+            getRequiredMode(mergedAnnotations)?.also {
+                when(it) {
+                    Schema.RequiredMode.AUTO -> Unit
+                    Schema.RequiredMode.REQUIRED -> {
+                        if(!schema.swagger.required.contains(prop.name)) {
+                            schema.swagger.required.add(prop.name)
+                        }
+                    }
+                    Schema.RequiredMode.NOT_REQUIRED -> {
+                        schema.swagger.required.remove(propData.name)
+                    }
+                }
+            }
             getMinLength(mergedAnnotations)?.also { prop.minLength = it }
             getMaxLength(mergedAnnotations)?.also { prop.maxLength = it }
             getFormat(mergedAnnotations)?.also { prop.format = it }
@@ -58,6 +67,10 @@ internal class SwaggerSchemaAnnotationStep {
             getMaximum(mergedAnnotations)?.also { prop.maximum = it }
             isExclusiveMinimum(mergedAnnotations)?.also { prop.exclusiveMinimum = it }
             isExclusiveMaximum(mergedAnnotations)?.also { prop.exclusiveMaximum = it }
+            getName(mergedAnnotations)?.also {
+                prop.name = it
+                propData.name = it
+            }
         }
     }
 
@@ -121,6 +134,14 @@ internal class SwaggerSchemaAnnotationStep {
             .firstOrNull { it != Schema.AccessMode.AUTO }
     }
 
+    private fun getRequiredMode(annotations: Collection<AnnotationData>): Schema.RequiredMode? {
+        return annotations
+            .filter { it.name == Schema::class.qualifiedName }
+            .map { it.values["requiredMode"] as Schema.RequiredMode }
+            .firstOrNull { it != Schema.RequiredMode.AUTO }
+    }
+
+
     private fun getMinLength(annotations: Collection<AnnotationData>): Int? {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
@@ -173,5 +194,4 @@ internal class SwaggerSchemaAnnotationStep {
             .map { it.values["exclusiveMaximum"] as Boolean }
             .firstOrNull { it }
     }
-
 }
