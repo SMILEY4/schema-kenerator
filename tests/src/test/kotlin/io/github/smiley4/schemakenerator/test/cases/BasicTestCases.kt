@@ -1492,6 +1492,7 @@ object BasicTestCases {
         expectedJsonInline = """
             {
               "type": "object",
+              "required": [],
               "properties": {
                 "self": {
                   "${'$'}ref": "#"
@@ -1503,6 +1504,7 @@ object BasicTestCases {
         expectedJsonReference = """
             {
               "type": "object",
+              "required": [],
               "properties": {
                 "self": {
                   "oneOf": [
@@ -1518,6 +1520,7 @@ object BasicTestCases {
               "definitions": {
                 "ClassDirectSelfReferencing": {
                   "type": "object",
+                  "required": [],
                   "properties": {
                     "self": {
                       "oneOf": [
