@@ -138,6 +138,9 @@ class DefaultSerializationTypeAnalyzerModule(
         // collect annotation data
         val annotations = annotationAnalyzer.analyzeAnnotations(context.descriptor)
 
+        // check if list or set
+        val uniqueItems = context.descriptor.javaClass.name == "kotlinx.serialization.internal.LinkedHashSetClassDesc" || context.descriptor.javaClass.name == "kotlinx.serialization.internal.HashSetClassDesc"
+
         // build type
         return TypeData(
             id = context.id,
@@ -151,7 +154,7 @@ class DefaultSerializationTypeAnalyzerModule(
             isInlineValue = false,
             enumData = null,
             collectionData = CollectionData(
-                unique = false,
+                unique = uniqueItems,
                 itemType = MemberData(
                     name = "item",
                     type = itemParameter.type,
