@@ -509,7 +509,7 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "fieldA" : {
-                      "type" : [ "type-a" ],
+                      "type" : "type-a",
                       "format" : "format-a",
                       "properties" : {
                         "nameOfPerson" : {
@@ -523,7 +523,7 @@ object MiscTestCases {
                       "required" : [ "nameOfPerson", "numberOfYears" ]
                     },
                     "fieldB" : {
-                      "type" : [ "type-b" ],
+                      "type" : "type-b",
                       "format" : "format-b",
                       "properties" : {
                         "nameOfPerson" : {
@@ -559,7 +559,7 @@ object MiscTestCases {
                   "required" : [ "fieldA", "fieldB" ]
                 },
                 "TestClassMergePropertyAttributesIntoTypeNested" : {
-                  "type" : [ "type-a" ],
+                  "type" : "type-a",
                   "format" : "format-a",
                   "properties" : {
                     "nameOfPerson" : {
@@ -573,7 +573,7 @@ object MiscTestCases {
                   "required" : [ "nameOfPerson", "numberOfYears" ]
                 },
                 "TestClassMergePropertyAttributesIntoTypeNested2" : {
-                  "type" : [ "type-b" ],
+                  "type" : "type-b",
                   "format" : "format-b",
                   "properties" : {
                     "nameOfPerson" : {

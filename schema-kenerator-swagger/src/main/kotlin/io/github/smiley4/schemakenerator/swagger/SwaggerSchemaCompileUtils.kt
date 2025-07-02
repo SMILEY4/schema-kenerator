@@ -148,6 +148,9 @@ object SwaggerSchemaCompileUtils {
                 target.types = it
             } else {
                 target.types = target.types + it
+                if(target.types.size > 1 && target.types.contains("object") && !target.types.contains("null")) {
+                    target.types.remove("object")
+                }
             }
         }
         source.uniqueItems?.also { target.uniqueItems = it }
