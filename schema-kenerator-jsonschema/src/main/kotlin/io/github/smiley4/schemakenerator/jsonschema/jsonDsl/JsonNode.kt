@@ -25,28 +25,46 @@ data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
 
     fun getText(propertyName: String): String {
         val prop = properties[propertyName]
-        if(prop is JsonTextValue) {
+        if (prop is JsonTextValue) {
             return prop.value
         } else {
-            throw Exception("Property '$propertyName' is not a ${JsonTextValue::class.simpleName}")
+            throw NoSuchElementException("Property '$propertyName' is not a ${JsonTextValue::class.simpleName}")
         }
     }
 
     fun getNumber(propertyName: String): Number {
         val prop = properties[propertyName]
-        if(prop is JsonNumericValue) {
+        if (prop is JsonNumericValue) {
             return prop.value
         } else {
-            throw Exception("Property '$propertyName' is not a ${JsonNumericValue::class.simpleName}")
+            throw NoSuchElementException("Property '$propertyName' is not a ${JsonNumericValue::class.simpleName}")
         }
     }
 
     fun getBool(propertyName: String): Boolean {
         val prop = properties[propertyName]
-        if(prop is JsonBooleanValue) {
+        if (prop is JsonBooleanValue) {
             return prop.value
         } else {
-            throw Exception("Property '$propertyName' is not a ${JsonBooleanValue::class.simpleName}")
+            throw NoSuchElementException("Property '$propertyName' is not a ${JsonBooleanValue::class.simpleName}")
+        }
+    }
+
+    fun getArray(propertyName: String): JsonArray {
+        val prop = properties[propertyName]
+        if (prop is JsonArray) {
+            return prop
+        } else {
+            throw NoSuchElementException("Property '$propertyName' is not a ${JsonArray::class.simpleName}")
+        }
+    }
+
+    fun getObject(propertyName: String): JsonObject {
+        val prop = properties[propertyName]
+        if (prop is JsonObject) {
+            return prop
+        } else {
+            throw NoSuchElementException("Property '$propertyName' is not a ${JsonObject::class.simpleName}")
         }
     }
 
@@ -69,6 +87,10 @@ data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
             properties = properties.mapValues { (_, value) -> value.copyNode() }.toMutableMap()
         )
     }
+
+    override fun equals(other: Any?) = other is JsonObject && other.properties == properties
+
+    override fun hashCode() = properties.hashCode()
 
 }
 
@@ -98,6 +120,9 @@ data class JsonArray(val items: MutableList<JsonNode> = mutableListOf()) : JsonN
         )
     }
 
+    override fun equals(other: Any?) = other is JsonArray && other.items == items
+
+    override fun hashCode() = items.hashCode()
 }
 
 
@@ -116,6 +141,10 @@ class JsonNumericValue(value: Number) : JsonValue<Number>(value) {
     }
 
     override fun copyNode() = JsonNumericValue(value)
+
+    override fun equals(other: Any?) = other is JsonNumericValue && other.value == value
+
+    override fun hashCode() = value.hashCode()
 }
 
 
@@ -128,6 +157,10 @@ class JsonTextValue(value: String) : JsonValue<String>(value) {
     }
 
     override fun copyNode() = JsonTextValue(value)
+
+    override fun equals(other: Any?) = other is JsonTextValue && other.value == value
+
+    override fun hashCode() = value.hashCode()
 }
 
 
@@ -140,6 +173,10 @@ class JsonBooleanValue(value: Boolean) : JsonValue<Boolean>(value) {
     }
 
     override fun copyNode() = JsonBooleanValue(value)
+
+    override fun equals(other: Any?) = other is JsonBooleanValue && other.value == value
+
+    override fun hashCode() = value.hashCode()
 }
 
 
@@ -152,4 +189,8 @@ class JsonNullValue : JsonValue<Unit>(Unit) {
     }
 
     override fun copyNode() = JsonNullValue()
+
+    override fun equals(other: Any?) = other is JsonNullValue
+
+    override fun hashCode() = value.hashCode()
 }

@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -42,37 +43,40 @@ object JsonSchemaCompileUtils {
         }
     }
 
-    fun shouldReference(json: JsonNode): Boolean {
-        val complexProperties = setOf(
-            "required",
-            "properties"
-        )
-        return if (json is JsonObject) {
-            val isComplexObject = getTextProperty(json, "type") == "object"
-                    && json.properties.keys.any { complexProperties.contains(it) }
-                    && !existsProperty(json, "additionalProperties")
-            isComplexObject || existsProperty(json, "enum") || existsProperty(json, "anyOf")
+    fun shouldReference(schema: JsonNode, typeData: TypeData): Boolean {
+        return if (schema is JsonObject) {
+
+            val isObject = (getTypes(schema).contains("object") || schema.properties.contains("properties"))
+                    && !typeData.isMap
+                    && typeData.identifyingName.full != Any::class.qualifiedName!!
+                    && typeData.identifyingName.full != "*"
+
+            val isEnum = schema.properties.contains("enum")
+
+            val isAnyOfObject = schema.properties.contains("anyOf") && schema.getArray("anyOf").items.all {
+                it is JsonObject && it.properties.containsKey("${'$'}ref")
+            }
+
+            val isOneOfObject = schema.properties.contains("oneOf") && schema.getArray("oneOf").items.all {
+                it is JsonObject && it.properties.containsKey("${'$'}ref")
+            }
+
+            return isObject || isEnum || isAnyOfObject || isOneOfObject
         } else {
             false
         }
-
     }
 
-    fun getTextProperty(node: JsonNode, key: String): String? {
-        if (node is JsonObject) {
-            val type = node.properties[key]
-            if (type is JsonTextValue) {
-                return type.value
+    private fun getTypes(schema: JsonObject): Set<String> {
+        return schema.properties["type"]
+            ?.let {
+                when (it) {
+                    is JsonArray -> it.items.filterIsInstance<JsonTextValue>().mapNotNull { it.value }.toSet()
+                    is JsonTextValue -> setOf(it.value)
+                    else -> emptySet()
+                }
             }
-        }
-        return null
-    }
-
-    fun existsProperty(node: JsonNode, key: String): Boolean {
-        if (node is JsonObject) {
-            return node.properties[key] != null
-        }
-        return false
+            ?: emptySet()
     }
 
 }

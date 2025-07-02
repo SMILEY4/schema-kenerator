@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
@@ -349,6 +350,8 @@ object MiscTestCases {
             """.trimIndent()
     }
 
+
+    @Serializable
     class TestClassCustomizeProperties(
         val describeMe: String,
         val otherProperty: String
@@ -368,12 +371,15 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "a" : {
-                      "anyOf" : [ {
-                        "type" : "object",
-                        "properties" : { }
-                      }, {
-                        "type" : "null"
-                      } ]
+                      "anyOf" : [
+                        {
+                          "type" : "object",
+                          "properties" : { }
+                        },
+                        {
+                          "type" : "null"
+                        }
+                      ]
                     }
                   }
                 }
@@ -388,11 +394,14 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "a" : {
-                      "oneOf" : [ {
-                        "type" : "null"
-                      }, {
-                        "${'$'}ref" : "#/components/schemas/SealedTestClassIssue39"
-                      } ]
+                      "oneOf" : [
+                        {
+                          "type" : "null"
+                        },
+                        {
+                          "${'$'}ref" : "#/components/schemas/SealedTestClassIssue39"
+                        }
+                      ]
                     }
                   }
                 },
@@ -420,6 +429,9 @@ object MiscTestCases {
                            "type": "object",
                            "required": [],
                            "properties": {}
+                        },
+                        {
+                          "type" : "null"
                         }
                      ]
                   }
@@ -433,7 +445,14 @@ object MiscTestCases {
                "required": [],
                "properties": {
                   "a": {
-                     "${'$'}ref": "#/definitions/SealedTestClassIssue39"
+                     "oneOf": [
+                        {
+                           "type": "null"
+                        },
+                        {
+                           "${'$'}ref": "#/definitions/SealedTestClassIssue39"
+                        }
+                     ]
                   }
                },
                "definitions": {
@@ -480,7 +499,7 @@ object MiscTestCases {
         postGenerateJsonSchema = {
             this
                 .handleCoreAnnotations()
-            // todo "mergePropertyAttributesIntoType"
+                .mergePropertyAttributesIntoType()
         }
         // language=json
         expectedSwaggerInline = """
@@ -490,7 +509,7 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "fieldA" : {
-                      "type" : [ "object", "type-a" ],
+                      "type" : "type-a",
                       "format" : "format-a",
                       "properties" : {
                         "nameOfPerson" : {
@@ -504,7 +523,7 @@ object MiscTestCases {
                       "required" : [ "nameOfPerson", "numberOfYears" ]
                     },
                     "fieldB" : {
-                      "type" : [ "object", "type-b" ],
+                      "type" : "type-b",
                       "format" : "format-b",
                       "properties" : {
                         "nameOfPerson" : {
@@ -540,7 +559,7 @@ object MiscTestCases {
                   "required" : [ "fieldA", "fieldB" ]
                 },
                 "TestClassMergePropertyAttributesIntoTypeNested" : {
-                  "type" : [ "object", "type-a" ],
+                  "type" : "type-a",
                   "format" : "format-a",
                   "properties" : {
                     "nameOfPerson" : {
@@ -554,7 +573,7 @@ object MiscTestCases {
                   "required" : [ "nameOfPerson", "numberOfYears" ]
                 },
                 "TestClassMergePropertyAttributesIntoTypeNested2" : {
-                  "type" : [ "object", "type-b" ],
+                  "type" : "type-b",
                   "format" : "format-b",
                   "properties" : {
                     "nameOfPerson" : {
@@ -636,7 +655,8 @@ object MiscTestCases {
                },
                "definitions": {
                   "TestClassMergePropertyAttributesIntoTypeNested": {
-                     "type": "object",
+                     "type": "type-a",
+                     "format": "format-a",
                      "required": [
                         "nameOfPerson",
                         "numberOfYears"
@@ -653,7 +673,8 @@ object MiscTestCases {
                      }
                   },
                   "TestClassMergePropertyAttributesIntoTypeNested2": {
-                     "type": "object",
+                     "type": "type-b",
+                     "format": "format-b",
                      "required": [
                         "nameOfPerson",
                         "numberOfYears"
@@ -890,6 +911,7 @@ object MiscTestCases {
             """.trimIndent()
     }
 
+
     @Serializable
     data class ClassMultipleContextuals(
         val fieldA: @Contextual Instant? = null,
@@ -960,7 +982,6 @@ object MiscTestCases {
         "collect correct subtypes with type parameters involved - https://github.com/SMILEY4/schema-kenerator/issues/43"
     ) {
         type = typeOf<Issue43Root>()
-        postAnalyze = { this.addMissingSupertypeSubtypeRelations() }
         postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
         postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
         // language=json
@@ -1061,7 +1082,7 @@ object MiscTestCases {
                "required": [],
                "properties": {
                   "withEnum": {
-                     "type": "object",
+                     "type" : [ "null", "object" ],
                      "required": [
                         "data"
                      ],
@@ -1077,7 +1098,7 @@ object MiscTestCases {
                      "title": "WithEnum"
                   },
                   "withInt": {
-                     "type": "object",
+                     "type" : [ "null", "object" ],
                      "required": [
                         "data"
                      ],
@@ -1101,12 +1122,20 @@ object MiscTestCases {
                "type": "object",
                "required": [],
                "properties": {
-                  "withEnum": {
+                 "withEnum" : {
+                   "oneOf" : [ {
+                     "type" : "null"
+                   }, {
                      "${'$'}ref": "#/definitions/WithEnum"
-                  },
-                  "withInt": {
+                   } ]
+                 },
+                 "withInt" : {
+                   "oneOf" : [ {
+                     "type" : "null"
+                   }, {
                      "${'$'}ref": "#/definitions/WithInt"
-                  }
+                   } ]
+                 }
                },
                "title": "Issue43Root",
                "definitions": {
@@ -1180,9 +1209,6 @@ object MiscTestCases {
         swaggerConfig = {
             allowSpecialFloatingPointValues = false
         }
-        jsonConfig = {
-            // todo ?
-        }
         // language=json
         expectedSwagger = """
             {
@@ -1209,10 +1235,7 @@ object MiscTestCases {
             }
             """.trimIndent()
         // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
     val specialFloatingPointValuesAllow = case(
@@ -1223,10 +1246,6 @@ object MiscTestCases {
         swaggerConfig = {
             allowSpecialFloatingPointValues = true
         }
-        jsonConfig = {
-            // todo ?
-        }
-        // language=json
         expectedSwagger = """
            {
               "schemas" : {
@@ -1259,11 +1278,7 @@ object MiscTestCases {
               }
             }
             """.trimIndent()
-        // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
 
@@ -1281,9 +1296,6 @@ object MiscTestCases {
         type = typeOf<TestClassWithCombinedKeyMap>()
         swaggerConfig = {
             mapsWithStructuredKeysAsArrays = false
-        }
-        jsonConfig = {
-            // todo ?
         }
         // language=json
         expectedSwagger = """
@@ -1305,11 +1317,7 @@ object MiscTestCases {
               }
             }
             """.trimIndent()
-        // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
     val mapsWithComplexKeysAsArraysEnabled = case(
@@ -1319,9 +1327,6 @@ object MiscTestCases {
         type = typeOf<TestClassWithCombinedKeyMap>()
         swaggerConfig = {
             mapsWithStructuredKeysAsArrays = true
-        }
-        jsonConfig = {
-            // todo ?
         }
         // language=json
         expectedSwaggerInline = """
@@ -1394,11 +1399,7 @@ object MiscTestCases {
               }
             }
             """.trimIndent()
-        // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
 
@@ -1410,7 +1411,6 @@ object MiscTestCases {
 
     @Serializable
     data class CombinedKey(val a: String, val b: Int)
-
 
 
     val descriptionOnPropertyAndType = case(
@@ -1426,7 +1426,7 @@ object MiscTestCases {
         postGenerateJsonSchema = {
             this
                 .handleCoreAnnotations()
-            // todo mergePropertyAttributesIntoType
+                .mergePropertyAttributesIntoType()
         }
         // language=json
         expectedSwaggerInline = """
@@ -1538,10 +1538,12 @@ object MiscTestCases {
             """.trimIndent()
     }
 
+
     @Serializable
     class TestClassWithPropertyDescription(
         @Description("description on property") val someProp: TestClassWithDescription
     )
+
 
     @Serializable
     @Description("description on class")

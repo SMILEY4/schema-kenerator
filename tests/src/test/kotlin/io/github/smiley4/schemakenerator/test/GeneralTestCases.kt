@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.test
 
+import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
@@ -46,7 +47,6 @@ class GeneralTestCases : FunSpec({
 
     runSuite(
         listOf(
-
             BasicTestCases.any,
             BasicTestCases.uByte,
             BasicTestCases.int,
@@ -171,6 +171,7 @@ class GeneralTestCases : FunSpec({
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
                                 .analyzeTypeUsingReflection(case.reflectionConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -188,6 +189,7 @@ class GeneralTestCases : FunSpec({
                         swaggerSchemaInlined(case.type, case) {
                             this
                                 .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -209,6 +211,7 @@ class GeneralTestCases : FunSpec({
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
                                 .analyzeTypeUsingReflection(case.reflectionConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -226,6 +229,7 @@ class GeneralTestCases : FunSpec({
                         swaggerSchemaReferenced(case.type, case) {
                             this
                                 .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -247,6 +251,7 @@ class GeneralTestCases : FunSpec({
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
                                 .analyzeTypeUsingReflection(case.reflectionConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -264,6 +269,7 @@ class GeneralTestCases : FunSpec({
                         jsonSchemaInlined(case.type, case) {
                             this
                                 .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -284,6 +290,7 @@ class GeneralTestCases : FunSpec({
                                 .collectSubTypes()
                                 .collectJacksonSubTypes(typeProcessing = { t -> t.analyzeTypeUsingReflection() })
                                 .analyzeTypeUsingReflection(case.reflectionConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")
@@ -301,6 +308,7 @@ class GeneralTestCases : FunSpec({
                         jsonSchemaReferenced(case.type, case) {
                             this
                                 .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
+                                .addMissingSupertypeSubtypeRelations()
                         }
                             .also {
                                 println("== ACTUAL =======================")

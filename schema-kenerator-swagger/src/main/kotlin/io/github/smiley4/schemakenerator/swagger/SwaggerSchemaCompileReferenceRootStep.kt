@@ -7,7 +7,7 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData
 
 internal class SwaggerSchemaCompileReferenceRootStep(
-    private val explicitNullTypes: Boolean ,
+    private val explicitNullTypes: Boolean,
     private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ) {
 
@@ -18,7 +18,7 @@ internal class SwaggerSchemaCompileReferenceRootStep(
      */
     fun compile(input: IntermediateSwaggerSchemaData): CompiledSwaggerSchemaData {
         val result = SwaggerSchemaCompileReferenceStep(explicitNullTypes, pathBuilder).compile(input)
-        if (shouldReference(result.swagger)) {
+        if (shouldReference(result.swagger, result.typeData)) {
             val refPath = pathBuilder(result.typeData, input.typeDataById)
             return CompiledSwaggerSchemaData(
                 typeData = result.typeData,

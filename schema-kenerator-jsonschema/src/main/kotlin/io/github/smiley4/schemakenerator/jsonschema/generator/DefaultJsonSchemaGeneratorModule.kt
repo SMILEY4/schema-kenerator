@@ -6,9 +6,12 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaUtils
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 
 class DefaultJsonSchemaGeneratorModule(
-    private val optionalAsNonRequired: Boolean = false
+    private val optionalAsNonRequired: Boolean = false,
+    private val nullableAsNonRequired: Boolean = false,
 ) : JsonSchemaGeneratorModule {
 
     private val schemaUtils = JsonSchemaUtils()
@@ -144,7 +147,12 @@ class DefaultJsonSchemaGeneratorModule(
 
         collectMembers(context.typeData, context.knownTypeData).forEach { member ->
             propertySchemas[member.name] = schemaUtils.referenceSchema(member.type)
-            val nullable = member.nullable
+            propertySchemas[member.name].also {
+                if (it is JsonObject && member.nullable) {
+                    it.properties["_nullable"] = JsonBooleanValue(true)
+                }
+            }
+            val nullable = member.nullable && nullableAsNonRequired
             val optional = member.optional && optionalAsNonRequired
             if (!nullable && !optional) {
                 requiredProperties.add(member.name)

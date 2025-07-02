@@ -77,19 +77,33 @@ object JsonSchemaSteps {
 
 
     /**
-     * Resolves references in generated json schemas by inlining them.
+     * Merge the attributes of a property into the referenced type.
      */
-    fun IntermediateJsonSchemaData.compileInlining(): CompiledJsonSchemaData {
-        return JsonSchemaCompileInlineStep().compile(this)
+    fun IntermediateJsonSchemaData.mergePropertyAttributesIntoType(): IntermediateJsonSchemaData {
+        return JsonMergePropertyAttributesStep().process(this)
+    }
+
+
+    /**
+     * Resolves references in generated json schemas by inlining them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
+     */
+    fun IntermediateJsonSchemaData.compileInlining(explicitNullTypes: Boolean = true): CompiledJsonSchemaData {
+        return JsonSchemaCompileInlineStep(explicitNullTypes).compile(this)
     }
 
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
      */
-    fun IntermediateJsonSchemaData.compileReferencing(pathType: RefType = RefType.FULL): CompiledJsonSchemaData {
+    fun IntermediateJsonSchemaData.compileReferencing(
+        explicitNullTypes: Boolean = true,
+        pathType: RefType = RefType.FULL
+    ): CompiledJsonSchemaData {
         return compileReferencing(
+            explicitNullTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -100,21 +114,28 @@ object JsonSchemaSteps {
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
     fun IntermediateJsonSchemaData.compileReferencing(
+        explicitNullTypes: Boolean = true,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
     ): CompiledJsonSchemaData {
-        return JsonSchemaCompileReferenceStep(builder).compile(this)
+        return JsonSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
     }
 
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
      */
-    fun IntermediateJsonSchemaData.compileReferencingRoot(pathType: RefType = RefType.FULL): CompiledJsonSchemaData {
+    fun IntermediateJsonSchemaData.compileReferencingRoot(
+        explicitNullTypes: Boolean = true,
+        pathType: RefType = RefType.FULL
+    ): CompiledJsonSchemaData {
         return compileReferencingRoot(
+            explicitNullTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -125,12 +146,14 @@ object JsonSchemaSteps {
 
     /**
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
     fun IntermediateJsonSchemaData.compileReferencingRoot(
+        explicitNullTypes: Boolean = true,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
     ): CompiledJsonSchemaData {
-        return JsonSchemaCompileReferenceRootStep(builder).compile(this)
+        return JsonSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
     }
 
 
@@ -142,6 +165,7 @@ object JsonSchemaSteps {
         return JsonSchemaCustomizeStep().customizeTypes(this, action)
     }
 
+
     /**
      * Provide a function that is called for each property. Can be used to manually manipulate the generated json schema.
      */
@@ -152,6 +176,7 @@ object JsonSchemaSteps {
     }
 
 
+    @Deprecated("Use 'RequiredHandling' instead")
     enum class OptionalHandling {
         /**
          * Handle optional parameters as "required" in the schema
@@ -163,6 +188,33 @@ object JsonSchemaSteps {
          * Handle optional parameters as not required in the schema
          */
         NON_REQUIRED
+    }
+
+    enum class RequiredHandling {
+        /**
+         * Handle optional parameters as "required" in the schema
+         */
+        REQUIRED,
+
+
+        /**
+         * Handle optional parameters as not required in the schema
+         */
+        NON_REQUIRED
+    }
+
+    fun RequiredHandling.toOptionalHandling(): OptionalHandling {
+        return when (this) {
+            RequiredHandling.REQUIRED -> OptionalHandling.REQUIRED
+            RequiredHandling.NON_REQUIRED -> OptionalHandling.NON_REQUIRED
+        }
+    }
+
+    fun OptionalHandling.toRequiredHandling(): RequiredHandling {
+        return when (this) {
+            OptionalHandling.REQUIRED -> RequiredHandling.REQUIRED
+            OptionalHandling.NON_REQUIRED -> RequiredHandling.NON_REQUIRED
+        }
     }
 
     class JsonSchemaGenerationStepConfig {
@@ -177,14 +229,46 @@ object JsonSchemaSteps {
          * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
          * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
          */
-        var optionalHandling = OptionalHandling.REQUIRED
+        @Deprecated("use 'optionals' instead")
+        var optionalHandling: OptionalHandling
+            get() = optionals.toOptionalHandling()
+            set(value) {
+                optionals = value.toRequiredHandling()
+            }
+
+
+        /**
+         * How to handle optional properties
+         *
+         * Example:
+         * ```
+         * class MyExample(val someValue: String = "hello")
+         * ```
+         * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
+         * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
+         */
+        var optionals = RequiredHandling.REQUIRED
+
+
+        /**
+         * How to handle nullable parameters
+         *
+         * Example:
+         * ```
+         * class MyExample(val someValue: String?)
+         * ```
+         * - with `nullables = REQUIRED` => "someValue" is required (but can be either a string value or "null")
+         * - with `nullables = NON_REQUIRED` => "someValue" is not required (but "null" as value is still valid)
+         */
+        var nullables: RequiredHandling = RequiredHandling.NON_REQUIRED
 
         val customModules = mutableListOf<JsonSchemaGeneratorModule>()
 
         internal fun buildCustomModules(): List<JsonSchemaGeneratorModule> {
             val allModules = listOf(
                 DefaultJsonSchemaGeneratorModule(
-                    optionalAsNonRequired = optionalHandling == OptionalHandling.NON_REQUIRED
+                    nullableAsNonRequired = nullables == RequiredHandling.NON_REQUIRED,
+                    optionalAsNonRequired = optionals == RequiredHandling.NON_REQUIRED
                 )
             ) + customModules
             return allModules.reversed()

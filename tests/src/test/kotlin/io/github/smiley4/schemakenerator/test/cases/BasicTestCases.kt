@@ -278,7 +278,7 @@ object BasicTestCases {
             optionals = SwaggerSteps.RequiredHandling.REQUIRED
         }
         jsonConfig = {
-            optionalHandling = JsonSchemaSteps.OptionalHandling.REQUIRED
+            optionals = JsonSchemaSteps.RequiredHandling.REQUIRED
         }
         // language=json
         expectedSwagger = """
@@ -340,7 +340,7 @@ object BasicTestCases {
             optionals = SwaggerSteps.RequiredHandling.NON_REQUIRED
         }
         jsonConfig = {
-            optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
+            optionals = JsonSchemaSteps.RequiredHandling.NON_REQUIRED
         }
         // language=json
         expectedSwagger = """
@@ -539,7 +539,7 @@ object BasicTestCases {
             nullables = SwaggerSteps.RequiredHandling.REQUIRED
         }
         jsonConfig = {
-            // todo
+            nullables = JsonSchemaSteps.RequiredHandling.REQUIRED
         }
         // language=json
         expectedSwaggerInline = """
@@ -714,7 +714,7 @@ object BasicTestCases {
             nullables = SwaggerSteps.RequiredHandling.REQUIRED
         }
         jsonConfig = {
-            // todo
+            nullables = JsonSchemaSteps.RequiredHandling.REQUIRED
         }
         // language=json
         expectedSwaggerInline = """
@@ -879,6 +879,7 @@ object BasicTestCases {
                 ]
               }
             }
+        }
         """.trimIndent()
     }
 
@@ -943,7 +944,8 @@ object BasicTestCases {
                  "value": {
                    "type": ["string", "null"]
                  }
-               }
+               },
+               "required": []
              }
         """.trimIndent()
     }
@@ -1199,10 +1201,10 @@ object BasicTestCases {
                   "type": "object",
                   "properties": {
                     "valueInt": {
-                      "${'$'}ref": "#/components/schemas/ClassWithGenericField<Int>"
+                      "${'$'}ref": "#/components/schemas/ClassWithGenericField_Int"
                     },
                     "valueString": {
-                      "${'$'}ref": "#/components/schemas/ClassWithGenericField<String>"
+                      "${'$'}ref": "#/components/schemas/ClassWithGenericField_String"
                     }
                   },
                   "required": [
@@ -1210,7 +1212,7 @@ object BasicTestCases {
                     "valueString"
                   ]
                 },
-                "ClassWithGenericField<Int>": {
+                "ClassWithGenericField_Int": {
                   "type": "object",
                   "properties": {
                     "value": {
@@ -1222,7 +1224,7 @@ object BasicTestCases {
                     "value"
                   ]
                 },
-                "ClassWithGenericField<String>": {
+                "ClassWithGenericField_String": {
                   "type": "object",
                   "properties": {
                     "value": {
@@ -1237,8 +1239,8 @@ object BasicTestCases {
             }
         """.trimIndent()
         expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference
-            ?.replace("ClassWithGenericField<Int>", "ClassWithGenericField")
-            ?.replace("ClassWithGenericField<String>", "ClassWithGenericField2")
+            ?.replace("ClassWithGenericField_Int", "ClassWithGenericField")
+            ?.replace("ClassWithGenericField_String", "ClassWithGenericField2")
         // language=json
         expectedJsonInline = """
             {
@@ -1490,6 +1492,7 @@ object BasicTestCases {
         expectedJsonInline = """
             {
               "type": "object",
+              "required": [],
               "properties": {
                 "self": {
                   "${'$'}ref": "#"
@@ -1501,6 +1504,7 @@ object BasicTestCases {
         expectedJsonReference = """
             {
               "type": "object",
+              "required": [],
               "properties": {
                 "self": {
                   "oneOf": [
@@ -1516,6 +1520,7 @@ object BasicTestCases {
               "definitions": {
                 "ClassDirectSelfReferencing": {
                   "type": "object",
+                  "required": [],
                   "properties": {
                     "self": {
                       "oneOf": [
