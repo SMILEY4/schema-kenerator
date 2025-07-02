@@ -3,7 +3,6 @@ package io.github.smiley4.schemakenerator.jsonschema
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.array
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
@@ -42,37 +41,16 @@ object JsonSchemaCompileUtils {
         }
     }
 
-    fun shouldReference(json: JsonNode): Boolean {
-        val complexProperties = setOf(
-            "required",
-            "properties"
-        )
-        return if (json is JsonObject) {
-            val isComplexObject = getTextProperty(json, "type") == "object"
-                    && json.properties.keys.any { complexProperties.contains(it) }
-                    && !existsProperty(json, "additionalProperties")
-            isComplexObject || existsProperty(json, "enum") || existsProperty(json, "anyOf")
+    fun shouldReference(schema: JsonNode): Boolean {
+        return if (schema is JsonObject) {
+            schema.properties.contains("properties")
+                    || schema.properties.contains("enum")
+                    || schema.properties.contains("anyOf")
+                    || schema.properties.contains("oneOf")
         } else {
             false
         }
-
     }
 
-    fun getTextProperty(node: JsonNode, key: String): String? {
-        if (node is JsonObject) {
-            val type = node.properties[key]
-            if (type is JsonTextValue) {
-                return type.value
-            }
-        }
-        return null
-    }
-
-    fun existsProperty(node: JsonNode, key: String): Boolean {
-        if (node is JsonObject) {
-            return node.properties[key] != null
-        }
-        return false
-    }
 
 }

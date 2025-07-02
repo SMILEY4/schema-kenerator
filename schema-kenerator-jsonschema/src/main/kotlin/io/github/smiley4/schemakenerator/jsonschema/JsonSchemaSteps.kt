@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
+import io.github.smiley4.schemakenerator.jsonschema.JsonMergePropertyAttributesStep
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
@@ -73,6 +74,14 @@ object JsonSchemaSteps {
             .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
             .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
             .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
+    }
+
+
+    /**
+     * Merge the attributes of a property into the referenced type.
+     */
+    fun IntermediateJsonSchemaData.mergePropertyAttributesIntoType(): IntermediateJsonSchemaData {
+        return JsonMergePropertyAttributesStep().process(this)
     }
 
 
@@ -196,14 +205,14 @@ object JsonSchemaSteps {
     }
 
     fun RequiredHandling.toOptionalHandling(): OptionalHandling {
-        return when(this) {
+        return when (this) {
             RequiredHandling.REQUIRED -> OptionalHandling.REQUIRED
             RequiredHandling.NON_REQUIRED -> OptionalHandling.NON_REQUIRED
         }
     }
 
     fun OptionalHandling.toRequiredHandling(): RequiredHandling {
-        return when(this) {
+        return when (this) {
             OptionalHandling.REQUIRED -> RequiredHandling.REQUIRED
             OptionalHandling.NON_REQUIRED -> RequiredHandling.NON_REQUIRED
         }
@@ -228,6 +237,7 @@ object JsonSchemaSteps {
                 optionals = value.toRequiredHandling()
             }
 
+
         /**
          * How to handle optional properties
          *
@@ -240,6 +250,7 @@ object JsonSchemaSteps {
          */
         var optionals = RequiredHandling.REQUIRED
 
+
         /**
          * How to handle nullable parameters
          *
@@ -251,7 +262,6 @@ object JsonSchemaSteps {
          * - with `nullables = NON_REQUIRED` => "someValue" is not required (but "null" as value is still valid)
          */
         var nullables: RequiredHandling = RequiredHandling.NON_REQUIRED
-
 
         val customModules = mutableListOf<JsonSchemaGeneratorModule>()
 

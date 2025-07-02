@@ -1,3 +1,5 @@
+@file:Suppress("EqualsOrHashCode")
+
 package io.github.smiley4.schemakenerator.jsonschema.jsonDsl
 
 /**
@@ -82,6 +84,10 @@ data class JsonObject(val properties: MutableMap<String, JsonNode>) : JsonNode {
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is JsonObject && other.properties == properties
+    }
+
     override fun copyNode(): JsonNode {
         return JsonObject(
             properties = properties.mapValues { (_, value) -> value.copyNode() }.toMutableMap()
@@ -110,6 +116,10 @@ data class JsonArray(val items: MutableList<JsonNode> = mutableListOf()) : JsonN
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is JsonArray && other.items == items
+    }
+
     override fun copyNode(): JsonNode {
         return JsonArray(
             items = items.map { it.copyNode() }.toMutableList()
@@ -133,6 +143,10 @@ class JsonNumericValue(value: Number) : JsonValue<Number>(value) {
         return "$value"
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is JsonNumericValue && other.value == value
+    }
+
     override fun copyNode() = JsonNumericValue(value)
 }
 
@@ -143,6 +157,10 @@ class JsonNumericValue(value: Number) : JsonValue<Number>(value) {
 class JsonTextValue(value: String) : JsonValue<String>(value) {
     override fun prettyPrint(level: Int): String {
         return "\"$value\""
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is JsonTextValue && other.value == value
     }
 
     override fun copyNode() = JsonTextValue(value)
@@ -157,6 +175,10 @@ class JsonBooleanValue(value: Boolean) : JsonValue<Boolean>(value) {
         return "$value"
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is JsonBooleanValue && other.value == value
+    }
+
     override fun copyNode() = JsonBooleanValue(value)
 }
 
@@ -167,6 +189,10 @@ class JsonBooleanValue(value: Boolean) : JsonValue<Boolean>(value) {
 class JsonNullValue : JsonValue<Unit>(Unit) {
     override fun prettyPrint(level: Int): String {
         return "null"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is JsonNullValue
     }
 
     override fun copyNode() = JsonNullValue()

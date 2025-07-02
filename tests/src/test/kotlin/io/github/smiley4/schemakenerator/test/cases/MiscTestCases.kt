@@ -12,6 +12,7 @@ import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.jackson.JacksonSteps.handleJacksonAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.customizeProperties
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
@@ -498,7 +499,7 @@ object MiscTestCases {
         postGenerateJsonSchema = {
             this
                 .handleCoreAnnotations()
-            // todo "mergePropertyAttributesIntoType"
+                .mergePropertyAttributesIntoType()
         }
         // language=json
         expectedSwaggerInline = """
@@ -508,7 +509,7 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "fieldA" : {
-                      "type" : [ "object", "type-a" ],
+                      "type" : [ "type-a" ],
                       "format" : "format-a",
                       "properties" : {
                         "nameOfPerson" : {
@@ -522,7 +523,7 @@ object MiscTestCases {
                       "required" : [ "nameOfPerson", "numberOfYears" ]
                     },
                     "fieldB" : {
-                      "type" : [ "object", "type-b" ],
+                      "type" : [ "type-b" ],
                       "format" : "format-b",
                       "properties" : {
                         "nameOfPerson" : {
@@ -558,7 +559,7 @@ object MiscTestCases {
                   "required" : [ "fieldA", "fieldB" ]
                 },
                 "TestClassMergePropertyAttributesIntoTypeNested" : {
-                  "type" : [ "object", "type-a" ],
+                  "type" : [ "type-a" ],
                   "format" : "format-a",
                   "properties" : {
                     "nameOfPerson" : {
@@ -572,7 +573,7 @@ object MiscTestCases {
                   "required" : [ "nameOfPerson", "numberOfYears" ]
                 },
                 "TestClassMergePropertyAttributesIntoTypeNested2" : {
-                  "type" : [ "object", "type-b" ],
+                  "type" : [ "type-b" ],
                   "format" : "format-b",
                   "properties" : {
                     "nameOfPerson" : {
@@ -654,7 +655,8 @@ object MiscTestCases {
                },
                "definitions": {
                   "TestClassMergePropertyAttributesIntoTypeNested": {
-                     "type": "object",
+                     "type": "type-a",
+                     "format": "format-a",
                      "required": [
                         "nameOfPerson",
                         "numberOfYears"
@@ -671,7 +673,8 @@ object MiscTestCases {
                      }
                   },
                   "TestClassMergePropertyAttributesIntoTypeNested2": {
-                     "type": "object",
+                     "type": "type-b",
+                     "format": "format-b",
                      "required": [
                         "nameOfPerson",
                         "numberOfYears"
@@ -1451,7 +1454,7 @@ object MiscTestCases {
         postGenerateJsonSchema = {
             this
                 .handleCoreAnnotations()
-            // todo mergePropertyAttributesIntoType
+                .mergePropertyAttributesIntoType()
         }
         // language=json
         expectedSwaggerInline = """

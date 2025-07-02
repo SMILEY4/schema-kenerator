@@ -12,6 +12,7 @@ object SwaggerSchemaCompileUtils {
         return (schema.types?.contains("object") == true && schema.properties != null)
                 || schema.enum != null
                 || schema.anyOf != null
+                || schema.oneOf != null
     }
 
     private const val MAX_RESOLVE_REFS_DEPTH = 64;
