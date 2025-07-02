@@ -1209,9 +1209,6 @@ object MiscTestCases {
         swaggerConfig = {
             allowSpecialFloatingPointValues = false
         }
-        jsonConfig = {
-            // todo ?
-        }
         // language=json
         expectedSwagger = """
             {
@@ -1238,10 +1235,7 @@ object MiscTestCases {
             }
             """.trimIndent()
         // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
     val specialFloatingPointValuesAllow = case(
@@ -1252,10 +1246,6 @@ object MiscTestCases {
         swaggerConfig = {
             allowSpecialFloatingPointValues = true
         }
-        jsonConfig = {
-            // todo ?
-        }
-        // language=json
         expectedSwagger = """
            {
               "schemas" : {
@@ -1288,11 +1278,7 @@ object MiscTestCases {
               }
             }
             """.trimIndent()
-        // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
 
@@ -1310,9 +1296,6 @@ object MiscTestCases {
         type = typeOf<TestClassWithCombinedKeyMap>()
         swaggerConfig = {
             mapsWithStructuredKeysAsArrays = false
-        }
-        jsonConfig = {
-            // todo ?
         }
         // language=json
         expectedSwagger = """
@@ -1334,11 +1317,7 @@ object MiscTestCases {
               }
             }
             """.trimIndent()
-        // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
     val mapsWithComplexKeysAsArraysEnabled = case(
@@ -1348,9 +1327,6 @@ object MiscTestCases {
         type = typeOf<TestClassWithCombinedKeyMap>()
         swaggerConfig = {
             mapsWithStructuredKeysAsArrays = true
-        }
-        jsonConfig = {
-            // todo ?
         }
         // language=json
         expectedSwaggerInline = """
@@ -1423,11 +1399,7 @@ object MiscTestCases {
               }
             }
             """.trimIndent()
-        // language=json
-        expectedJson = """
-            {
-            }
-            """.trimIndent()
+        expectedJson = null // not supported for json schemas
     }
 
 

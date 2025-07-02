@@ -1,8 +1,10 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.array
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
@@ -41,16 +43,40 @@ object JsonSchemaCompileUtils {
         }
     }
 
-    fun shouldReference(schema: JsonNode): Boolean {
+    fun shouldReference(schema: JsonNode, typeData: TypeData): Boolean {
         return if (schema is JsonObject) {
-            schema.properties.contains("properties")
-                    || schema.properties.contains("enum")
-                    || schema.properties.contains("anyOf")
-                    || schema.properties.contains("oneOf")
+
+            val isObject = (getTypes(schema).contains("object") || schema.properties.contains("properties"))
+                    && !typeData.isMap
+                    && typeData.identifyingName.full != Any::class.qualifiedName!!
+                    && typeData.identifyingName.full != "*"
+
+            val isEnum = schema.properties.contains("enum")
+
+            val isAnyOfObject = schema.properties.contains("anyOf") && schema.getArray("anyOf").items.all {
+                it is JsonObject && it.properties.containsKey("${'$'}ref")
+            }
+
+            val isOneOfObject = schema.properties.contains("oneOf") && schema.getArray("oneOf").items.all {
+                it is JsonObject && it.properties.containsKey("${'$'}ref")
+            }
+
+            return isObject || isEnum || isAnyOfObject || isOneOfObject
         } else {
             false
         }
     }
 
+    private fun getTypes(schema: JsonObject): Set<String> {
+        return schema.properties["type"]
+            ?.let {
+                when (it) {
+                    is JsonArray -> it.items.filterIsInstance<JsonTextValue>().mapNotNull { it.value }.toSet()
+                    is JsonTextValue -> setOf(it.value)
+                    else -> emptySet()
+                }
+            }
+            ?: emptySet()
+    }
 
 }

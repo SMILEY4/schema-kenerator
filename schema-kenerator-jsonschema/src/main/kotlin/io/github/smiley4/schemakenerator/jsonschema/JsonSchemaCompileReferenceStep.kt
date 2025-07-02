@@ -84,7 +84,7 @@ internal class JsonSchemaCompileReferenceStep(
         }
 
         // create swagger property with correct reference path (and add actual schema to context)
-        val property = if (shouldReference(referencedSchema.json)) {
+        val property = if (shouldReference(referencedSchema.json, referencedSchema.typeData)) {
             createRefProperty(refObj, referencedSchema, context)
         } else {
             createInlineProperty(refObj, referencedSchema)

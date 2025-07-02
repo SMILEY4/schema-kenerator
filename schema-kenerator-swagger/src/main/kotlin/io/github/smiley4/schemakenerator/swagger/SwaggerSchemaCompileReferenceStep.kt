@@ -87,7 +87,7 @@ internal class SwaggerSchemaCompileReferenceStep(
         }
 
         // create swagger property with correct reference path (and add actual schema to context)
-        val property = if (shouldReference(referencedSchema.swagger)) {
+        val property = if (shouldReference(referencedSchema.swagger, referencedSchema.typeData)) {
             createRefProperty(refObj, referencedSchema, context)
         } else {
             createInlineProperty(refObj, referencedSchema)

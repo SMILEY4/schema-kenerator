@@ -18,7 +18,7 @@ internal class SwaggerSchemaCompileReferenceRootStep(
      */
     fun compile(input: IntermediateSwaggerSchemaData): CompiledSwaggerSchemaData {
         val result = SwaggerSchemaCompileReferenceStep(explicitNullTypes, pathBuilder).compile(input)
-        if (shouldReference(result.swagger)) {
+        if (shouldReference(result.swagger, result.typeData)) {
             val refPath = pathBuilder(result.typeData, input.typeDataById)
             return CompiledSwaggerSchemaData(
                 typeData = result.typeData,
