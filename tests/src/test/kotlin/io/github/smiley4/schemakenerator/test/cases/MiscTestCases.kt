@@ -349,6 +349,8 @@ object MiscTestCases {
             """.trimIndent()
     }
 
+
+    @Serializable
     class TestClassCustomizeProperties(
         val describeMe: String,
         val otherProperty: String
@@ -368,12 +370,15 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "a" : {
-                      "anyOf" : [ {
-                        "type" : "object",
-                        "properties" : { }
-                      }, {
-                        "type" : "null"
-                      } ]
+                      "anyOf" : [
+                        {
+                          "type" : "object",
+                          "properties" : { }
+                        },
+                        {
+                          "type" : "null"
+                        }
+                      ]
                     }
                   }
                 }
@@ -388,11 +393,14 @@ object MiscTestCases {
                   "type" : "object",
                   "properties" : {
                     "a" : {
-                      "oneOf" : [ {
-                        "type" : "null"
-                      }, {
-                        "${'$'}ref" : "#/components/schemas/SealedTestClassIssue39"
-                      } ]
+                      "oneOf" : [
+                        {
+                          "type" : "null"
+                        },
+                        {
+                          "${'$'}ref" : "#/components/schemas/SealedTestClassIssue39"
+                        }
+                      ]
                     }
                   }
                 },
@@ -420,6 +428,9 @@ object MiscTestCases {
                            "type": "object",
                            "required": [],
                            "properties": {}
+                        },
+                        {
+                          "type" : "null"
                         }
                      ]
                   }
@@ -433,7 +444,14 @@ object MiscTestCases {
                "required": [],
                "properties": {
                   "a": {
-                     "${'$'}ref": "#/definitions/SealedTestClassIssue39"
+                     "oneOf": [
+                        {
+                           "type": "null"
+                        },
+                        {
+                           "${'$'}ref": "#/definitions/SealedTestClassIssue39"
+                        }
+                     ]
                   }
                },
                "definitions": {
@@ -890,6 +908,7 @@ object MiscTestCases {
             """.trimIndent()
     }
 
+
     @Serializable
     data class ClassMultipleContextuals(
         val fieldA: @Contextual Instant? = null,
@@ -960,7 +979,6 @@ object MiscTestCases {
         "collect correct subtypes with type parameters involved - https://github.com/SMILEY4/schema-kenerator/issues/43"
     ) {
         type = typeOf<Issue43Root>()
-        postAnalyze = { this.addMissingSupertypeSubtypeRelations() }
         postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
         postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
         // language=json
@@ -1061,7 +1079,7 @@ object MiscTestCases {
                "required": [],
                "properties": {
                   "withEnum": {
-                     "type": "object",
+                     "type" : [ "null", "object" ],
                      "required": [
                         "data"
                      ],
@@ -1077,7 +1095,7 @@ object MiscTestCases {
                      "title": "WithEnum"
                   },
                   "withInt": {
-                     "type": "object",
+                     "type" : [ "null", "object" ],
                      "required": [
                         "data"
                      ],
@@ -1101,12 +1119,20 @@ object MiscTestCases {
                "type": "object",
                "required": [],
                "properties": {
-                  "withEnum": {
+                 "withEnum" : {
+                   "oneOf" : [ {
+                     "type" : "null"
+                   }, {
                      "${'$'}ref": "#/definitions/WithEnum"
-                  },
-                  "withInt": {
+                   } ]
+                 },
+                 "withInt" : {
+                   "oneOf" : [ {
+                     "type" : "null"
+                   }, {
                      "${'$'}ref": "#/definitions/WithInt"
-                  }
+                   } ]
+                 }
                },
                "title": "Issue43Root",
                "definitions": {
@@ -1412,7 +1438,6 @@ object MiscTestCases {
     data class CombinedKey(val a: String, val b: Int)
 
 
-
     val descriptionOnPropertyAndType = case(
         "misc",
         "description annotations on property and type"
@@ -1538,10 +1563,12 @@ object MiscTestCases {
             """.trimIndent()
     }
 
+
     @Serializable
     class TestClassWithPropertyDescription(
         @Description("description on property") val someProp: TestClassWithDescription
     )
+
 
     @Serializable
     @Description("description on class")

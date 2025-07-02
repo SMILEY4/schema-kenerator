@@ -51,7 +51,7 @@ object RedirectTypeTestCases {
                ],
                "properties": {
                   "nullableText": {
-                     "type": "string"
+                     "type": [ "null", "string" ]
                   },
                   "requiredText": {
                      "type": "integer",
@@ -103,10 +103,10 @@ object RedirectTypeTestCases {
                "required": [],
                "properties": {
                   "nullableText": {
-                     "type": "string"
+                     "type": [ "null", "string" ]
                   },
                   "requiredText": {
-                     "type": "integer",
+                     "type": [ "null", "integer" ],
                      "minimum": -2147483648,
                      "maximum": 2147483647
                   }
@@ -159,7 +159,7 @@ object RedirectTypeTestCases {
                ],
                "properties": {
                   "nullableText": {
-                     "type": "integer",
+                     "type": [ "null", "integer" ],
                      "minimum": -2147483648,
                      "maximum": 2147483647
                   },
@@ -214,12 +214,12 @@ object RedirectTypeTestCases {
                "required": [],
                "properties": {
                   "nullableText": {
-                     "type": "integer",
+                     "type": [ "null", "integer" ],
                      "minimum": -2147483648,
                      "maximum": 2147483647
                   },
                   "requiredText": {
-                     "type": "integer",
+                     "type": [ "null", "integer" ],
                      "minimum": -2147483648,
                      "maximum": 2147483647
                   }
@@ -273,7 +273,7 @@ object RedirectTypeTestCases {
                "required": [],
                "properties": {
                   "data": {
-                     "type": "integer",
+                     "type": [ "null", "integer" ],
                      "minimum": -2147483648,
                      "maximum": 2147483647
                   }
@@ -313,7 +313,7 @@ object RedirectTypeTestCases {
                "required": [],
                "properties": {
                   "name": {
-                     "type": "string"
+                     "type": [ "null", "string" ]
                   }
                }
             }
