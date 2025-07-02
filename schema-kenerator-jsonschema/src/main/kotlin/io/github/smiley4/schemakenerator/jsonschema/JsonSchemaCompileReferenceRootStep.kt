@@ -18,7 +18,7 @@ internal class JsonSchemaCompileReferenceRootStep(
      * Put referenced schemas into definitions and reference them
      */
     fun compile(input: IntermediateJsonSchemaData): CompiledJsonSchemaData {
-        val result = JsonSchemaCompileReferenceStep(true, pathBuilder).compile(input)
+        val result = JsonSchemaCompileReferenceStep(explicitNullTypes, pathBuilder).compile(input)
         if (shouldReference(result.json, result.typeData)) {
             val refPath = pathBuilder(result.typeData, input.typeDataById)
             return CompiledJsonSchemaData(

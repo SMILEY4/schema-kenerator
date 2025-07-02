@@ -1,6 +1,5 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.jsonschema.JsonMergePropertyAttributesStep
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
