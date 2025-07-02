@@ -10,7 +10,8 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 
 class DefaultJsonSchemaGeneratorModule(
-    private val optionalAsNonRequired: Boolean = false
+    private val optionalAsNonRequired: Boolean = false,
+    private val nullableAsNonRequired: Boolean = false,
 ) : JsonSchemaGeneratorModule {
 
     private val schemaUtils = JsonSchemaUtils()
@@ -151,7 +152,7 @@ class DefaultJsonSchemaGeneratorModule(
                     it.properties["_nullable"] = JsonBooleanValue(true)
                 }
             }
-            val nullable = member.nullable
+            val nullable = member.nullable && nullableAsNonRequired
             val optional = member.optional && optionalAsNonRequired
             if (!nullable && !optional) {
                 requiredProperties.add(member.name)

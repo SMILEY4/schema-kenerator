@@ -11,7 +11,6 @@ import io.github.smiley4.schemakenerator.core.annotations.Example
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.jackson.jsonschema.JacksonJsonSchemaSteps.handleJacksonJsonSchemaAnnotations
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.OptionalHandling
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
@@ -22,7 +21,6 @@ import io.github.smiley4.schemakenerator.jsonschema.data.RefType
 import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.kotest.core.spec.style.FreeSpec
-import kotlin.reflect.typeOf
 
 class E03_Generating_JsonSchema : FreeSpec({
 
@@ -176,7 +174,7 @@ class E03_Generating_JsonSchema : FreeSpec({
                 // configure how optional properties, i.e properties that are not necessarily nullable but have a default value assigned, should be treated
                 // "REQUIRED":     these properties are handled as "required"
                 // "NON_REQUIRED": these properties are handled as "not required"
-                optionalHandling = OptionalHandling.REQUIRED
+                optionals = JsonSchemaSteps.RequiredHandling.REQUIRED
             }
 
     }

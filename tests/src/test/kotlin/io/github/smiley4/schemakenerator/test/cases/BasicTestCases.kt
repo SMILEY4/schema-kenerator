@@ -2,26 +2,7 @@ package io.github.smiley4.schemakenerator.test.cases
 
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
-import io.github.smiley4.schemakenerator.test.cases.MiscTestCases.MyInstantSerializer
-import io.github.smiley4.schemakenerator.test.cases.MiscTestCases.MyUUIDSerializer
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.SerialKind
-import kotlinx.serialization.descriptors.buildSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.UUID
 import kotlin.reflect.typeOf
 
 object BasicTestCases {
@@ -297,7 +278,7 @@ object BasicTestCases {
             optionals = SwaggerSteps.RequiredHandling.REQUIRED
         }
         jsonConfig = {
-            optionalHandling = JsonSchemaSteps.OptionalHandling.REQUIRED
+            optionals = JsonSchemaSteps.RequiredHandling.REQUIRED
         }
         // language=json
         expectedSwagger = """
@@ -359,7 +340,7 @@ object BasicTestCases {
             optionals = SwaggerSteps.RequiredHandling.NON_REQUIRED
         }
         jsonConfig = {
-            optionalHandling = JsonSchemaSteps.OptionalHandling.NON_REQUIRED
+            optionals = JsonSchemaSteps.RequiredHandling.NON_REQUIRED
         }
         // language=json
         expectedSwagger = """
@@ -558,7 +539,7 @@ object BasicTestCases {
             nullables = SwaggerSteps.RequiredHandling.REQUIRED
         }
         jsonConfig = {
-            // todo
+            nullables = JsonSchemaSteps.RequiredHandling.REQUIRED
         }
         // language=json
         expectedSwaggerInline = """
@@ -733,7 +714,7 @@ object BasicTestCases {
             nullables = SwaggerSteps.RequiredHandling.REQUIRED
         }
         jsonConfig = {
-            // todo
+            nullables = JsonSchemaSteps.RequiredHandling.REQUIRED
         }
         // language=json
         expectedSwaggerInline = """
