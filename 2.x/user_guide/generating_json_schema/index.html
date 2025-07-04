@@ -664,6 +664,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#output-and-merging-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      Output and Merging Schemas
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#automatically-adding-titles" class="md-nav__link">
     <span class="md-ellipsis">
       Automatically Adding Titles
@@ -879,7 +888,7 @@ Resulting Root JSON Schema:
 <span class="w">   </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;nested&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="w"> </span><span class="p">],</span>
 <span class="w">   </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;nested&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/definitions/examples.NestedClass&quot;</span>
+<span class="w">         </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/examples.NestedClass&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;number&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="p">,</span>
@@ -915,7 +924,7 @@ Referenced schemas are returned in an extra property <code>.compileReferencing()
 </code></pre></div>
 Resulting Root JSON Schema:
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">   </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">&quot;#/definitions/examples.ExampleClass</span>
+<span class="w">   </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">&quot;#/$defs/examples.ExampleClass</span>
 <span class="err">}</span>
 </code></pre></div>
 Referenced JSON Schema (e.g. <code>.compileReferencingRoot().definitions["examples.ExampleClass"]</code>): 
@@ -927,7 +936,7 @@ Referenced JSON Schema (e.g. <code>.compileReferencingRoot().definitions["exampl
 <span class="w">   </span><span class="p">],</span>
 <span class="w">   </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;nested&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/definitions/examples.NestedClass&quot;</span>
+<span class="w">         </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/examples.NestedClass&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;number&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="p">,</span>
@@ -986,7 +995,7 @@ Referenced JSON Schema (e.g. <code>.compileReferencingRoot().definitions["exampl
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/definitions/GenericClass&lt;String&gt;&quot;</span>
+<span class="w">      </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/GenericClass&lt;String&gt;&quot;</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div></p>
@@ -1014,6 +1023,87 @@ Referenced JSON Schema (e.g. <code>.compileReferencingRoot().definitions["exampl
 </div>
 </div>
 </details>
+<h2 id="output-and-merging-schemas">Output and Merging Schemas</h2>
+<p>By default, the output of the <code>compileReferencing</code> and <code>compileReferencingRoot</code> is the root schema for the input type and all additional referenced schemas in a separate map.
+To combine these separate schemas into a single one, while still retaining references, use the <code>merge</code>-step.
+This step will result in the root schema with a new "$defs"-section (name is configurable) where all other schemas are placed into, creating a single json schema.</p>
+<details class="example">
+<summary>Merging Schemas</summary>
+</details>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ParentClass</span><span class="p">(</span>
+<span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">child</span><span class="p">:</span><span class="w"> </span><span class="n">ChildClass</span>
+<span class="w"> </span><span class="p">)</span>
+
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildClass</span>
+</code></pre></div>
+<pre><code>=== "without merge()-step"
+    ```kotlin
+    val result = initial&lt;ParentClass&gt;()
+        .analyzeTypeUsingReflection()
+        .generateJsonSchema()
+        .withTitle(TitleType.SIMPLE)
+        .compileReferencing(pathType = RefType.SIMPLE)
+    ```
+
+    `result.json.prettyPrint()` outputs:
+    ```json
+    {
+      "title" : "ParentClass",
+      "type" : "object",
+      "required" : [ "child" ],
+      "properties" : {
+        "child" : {
+          "$ref" : "#/$defs/ChildClass"
+        }
+      }
+    }
+    ```
+
+    `result.definitions` contains one entry with key `ChildClass`. `result.definitions["ChildClass"].prettyPrint()` outputs:
+    ```json
+    {
+      "title" : "ChildClass",
+      "type" : "object",
+      "required" : [ ],
+      "properties" : { }
+    }
+    ```
+
+
+=== "with merge()-step"
+    ```kotlin
+    val result = initial&lt;ParentClass&gt;()
+        .analyzeTypeUsingReflection()
+        .generateJsonSchema()
+        .withTitle(TitleType.SIMPLE)
+        .compileReferencing(pathType = RefType.SIMPLE)
+        .merge()
+    ```
+
+    `result.json.prettyPrint()` outputs:
+    ```json
+    {
+      "title" : "ParentClass",
+      "type" : "object",
+      "required" : [ "child" ],
+      "properties" : {
+        "child" : {
+          "$ref" : "#/$defs/ChildClass"
+        }
+      },
+      "$defs" : {
+        "ChildClass" : {
+          "title" : "ChildClass",
+          "type" : "object",
+          "required" : [ ],
+          "properties" : { }
+        }
+      }
+    }
+    ```
+
+    `result.definitions` is empty here. All schemas have been merged into the root schema.
+</code></pre>
 <h2 id="automatically-adding-titles">Automatically Adding Titles</h2>
 <p>A "title" property can be automatically added to all types in the JSON Schema.</p>
 <p><div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">GenericClass</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;</span><span class="p">()</span>
@@ -1167,8 +1257,8 @@ Referenced JSON Schema (e.g. <code>.compileReferencingRoot().definitions["exampl
 <span class="w">   </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="w"> </span><span class="p">],</span>
 <span class="w">   </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;Example description of the field&quot;</span>
-<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example description of the field&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>

@@ -985,13 +985,13 @@ Referenced Schema (e.g. <code>.compileReferencingRoot().componentSchemas["exampl
 <summary>Simple OpenAPI Path Type</summary>
 <p><div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">GenericClass</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;</span><span class="p">()</span>
 <span class="w">    </span><span class="p">.</span><span class="na">analyzeTypeUsingReflection</span><span class="p">()</span>
-<span class="w">    </span><span class="p">.</span><span class="na">generateJsonSchema</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">generateSwaggerSchema</span><span class="p">()</span>
 <span class="w">    </span><span class="p">.</span><span class="na">compileReferencing</span><span class="p">(</span><span class="n">pathType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RefType</span><span class="p">.</span><span class="na">OPENAPI_SIMPLE</span><span class="p">)</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/definitions/GenericClass_String&quot;</span>
+<span class="w">      </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/components/schemas//GenericClass_String&quot;</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div></p>
