@@ -677,12 +677,12 @@ object BasicTestCases {
                       "type": "null"
                     },
                     {
-                      "${'$'}ref": "#/definitions/Test"
+                      "${'$'}ref": "#/${'$'}defs/Test"
                     }
                   ]
                 },
                 "t2": {
-                  "${'$'}ref": "#/definitions/Test"
+                  "${'$'}ref": "#/${'$'}defs/Test"
                 }
               },
               "required": [
@@ -847,7 +847,7 @@ object BasicTestCases {
               "type": "object",
               "properties": {
                 "t1": {
-                  "${'$'}ref": "#/definitions/Test"
+                  "${'$'}ref": "#/${'$'}defs/Test"
                 },
                 "t2": {
                   "oneOf": [
@@ -855,7 +855,7 @@ object BasicTestCases {
                       "type": "null"
                     },
                     {
-                      "${'$'}ref": "#/definitions/Test"
+                      "${'$'}ref": "#/${'$'}defs/Test"
                     }
                   ]
                 }
@@ -1035,7 +1035,7 @@ object BasicTestCases {
               "type": "object",
               "properties": {
                 "value": {
-                  "${'$'}ref": "#/definitions/NestedClass"
+                  "${'$'}ref": "#/${'$'}defs/NestedClass"
                 }
               },
               "required": [
@@ -1287,10 +1287,10 @@ object BasicTestCases {
               ],
               "properties": {
                 "valueInt": {
-                  "${'$'}ref": "#/definitions/ClassWithGenericField<Int>"
+                  "${'$'}ref": "#/${'$'}defs/ClassWithGenericField<Int>"
                 },
                 "valueString": {
-                  "${'$'}ref": "#/definitions/ClassWithGenericField<String>"
+                  "${'$'}ref": "#/${'$'}defs/ClassWithGenericField<String>"
                 }
               },
               "definitions": {
@@ -1414,7 +1414,7 @@ object BasicTestCases {
               "type": "object",
               "properties": {
                 "nested": {
-                  "${'$'}ref": "#/definitions/NestedClass"
+                  "${'$'}ref": "#/${'$'}defs/NestedClass"
                 }
               },
               "definitions": {
@@ -1512,7 +1512,7 @@ object BasicTestCases {
                       "type": "null"
                     },
                     {
-                      "${'$'}ref": "#/definitions/ClassDirectSelfReferencing"
+                      "${'$'}ref": "#/${'$'}defs/ClassDirectSelfReferencing"
                     }
                   ]
                 }
@@ -1528,7 +1528,7 @@ object BasicTestCases {
                           "type": "null"
                         },
                         {
-                          "${'$'}ref": "#/definitions/ClassDirectSelfReferencing"
+                          "${'$'}ref": "#/${'$'}defs/ClassDirectSelfReferencing"
                         }
                       ]
                     }

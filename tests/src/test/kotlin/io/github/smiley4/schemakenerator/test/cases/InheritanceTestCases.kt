@@ -158,10 +158,10 @@ object InheritanceTestCases {
             {
               "anyOf": [
                 {
-                  "${'$'}ref": "#/definitions/SubClassA"
+                  "${'$'}ref": "#/${'$'}defs/SubClassA"
                 },
                 {
-                  "${'$'}ref": "#/definitions/SubClassB"
+                  "${'$'}ref": "#/${'$'}defs/SubClassB"
                 }
               ],
               "definitions": {
@@ -369,10 +369,10 @@ object InheritanceTestCases {
             {
               "anyOf": [
                 {
-                  "${'$'}ref": "#/definitions/TestSubClass1"
+                  "${'$'}ref": "#/${'$'}defs/TestSubClass1"
                 },
                 {
-                  "${'$'}ref": "#/definitions/TestSubClass2"
+                  "${'$'}ref": "#/${'$'}defs/TestSubClass2"
                 }
               ],
               "definitions": {
@@ -464,10 +464,10 @@ object InheritanceTestCases {
             {
               "anyOf": [
                 {
-                  "${'$'}ref": "#/definitions/JacksonUseClassTestSubClass1"
+                  "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass1"
                 },
                 {
-                  "${'$'}ref": "#/definitions/JacksonUseClassTestSubClass2"
+                  "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass2"
                 }
               ],
               "definitions": {
@@ -559,10 +559,10 @@ object InheritanceTestCases {
             {
               "anyOf": [
                 {
-                  "${'$'}ref": "#/definitions/JacksonUseNameTestSubClass1"
+                  "${'$'}ref": "#/${'$'}defs/JacksonUseNameTestSubClass1"
                 },
                 {
-                  "${'$'}ref": "#/definitions/JacksonUseNameTestSubClass2"
+                  "${'$'}ref": "#/${'$'}defs/JacksonUseNameTestSubClass2"
                 }
               ],
               "definitions": {
@@ -654,10 +654,10 @@ object InheritanceTestCases {
             {
               "anyOf": [
                 {
-                  "${'$'}ref": "#/definitions/JacksonUseSimpleNameTestSubClass1"
+                  "${'$'}ref": "#/${'$'}defs/JacksonUseSimpleNameTestSubClass1"
                 },
                 {
-                  "${'$'}ref": "#/definitions/JacksonUseSimpleNameTestSubClass2"
+                  "${'$'}ref": "#/${'$'}defs/JacksonUseSimpleNameTestSubClass2"
                 }
               ],
               "definitions": {
@@ -864,13 +864,13 @@ object InheritanceTestCases {
             {
                "anyOf": [
                   {
-                     "${'$'}ref": "#/definitions/SubClass1A"
+                     "${'$'}ref": "#/${'$'}defs/SubClass1A"
                   },
                   {
-                     "${'$'}ref": "#/definitions/SubClass1B"
+                     "${'$'}ref": "#/${'$'}defs/SubClass1B"
                   },
                   {
-                     "${'$'}ref": "#/definitions/SubClass1C"
+                     "${'$'}ref": "#/${'$'}defs/SubClass1C"
                   }
                ],
                "title": "BaseClass1",
@@ -894,7 +894,7 @@ object InheritanceTestCases {
                      ],
                      "properties": {
                         "nested": {
-                           "${'$'}ref": "#/definitions/BaseClass2"
+                           "${'$'}ref": "#/${'$'}defs/BaseClass2"
                         }
                      },
                      "title": "SubClass1C"
@@ -902,10 +902,10 @@ object InheritanceTestCases {
                   "BaseClass2": {
                      "anyOf": [
                         {
-                           "${'$'}ref": "#/definitions/SubClass2A"
+                           "${'$'}ref": "#/${'$'}defs/SubClass2A"
                         },
                         {
-                           "${'$'}ref": "#/definitions/SubClass2B"
+                           "${'$'}ref": "#/${'$'}defs/SubClass2B"
                         }
                      ],
                      "title": "BaseClass2"
@@ -1082,13 +1082,13 @@ object InheritanceTestCases {
             {
                "anyOf": [
                   {
-                     "${'$'}ref": "#/definitions/JacksonSubClass1A"
+                     "${'$'}ref": "#/${'$'}defs/JacksonSubClass1A"
                   },
                   {
-                     "${'$'}ref": "#/definitions/JacksonSubClass1B"
+                     "${'$'}ref": "#/${'$'}defs/JacksonSubClass1B"
                   },
                   {
-                     "${'$'}ref": "#/definitions/JacksonSubClass1C"
+                     "${'$'}ref": "#/${'$'}defs/JacksonSubClass1C"
                   }
                ],
                "title": "JacksonBaseClass1",
@@ -1112,7 +1112,7 @@ object InheritanceTestCases {
                      ],
                      "properties": {
                         "nested": {
-                           "${'$'}ref": "#/definitions/JacksonBaseClass2"
+                           "${'$'}ref": "#/${'$'}defs/JacksonBaseClass2"
                         }
                      },
                      "title": "JacksonSubClass1C"
@@ -1120,10 +1120,10 @@ object InheritanceTestCases {
                   "JacksonBaseClass2": {
                      "anyOf": [
                         {
-                           "${'$'}ref": "#/definitions/JacksonSubClass2A"
+                           "${'$'}ref": "#/${'$'}defs/JacksonSubClass2A"
                         },
                         {
-                           "${'$'}ref": "#/definitions/JacksonSubClass2B"
+                           "${'$'}ref": "#/${'$'}defs/JacksonSubClass2B"
                         }
                      ],
                      "title": "JacksonBaseClass2"

@@ -160,7 +160,7 @@ object TitleTestCases {
                ],
                "properties": {
                   "nested": {
-                     "${'$'}ref": "#/definitions/NestedClass2<NestedClass1<String,Int>>"
+                     "${'$'}ref": "#/${'$'}defs/NestedClass2<NestedClass1<String,Int>>"
                   }
                },
                "title": "TestClass",
@@ -172,7 +172,7 @@ object TitleTestCases {
                      ],
                      "properties": {
                         "someValue": {
-                           "${'$'}ref": "#/definitions/NestedClass1<String,Int>"
+                           "${'$'}ref": "#/${'$'}defs/NestedClass1<String,Int>"
                         }
                      },
                      "title": "NestedClass2<NestedClass1<String,Int>>"
@@ -354,7 +354,7 @@ object TitleTestCases {
                ],
                "properties": {
                   "nested": {
-                     "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>"
+                     "${'$'}ref": "#/${'$'}defs/io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>"
                   }
                },
                "title": "io.github.smiley4.schemakenerator.test.cases.TitleTestCases.TestClass",
@@ -366,7 +366,7 @@ object TitleTestCases {
                      ],
                      "properties": {
                         "someValue": {
-                          "${'$'}ref": "#/definitions/io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>"
+                          "${'$'}ref": "#/${'$'}defs/io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>"
                         }
                      },
                      "title": "io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>"

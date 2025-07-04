@@ -21,7 +21,6 @@ class JsonSchemaUtils {
             "type" to "string"
             min?.also { "minLength" to it }
             max?.also { "maxLength" to it }
-            //"pattern" to "^[A-Za-z]*@gmail.com$"
         }
     }
 
@@ -37,9 +36,6 @@ class JsonSchemaUtils {
             "type" to if (integer) "integer" else "number"
             min?.also { "minimum" to it }
             max?.also { "maximum" to it }
-            //"exclusiveMaximum" to true // inclusive by default
-            //"exclusiveMinimum" to true // inclusive by default
-            //"multipleOf" to 10
         }
     }
 
@@ -73,9 +69,6 @@ class JsonSchemaUtils {
             if(uniqueItems) {
                 "uniqueItems" to true
             }
-            //"maxItems" to 10
-            //"minItems" to 0
-            //"maxItems" to 99
         }
     }
 
@@ -146,27 +139,37 @@ class JsonSchemaUtils {
 
     //=====  REFERENCE ==============================
 
-    fun referenceSchema(type: TypeId, prefixDefinitions: Boolean = false): JsonObject {
-        return referenceSchema(type.id, prefixDefinitions)
-    }
-
-    fun referenceSchema(refId: String, prefixDefinitions: Boolean = false): JsonObject {
+    fun referencePlaceholder(type: TypeId, prefix: String = ""): JsonObject {
         return obj {
-            "\$ref" to if(prefixDefinitions) "#/definitions/$refId" else refId
+            "\$ref" to type.id
         }
     }
 
-    fun referenceSchemaNullable(refId: String, prefixDefinitions: Boolean = false): JsonObject {
+    fun reference(refId: String = "", prefix: String = ""): JsonObject {
+        return obj {
+            "\$ref" to buildString {
+                this.append("#")
+                if(prefix.isNotBlank()) {
+                    this.append("/$prefix")
+                }
+                if(refId.isNotBlank()) {
+                    this.append("/$refId")
+                }
+            }
+        }
+    }
+
+    fun referenceNullable(refId: String, prefix: String = ""): JsonObject {
         return obj {
             "oneOf" to array {
                 item(nullSchema())
-                item(referenceSchema(refId, prefixDefinitions))
+                item(reference(refId, prefix))
             }
         }
     }
 
     fun referenceSelf(): JsonObject {
-        return referenceSchema("#", false)
+        return reference()
     }
 
 }

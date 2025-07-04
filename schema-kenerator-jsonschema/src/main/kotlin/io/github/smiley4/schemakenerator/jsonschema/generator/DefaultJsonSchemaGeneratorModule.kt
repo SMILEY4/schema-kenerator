@@ -120,20 +120,20 @@ class DefaultJsonSchemaGeneratorModule(
 
     private fun buildCollectionSchema(typeData: TypeData): JsonNode {
         return schemaUtils.arraySchema(
-            items = schemaUtils.referenceSchema(typeData.collectionData!!.itemType.type),
+            items = schemaUtils.referencePlaceholder(typeData.collectionData!!.itemType.type),
             uniqueItems = typeData.collectionData?.unique ?: false
         )
     }
 
     private fun buildMapSchema(typeData: TypeData): JsonNode {
         return schemaUtils.mapObjectSchema(
-            values = schemaUtils.referenceSchema(typeData.mapData!!.valueType.type)
+            values = schemaUtils.referencePlaceholder(typeData.mapData!!.valueType.type)
         )
     }
 
     private fun buildWithSubtypes(typeData: TypeData): JsonNode {
         return schemaUtils.subtypesSchema(
-            subtypes = typeData.subtypes.map { schemaUtils.referenceSchema(it) }
+            subtypes = typeData.subtypes.map { schemaUtils.referencePlaceholder(it) }
         )
     }
 
@@ -146,7 +146,7 @@ class DefaultJsonSchemaGeneratorModule(
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
         collectMembers(context.typeData, context.knownTypeData).forEach { member ->
-            propertySchemas[member.name] = schemaUtils.referenceSchema(member.type)
+            propertySchemas[member.name] = schemaUtils.referencePlaceholder(member.type)
             propertySchemas[member.name].also {
                 if (it is JsonObject && member.nullable) {
                     it.properties["_nullable"] = JsonBooleanValue(true)
