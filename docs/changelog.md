@@ -5,6 +5,36 @@ search:
 
 # Changelog
 
+## 2.2.0
+
+**Improvements to JSON schema generation:**
+
+- explicit nullables handling now configurable (now on parity with swagger schema). `nullables` property in `generateJsonSchema`-step.
+- renamed `optionalHandling` property to `optionals` in `generateJsonSchema`-step (now on parity with swagger schema).
+- added `mergePropertyAttributesIntoType`-step (now on parity with swagger schema)
+- changed default reference path from #/definitions/MySchema to #/$defs/MySchema to better match jsonschema spec (path is configurable at compile step)
+- added new step `merge` that creates a single json schema (from the output of the compile steps) with all separate referenced schemas placed in a `$defs` section (configurable) of the root schema.
+
+**Improvements to Swagger schema generation:**
+
+- added previously missing support for `@Swagger#requiredMode` property
+- improved handling of schemas with multiple types (e.g. due to `@Type`-annotation) in specific situations. This change prevents results like `"type": ["object", "myType"]` where the type "object" should have been replaced by "myType".
+
+**Other improvements and fixes:**
+
+- kotlinx-serialization can now distinguish between lists (with any items) and sets (with unique items) and set the flag accordingly (now on parity with reflection type analysis)
+- improved check determining whether a schema should be inlined or referenced. This should lead to simpler and more predictable schemas.
+
+## 2.1.4
+
+Upgrade dependency versions
+- Jackson 2.15.3 -> 2.19.1
+- Jackson Serialization Json 1.7.3 -> 1.8.1
+- Swagger Parser 2.1.24 -> 2.1.30
+- Jakarta Validation 3.0.0 -> 3.1.1
+- Kotest 5.8.0 -> 5.9.1
+- forced commons-codec 1.11 -> 1.13 (transitive dependency)
+
 ## 2.1.3
 
 - improved handling of recursion with inlined schemas: if the root type of a schema is used recursively, it is referenced instead of inlined.
