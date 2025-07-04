@@ -139,7 +139,7 @@ class JsonSchemaUtils {
 
     //=====  REFERENCE ==============================
 
-    fun referencePlaceholder(type: TypeId, prefix: String = ""): JsonObject {
+    fun referencePlaceholder(type: TypeId): JsonObject {
         return obj {
             "\$ref" to type.id
         }

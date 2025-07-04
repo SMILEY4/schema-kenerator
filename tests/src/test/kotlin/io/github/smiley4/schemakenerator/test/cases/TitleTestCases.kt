@@ -164,7 +164,7 @@ object TitleTestCases {
                   }
                },
                "title": "TestClass",
-               "definitions": {
+               "${'$'}defs": {
                   "NestedClass2<NestedClass1<String,Int>>": {
                      "type": "object",
                      "required": [
@@ -358,7 +358,7 @@ object TitleTestCases {
                   }
                },
                "title": "io.github.smiley4.schemakenerator.test.cases.TitleTestCases.TestClass",
-               "definitions": {
+               "${'$'}defs": {
                   "io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>": {
                      "type": "object",
                      "required": [

@@ -83,7 +83,7 @@ object CustomTypeProcessingTestCases {
                      "${'$'}ref": "#/${'$'}defs/LocalDateTime"
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "LocalDateTime": {
                      "type": "object",
                      "required": [],

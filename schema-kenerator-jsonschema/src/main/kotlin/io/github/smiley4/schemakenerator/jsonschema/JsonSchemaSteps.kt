@@ -156,7 +156,7 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
-     * @param definitionsPath the path to place referenced schemas (default: $defs)
+     * @param definitionsPath the path (prefix) of referenced schemas (default: $defs)
      */
     fun IntermediateJsonSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
@@ -164,6 +164,14 @@ object JsonSchemaSteps {
         definitionsPath: String = "${'$'}defs"
     ): CompiledJsonSchemaData {
         return JsonSchemaCompileReferenceRootStep(explicitNullTypes, builder, definitionsPath).compile(this)
+    }
+
+
+    /**
+     * @param definitionsPath the path to place referenced schemas (default: $defs). Must match the value specified in the compile step.
+     */
+    fun CompiledJsonSchemaData.merge(definitionsPath: String = "${'$'}defs"): CompiledJsonSchemaData {
+        return JsonSchemaMergeStep(definitionsPath).merge(this)
     }
 
 

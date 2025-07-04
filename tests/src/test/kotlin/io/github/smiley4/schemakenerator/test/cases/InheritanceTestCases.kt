@@ -164,7 +164,7 @@ object InheritanceTestCases {
                   "${'$'}ref": "#/${'$'}defs/SubClassB"
                 }
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "SubClassA": {
                   "type": "object",
                   "required": [
@@ -375,7 +375,7 @@ object InheritanceTestCases {
                   "${'$'}ref": "#/${'$'}defs/TestSubClass2"
                 }
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "TestSubClass1": {
                   "type": "object",
                   "required": [
@@ -470,7 +470,7 @@ object InheritanceTestCases {
                   "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass2"
                 }
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "JacksonUseClassTestSubClass1": {
                   "type": "object",
                   "required": [
@@ -565,7 +565,7 @@ object InheritanceTestCases {
                   "${'$'}ref": "#/${'$'}defs/JacksonUseNameTestSubClass2"
                 }
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "JacksonUseNameTestSubClass1": {
                   "type": "object",
                   "required": [
@@ -660,7 +660,7 @@ object InheritanceTestCases {
                   "${'$'}ref": "#/${'$'}defs/JacksonUseSimpleNameTestSubClass2"
                 }
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "JacksonUseSimpleNameTestSubClass1": {
                   "type": "object",
                   "required": [
@@ -874,7 +874,7 @@ object InheritanceTestCases {
                   }
                ],
                "title": "BaseClass1",
-               "definitions": {
+               "${'$'}defs": {
                   "SubClass1A": {
                      "type": "object",
                      "required": [],
@@ -1092,7 +1092,7 @@ object InheritanceTestCases {
                   }
                ],
                "title": "JacksonBaseClass1",
-               "definitions": {
+               "${'$'}defs": {
                   "JacksonSubClass1A": {
                      "type": "object",
                      "required": [],

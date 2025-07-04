@@ -8,6 +8,7 @@ import io.github.smiley4.schemakenerator.jackson.JacksonSteps.collectJacksonSubT
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.merge
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
@@ -372,7 +373,7 @@ class GeneralTestCases : FunSpec({
             generateJsonSchema(type, data, analyzeStep) { compileInlining() }
 
         private fun jsonSchemaReferenced(type: KType, data: TestCase, analyzeStep: InitialTypeData.() -> TypeDataGroup) =
-            generateJsonSchema(type, data, analyzeStep) { compileReferencing(pathType = data.jsonRefType) }
+            generateJsonSchema(type, data, analyzeStep) { compileReferencing(pathType = data.jsonRefType).merge() }
 
         private fun generateJsonSchema(
             type: KType,

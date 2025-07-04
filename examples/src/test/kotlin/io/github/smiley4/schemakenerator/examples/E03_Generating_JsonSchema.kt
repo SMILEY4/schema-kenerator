@@ -84,7 +84,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             //    ],
             //    "properties": {
             //       "nested": {
-            //          "$ref": "#/definitions/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.NestedClass"
+            //          "$ref": "#/$defs/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.NestedClass"
             //       },
             //       "number": {
             //          "type": "integer",
@@ -123,7 +123,7 @@ class E03_Generating_JsonSchema : FreeSpec({
 
             println(jsonSchema.json.prettyPrint())
             // {
-            //    "$ref": "#/definitions/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.ExampleClass"
+            //    "$ref": "#/$defs/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.ExampleClass"
             // }
 
             println(jsonSchema.definitions["io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.ExampleClass"]!!.prettyPrint())
@@ -135,7 +135,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             //    ],
             //    "properties": {
             //       "nested": {
-            //          "$ref": "#/definitions/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.NestedClass"
+            //          "$ref": "#/$defs/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.NestedClass"
             //       },
             //       "number": {
             //          "type": "integer",
@@ -194,7 +194,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // {
             //    "type": "array",
             //    "items": {
-            //       "$ref": "#/definitions/GenericClass<String>"
+            //       "$ref": "#/$defs/GenericClass<String>"
             //    }
             // }
 
@@ -211,7 +211,7 @@ class E03_Generating_JsonSchema : FreeSpec({
             // {
             //    "type": "array",
             //    "items": {
-            //       "$ref": "#/definitions/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.GenericClass<kotlin.String>"
+            //       "$ref": "#/$defs/io.github.smiley4.schemakenerator.examples.E03_Generating_JsonSchema.Companion.GenericClass<kotlin.String>"
             //    }
             // }
         }

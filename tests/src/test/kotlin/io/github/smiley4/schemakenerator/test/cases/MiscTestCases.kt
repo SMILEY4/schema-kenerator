@@ -455,7 +455,7 @@ object MiscTestCases {
                      ]
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "SealedTestClassIssue39": {
                      "anyOf": [
                         {
@@ -653,7 +653,7 @@ object MiscTestCases {
                      "${'$'}ref": "#/${'$'}defs/TestClassMergePropertyAttributesIntoTypeNested2"
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "TestClassMergePropertyAttributesIntoTypeNested": {
                      "type": "type-a",
                      "format": "format-a",
@@ -1138,7 +1138,7 @@ object MiscTestCases {
                  }
                },
                "title": "Issue43Root",
-               "definitions": {
+               "${'$'}defs": {
                   "WithEnum": {
                      "type": "object",
                      "required": [
@@ -1518,7 +1518,7 @@ object MiscTestCases {
                      "description": "description on property"
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "TestClassWithDescription": {
                      "type": "object",
                      "required": [
