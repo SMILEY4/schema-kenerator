@@ -1029,81 +1029,75 @@ To combine these separate schemas into a single one, while still retaining refer
 This step will result in the root schema with a new "$defs"-section (name is configurable) where all other schemas are placed into, creating a single json schema.</p>
 <details class="example">
 <summary>Merging Schemas</summary>
-</details>
 <div class="highlight"><pre><span></span><code><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ParentClass</span><span class="p">(</span>
 <span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">child</span><span class="p">:</span><span class="w"> </span><span class="n">ChildClass</span>
 <span class="w"> </span><span class="p">)</span>
 
 <span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">ChildClass</span>
 </code></pre></div>
-<pre><code>=== "without merge()-step"
-    ```kotlin
-    val result = initial&lt;ParentClass&gt;()
-        .analyzeTypeUsingReflection()
-        .generateJsonSchema()
-        .withTitle(TitleType.SIMPLE)
-        .compileReferencing(pathType = RefType.SIMPLE)
-    ```
-
-    `result.json.prettyPrint()` outputs:
-    ```json
-    {
-      "title" : "ParentClass",
-      "type" : "object",
-      "required" : [ "child" ],
-      "properties" : {
-        "child" : {
-          "$ref" : "#/$defs/ChildClass"
-        }
-      }
-    }
-    ```
-
-    `result.definitions` contains one entry with key `ChildClass`. `result.definitions["ChildClass"].prettyPrint()` outputs:
-    ```json
-    {
-      "title" : "ChildClass",
-      "type" : "object",
-      "required" : [ ],
-      "properties" : { }
-    }
-    ```
-
-
-=== "with merge()-step"
-    ```kotlin
-    val result = initial&lt;ParentClass&gt;()
-        .analyzeTypeUsingReflection()
-        .generateJsonSchema()
-        .withTitle(TitleType.SIMPLE)
-        .compileReferencing(pathType = RefType.SIMPLE)
-        .merge()
-    ```
-
-    `result.json.prettyPrint()` outputs:
-    ```json
-    {
-      "title" : "ParentClass",
-      "type" : "object",
-      "required" : [ "child" ],
-      "properties" : {
-        "child" : {
-          "$ref" : "#/$defs/ChildClass"
-        }
-      },
-      "$defs" : {
-        "ChildClass" : {
-          "title" : "ChildClass",
-          "type" : "object",
-          "required" : [ ],
-          "properties" : { }
-        }
-      }
-    }
-    ```
-
-    `result.definitions` is empty here. All schemas have been merged into the root schema.
-</code></pre>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">without merge()-step</label><label for="__tabbed_4_2">with merge()-step</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">initial</span><span class="o">&lt;</span><span class="n">ParentClass</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyzeTypeUsingReflection</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">generateJsonSchema</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">withTitle</span><span class="p">(</span><span class="n">TitleType</span><span class="p">.</span><span class="na">SIMPLE</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">compileReferencing</span><span class="p">(</span><span class="n">pathType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RefType</span><span class="p">.</span><span class="na">SIMPLE</span><span class="p">)</span>
+</code></pre></div>
+<p><code>result.json.prettyPrint()</code> outputs:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ParentClass&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;required&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;child&quot;</span><span class="w"> </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;properties&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;child&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;$ref&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/ChildClass&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><code>result.definitions</code> contains one entry with key <code>ChildClass</code>. <code>result.definitions["ChildClass"].prettyPrint()</code> outputs:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ChildClass&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;required&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;properties&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">initial</span><span class="o">&lt;</span><span class="n">ParentClass</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">analyzeTypeUsingReflection</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">generateJsonSchema</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">withTitle</span><span class="p">(</span><span class="n">TitleType</span><span class="p">.</span><span class="na">SIMPLE</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">compileReferencing</span><span class="p">(</span><span class="n">pathType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RefType</span><span class="p">.</span><span class="na">SIMPLE</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">merge</span><span class="p">()</span>
+</code></pre></div>
+<p><code>result.json.prettyPrint()</code> outputs:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ParentClass&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;required&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;child&quot;</span><span class="w"> </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;properties&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;child&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;$ref&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/ChildClass&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;$defs&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;ChildClass&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ChildClass&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;required&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><code>result.definitions</code> is empty here. All schemas have been merged into the root schema.</p>
+</div>
+</div>
+</div>
+</details>
 <h2 id="automatically-adding-titles">Automatically Adding Titles</h2>
 <p>A "title" property can be automatically added to all types in the JSON Schema.</p>
 <p><div class="highlight"><pre><span></span><code><span class="n">initial</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">GenericClass</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;</span><span class="p">()</span>
@@ -1135,7 +1129,7 @@ This step will result in the root schema with a new "$defs"-section (name is con
 </ul>
 <details class="info">
 <summary>Required Dependencies</summary>
-<div class="tabbed-set tabbed-alternate" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Gradle (Kotlin)</label><label for="__tabbed_4_2">Gradle</label><label for="__tabbed_4_3">Maven</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Gradle (Kotlin)</label><label for="__tabbed_5_2">Gradle</label><label for="__tabbed_5_3">Maven</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-jsonschema:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
@@ -1208,7 +1202,7 @@ This step will result in the root schema with a new "$defs"-section (name is con
 </code></pre></div></p>
 <details class="info">
 <summary>Required Dependencies</summary>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Gradle (Kotlin)</label><label for="__tabbed_5_2">Gradle</label><label for="__tabbed_5_3">Maven</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Gradle (Kotlin)</label><label for="__tabbed_6_2">Gradle</label><label for="__tabbed_6_3">Maven</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-core:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
@@ -1265,7 +1259,7 @@ This step will result in the root schema with a new "$defs"-section (name is con
 </code></pre></div></p>
 <details class="info">
 <summary>Required Dependencies</summary>
-<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Gradle (Kotlin)</label><label for="__tabbed_6_2">Gradle</label><label for="__tabbed_6_3">Maven</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:3"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><input id="__tabbed_7_3" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Gradle (Kotlin)</label><label for="__tabbed_7_2">Gradle</label><label for="__tabbed_7_3">Maven</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><div class="highlight"><pre><span></span><code><span class="n">implementation</span><span class="p">(</span><span class="s">&quot;io.github.smiley4:schema-kenerator-jackson-jsonschema:</span><span class="si">$</span><span class="n">version</span><span class="s">&quot;</span><span class="p">)</span>
