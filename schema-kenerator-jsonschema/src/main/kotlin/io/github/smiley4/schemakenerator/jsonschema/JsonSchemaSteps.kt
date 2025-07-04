@@ -168,6 +168,7 @@ object JsonSchemaSteps {
 
 
     /**
+     * Merge referenced schemas into the definitions section of the root schema, creating a single json object.
      * @param definitionsPath the path to place referenced schemas (default: $defs). Must match the value specified in the compile step.
      */
     fun CompiledJsonSchemaData.merge(definitionsPath: String = "${'$'}defs"): CompiledJsonSchemaData {

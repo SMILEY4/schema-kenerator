@@ -74,7 +74,7 @@ class NestedClass(
        "required": [ "nested", "number" ],
        "properties": {
           "nested": {
-             "$ref": "#/definitions/examples.NestedClass"
+             "$ref": "#/$defs/examples.NestedClass"
           },
           "number": {
              "type": "integer",
@@ -115,7 +115,7 @@ class NestedClass(
     Resulting Root JSON Schema:
     ```json
     {
-       "$ref": "#/definitions/examples.ExampleClass
+       "$ref": "#/$defs/examples.ExampleClass
     }
     ```
     Referenced JSON Schema (e.g. `.compileReferencingRoot().definitions["examples.ExampleClass"]`): 
@@ -128,7 +128,7 @@ class NestedClass(
        ],
        "properties": {
           "nested": {
-             "$ref": "#/definitions/examples.NestedClass"
+             "$ref": "#/$defs/examples.NestedClass"
           },
           "number": {
              "type": "integer",
@@ -186,7 +186,7 @@ Schemas can be referenced using different paths or "ids" when using `compileRefe
     {
        "type": "array",
        "items": {
-          "$ref": "#/definitions/GenericClass<String>"
+          "$ref": "#/$defs/GenericClass<String>"
        }
     }
     ```
@@ -211,6 +211,83 @@ Schemas can be referenced using different paths or "ids" when using `compileRefe
             <version>${version}</version>
         </dependency>
         ```
+
+## Output and Merging Schemas
+
+By default, the output of the `compileReferencing` and `compileReferencingRoot` is the root schema for the input type and all additional referenced schemas in a separate map.
+To combine these separate schemas into a single one, while still retaining references, use the `merge`-step.
+This step will result in the root schema with a new "$defs"-section (name is configurable) where all other schemas are placed into, creating a single json schema.
+
+??? example "Merging Schemas"
+
+    === "without merge()-step"
+        ```kotlin
+        val result = initial<ParentClass>()
+            .analyzeTypeUsingReflection()
+            .generateJsonSchema()
+            .withTitle(TitleType.SIMPLE)
+            .compileReferencing(pathType = RefType.SIMPLE)
+        ```
+
+        `result.json.prettyPrint()` outputs:
+        ```json
+        {
+          "title" : "ParentClass",
+          "type" : "object",
+          "required" : [ "child" ],
+          "properties" : {
+            "child" : {
+              "$ref" : "#/$defs/ChildClass"
+            }
+          }
+        }
+        ```
+        
+        `result.definitions` contains one entry with key `ChildClass`. `result.definitions["ChildClass"].prettyPrint()` outputs:
+        ```json
+        {
+          "title" : "ChildClass",
+          "type" : "object",
+          "required" : [ ],
+          "properties" : { }
+        }
+        ```
+
+    
+    === "with merge()-step"
+        ```kotlin
+        val result = initial<ParentClass>()
+            .analyzeTypeUsingReflection()
+            .generateJsonSchema()
+            .withTitle(TitleType.SIMPLE)
+            .compileReferencing(pathType = RefType.SIMPLE)
+            .merge()
+        ```
+
+        `result.json.prettyPrint()` outputs:
+        ```json
+        {
+          "title" : "ParentClass",
+          "type" : "object",
+          "required" : [ "child" ],
+          "properties" : {
+            "child" : {
+              "$ref" : "#/$defs/ChildClass"
+            }
+          },
+          "$defs" : {
+            "ChildClass" : {
+              "title" : "ChildClass",
+              "type" : "object",
+              "required" : [ ],
+              "properties" : { }
+            }
+          }
+        }
+        ```
+        
+        `result.definitions` is empty here. All schemas have been merged into the root schema.
+
 
 ## Automatically Adding Titles
 
