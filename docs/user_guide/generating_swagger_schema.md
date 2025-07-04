@@ -175,14 +175,14 @@ Schemas can be referenced using different paths or "ids" when using `compileRefe
     ```kotlin
     initial<List<GenericClass<String>>>()
         .analyzeTypeUsingReflection()
-        .generateJsonSchema()
+        .generateSwaggerSchema()
         .compileReferencing(pathType = RefType.OPENAPI_SIMPLE)
     ```
     ```json
     {
        "type": "array",
        "items": {
-          "$ref": "#/definitions/GenericClass_String"
+          "$ref": "#/components/schemas//GenericClass_String"
        }
     }
     ```

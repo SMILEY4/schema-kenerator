@@ -2,18 +2,23 @@ package io.github.smiley4.schemakenerator.jsonschema
 
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.resolveReferences
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaCompileUtils.shouldReference
 import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNullValue
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 
-internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String) {
+internal class JsonSchemaCompileReferenceStep(
+    private val explicitNullTypes: Boolean,
+    private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String,
+    private val definitionsPath: String
+) {
 
     private val schemaUtils = JsonSchemaUtils()
 
@@ -50,6 +55,7 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
         }
     }
 
+
     /**
      * Put referenced schemas into definitions and reference them
      */
@@ -74,22 +80,24 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
     private fun resolveReference(refObj: JsonObject, context: Context): JsonNode {
         // find actual schema data
         val referencedSchema = context.knownSchemas.find { it.typeData.id == TypeId((refObj.properties["\$ref"] as JsonTextValue).value) }
-        return if (referencedSchema != null) {
-            // create swagger property with correct reference path (and add actual schema to context)
-            val property = if (shouldReference(referencedSchema.json)) {
-                createRefProperty(referencedSchema, context)
-            } else {
-                createInlineProperty(refObj, referencedSchema)
-            }
-            // add back some information to property
-            if(refObj.properties.containsKey("description") && property is JsonObject) {
-                property.properties["description"] = refObj.properties["description"] ?: JsonNullValue()
-            }
-            // return
-            property
-        } else {
-            refObj
+        if (referencedSchema == null) {
+            return refObj
         }
+
+        // create swagger property with correct reference path (and add actual schema to context)
+        val property = if (shouldReference(referencedSchema.json, referencedSchema.typeData)) {
+            createRefProperty(refObj, referencedSchema, context)
+        } else {
+            createInlineProperty(refObj, referencedSchema)
+        }
+
+        // add back some information to property
+        if (refObj.properties.containsKey("description") && property is JsonObject) {
+            property.properties["description"] = refObj.properties["description"] ?: JsonNullValue()
+        }
+
+        // return
+        return property
     }
 
 
@@ -98,13 +106,17 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
      * @param schema the referenced schema
      * @param context the current compile context with data about input schemas and type data as well as current produced information
      */
-    private fun createRefProperty(schema: JsonSchemaData, context: Context): JsonNode {
-        val refPath = if(context.refPathMapping.containsKey(schema.typeData.id)) {
+    private fun createRefProperty(
+        refObj: JsonObject,
+        schema: JsonSchemaData,
+        context: Context
+    ): JsonNode {
+        val refPath = if (context.refPathMapping.containsKey(schema.typeData.id)) {
             context.refPathMapping[schema.typeData.id]!!
         } else {
             var newRefPath = pathBuilder(schema.typeData, context.knownTypeData)
             context.pathCounters[newRefPath] = (context.pathCounters[newRefPath] ?: 0) + 1
-            if(context.definitions.containsKey(newRefPath)) {
+            if (context.definitions.containsKey(newRefPath)) {
                 newRefPath += context.pathCounters[newRefPath]
             }
             context.refPathMapping[schema.typeData.id] = newRefPath
@@ -112,7 +124,12 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
             context.definitions[newRefPath] = resolveReferences(schema.json) { resolveReference(it, context) }
             newRefPath
         }
-        return schemaUtils.referenceSchema(refPath, true)
+
+        return if(refObj.properties.containsKey("_nullable") && refObj.getBool("_nullable")) {
+            schemaUtils.referenceNullable(refPath, definitionsPath)
+        } else {
+            schemaUtils.reference(refPath, definitionsPath)
+        }
     }
 
 
@@ -128,10 +145,29 @@ internal class JsonSchemaCompileReferenceStep(private val pathBuilder: (type: Ty
                     this.putAll(refObj.properties)
                     this.remove("\$ref")
                 })
+                if (it.properties.contains("_nullable") && it.getBool("_nullable") && explicitNullTypes) {
+                    setNullable(it)
+                    it.properties.remove("_nullable")
+                }
             }
         }
     }
 
+    /**
+     * Explicitly mark the given schema as a nullable type
+     */
+    private fun setNullable(schema: JsonObject) {
+        if (schema.properties.contains("type") && schema.properties["type"] is JsonTextValue) {
+            schema.properties["type"] = JsonArray(
+                mutableListOf(
+                    JsonTextValue(schema.getText("type")),
+                )
+            )
+        }
+        if (schema.properties.contains("type") && schema.properties["type"] is JsonArray) {
+            schema.getArray("type").items.add(JsonTextValue("null"))
+        }
+    }
 
     /**
      * @return a placeholder json object

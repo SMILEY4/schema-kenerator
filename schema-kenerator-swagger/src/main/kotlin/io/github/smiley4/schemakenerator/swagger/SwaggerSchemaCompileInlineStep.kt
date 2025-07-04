@@ -21,14 +21,7 @@ internal class SwaggerSchemaCompileInlineStep(private val explicitNullTypes: Boo
     fun compile(input: IntermediateSwaggerSchemaData): CompiledSwaggerSchemaData {
         copyTypeToTypes(input.entries)
         val root = resolveReferences(input.rootSchema) { refObj ->
-            val referencedSchema = input[TypeId(refObj.`$ref`)]
-            if (referencedSchema == null) {
-                refObj
-            } else if(referencedSchema.typeData.id == input.rootId) {
-                schemaUtils.referenceSelf()
-            } else {
-                createInlining(refObj, referencedSchema)
-            }
+            resolveReference(input, refObj)
         }
         handleDiscriminatorMappings(root)
         return CompiledSwaggerSchemaData(
@@ -36,6 +29,21 @@ internal class SwaggerSchemaCompileInlineStep(private val explicitNullTypes: Boo
             swagger = root,
             componentSchemas = emptyMap()
         )
+    }
+
+    private fun resolveReference(input: IntermediateSwaggerSchemaData, refObj: Schema<*>): Schema<out Any> {
+        // find actual schema data
+        val referencedSchema = input[TypeId(refObj.`$ref`)]
+        // no schema data found -> fallback to original property
+        if(referencedSchema == null) {
+            return refObj
+        }
+        // create replacement property
+        return if(referencedSchema.typeData.id == input.rootId) {
+            schemaUtils.referenceSelf()
+        } else {
+            createInlining(refObj, referencedSchema)
+        }
     }
 
 

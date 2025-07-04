@@ -5,6 +5,12 @@ search:
 
 # Changelog
 
+## 2.1.3
+
+- improved handling of recursion with inlined schemas: if the root type of a schema is used recursively, it is referenced instead of inlined.
+- fixed: null pointer exception when using multiple `@Contextual` annotations
+- fixed: fixed handling of `@Description` annotation when added to properties and classes
+
 ## 2.1.2
 
 - fixed bug: duplicate "string" type added by type discriminator handling

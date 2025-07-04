@@ -1,5 +1,6 @@
 package io.github.smiley4.schemakenerator.swagger
 
+import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.swagger.data.SwaggerSchemaData
 import io.swagger.v3.oas.models.media.Schema
 
@@ -8,10 +9,20 @@ object SwaggerSchemaCompileUtils {
     /**
      * Whether the given schema should be referenced or inlined
      */
-    fun shouldReference(schema: Schema<*>): Boolean {
-        return (schema.types?.contains("object") == true && schema.properties != null)
-                || schema.enum != null
-                || schema.anyOf != null
+    fun shouldReference(schema: Schema<*>, typeData: TypeData): Boolean {
+
+        val isObject = (schema.types?.contains("object") == true || schema.type == "object" || schema.properties != null)
+                && !typeData.isMap
+                && typeData.identifyingName.full != Any::class.qualifiedName!!
+                && typeData.identifyingName.full != "*"
+
+        val isEnum = schema.enum != null
+
+        val isAnyOfObject = schema.anyOf != null && schema.anyOf.all { !it.`$ref`.isNullOrBlank() }
+
+        val isOneOfObject = schema.oneOf != null && schema.oneOf.all { !it.`$ref`.isNullOrBlank() }
+
+        return isObject || isEnum || isAnyOfObject || isOneOfObject
     }
 
     private const val MAX_RESOLVE_REFS_DEPTH = 64;
@@ -137,6 +148,9 @@ object SwaggerSchemaCompileUtils {
                 target.types = it
             } else {
                 target.types = target.types + it
+                if(target.types.size > 1 && target.types.contains("object") && !target.types.contains("null")) {
+                    target.types.remove("object")
+                }
             }
         }
         source.uniqueItems?.also { target.uniqueItems = it }

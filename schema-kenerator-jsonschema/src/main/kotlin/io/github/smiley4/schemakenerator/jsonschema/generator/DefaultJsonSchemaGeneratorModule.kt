@@ -6,9 +6,12 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaUtils
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
+import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 
 class DefaultJsonSchemaGeneratorModule(
-    private val optionalAsNonRequired: Boolean = false
+    private val optionalAsNonRequired: Boolean = false,
+    private val nullableAsNonRequired: Boolean = false,
 ) : JsonSchemaGeneratorModule {
 
     private val schemaUtils = JsonSchemaUtils()
@@ -117,20 +120,20 @@ class DefaultJsonSchemaGeneratorModule(
 
     private fun buildCollectionSchema(typeData: TypeData): JsonNode {
         return schemaUtils.arraySchema(
-            items = schemaUtils.referenceSchema(typeData.collectionData!!.itemType.type),
+            items = schemaUtils.referencePlaceholder(typeData.collectionData!!.itemType.type),
             uniqueItems = typeData.collectionData?.unique ?: false
         )
     }
 
     private fun buildMapSchema(typeData: TypeData): JsonNode {
         return schemaUtils.mapObjectSchema(
-            values = schemaUtils.referenceSchema(typeData.mapData!!.valueType.type)
+            values = schemaUtils.referencePlaceholder(typeData.mapData!!.valueType.type)
         )
     }
 
     private fun buildWithSubtypes(typeData: TypeData): JsonNode {
         return schemaUtils.subtypesSchema(
-            subtypes = typeData.subtypes.map { schemaUtils.referenceSchema(it) }
+            subtypes = typeData.subtypes.map { schemaUtils.referencePlaceholder(it) }
         )
     }
 
@@ -143,8 +146,13 @@ class DefaultJsonSchemaGeneratorModule(
         val propertySchemas = mutableMapOf<String, JsonNode>()
 
         collectMembers(context.typeData, context.knownTypeData).forEach { member ->
-            propertySchemas[member.name] = schemaUtils.referenceSchema(member.type)
-            val nullable = member.nullable
+            propertySchemas[member.name] = schemaUtils.referencePlaceholder(member.type)
+            propertySchemas[member.name].also {
+                if (it is JsonObject && member.nullable) {
+                    it.properties["_nullable"] = JsonBooleanValue(true)
+                }
+            }
+            val nullable = member.nullable && nullableAsNonRequired
             val optional = member.optional && optionalAsNonRequired
             if (!nullable && !optional) {
                 requiredProperties.add(member.name)
