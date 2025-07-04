@@ -1,6 +1,6 @@
 # Schema Kenerator
 
-[![Version](https://img.shields.io/maven-central/v/io.github.smiley4/schema-kenerator-core?style=flat&color=blue&logo=apachemaven)](https://search.maven.org/search?q=g:io.github.smiley4%20a:schema-kenerator-*)
+[![Version](https://img.shields.io/maven-central/v/io.github.smiley4/schema-kenerator-core?style=flat&color=blue&logo=apachemaven)](https://central.sonatype.com/search?q=github.smiley4.schema-kenerator-*)
 [![Checks Passing](https://img.shields.io/github/actions/workflow/status/SMILEY4/schema-kenerator/checks.yml?style=flat&logo=github)](https://github.com/SMILEY4/schema-kenerator/actions/workflows/checks.yml)
 [![License](https://img.shields.io/github/license/SMILEY4/schema-kenerator?style=flat&color=teal)](https://github.com/SMILEY4/schema-kenerator/blob/develop/LICENSE)
 
