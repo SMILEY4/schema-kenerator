@@ -220,6 +220,14 @@ This step will result in the root schema with a new "$defs"-section (name is con
 
 ??? example "Merging Schemas"
 
+   ```kotlin
+    class ParentClass(
+        val child: ChildClass
+    )
+
+    class ChildClass
+   ```
+
     === "without merge()-step"
         ```kotlin
         val result = initial<ParentClass>()
@@ -457,8 +465,8 @@ initial<JacksonAnnotatedClass>()
    "required": [ "value" ],
    "properties": {
       "value": {
-         "description": "Example description of the field"
-         "type": "string",
+         "description": "Example description of the field",
+         "type": "string"
       }
    }
 }
