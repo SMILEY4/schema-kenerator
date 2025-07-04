@@ -80,10 +80,10 @@ object CustomTypeProcessingTestCases {
                ],
                "properties": {
                   "dateTime": {
-                     "${'$'}ref": "#/definitions/LocalDateTime"
+                     "${'$'}ref": "#/${'$'}defs/LocalDateTime"
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "LocalDateTime": {
                      "type": "object",
                      "required": [],

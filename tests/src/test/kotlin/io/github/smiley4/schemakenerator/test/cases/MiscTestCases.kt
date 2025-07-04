@@ -450,16 +450,16 @@ object MiscTestCases {
                            "type": "null"
                         },
                         {
-                           "${'$'}ref": "#/definitions/SealedTestClassIssue39"
+                           "${'$'}ref": "#/${'$'}defs/SealedTestClassIssue39"
                         }
                      ]
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "SealedTestClassIssue39": {
                      "anyOf": [
                         {
-                           "${'$'}ref": "#/definitions/TestClassIssue39a"
+                           "${'$'}ref": "#/${'$'}defs/TestClassIssue39a"
                         }
                      ]
                   },
@@ -647,13 +647,13 @@ object MiscTestCases {
                ],
                "properties": {
                   "fieldA": {
-                     "${'$'}ref": "#/definitions/TestClassMergePropertyAttributesIntoTypeNested"
+                     "${'$'}ref": "#/${'$'}defs/TestClassMergePropertyAttributesIntoTypeNested"
                   },
                   "fieldB": {
-                     "${'$'}ref": "#/definitions/TestClassMergePropertyAttributesIntoTypeNested2"
+                     "${'$'}ref": "#/${'$'}defs/TestClassMergePropertyAttributesIntoTypeNested2"
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "TestClassMergePropertyAttributesIntoTypeNested": {
                      "type": "type-a",
                      "format": "format-a",
@@ -1126,19 +1126,19 @@ object MiscTestCases {
                    "oneOf" : [ {
                      "type" : "null"
                    }, {
-                     "${'$'}ref": "#/definitions/WithEnum"
+                     "${'$'}ref": "#/${'$'}defs/WithEnum"
                    } ]
                  },
                  "withInt" : {
                    "oneOf" : [ {
                      "type" : "null"
                    }, {
-                     "${'$'}ref": "#/definitions/WithInt"
+                     "${'$'}ref": "#/${'$'}defs/WithInt"
                    } ]
                  }
                },
                "title": "Issue43Root",
-               "definitions": {
+               "${'$'}defs": {
                   "WithEnum": {
                      "type": "object",
                      "required": [
@@ -1146,7 +1146,7 @@ object MiscTestCases {
                      ],
                      "properties": {
                         "data": {
-                           "${'$'}ref": "#/definitions/Issue43Enum"
+                           "${'$'}ref": "#/${'$'}defs/Issue43Enum"
                         }
                      },
                      "title": "WithEnum"
@@ -1514,11 +1514,11 @@ object MiscTestCases {
                ],
                "properties": {
                   "someProp": {
-                     "${'$'}ref": "#/definitions/TestClassWithDescription",
+                     "${'$'}ref": "#/${'$'}defs/TestClassWithDescription",
                      "description": "description on property"
                   }
                },
-               "definitions": {
+               "${'$'}defs": {
                   "TestClassWithDescription": {
                      "type": "object",
                      "required": [

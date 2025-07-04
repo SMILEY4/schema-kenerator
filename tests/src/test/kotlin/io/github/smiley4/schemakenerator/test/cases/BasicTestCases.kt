@@ -677,19 +677,19 @@ object BasicTestCases {
                       "type": "null"
                     },
                     {
-                      "${'$'}ref": "#/definitions/Test"
+                      "${'$'}ref": "#/${'$'}defs/Test"
                     }
                   ]
                 },
                 "t2": {
-                  "${'$'}ref": "#/definitions/Test"
+                  "${'$'}ref": "#/${'$'}defs/Test"
                 }
               },
               "required": [
                 "t1",
                 "t2"
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "Test": {
                   "type": "object",
                   "properties": {
@@ -847,7 +847,7 @@ object BasicTestCases {
               "type": "object",
               "properties": {
                 "t1": {
-                  "${'$'}ref": "#/definitions/Test"
+                  "${'$'}ref": "#/${'$'}defs/Test"
                 },
                 "t2": {
                   "oneOf": [
@@ -855,7 +855,7 @@ object BasicTestCases {
                       "type": "null"
                     },
                     {
-                      "${'$'}ref": "#/definitions/Test"
+                      "${'$'}ref": "#/${'$'}defs/Test"
                     }
                   ]
                 }
@@ -864,7 +864,7 @@ object BasicTestCases {
                 "t1",
                 "t2"
               ],
-            "definitions": {
+            "${'$'}defs": {
               "Test": {
                 "type": "object",
                 "properties": {
@@ -1035,13 +1035,13 @@ object BasicTestCases {
               "type": "object",
               "properties": {
                 "value": {
-                  "${'$'}ref": "#/definitions/NestedClass"
+                  "${'$'}ref": "#/${'$'}defs/NestedClass"
                 }
               },
               "required": [
                 "value"
               ],
-              "definitions": {
+              "${'$'}defs": {
                 "NestedClass": {
                   "type": "object",
                   "properties": {
@@ -1287,13 +1287,13 @@ object BasicTestCases {
               ],
               "properties": {
                 "valueInt": {
-                  "${'$'}ref": "#/definitions/ClassWithGenericField<Int>"
+                  "${'$'}ref": "#/${'$'}defs/ClassWithGenericField<Int>"
                 },
                 "valueString": {
-                  "${'$'}ref": "#/definitions/ClassWithGenericField<String>"
+                  "${'$'}ref": "#/${'$'}defs/ClassWithGenericField<String>"
                 }
               },
-              "definitions": {
+              "${'$'}defs": {
                 "ClassWithGenericField<Int>": {
                   "type": "object",
                   "required": [
@@ -1414,10 +1414,10 @@ object BasicTestCases {
               "type": "object",
               "properties": {
                 "nested": {
-                  "${'$'}ref": "#/definitions/NestedClass"
+                  "${'$'}ref": "#/${'$'}defs/NestedClass"
                 }
               },
-              "definitions": {
+              "${'$'}defs": {
                  "NestedClass": {
                    "required": [
                      "text"
@@ -1512,12 +1512,12 @@ object BasicTestCases {
                       "type": "null"
                     },
                     {
-                      "${'$'}ref": "#/definitions/ClassDirectSelfReferencing"
+                      "${'$'}ref": "#/${'$'}defs/ClassDirectSelfReferencing"
                     }
                   ]
                 }
               },
-              "definitions": {
+              "${'$'}defs": {
                 "ClassDirectSelfReferencing": {
                   "type": "object",
                   "required": [],
@@ -1528,7 +1528,7 @@ object BasicTestCases {
                           "type": "null"
                         },
                         {
-                          "${'$'}ref": "#/definitions/ClassDirectSelfReferencing"
+                          "${'$'}ref": "#/${'$'}defs/ClassDirectSelfReferencing"
                         }
                       ]
                     }

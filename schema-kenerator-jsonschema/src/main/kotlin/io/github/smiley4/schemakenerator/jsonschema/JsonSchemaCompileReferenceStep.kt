@@ -16,7 +16,8 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.obj
 
 internal class JsonSchemaCompileReferenceStep(
     private val explicitNullTypes: Boolean,
-    private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+    private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String,
+    private val definitionsPath: String
 ) {
 
     private val schemaUtils = JsonSchemaUtils()
@@ -125,9 +126,9 @@ internal class JsonSchemaCompileReferenceStep(
         }
 
         return if(refObj.properties.containsKey("_nullable") && refObj.getBool("_nullable")) {
-            schemaUtils.referenceSchemaNullable(refPath, true)
+            schemaUtils.referenceNullable(refPath, definitionsPath)
         } else {
-            schemaUtils.referenceSchema(refPath, true)
+            schemaUtils.reference(refPath, definitionsPath)
         }
     }
 

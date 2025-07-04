@@ -97,17 +97,20 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
+     * @param definitionsPath the path to place referenced schemas (default: $defs)
      */
     fun IntermediateJsonSchemaData.compileReferencing(
         explicitNullTypes: Boolean = true,
-        pathType: RefType = RefType.FULL
+        pathType: RefType = RefType.FULL,
+        definitionsPath: String = "${'$'}defs"
     ): CompiledJsonSchemaData {
         return compileReferencing(
             explicitNullTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
-            }
+            },
+            definitionsPath
         )
     }
 
@@ -116,12 +119,14 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
+     * @param definitionsPath the path to place referenced schemas (default: $defs)
      */
     fun IntermediateJsonSchemaData.compileReferencing(
         explicitNullTypes: Boolean = true,
-        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String,
+        definitionsPath: String = "${'$'}defs"
     ): CompiledJsonSchemaData {
-        return JsonSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
+        return JsonSchemaCompileReferenceStep(explicitNullTypes, builder, definitionsPath).compile(this)
     }
 
 
@@ -129,17 +134,20 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param pathType the type of the schema reference path
+     * @param definitionsPath the path to place referenced schemas (default: $defs)
      */
     fun IntermediateJsonSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
-        pathType: RefType = RefType.FULL
+        pathType: RefType = RefType.FULL,
+        definitionsPath: String = "${'$'}defs"
     ): CompiledJsonSchemaData {
         return compileReferencingRoot(
             explicitNullTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
-            }
+            },
+            definitionsPath
         )
     }
 
@@ -148,12 +156,23 @@ object JsonSchemaSteps {
      * Resolves references in generated json schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
      * @param builder builds the path to reference the type, i.e. which "name" to use
+     * @param definitionsPath the path (prefix) of referenced schemas (default: $defs)
      */
     fun IntermediateJsonSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
-        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
+        builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String,
+        definitionsPath: String = "${'$'}defs"
     ): CompiledJsonSchemaData {
-        return JsonSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
+        return JsonSchemaCompileReferenceRootStep(explicitNullTypes, builder, definitionsPath).compile(this)
+    }
+
+
+    /**
+     * Merge referenced schemas into the definitions section of the root schema, creating a single json object.
+     * @param definitionsPath the path to place referenced schemas (default: $defs). Must match the value specified in the compile step.
+     */
+    fun CompiledJsonSchemaData.merge(definitionsPath: String = "${'$'}defs"): CompiledJsonSchemaData {
+        return JsonSchemaMergeStep(definitionsPath).merge(this)
     }
 
 
