@@ -66,11 +66,17 @@ object SerializationSteps {
         return SerializationTypeAnalyzerImpl(
             serializersModule = config.serializersModule,
             typeRedirects = config.typeRedirects,
-            modules = config.buildCustomModules()
+            modules = config.buildCustomModules(),
+            findTypeParametersUsingReflection = config.findTypeParametersUsingReflection
         ).analyze(this)
     }
 
     class KotlinxSerializationTypeProcessingConfig {
+
+        /**
+         * Attempt to determine type parameters using reflection. Can result in improved titles in schemas.
+         */
+        var findTypeParametersUsingReflection: Boolean = true
 
         /**
          * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
@@ -78,7 +84,6 @@ object SerializationSteps {
         var serializersModule: SerializersModule? = null
 
         var knownNotParameterized = mutableSetOf<String>()
-
 
         /**
          * Mark the type with the given full/qualified name as "not parameterized", i.e. as not having any generic type parameters.

@@ -23,6 +23,9 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 class DefaultSerializationTypeAnalyzerModule(
     /**
@@ -291,6 +294,16 @@ class DefaultSerializationTypeAnalyzerModule(
             }
         }
 
+        // collect known type parameters
+        val typeParameters = determineTypeParameters(context.descriptor, context.knownTypeParameters).mapIndexed { index, descriptor ->
+            val type = context.analyze(descriptor)
+            TypeParameterData(
+                name = "T$index",
+                type = type.typeData.id,
+                nullable = type.nullable,
+            )
+        }
+
         // whether class is inline class
         val isInline = context.descriptor.isInline
 
@@ -299,7 +312,7 @@ class DefaultSerializationTypeAnalyzerModule(
             id = context.id,
             identifyingName = identifyingName,
             descriptiveName = descriptiveName,
-            typeParameters = mutableListOf(),
+            typeParameters = typeParameters.toMutableList(),
             annotations = annotations,
             subtypes = mutableListOf(),
             supertypes = mutableListOf(),
@@ -310,7 +323,6 @@ class DefaultSerializationTypeAnalyzerModule(
             mapData = null
         )
     }
-
 
     /**
      * Analyze the given serial descriptor classified as a sealed class
@@ -434,6 +446,23 @@ class DefaultSerializationTypeAnalyzerModule(
             collectionData = null,
             mapData = null
         )
+    }
+
+
+    /**
+     * Try to determine the type parameters of the given serial descriptor (if possible).
+     */
+    private fun determineTypeParameters(serialDescriptor: SerialDescriptor, knownTypeParameters: List<SerialDescriptor>): List<SerialDescriptor> {
+        if(knownTypeParameters.isNotEmpty()) {
+            return knownTypeParameters
+        }
+        if(serialDescriptor::class.qualifiedName == "kotlinx.serialization.internal.PluginGeneratedSerialDescriptor") {
+            val property = serialDescriptor::class.memberProperties.find { it.name == "typeParameterDescriptors" }!!
+            @Suppress("UNCHECKED_CAST") val typedProperty = property as KProperty1<SerialDescriptor, Array<SerialDescriptor>>
+            typedProperty.isAccessible = true
+            return typedProperty.get(serialDescriptor).toList()
+        }
+        return emptyList()
     }
 
 
