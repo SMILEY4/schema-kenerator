@@ -21,7 +21,6 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttri
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldBe
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
@@ -30,15 +29,24 @@ import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
+    fun myFunc(): _ManualTests.Companion.ParentClass<String> {
+        TODO("dummy")
+    }
+
 /**
  * internal / manual tests only
  */
 class _ManualTests : StringSpec({
 
+
     "kotlinx type parameters" {
 
-        val schema = initial<ParentClass<String>>()
-            .analyzeTypeUsingKotlinxSerialization()
+        print(::myFunc.returnType)
+
+        val schema = initial(::myFunc.returnType)
+            .analyzeTypeUsingKotlinxSerialization{
+                findTypeParametersUsingReflection = false
+            }
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
             .generateSwaggerSchema()
