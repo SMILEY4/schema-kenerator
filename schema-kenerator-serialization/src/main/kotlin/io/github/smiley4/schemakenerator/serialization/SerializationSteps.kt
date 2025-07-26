@@ -67,7 +67,6 @@ object SerializationSteps {
             serializersModule = config.serializersModule,
             typeRedirects = config.typeRedirects,
             modules = config.buildCustomModules(),
-            findTypeParametersUsingReflection = config.findTypeParametersUsingReflection
         ).analyze(this)
     }
 
@@ -119,7 +118,8 @@ object SerializationSteps {
         internal fun buildCustomModules(): List<SerializationTypeAnalyzerModule> {
             val allModules = listOf(
                 DefaultSerializationTypeAnalyzerModule(
-                    knownNotParameterized = knownNotParameterized
+                    knownNotParameterized = knownNotParameterized,
+                    findTypeParametersUsingReflection = findTypeParametersUsingReflection
                 )
             ) + customModules
             return allModules.reversed()

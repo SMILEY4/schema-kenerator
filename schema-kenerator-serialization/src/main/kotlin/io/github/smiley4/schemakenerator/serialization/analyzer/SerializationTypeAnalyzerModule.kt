@@ -11,7 +11,6 @@ interface SerializationTypeAnalyzerModule {
         private val analyzer: SerializationTypeAnalyzer,
         val id: TypeId,
         val descriptor: SerialDescriptor,
-        val knownTypeParameters: List<SerialDescriptor>,
         val knownTypeData: MutableList<TypeData>,
         val cache: TypeDataCache
     ) {
@@ -19,7 +18,6 @@ interface SerializationTypeAnalyzerModule {
         fun analyze(descriptor: SerialDescriptor): WrappedTypeData {
             return this.analyzer.analyze(
                 descriptor = descriptor,
-                knownTypeParameters = knownTypeParameters,
                 knownTypeData = knownTypeData,
                 cache = cache,
             )
