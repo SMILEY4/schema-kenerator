@@ -82,21 +82,24 @@ object SerializationSteps {
          */
         var serializersModule: SerializersModule? = null
 
+        @Deprecated("unused")
         var knownNotParameterized = mutableSetOf<String>()
 
         /**
          * Mark the type with the given full/qualified name as "not parameterized", i.e. as not having any generic type parameters.
          * This helps the type processing step to determine whether two types are truly the same.
          */
+        @Deprecated("unused")
         fun markNotParameterized(name: String) {
             knownNotParameterized.add(name)
         }
 
 
         /**
-         * Mark the given type as "not parameterized", i.e as not having any generic type parameters.
+         * Mark the given type as "not parameterized", i.e. as not having any generic type parameters.
          * This helps the type processing step to determine whether two types are truly the same.
          */
+        @Deprecated("unused")
         fun markNotParameterized(type: KType) {
             val clazz = type.classifier!! as KClass<*>
             markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
@@ -107,6 +110,7 @@ object SerializationSteps {
          * Mark the given type as "not parameterized", i.e as not having any generic type parameters.
          * This helps the type processing step to determine whether two types are truly the same.
          */
+        @Deprecated("unused")
         inline fun <reified T> markNotParameterized() {
             val clazz = typeOf<T>().classifier!! as KClass<*>
             markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
@@ -118,7 +122,6 @@ object SerializationSteps {
         internal fun buildCustomModules(): List<SerializationTypeAnalyzerModule> {
             val allModules = listOf(
                 DefaultSerializationTypeAnalyzerModule(
-                    knownNotParameterized = knownNotParameterized,
                     findTypeParametersUsingReflection = findTypeParametersUsingReflection
                 )
             ) + customModules

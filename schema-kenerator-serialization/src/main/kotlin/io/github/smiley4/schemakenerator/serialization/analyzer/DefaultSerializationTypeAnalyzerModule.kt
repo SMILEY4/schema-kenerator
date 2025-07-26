@@ -29,10 +29,6 @@ import kotlin.reflect.jvm.isAccessible
 
 class DefaultSerializationTypeAnalyzerModule(
     /**
-     * types that are known to not have any type parameters
-     */
-    private val knownNotParameterized: Set<String> = emptySet(),
-    /**
      * Whether to find type parameters using reflection whenever possible
      */
     private val findTypeParametersUsingReflection: Boolean
@@ -265,14 +261,24 @@ class DefaultSerializationTypeAnalyzerModule(
         val descriptiveName = context.descriptor.toTypeName()
         val identifyingName = context.descriptor.toTypeName()
 
-        // Check type has already been parsed.
-        // Only search if we know this type does not have type parameters, otherwise we can't trust possible matches due to
-        // possible differences in type parameters that are not exposed by kotlinx-serialization.
-        if (knownNotParameterized.contains(descriptiveName.full)) {
-            val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
-            if (existing != null) {
-                return existing
+        // extract type parameters using reflection (if enabled)
+        val typeParameters = if (findTypeParametersUsingReflection) {
+            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
+                val type = context.analyze(descriptor)
+                TypeParameterData(
+                    name = "T$index",
+                    type = type.typeData.id,
+                    nullable = type.nullable,
+                )
             }
+        } else {
+            emptyList()
+        }
+
+        // Check type has already been parsed.
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, typeParameters) }
+        if (existing != null) {
+            return existing
         }
 
         // collect annotation data
@@ -296,20 +302,6 @@ class DefaultSerializationTypeAnalyzerModule(
                     )
                 )
             }
-        }
-
-        // extract type parameters using reflection (if enabled)
-        val typeParameters = if(findTypeParametersUsingReflection) {
-            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
-                val type = context.analyze(descriptor)
-                TypeParameterData(
-                    name = "T$index",
-                    type = type.typeData.id,
-                    nullable = type.nullable,
-                )
-            }
-        } else {
-            emptyList()
         }
 
         // whether class is inline class
@@ -343,14 +335,24 @@ class DefaultSerializationTypeAnalyzerModule(
         val descriptiveName = context.descriptor.toTypeName()
         val identifyingName = context.descriptor.toTypeName()
 
-        // Check type has already been parsed.
-        // Only search if we know this type does not have type parameters, otherwise we can't trust possible matches due to
-        // possible differences in type parameters that are not exposed by kotlinx-serialization.
-        if (knownNotParameterized.contains(descriptiveName.full)) {
-            val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
-            if (existing != null) {
-                return existing
+        // extract type parameters using reflection (if enabled)
+        val typeParameters = if (findTypeParametersUsingReflection) {
+            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
+                val type = context.analyze(descriptor)
+                TypeParameterData(
+                    name = "T$index",
+                    type = type.typeData.id,
+                    nullable = type.nullable,
+                )
             }
+        } else {
+            emptyList()
+        }
+
+        // Check type has already been parsed.
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, typeParameters) }
+        if (existing != null) {
+            return existing
         }
 
         // collect annotation data
