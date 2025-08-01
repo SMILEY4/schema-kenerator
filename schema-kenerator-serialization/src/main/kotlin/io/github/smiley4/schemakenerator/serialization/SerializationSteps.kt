@@ -66,33 +66,40 @@ object SerializationSteps {
         return SerializationTypeAnalyzerImpl(
             serializersModule = config.serializersModule,
             typeRedirects = config.typeRedirects,
-            modules = config.buildCustomModules()
+            modules = config.buildCustomModules(),
         ).analyze(this)
     }
 
     class KotlinxSerializationTypeProcessingConfig {
 
         /**
+         * Attempt to determine type parameters using reflection. Can result in improved titles in schemas.
+         */
+        var findTypeParametersUsingReflection: Boolean = true
+
+        /**
          * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
          */
         var serializersModule: SerializersModule? = null
 
+        @Deprecated("unused")
         var knownNotParameterized = mutableSetOf<String>()
-
 
         /**
          * Mark the type with the given full/qualified name as "not parameterized", i.e. as not having any generic type parameters.
          * This helps the type processing step to determine whether two types are truly the same.
          */
+        @Deprecated("unused")
         fun markNotParameterized(name: String) {
             knownNotParameterized.add(name)
         }
 
 
         /**
-         * Mark the given type as "not parameterized", i.e as not having any generic type parameters.
+         * Mark the given type as "not parameterized", i.e. as not having any generic type parameters.
          * This helps the type processing step to determine whether two types are truly the same.
          */
+        @Deprecated("unused")
         fun markNotParameterized(type: KType) {
             val clazz = type.classifier!! as KClass<*>
             markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
@@ -103,6 +110,7 @@ object SerializationSteps {
          * Mark the given type as "not parameterized", i.e as not having any generic type parameters.
          * This helps the type processing step to determine whether two types are truly the same.
          */
+        @Deprecated("unused")
         inline fun <reified T> markNotParameterized() {
             val clazz = typeOf<T>().classifier!! as KClass<*>
             markNotParameterized(clazz.qualifiedName ?: clazz.java.name)
@@ -114,7 +122,7 @@ object SerializationSteps {
         internal fun buildCustomModules(): List<SerializationTypeAnalyzerModule> {
             val allModules = listOf(
                 DefaultSerializationTypeAnalyzerModule(
-                    knownNotParameterized = knownNotParameterized
+                    findTypeParametersUsingReflection = findTypeParametersUsingReflection
                 )
             ) + customModules
             return allModules.reversed()

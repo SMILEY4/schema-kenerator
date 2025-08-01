@@ -6,15 +6,20 @@ package io.github.smiley4.schemakenerator.test
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
+import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.merge
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
-import io.github.smiley4.schemakenerator.jsonschema.data.RefType
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
+import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.models.Components
@@ -22,61 +27,86 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+
+    fun myFunc(): _ManualTests.Companion.ParentClass<String> {
+        TODO("dummy")
+    }
 
 /**
  * internal / manual tests only
  */
 class _ManualTests : StringSpec({
 
-    "reflection" {
-        val schema = initial<ParentClass>()
-            .analyzeTypeUsingReflection()
-            .generateJsonSchema()
-            .withTitle(TitleType.SIMPLE)
-            .compileReferencing(pathType = RefType.SIMPLE)
-            .merge()
 
-        println(schema)
+    "kotlinx type parameters" {
+
+        print(::myFunc.returnType)
+
+        val schema = initial(::myFunc.returnType)
+            .analyzeTypeUsingKotlinxSerialization{
+                findTypeParametersUsingReflection = false
+            }
+            .addJsonClassDiscriminatorProperty()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+            .asPrintable()
+
+        println(json.writeValueAsString(schema))
+
+//        schema.root.`$ref` shouldBe "#/components/schemas/ParentClass_String"
     }
 
-//    "reflection" {
-//        val schema = initial<ParentClass>()
-//            .collectSubTypes()
-//            .analyzeTypeUsingReflection()
-//            .addMissingSupertypeSubtypeRelations()
-//            .handleNameAnnotation()
-//            .generateSwaggerSchema()
-//            .handleCoreAnnotations()
-//            .handleSchemaAnnotations()
-//            .mergePropertyAttributesIntoType()
-//            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
-//
-//            // println(json.writeValueAsString(schema.asPrintable()))
-//            println(schema.asOpenApiJson())
-//    }
-//
-//    "kotlinx" {
-//        val schema = initial<ParentClass>()
-//            .analyzeTypeUsingKotlinxSerialization()
-//            .addJsonClassDiscriminatorProperty()
-//            .handleNameAnnotation()
-//            .generateSwaggerSchema()
-//            .handleCoreAnnotations()
-//            .handleSchemaAnnotations()
-//            .mergePropertyAttributesIntoType()
-//            .compileReferencingRoot()
-//            .asPrintable()
-//        println(json.writeValueAsString(schema))
-//    }
+    "reflection" {
+        val schema = initial<ParentClass<ChildClass>>()
+            .collectSubTypes()
+            .analyzeTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+
+            // println(json.writeValueAsString(schema.asPrintable()))
+            println(schema.asOpenApiJson())
+    }
+
+    "kotlinx" {
+        val schema = initial<RootClass>()
+            .analyzeTypeUsingKotlinxSerialization()
+            .addJsonClassDiscriminatorProperty()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+            .asPrintable()
+        println(json.writeValueAsString(schema))
+    }
 
 }) {
     companion object {
 
-        class ParentClass(
-            val child: ChildClass
+        @Serializable
+        class RootClass(
+            val parent1: ParentClass<String>,
+            val parent2: ParentClass<Int>
         )
 
-        class ChildClass
+        @Serializable
+        class ParentClass<T>(
+            val child: T
+        )
+
+        @Serializable
+        class ChildClass(val value: String)
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

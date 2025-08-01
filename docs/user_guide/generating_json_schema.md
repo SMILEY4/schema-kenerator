@@ -220,13 +220,13 @@ This step will result in the root schema with a new "$defs"-section (name is con
 
 ??? example "Merging Schemas"
 
-   ```kotlin
-    class ParentClass(
-        val child: ChildClass
-    )
+    ```kotlin
+     class ParentClass(
+         val child: ChildClass
+     )
 
-    class ChildClass
-   ```
+     class ChildClass
+    ```
 
     === "without merge()-step"
         ```kotlin

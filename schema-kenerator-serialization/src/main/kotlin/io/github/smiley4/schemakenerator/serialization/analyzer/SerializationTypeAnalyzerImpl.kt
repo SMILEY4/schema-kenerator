@@ -21,7 +21,7 @@ internal class SerializationTypeAnalyzerImpl(
     /**
      * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
      */
-    private val serializersModule: SerializersModule? = null,
+    private val serializersModule: SerializersModule?,
     /**
      * redirect types to other types, i.e. when a type is found as a key, the corresponding type will be processed instead
      */
@@ -29,7 +29,7 @@ internal class SerializationTypeAnalyzerImpl(
     /**
      * List of modules for type analysis. First matching module is used to analyze a given type.
      */
-    private val modules: List<SerializationTypeAnalyzerModule>
+    private val modules: List<SerializationTypeAnalyzerModule>,
 ) : SerializationTypeAnalyzer {
 
     /**
