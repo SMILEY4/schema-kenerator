@@ -1238,9 +1238,6 @@ object BasicTestCases {
               }
             }
         """.trimIndent()
-        expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference
-            ?.replace("ClassWithGenericField_Int", "ClassWithGenericField")
-            ?.replace("ClassWithGenericField_String", "ClassWithGenericField2")
         // language=json
         expectedJsonInline = """
             {
@@ -1321,9 +1318,6 @@ object BasicTestCases {
               }
             }
         """.trimIndent()
-        expectedJsonReferenceKotlinxSerialization = expectedJsonReference
-            ?.replace("ClassWithGenericField<Int>", "ClassWithGenericField")
-            ?.replace("ClassWithGenericField<String>", "ClassWithGenericField2")
     }
 
     val nestedClass = case("basics", "nested class") {

@@ -23,12 +23,15 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 class DefaultSerializationTypeAnalyzerModule(
     /**
-     * types that are known to not have any type parameters
+     * Whether to find type parameters using reflection whenever possible
      */
-    private val knownNotParameterized: Set<String> = emptySet()
+    private val findTypeParametersUsingReflection: Boolean
 ) : SerializationTypeAnalyzerModule {
 
     private val annotationAnalyzer = AnnotationAnalyzer()
@@ -258,14 +261,24 @@ class DefaultSerializationTypeAnalyzerModule(
         val descriptiveName = context.descriptor.toTypeName()
         val identifyingName = context.descriptor.toTypeName()
 
-        // Check type has already been parsed.
-        // Only search if we know this type does not have type parameters, otherwise we can't trust possible matches due to
-        // possible differences in type parameters that are not exposed by kotlinx-serialization.
-        if (knownNotParameterized.contains(descriptiveName.full)) {
-            val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
-            if (existing != null) {
-                return existing
+        // extract type parameters using reflection (if enabled)
+        val typeParameters = if (findTypeParametersUsingReflection) {
+            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
+                val type = context.analyze(descriptor)
+                TypeParameterData(
+                    name = "T$index",
+                    type = type.typeData.id,
+                    nullable = type.nullable,
+                )
             }
+        } else {
+            emptyList()
+        }
+
+        // Check type has already been parsed.
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, typeParameters) }
+        if (existing != null) {
+            return existing
         }
 
         // collect annotation data
@@ -299,7 +312,7 @@ class DefaultSerializationTypeAnalyzerModule(
             id = context.id,
             identifyingName = identifyingName,
             descriptiveName = descriptiveName,
-            typeParameters = mutableListOf(),
+            typeParameters = typeParameters.toMutableList(),
             annotations = annotations,
             subtypes = mutableListOf(),
             supertypes = mutableListOf(),
@@ -322,14 +335,24 @@ class DefaultSerializationTypeAnalyzerModule(
         val descriptiveName = context.descriptor.toTypeName()
         val identifyingName = context.descriptor.toTypeName()
 
-        // Check type has already been parsed.
-        // Only search if we know this type does not have type parameters, otherwise we can't trust possible matches due to
-        // possible differences in type parameters that are not exposed by kotlinx-serialization.
-        if (knownNotParameterized.contains(descriptiveName.full)) {
-            val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
-            if (existing != null) {
-                return existing
+        // extract type parameters using reflection (if enabled)
+        val typeParameters = if (findTypeParametersUsingReflection) {
+            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
+                val type = context.analyze(descriptor)
+                TypeParameterData(
+                    name = "T$index",
+                    type = type.typeData.id,
+                    nullable = type.nullable,
+                )
             }
+        } else {
+            emptyList()
+        }
+
+        // Check type has already been parsed.
+        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, typeParameters) }
+        if (existing != null) {
+            return existing
         }
 
         // collect annotation data
@@ -434,6 +457,20 @@ class DefaultSerializationTypeAnalyzerModule(
             collectionData = null,
             mapData = null
         )
+    }
+
+
+    /**
+     * Try to determine the type parameters of the given serial descriptor (if possible).
+     */
+    private fun extractTypeParameters(serialDescriptor: SerialDescriptor): List<SerialDescriptor> {
+        if (serialDescriptor::class.qualifiedName == "kotlinx.serialization.internal.PluginGeneratedSerialDescriptor") {
+            val property = serialDescriptor::class.memberProperties.find { it.name == "typeParameterDescriptors" }!!
+            @Suppress("UNCHECKED_CAST") val typedProperty = property as KProperty1<SerialDescriptor, Array<SerialDescriptor>>
+            typedProperty.isAccessible = true
+            return typedProperty.get(serialDescriptor).toList()
+        }
+        return emptyList()
     }
 
 

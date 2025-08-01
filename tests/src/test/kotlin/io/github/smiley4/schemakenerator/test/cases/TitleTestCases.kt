@@ -58,9 +58,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerInlineKotlinxSerialization = expectedSwaggerInline!!
-            .replace("NestedClass2<NestedClass1<String,Int>>", "NestedClass2")
-            .replace("NestedClass1<String,Int>", "NestedClass1")
         // language=json
         expectedSwaggerReference = """
             {
@@ -104,9 +101,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference!!
-            .replace("NestedClass2<NestedClass1<String,Int>>", "NestedClass2")
-            .replace("NestedClass1<String,Int>", "NestedClass1")
         // language=json
         expectedJsonInline = """
             {
@@ -148,9 +142,6 @@ object TitleTestCases {
                "title": "TestClass"
             }
             """.trimIndent()
-        expectedJsonInlineKotlinxSerialization = expectedJsonInline!!
-            .replace("NestedClass2<NestedClass1<String,Int>>", "NestedClass2")
-            .replace("NestedClass1<String,Int>", "NestedClass1")
         // language=json
         expectedJsonReference = """
             {
@@ -200,9 +191,6 @@ object TitleTestCases {
                }
             }
             """.trimIndent()
-        expectedJsonReferenceKotlinxSerialization = expectedJsonReference!!
-            .replace("NestedClass2<NestedClass1<String,Int>>", "NestedClass2")
-            .replace("NestedClass1<String,Int>", "NestedClass1")
     }
 
     val full = case("title", "full") {
@@ -252,9 +240,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerInlineKotlinxSerialization = expectedSwaggerInline!!
-            .replace("NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>", "NestedClass2")
-            .replace("NestedClass1<kotlin.String,kotlin.Int>", "NestedClass1")
         // language=json
         expectedSwaggerReference = """
             {
@@ -298,9 +283,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference!!
-            .replace("NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>", "NestedClass2")
-            .replace("NestedClass1<kotlin.String,kotlin.Int>", "NestedClass1")
         // language=json
         expectedJsonInline = """
             {
@@ -342,9 +324,6 @@ object TitleTestCases {
                "title": "io.github.smiley4.schemakenerator.test.cases.TitleTestCases.TestClass"
             }
             """.trimIndent()
-        expectedJsonInlineKotlinxSerialization = expectedJsonInline!!
-            .replace("NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>", "NestedClass2")
-            .replace("NestedClass1<kotlin.String,kotlin.Int>", "NestedClass1")
         // language=json
         expectedJsonReference = """
             {
@@ -394,9 +373,6 @@ object TitleTestCases {
                }
             }
             """.trimIndent()
-        expectedJsonReferenceKotlinxSerialization = expectedJsonReference!!
-            .replace("NestedClass2<io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1<kotlin.String,kotlin.Int>>", "NestedClass2")
-            .replace("NestedClass1<kotlin.String,kotlin.Int>", "NestedClass1")
     }
 
     val openApiSimple = case("title", "openapi simple") {
@@ -442,10 +418,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerInlineKotlinxSerialization = expectedSwaggerInline!!
-            .replace("NestedClass1_String-Int", "NestedClass1")
-            .replace("NestedClass2_NestedClass1_String-Int", "NestedClass2") // todo: correct ?
-            .replace("NestedClass2_NestedClass1", "NestedClass2") // todo: correct ?
         // language=json
         expectedSwaggerReference = """
             {
@@ -489,10 +461,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference!!
-            .replace("NestedClass1_String-Int", "NestedClass1")
-            .replace("NestedClass2_NestedClass1_String-Int", "NestedClass2")
-            .replace("NestedClass2_NestedClass1", "NestedClass2")
 
         expectedJson = null
     }
@@ -547,13 +515,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerInlineKotlinxSerialization = expectedSwaggerInline!!
-            .replace("NestedClass1_String-Int", "NestedClass1")
-            .replace("NestedClass1_kotlin.String-kotlin.Int", "NestedClass1")
-            .replace("NestedClass2_NestedClass1_String-Int", "NestedClass2")
-            .replace("NestedClass2_NestedClass1", "NestedClass2")
-            .replace("NestedClass2_io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1_kotlin.String-kotlin.Int", "NestedClass2")
-            .replace("NestedClass2_io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1", "NestedClass2")
 
         // language=json
         expectedSwaggerReference = """
@@ -598,13 +559,6 @@ object TitleTestCases {
               }
             }
             """.trimIndent()
-        expectedSwaggerReferenceKotlinxSerialization = expectedSwaggerReference!!
-            .replace("NestedClass1_String-Int", "NestedClass1")
-            .replace("NestedClass1_kotlin.String-kotlin.Int", "NestedClass1")
-            .replace("NestedClass2_NestedClass1_String-Int", "NestedClass2")
-            .replace("NestedClass2_NestedClass1", "NestedClass2")
-            .replace("NestedClass2_io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1_kotlin.String-kotlin.Int", "NestedClass2")
-            .replace("NestedClass2_io.github.smiley4.schemakenerator.test.cases.TitleTestCases.NestedClass1", "NestedClass2")
         expectedJson = null
     }
 
