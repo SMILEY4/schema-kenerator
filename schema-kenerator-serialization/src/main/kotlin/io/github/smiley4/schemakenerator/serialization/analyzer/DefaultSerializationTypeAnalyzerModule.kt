@@ -83,10 +83,10 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzePrimitive(context: SerializationTypeAnalyzerModule.Context, identifyingName: TypeName): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
+        val descriptiveName = context.toTypeName()
 
         // check type has already been parsed
-        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, emptyList()) }
+        val existing = context.findKnown(identifyingName, descriptiveName)
         if (existing != null) {
             return existing
         }
@@ -119,8 +119,7 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzeList(context: SerializationTypeAnalyzerModule.Context): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
-        val identifyingName = context.descriptor.toTypeName()
+        val name = context.toTypeName()
 
         // collect information about item type
         val itemDescriptor = context.descriptor.getElementDescriptor(0)
@@ -133,7 +132,7 @@ class DefaultSerializationTypeAnalyzerModule(
         )
 
         // check type has already been parsed
-        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf(itemParameter)) }
+        val existing = context.findKnown(typeParameters = listOf(itemParameter))
         if (existing != null) {
             return existing
         }
@@ -148,8 +147,8 @@ class DefaultSerializationTypeAnalyzerModule(
         // build type
         return TypeData(
             id = context.id,
-            identifyingName = identifyingName,
-            descriptiveName = descriptiveName,
+            identifyingName = name,
+            descriptiveName = name,
             typeParameters = mutableListOf(itemParameter),
             annotations = annotations,
             subtypes = mutableListOf(),
@@ -181,8 +180,7 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzeMap(context: SerializationTypeAnalyzerModule.Context): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
-        val identifyingName = context.descriptor.toTypeName()
+        val name = context.toTypeName()
 
         // collect information about key type
         val keyDescriptor = context.descriptor.getElementDescriptor(0)
@@ -205,8 +203,7 @@ class DefaultSerializationTypeAnalyzerModule(
         )
 
         // check type has already been parsed
-        val existing =
-            context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf(keyParameter, valueParameter)) }
+        val existing = context.findKnown(typeParameters = listOf(keyParameter, valueParameter))
         if (existing != null) {
             return existing
         }
@@ -217,8 +214,8 @@ class DefaultSerializationTypeAnalyzerModule(
         // build type
         return TypeData(
             id = context.id,
-            identifyingName = identifyingName,
-            descriptiveName = descriptiveName,
+            identifyingName = name,
+            descriptiveName = name,
             typeParameters = mutableListOf(keyParameter, valueParameter),
             annotations = annotations,
             subtypes = mutableListOf(),
@@ -258,8 +255,7 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzeClass(context: SerializationTypeAnalyzerModule.Context): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
-        val identifyingName = context.descriptor.toTypeName()
+        val name = context.toTypeName()
 
         // extract type parameters using reflection (if enabled)
         val typeParameters = if (findTypeParametersUsingReflection) {
@@ -276,7 +272,7 @@ class DefaultSerializationTypeAnalyzerModule(
         }
 
         // Check type has already been parsed.
-        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, typeParameters) }
+        val existing = context.findKnown(typeParameters = typeParameters)
         if (existing != null) {
             return existing
         }
@@ -310,8 +306,8 @@ class DefaultSerializationTypeAnalyzerModule(
         // build type
         return TypeData(
             id = context.id,
-            identifyingName = identifyingName,
-            descriptiveName = descriptiveName,
+            identifyingName = name,
+            descriptiveName = name,
             typeParameters = typeParameters.toMutableList(),
             annotations = annotations,
             subtypes = mutableListOf(),
@@ -332,8 +328,7 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzeSealed(context: SerializationTypeAnalyzerModule.Context): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
-        val identifyingName = context.descriptor.toTypeName()
+        val name = context.toTypeName()
 
         // extract type parameters using reflection (if enabled)
         val typeParameters = if (findTypeParametersUsingReflection) {
@@ -350,7 +345,7 @@ class DefaultSerializationTypeAnalyzerModule(
         }
 
         // Check type has already been parsed.
-        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, typeParameters) }
+        val existing = context.findKnown(typeParameters = typeParameters)
         if (existing != null) {
             return existing
         }
@@ -366,8 +361,8 @@ class DefaultSerializationTypeAnalyzerModule(
         // build type
         return TypeData(
             id = context.id,
-            identifyingName = identifyingName,
-            descriptiveName = descriptiveName,
+            identifyingName = name,
+            descriptiveName = name,
             typeParameters = mutableListOf(),
             annotations = annotations,
             subtypes = subtypes.toMutableList(),
@@ -388,11 +383,10 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzeObject(context: SerializationTypeAnalyzerModule.Context): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
-        val identifyingName = context.descriptor.toTypeName()
+        val name = context.toTypeName()
 
         // check type has already been parsed
-        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
+        val existing = context.findKnown()
         if (existing != null) {
             return existing
         }
@@ -403,8 +397,8 @@ class DefaultSerializationTypeAnalyzerModule(
         // build type
         return TypeData(
             id = context.id,
-            identifyingName = identifyingName,
-            descriptiveName = descriptiveName,
+            identifyingName = name,
+            descriptiveName = name,
             typeParameters = mutableListOf(),
             annotations = annotations,
             subtypes = mutableListOf(),
@@ -425,11 +419,10 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun analyzeEnum(context: SerializationTypeAnalyzerModule.Context): TypeData {
 
         // create basic information for this type
-        val descriptiveName = context.descriptor.toTypeName()
-        val identifyingName = context.descriptor.toTypeName()
+        val name = context.toTypeName()
 
         // check type has already been parsed
-        val existing = context.knownTypeData.find { known -> known.matches(identifyingName, descriptiveName, listOf()) }
+        val existing = context.findKnown()
         if (existing != null) {
             return existing
         }
@@ -443,8 +436,8 @@ class DefaultSerializationTypeAnalyzerModule(
         // build type
         return TypeData(
             id = TypeId.create(),
-            identifyingName = identifyingName,
-            descriptiveName = descriptiveName,
+            identifyingName = name,
+            descriptiveName = name,
             typeParameters = mutableListOf(),
             annotations = annotations,
             subtypes = mutableListOf(),
@@ -480,15 +473,6 @@ class DefaultSerializationTypeAnalyzerModule(
     private fun KClass<*>.toTypeName() = TypeName(
         full = this.qualifiedName ?: this.java.name,
         short = this.simpleName ?: this.java.name
-    )
-
-
-    /**
-     * @return a [TypeName] for this class
-     */
-    private fun SerialDescriptor.toTypeName() = TypeName(
-        full = this.fullName(),
-        short = this.serialName.split(".").last().replace("?", "")
     )
 
 }

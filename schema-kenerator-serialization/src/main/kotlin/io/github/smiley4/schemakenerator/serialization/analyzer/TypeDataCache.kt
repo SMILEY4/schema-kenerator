@@ -6,7 +6,10 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.nonNullOriginal
 
 @OptIn(ExperimentalSerializationApi::class)
-class TypeDataCache(private val entries: MutableMap<SerialDescriptor, TypeData> = mutableMapOf()) {
+class TypeDataCache(
+    private val entries: MutableMap<SerialDescriptor, TypeData> = mutableMapOf(),
+    private val reversedEntries: MutableMap<TypeData, SerialDescriptor> = mutableMapOf()
+) {
 
     /**
      * Cache the given [TypeData] for the given [SerialDescriptor]. The nullability of the descriptor is irrelevant
@@ -15,6 +18,7 @@ class TypeDataCache(private val entries: MutableMap<SerialDescriptor, TypeData> 
      * */
     operator fun set(descriptor: SerialDescriptor, typeData: TypeData) {
         entries[descriptor.nonNullOriginal] = typeData
+        reversedEntries[typeData] = descriptor.nonNullOriginal
     }
 
 
@@ -27,4 +31,11 @@ class TypeDataCache(private val entries: MutableMap<SerialDescriptor, TypeData> 
         return entries[descriptor.nonNullOriginal]
     }
 
+    /**
+     * Retrieve the [SerialDescriptor] for the given [TypeData]
+     *
+     * @param typeData the [TypeData] for the descriptor
+     * @return the [SerialDescriptor] for the given type data or null
+     */
+    fun getDescriptor(typeData: TypeData): SerialDescriptor? = reversedEntries[typeData]
 }
