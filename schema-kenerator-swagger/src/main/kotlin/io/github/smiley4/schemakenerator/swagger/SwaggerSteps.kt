@@ -133,14 +133,17 @@ object SwaggerSteps {
     /**
      * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
+     * @param inlineDiscriminatedTypes if this is true and a type is discriminated, it will be compiled inline.
      * @param pathType the type of the schema reference path
      */
     fun IntermediateSwaggerSchemaData.compileReferencing(
         explicitNullTypes: Boolean = true,
+        inlineDiscriminatedTypes: Boolean = false,
         pathType: RefType = RefType.OPENAPI_FULL
     ): CompiledSwaggerSchemaData {
         return compileReferencing(
             explicitNullTypes,
+            inlineDiscriminatedTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -154,27 +157,31 @@ object SwaggerSteps {
     /**
      * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
+     * @param inlineDiscriminatedTypes if this is true and a type is discriminated, it will be compiled inline.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
     fun IntermediateSwaggerSchemaData.compileReferencing(
         explicitNullTypes: Boolean = true,
+        inlineDiscriminatedTypes: Boolean = false,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
     ): CompiledSwaggerSchemaData {
-        return SwaggerSchemaCompileReferenceStep(explicitNullTypes, builder).compile(this)
+        return SwaggerSchemaCompileReferenceStep(explicitNullTypes, inlineDiscriminatedTypes, builder).compile(this)
     }
-
 
     /**
      * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
      * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
+     * @param inlineDiscriminatedTypes if this is true and a type is discriminated, it will be compiled inline.
      * @param pathType the type of the schema reference path
      */
     fun IntermediateSwaggerSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
+        inlineDiscriminatedTypes: Boolean = false,
         pathType: RefType = RefType.OPENAPI_FULL
     ): CompiledSwaggerSchemaData {
         return compileReferencingRoot(
             explicitNullTypes,
+            inlineDiscriminatedTypes,
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
@@ -187,14 +194,16 @@ object SwaggerSteps {
 
     /**
      * Resolves references in generated swagger schemas by collecting them in the components-section and referencing them.
-     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields.
+     * @param explicitNullTypes whether to explicitly add "null" as a type to nullable fields
+     * @param inlineDiscriminatedTypes if this is true and a type is discriminated, it will be compiled inline.
      * @param builder builds the path to reference the type, i.e. which "name" to use
      */
     fun IntermediateSwaggerSchemaData.compileReferencingRoot(
         explicitNullTypes: Boolean = true,
+        inlineDiscriminatedTypes: Boolean = false,
         builder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
     ): CompiledSwaggerSchemaData {
-        return SwaggerSchemaCompileReferenceRootStep(explicitNullTypes, builder).compile(this)
+        return SwaggerSchemaCompileReferenceRootStep(explicitNullTypes, inlineDiscriminatedTypes, builder).compile(this)
     }
 
 

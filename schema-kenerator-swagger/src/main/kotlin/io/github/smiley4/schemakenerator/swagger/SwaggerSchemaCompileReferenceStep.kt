@@ -13,6 +13,7 @@ import io.swagger.v3.oas.models.media.Schema
 
 internal class SwaggerSchemaCompileReferenceStep(
     private val explicitNullTypes: Boolean,
+    private val inlineDiscriminatedTypes: Boolean,
     private val pathBuilder: (type: TypeData, types: Map<TypeId, TypeData>) -> String
 ) {
 
@@ -86,8 +87,14 @@ internal class SwaggerSchemaCompileReferenceStep(
             return refObj
         }
 
+        val shouldInline = inlineDiscriminatedTypes &&
+                (referencedSchema.swagger.discriminator != null
+                        || context.knownSchemas.firstOrNull {
+                            it.swagger.anyOf?.contains(refObj) == true || it.swagger.oneOf?.contains(refObj) == true
+                        } != null)
+
         // create swagger property with correct reference path (and add actual schema to context)
-        val property = if (shouldReference(referencedSchema.swagger, referencedSchema.typeData)) {
+        val property = if (shouldReference(referencedSchema.swagger, referencedSchema.typeData) && !shouldInline) {
             createRefProperty(refObj, referencedSchema, context)
         } else {
             createInlineProperty(refObj, referencedSchema)
