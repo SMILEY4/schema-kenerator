@@ -35,7 +35,7 @@ interface SerializationTypeAnalyzerModule {
             // REQUIRED when the types have matching @SerialName values.
             return knownTypeData.find { known ->
                 known.matches(identifyingName, descriptiveName, typeParameters) &&
-                        cache.getDescriptor(known)?.equals(descriptor) ?: false
+                        cache.getDescriptor(known)?.equals(descriptor) ?: true
             }
         }
 
