@@ -18,7 +18,7 @@ internal class JsonSchemaCoreAnnotationTypeStep {
     }
 
     private fun process(schema: JsonSchemaData, typeDataMap: Map<TypeId, TypeData>) {
-        if (schema.json is JsonObject && schema.json.properties["type"] == null) {
+        if (schema.json is JsonObject) {
             determineType(schema.typeData.annotations)?.also { type ->
                 schema.json.properties["type"] = JsonTextValue(type)
             }
