@@ -36,7 +36,7 @@ It is designed as a pipeline of individual steps to be highly configurable and f
 
 A wiki with documentation is available [here](https://smiley4.github.io/schema-kenerator/latest).
 
-Examples showcasing and explaining the functionalities and use cases of this project can be found [here](https://github.com/SMILEY4/schema-kenerator/tree/develop/schema-kenerator-examples/src/test/kotlin/io/github/smiley4/schemakenerator/examples).
+Examples showcasing and explaining the functionalities and use cases of this project can be found [here](https://github.com/SMILEY4/schema-kenerator/tree/develop/examples/src/test/kotlin/io/github/smiley4/schemakenerator/examples).
 
 
 ## Installation
