@@ -9,6 +9,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.annotations.Name
+import io.github.smiley4.schemakenerator.core.annotations.Title
+import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
@@ -29,37 +32,11 @@ import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
-    fun myFunc(): _ManualTests.Companion.ParentClass<String> {
-        TODO("dummy")
-    }
 
 /**
  * internal / manual tests only
  */
 class _ManualTests : StringSpec({
-
-
-    "kotlinx type parameters" {
-
-        print(::myFunc.returnType)
-
-        val schema = initial(::myFunc.returnType)
-            .analyzeTypeUsingKotlinxSerialization{
-                findTypeParametersUsingReflection = false
-            }
-            .addJsonClassDiscriminatorProperty()
-            .handleNameAnnotation()
-            .generateSwaggerSchema()
-            .handleCoreAnnotations()
-            .handleSchemaAnnotations()
-            .mergePropertyAttributesIntoType()
-            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
-            .asPrintable()
-
-        println(json.writeValueAsString(schema))
-
-//        schema.root.`$ref` shouldBe "#/components/schemas/ParentClass_String"
-    }
 
     "reflection" {
         val schema = initial<ParentClass<ChildClass>>()
