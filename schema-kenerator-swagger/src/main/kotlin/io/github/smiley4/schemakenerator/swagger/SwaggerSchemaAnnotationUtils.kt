@@ -28,7 +28,7 @@ object SwaggerSchemaAnnotationUtils {
             }
             propertiesToRename.forEach {(prevName, newName) ->
                 schema.swagger.properties[newName] = schema.swagger.properties.remove(prevName)
-                if(schema.swagger.required.contains(prevName)) {
+                if(schema.swagger.required?.contains(prevName) == true) {
                     schema.swagger.required.remove(prevName)
                     schema.swagger.required.add(newName)
                 }

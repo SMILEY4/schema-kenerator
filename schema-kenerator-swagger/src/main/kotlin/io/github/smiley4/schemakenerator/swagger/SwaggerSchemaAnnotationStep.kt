@@ -51,7 +51,7 @@ internal class SwaggerSchemaAnnotationStep {
                 when(it) {
                     Schema.RequiredMode.AUTO -> Unit
                     Schema.RequiredMode.REQUIRED -> {
-                        if(!schema.swagger.required.contains(prop.name)) {
+                        if(schema.swagger.required?.contains(prop.name) != true) {
                             schema.swagger.required.add(prop.name)
                         }
                     }
