@@ -63,6 +63,13 @@ object SwaggerSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.Title]
      * - [io.github.smiley4.schemakenerator.core.annotations.Format]
      * - [io.github.smiley4.schemakenerator.core.annotations.Type]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Min]
+     * - [io.github.smiley4.schemakenerator.core.annotations.ExclusiveMin]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Max]
+     * - [io.github.smiley4.schemakenerator.core.annotations.ExclusiveMax]
+     * - [io.github.smiley4.schemakenerator.core.annotations.MinLength]
+     * - [io.github.smiley4.schemakenerator.core.annotations.MaxLength]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Pattern]
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateSwaggerSchemaData.handleCoreAnnotations(): IntermediateSwaggerSchemaData {
@@ -75,6 +82,9 @@ object SwaggerSteps {
             .let { SwaggerSchemaCoreAnnotationTitleStep().process(this) }
             .let { SwaggerSchemaCoreAnnotationFormatStep().process(this) }
             .let { SwaggerSchemaCoreAnnotationTypeStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationMinMaxStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationMinMaxLengthStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationPatternStep().process(this) }
     }
 
 

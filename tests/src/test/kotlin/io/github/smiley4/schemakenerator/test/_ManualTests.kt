@@ -9,9 +9,16 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.annotations.ExclusiveMax
+import io.github.smiley4.schemakenerator.core.annotations.MaxLength
+import io.github.smiley4.schemakenerator.core.annotations.Min
+import io.github.smiley4.schemakenerator.core.annotations.MinLength
 import io.github.smiley4.schemakenerator.core.annotations.Name
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.core.annotations.Type
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
@@ -37,6 +44,19 @@ import kotlinx.serialization.Serializable
  * internal / manual tests only
  */
 class _ManualTests : StringSpec({
+
+    "json" {
+        val schema = initial<TestClass>()
+            .collectSubTypes()
+            .analyzeTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .handleNameAnnotation()
+            .generateJsonSchema()
+            .handleCoreAnnotations()
+            .compileInlining()
+
+        println(schema.json.prettyPrint())
+    }
 
     "reflection" {
         val schema = initial<ParentClass<ChildClass>>()
@@ -70,6 +90,22 @@ class _ManualTests : StringSpec({
 
 }) {
     companion object {
+
+        @Serializable
+        class TestClass(
+
+            @MinLength(3)
+            @MaxLength(10)
+            val myText: String,
+
+            @Min(2)
+            @ExclusiveMax(5)
+            val myNumber: Int,
+
+            @MinLength(1)
+            @MaxLength(9)
+            val myList: List<Boolean>
+        )
 
         @Serializable
         class RootClass(

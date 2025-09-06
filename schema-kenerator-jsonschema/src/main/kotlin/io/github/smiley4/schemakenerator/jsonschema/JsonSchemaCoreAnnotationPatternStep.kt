@@ -1,19 +1,18 @@
 package io.github.smiley4.schemakenerator.jsonschema
 
-import io.github.smiley4.schemakenerator.core.annotations.Format
+import io.github.smiley4.schemakenerator.core.annotations.Pattern
 import io.github.smiley4.schemakenerator.core.data.AnnotationData
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.iterateProperties
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
 /**
- * Handles the core [Format] annotation
+ * Handles the core [Pattern] annotation.
  */
-internal class JsonSchemaCoreAnnotationFormatStep {
+internal class JsonSchemaCoreAnnotationPatternStep {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {
         input.entries.forEach { process(it, input.typeDataById) }
@@ -21,22 +20,17 @@ internal class JsonSchemaCoreAnnotationFormatStep {
     }
 
     private fun process(schema: JsonSchemaData, typeDataMap: Map<TypeId, TypeData>) {
-        if (schema.json is JsonObject && schema.json.properties["format"] == null) {
-            determineFormat(schema.typeData.annotations)?.also { format ->
-                schema.json.properties["format"] = JsonTextValue(format)
-            }
-        }
         iterateProperties(schema, typeDataMap) { prop, propData, propTypeData ->
-            determineFormat(propData.annotations + propTypeData.annotations)?.also { format ->
-                prop.properties["format"] = JsonTextValue(format)
+            determineValue(propData.annotations + propTypeData.annotations)?.also { value ->
+                prop.properties["pattern"] = JsonTextValue(value)
             }
         }
     }
 
-    private fun determineFormat(annotations: List<AnnotationData>): String? {
+    private fun determineValue(annotations: List<AnnotationData>): String? {
         return annotations
-            .filter { it.name == Format::class.qualifiedName }
-            .map { it.values["format"] as String }
+            .filter { it.name == Pattern::class.qualifiedName }
+            .map { it.values["value"] as String }
             .firstOrNull()
     }
 }
