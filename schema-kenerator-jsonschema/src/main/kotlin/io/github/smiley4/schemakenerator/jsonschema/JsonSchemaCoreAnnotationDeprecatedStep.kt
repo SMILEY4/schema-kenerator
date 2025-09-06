@@ -10,6 +10,10 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 
+
+/**
+ * Handles the kotlin and core [Deprecated] annotation
+ */
 internal class JsonSchemaCoreAnnotationDeprecatedStep {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {

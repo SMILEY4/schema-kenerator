@@ -10,6 +10,9 @@ import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaAnnotationUtils.it
 import io.github.smiley4.schemakenerator.jsonschema.data.IntermediateJsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 
+/**
+ * Handles the core [Description] annotation
+ */
 internal class JsonSchemaCoreAnnotationDescriptionStep  {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {
