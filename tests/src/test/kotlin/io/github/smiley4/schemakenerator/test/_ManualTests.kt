@@ -19,6 +19,8 @@ import io.github.smiley4.schemakenerator.core.annotations.Type
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
+import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
@@ -37,7 +39,10 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlin.reflect.full.starProjectedType
 
 
 /**
@@ -45,17 +50,16 @@ import kotlinx.serialization.Serializable
  */
 class _ManualTests : StringSpec({
 
-    "json" {
-        val schema = initial<TestClass>()
-            .collectSubTypes()
-            .analyzeTypeUsingReflection()
+    "test #60" {
+        val data = initial(TestSchema::class.starProjectedType)
+            .analyzeTypeUsingKotlinxSerialization()
+            .addJsonClassDiscriminatorProperty()
             .addMissingSupertypeSubtypeRelations()
-            .handleNameAnnotation()
+            .let { it }
             .generateJsonSchema()
-            .handleCoreAnnotations()
+            .withTitle(TitleType.FULL)
             .compileInlining()
-
-        println(schema.json.prettyPrint())
+        println(data.json.prettyPrint())
     }
 
     "reflection" {
@@ -90,6 +94,17 @@ class _ManualTests : StringSpec({
 
 }) {
     companion object {
+
+        @Serializable
+        @JsonClassDiscriminator("type")
+        sealed class TestSchema {
+            @Serializable
+            @SerialName("a")
+            object A : TestSchema()
+            @Serializable
+            @SerialName("b")
+            object B : TestSchema()
+        }
 
         @Serializable
         class TestClass(
