@@ -29,7 +29,7 @@ abstract class AbstractAddDiscriminatorStep {
         input.typeData
             .filter { it.subtypes.isNotEmpty() }
             .forEach { typeData ->
-                addDiscriminator(typeData, typeDataGroup)?.also {
+                addDiscriminator(typeData)?.also {
                     typeDataGroup = TypeDataGroup(
                         rootId = typeDataGroup.rootId,
                         data = buildMap {
@@ -42,7 +42,7 @@ abstract class AbstractAddDiscriminatorStep {
         return typeDataGroup
     }
 
-    private fun addDiscriminator(parentTypeData: TypeData, typeDataGroup: TypeDataGroup): TypeData? {
+    private fun addDiscriminator(parentTypeData: TypeData): TypeData? {
         val discriminatorName = getDiscriminatorPropertyName(parentTypeData)
         if (discriminatorName == null) {
             // no name provided -> don't add discriminator
@@ -60,7 +60,7 @@ abstract class AbstractAddDiscriminatorStep {
         }
 
         // add new member marked with marker annotation
-        val (discriminatorMemberData, discriminatorTypeData) = buildDiscriminatorProperty(parentTypeData, discriminatorName, typeDataGroup)
+        val (discriminatorMemberData, discriminatorTypeData) = buildDiscriminatorStringProperty(discriminatorName)
         parentTypeData.members.add(discriminatorMemberData)
         return discriminatorTypeData
     }
@@ -69,24 +69,24 @@ abstract class AbstractAddDiscriminatorStep {
     /**
      * @return a new [MemberData] for the discriminator property
      */
-    private fun buildDiscriminatorProperty(typeData: TypeData, name: String, typeDataGroup: TypeDataGroup): Pair<MemberData, TypeData> {
-        val discriminatorTypeDataName = TypeName(
-            full = typeData.identifyingName.full + "_discriminator",
-            short = typeData.identifyingName.short + "_discriminator"
-        )
+    private fun buildDiscriminatorStringProperty(name: String): Pair<MemberData, TypeData> {
         val typeData = TypeData(
             id = TypeId.create(),
-            identifyingName = discriminatorTypeDataName,
-            descriptiveName = discriminatorTypeDataName,
+            identifyingName = TypeName(
+                full = String::class.qualifiedName!!,
+                short = String::class.simpleName!!,
+            ),
+            descriptiveName = TypeName(
+                full = String::class.qualifiedName!!,
+                short = String::class.simpleName!!,
+            ),
             typeParameters = mutableListOf(),
             annotations = mutableListOf(),
             subtypes = mutableListOf(),
             supertypes = mutableListOf(),
             members = mutableListOf(),
             isInlineValue = false,
-            enumData = EnumData(
-                constants = collectSubtypeSerialNames(typeData, typeDataGroup).toMutableList(),
-            ),
+            enumData = null,
             collectionData = null,
             mapData = null
         )
@@ -100,15 +100,6 @@ abstract class AbstractAddDiscriminatorStep {
             annotations = mutableListOf(buildMarkerAnnotation())
         )
         return memberData to typeData
-    }
-
-    private fun collectSubtypeSerialNames(typeData: TypeData, typeDataGroup: TypeDataGroup): List<String> {
-        if(typeData.subtypes.isEmpty()) {
-            return listOf(typeData.descriptiveName.full)
-        }
-        return typeData.subtypes.flatMap { subtype ->
-            typeDataGroup[subtype]?.let { collectSubtypeSerialNames(it, typeDataGroup) } ?: emptyList()
-        }
     }
 
 
