@@ -3,7 +3,6 @@
 package io.github.smiley4.schemakenerator.test.cases
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Format

@@ -44,7 +44,7 @@ import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.models.Components
 import kotlin.reflect.KType
 
-class GeneralTestCases : FunSpec({
+class GeneralTests : FunSpec({
 
     runSuite(
         listOf(
@@ -81,10 +81,13 @@ class GeneralTestCases : FunSpec({
             InheritanceTestCases.subtypeWithSupertype,
             InheritanceTestCases.supertypeWithSubtypes,
             InheritanceTestCases.basicDiscriminator,
+            InheritanceTestCases.basicDiscriminatorAsEnum,
             InheritanceTestCases.jacksonUseClassDiscriminator,
+            InheritanceTestCases.jacksonUseClassDiscriminatorAsEnum,
             InheritanceTestCases.jacksonUseNameDiscriminator,
             InheritanceTestCases.jacksonUseSimpleNameDiscriminator,
             InheritanceTestCases.kotlinxSerializationDiscriminator,
+            InheritanceTestCases.kotlinxSerializationDiscriminatorAsEnum,
             InheritanceTestCases.collectSubtypesCore,
             InheritanceTestCases.collectSubtypesJackson,
 

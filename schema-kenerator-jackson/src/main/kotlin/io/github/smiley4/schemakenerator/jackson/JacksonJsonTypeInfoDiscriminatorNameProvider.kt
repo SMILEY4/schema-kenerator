@@ -1,10 +1,10 @@
 package io.github.smiley4.schemakenerator.jackson
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.DiscriminatorNameProvider
 import io.github.smiley4.schemakenerator.core.data.TypeData
 
-internal class JacksonJsonTypeInfoDiscriminatorStep : AbstractAddDiscriminatorStep() {
+internal class JacksonJsonTypeInfoDiscriminatorNameProvider : DiscriminatorNameProvider {
 
     override fun getDiscriminatorPropertyName(typeData: TypeData): String? {
         val annotation = typeData.annotations.find { it.name == JsonTypeInfo::class.qualifiedName }

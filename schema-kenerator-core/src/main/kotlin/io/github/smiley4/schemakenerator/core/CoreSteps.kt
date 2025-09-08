@@ -74,13 +74,17 @@ object CoreSteps {
 
     /**
      * Adds properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.
-     * The created property is annotated with a marker annotation with the name [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME].
+     * The created property is annotated with a marker annotation with the name [AddStringDiscriminatorStep.MARKER_ANNOTATION_NAME].
      * If a type already contains a property annotated with the marker annotation, no new property will be added.
      * Add this step after type analysis and before schema generation.
      * @param discriminatorPropertyName the name of the property to add. The type will always be [String].
+     * @param asEnum whether the property should be a simple string or an enum with the (full identifying) name of the type as only option.
      */
-    fun TypeDataGroup.addDiscriminatorProperty(discriminatorPropertyName: String = "type"): TypeDataGroup {
-        return AddDiscriminatorStep(discriminatorPropertyName).process(this)
+    fun TypeDataGroup.addDiscriminatorProperty(discriminatorPropertyName: String = "type", asEnum: Boolean = false): TypeDataGroup {
+        return when(asEnum) {
+            true -> AddEnumDiscriminatorStep(ConstDiscriminatorNameProvider(discriminatorPropertyName)).process(this)
+            false -> AddStringDiscriminatorStep(ConstDiscriminatorNameProvider(discriminatorPropertyName)).process(this)
+        }
     }
 
 }
