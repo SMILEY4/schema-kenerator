@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreType
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.AddEnumDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.AddStringDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.InitialKTypeData
 import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
@@ -57,11 +58,15 @@ object JacksonSteps {
 
     /**
      * Handles the [JsonTypeInfo]-annotations and adds a discriminator property with the defined name and
-     * annotated with a marker annotation called [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME].
+     * annotated with a marker annotation called [AddStringDiscriminatorStep.MARKER_ANNOTATION_NAME].
      * Add this step after type analysis and before schema generation.
+     * @param asEnum whether the property should be a simple string or an enum with the (full identifying) name of the type as only option.
      */
-    fun TypeDataGroup.addJacksonTypeInfoDiscriminatorProperty(): TypeDataGroup {
-        return JacksonJsonTypeInfoDiscriminatorStep().process(this)
+    fun TypeDataGroup.addJacksonTypeInfoDiscriminatorProperty(asEnum: Boolean = false): TypeDataGroup {
+        return when(asEnum) {
+            true -> AddEnumDiscriminatorStep(JacksonJsonTypeInfoDiscriminatorNameProvider()).process(this)
+            false -> AddStringDiscriminatorStep(JacksonJsonTypeInfoDiscriminatorNameProvider()).process(this)
+        }
     }
 
 }

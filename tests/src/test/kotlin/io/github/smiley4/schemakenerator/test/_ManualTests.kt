@@ -102,11 +102,18 @@ class _ManualTests : StringSpec({
             )
         )
             .addMissingSupertypeSubtypeRelations()
-            .addJsonClassDiscriminatorProperty()
-            .generateJsonSchema()
-            .withTitle(TitleType.FULL)
-            .compileInlining()
-        println(data.json.prettyPrint())
+            .addJsonClassDiscriminatorProperty(asEnum = true)
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
+            .handleSchemaAnnotations()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+
+        println(data.asOpenApiJson())
+//            .generateJsonSchema()
+//            .withTitle(TitleType.FULL)
+//            .compileInlining()
+//        println(data.json.prettyPrint())
     }
 
     "test #60" {
@@ -132,7 +139,6 @@ class _ManualTests : StringSpec({
             .mergePropertyAttributesIntoType()
             .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
 
-        // println(json.writeValueAsString(schema.asPrintable()))
         println(schema.asOpenApiJson())
     }
 

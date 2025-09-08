@@ -1,5 +1,7 @@
 package io.github.smiley4.schemakenerator.serialization
 
+import io.github.smiley4.schemakenerator.core.AddEnumDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.AddStringDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
@@ -36,10 +38,14 @@ object SerializationSteps {
 
     /**
      * Handles the [JsonClassDiscriminator]-annotations and adds a discriminator property with the defined name and
-     * annotated with a marker annotation called [io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME]
+     * annotated with a marker annotation called [AddStringDiscriminatorStep.MARKER_ANNOTATION_NAME]
+     * @param asEnum whether the property should be a simple string or an enum with the (full identifying) name of the type as only option.
      */
-    fun TypeDataGroup.addJsonClassDiscriminatorProperty(): TypeDataGroup {
-        return HandleJsonClassDiscriminatorStep().process(this)
+    fun TypeDataGroup.addJsonClassDiscriminatorProperty(asEnum: Boolean = false): TypeDataGroup {
+        return when(asEnum) {
+            true -> AddEnumDiscriminatorStep(KotlinxJsonDiscriminatorNameProvider()).process(this)
+            false -> AddStringDiscriminatorStep(KotlinxJsonDiscriminatorNameProvider()).process(this)
+        }
     }
 
 

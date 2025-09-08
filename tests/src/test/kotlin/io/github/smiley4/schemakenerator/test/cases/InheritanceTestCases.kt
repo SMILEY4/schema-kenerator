@@ -403,6 +403,171 @@ object InheritanceTestCases {
             """.trimIndent()
     }
 
+    val basicDiscriminatorAsEnum = case("inheritance", "basic discriminator as enum") {
+        type = typeOf<SimpleTestClass>()
+        postAnalyze = {
+            this.addDiscriminatorProperty("_type", asEnum = true)
+        }
+        // language=json
+        expectedSwaggerInline = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "type" : "object",
+                    "properties" : {
+                      "_type" : {
+                        "type" : "string",
+                        "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass1" ]
+                      }
+                    },
+                    "required" : [ "_type" ]
+                  }, {
+                    "type" : "object",
+                    "properties" : {
+                      "_type" : {
+                        "type" : "string",
+                        "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass2" ]
+                      }
+                    },
+                    "required" : [ "_type" ]
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_type"
+                  }
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "${'$'}ref" : "#/components/schemas/TestSubClass1"
+                  }, {
+                    "${'$'}ref" : "#/components/schemas/TestSubClass2"
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_type",
+                    "mapping" : {
+                      "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass1" : "#/components/schemas/TestSubClass1",
+                      "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass2" : "#/components/schemas/TestSubClass2"
+                    }
+                  }
+                },
+                "TestSubClass1" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_type" : {
+                      "${'$'}ref" : "#/components/schemas/TestSubClass1_discriminator"
+                    }
+                  },
+                  "required" : [ "_type" ]
+                },
+                "TestSubClass1_discriminator" : {
+                  "type" : "string",
+                  "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass1" ]
+                },
+                "TestSubClass2" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_type" : {
+                      "${'$'}ref" : "#/components/schemas/TestSubClass2_discriminator"
+                    }
+                  },
+                  "required" : [ "_type" ]
+                },
+                "TestSubClass2_discriminator" : {
+                  "type" : "string",
+                  "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass2" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonInline = """
+            {
+               "anyOf": [
+                  {
+                     "type": "object",
+                     "required": [
+                        "_type"
+                     ],
+                     "properties": {
+                        "_type": {
+                           "enum": [
+                              "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass1"
+                           ]
+                        }
+                     }
+                  },
+                  {
+                     "type": "object",
+                     "required": [
+                        "_type"
+                     ],
+                     "properties": {
+                        "_type": {
+                           "enum": [
+                              "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass2"
+                           ]
+                        }
+                     }
+                  }
+               ]
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonReference = """
+            {
+               "anyOf": [
+                  {
+                     "${'$'}ref": "#/${'$'}defs/TestSubClass1"
+                  },
+                  {
+                     "${'$'}ref": "#/${'$'}defs/TestSubClass2"
+                  }
+               ],
+               "${'$'}defs": {
+                  "TestSubClass1": {
+                     "type": "object",
+                     "required": [
+                        "_type"
+                     ],
+                     "properties": {
+                        "_type": {
+                           "${'$'}ref": "#/${'$'}defs/TestSubClass1_discriminator"
+                        }
+                     }
+                  },
+                  "TestSubClass1_discriminator": {
+                     "enum": [
+                        "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass1"
+                     ]
+                  },
+                  "TestSubClass2": {
+                     "type": "object",
+                     "required": [
+                        "_type"
+                     ],
+                     "properties": {
+                        "_type": {
+                           "${'$'}ref": "#/${'$'}defs/TestSubClass2_discriminator"
+                        }
+                     }
+                  },
+                  "TestSubClass2_discriminator": {
+                     "enum": [
+                        "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.TestSubClass2"
+                     ]
+                  }
+               }
+            }
+            """.trimIndent()
+    }
+
     val jacksonUseClassDiscriminator = case("inheritance", "jackson discriminator (use class)") {
         type = typeOf<JacksonUseClassTestClass>()
         withKotlinxSerialization = false // jackson annotations not supported by kotlinx-serialization
@@ -494,6 +659,112 @@ object InheritanceTestCases {
                   }
                 }
               }
+            }
+            """.trimIndent()
+    }
+
+    val jacksonUseClassDiscriminatorAsEnum = case("inheritance", "jackson discriminator as enum (use class)") {
+        type = typeOf<JacksonUseClassTestClass>()
+        withKotlinxSerialization = false // jackson annotations not supported by kotlinx-serialization
+        postAnalyze = {
+            this.addJacksonTypeInfoDiscriminatorProperty(asEnum = true)
+        }
+        // language=json
+        expectedSwaggerInline = null
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "${'$'}ref" : "#/components/schemas/JacksonUseClassTestSubClass1"
+                  }, {
+                    "${'$'}ref" : "#/components/schemas/JacksonUseClassTestSubClass2"
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_type",
+                    "mapping" : {
+                      "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.JacksonUseClassTestSubClass1" : "#/components/schemas/JacksonUseClassTestSubClass1",
+                      "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.JacksonUseClassTestSubClass2" : "#/components/schemas/JacksonUseClassTestSubClass2"
+                    }
+                  }
+                },
+                "JacksonUseClassTestSubClass1" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_type" : {
+                      "${'$'}ref" : "#/components/schemas/JacksonUseClassTestSubClass1_discriminator"
+                    }
+                  },
+                  "required" : [ "_type" ]
+                },
+                "JacksonUseClassTestSubClass1_discriminator" : {
+                  "type" : "string",
+                  "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.JacksonUseClassTestSubClass1" ]
+                },
+                "JacksonUseClassTestSubClass2" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_type" : {
+                      "${'$'}ref" : "#/components/schemas/JacksonUseClassTestSubClass2_discriminator"
+                    }
+                  },
+                  "required" : [ "_type" ]
+                },
+                "JacksonUseClassTestSubClass2_discriminator" : {
+                  "type" : "string",
+                  "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.JacksonUseClassTestSubClass2" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonInline = null
+        // language=json
+        expectedJsonReference = """
+            {
+               "anyOf": [
+                  {
+                     "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass1"
+                  },
+                  {
+                     "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass2"
+                  }
+               ],
+               "${'$'}defs": {
+                  "JacksonUseClassTestSubClass1": {
+                     "type": "object",
+                     "required": [
+                        "_type"
+                     ],
+                     "properties": {
+                        "_type": {
+                           "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass1_discriminator"
+                        }
+                     }
+                  },
+                  "JacksonUseClassTestSubClass1_discriminator": {
+                     "enum": [
+                        "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.JacksonUseClassTestSubClass1"
+                     ]
+                  },
+                  "JacksonUseClassTestSubClass2": {
+                     "type": "object",
+                     "required": [
+                        "_type"
+                     ],
+                     "properties": {
+                        "_type": {
+                           "${'$'}ref": "#/${'$'}defs/JacksonUseClassTestSubClass2_discriminator"
+                        }
+                     }
+                  },
+                  "JacksonUseClassTestSubClass2_discriminator": {
+                     "enum": [
+                        "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.JacksonUseClassTestSubClass2"
+                     ]
+                  }
+               }
             }
             """.trimIndent()
     }
@@ -689,15 +960,311 @@ object InheritanceTestCases {
     }
 
     val kotlinxSerializationDiscriminator = case("inheritance", "kotlinx discriminator") {
-        // todo: kotlinx analysis
         type = typeOf<KotlinxTestClass>()
+        withReflection = false
         postAnalyze = {
             this.addJsonClassDiscriminatorProperty()
         }
-        expectedSwaggerInline = null
-        expectedSwaggerReference = null
-        expectedJsonInline = null
-        expectedJsonReference = null
+        // language=json
+        expectedSwaggerInline = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "type" : "object",
+                    "properties" : {
+                      "_myType" : {
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [ "_myType" ]
+                  }, {
+                    "type" : "object",
+                    "properties" : {
+                      "_myType" : {
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [ "_myType" ]
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_myType"
+                  }
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "${'$'}ref" : "#/components/schemas/KotlinxTestSubClass1"
+                  }, {
+                    "${'$'}ref" : "#/components/schemas/test_2"
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_myType",
+                    "mapping" : {
+                      "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.KotlinxTestSubClass1" : "#/components/schemas/KotlinxTestSubClass1",
+                      "test_2" : "#/components/schemas/test_2"
+                    }
+                  }
+                },
+                "KotlinxTestSubClass1" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_myType" : {
+                      "type" : "string"
+                    }
+                  },
+                  "required" : [ "_myType" ]
+                },
+                "test_2" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_myType" : {
+                      "type" : "string"
+                    }
+                  },
+                  "required" : [ "_myType" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonInline = """
+            {
+               "anyOf": [
+                  {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "type": "string"
+                        }
+                     }
+                  },
+                  {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "type": "string"
+                        }
+                     }
+                  }
+               ]
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonReference = """
+            {
+               "anyOf": [
+                  {
+                     "${'$'}ref": "#/${'$'}defs/KotlinxTestSubClass1"
+                  },
+                  {
+                     "${'$'}ref": "#/${'$'}defs/test_2"
+                  }
+               ],
+               "${'$'}defs": {
+                  "KotlinxTestSubClass1": {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "type": "string"
+                        }
+                     }
+                  },
+                  "test_2": {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "type": "string"
+                        }
+                     }
+                  }
+               }
+            }
+            """.trimIndent()
+    }
+
+    val kotlinxSerializationDiscriminatorAsEnum = case("inheritance", "kotlinx discriminator as enum") {
+        type = typeOf<KotlinxTestClass>()
+        withReflection = false
+        postAnalyze = {
+            this.addJsonClassDiscriminatorProperty(asEnum = true)
+        }
+        // language=json
+        expectedSwaggerInline = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "type" : "object",
+                    "properties" : {
+                      "_myType" : {
+                        "type" : "string",
+                        "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.KotlinxTestSubClass1" ]
+                      }
+                    },
+                    "required" : [ "_myType" ]
+                  }, {
+                    "type" : "object",
+                    "properties" : {
+                      "_myType" : {
+                        "type" : "string",
+                        "enum" : [ "test_2" ]
+                      }
+                    },
+                    "required" : [ "_myType" ]
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_myType"
+                  }
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "anyOf" : [ {
+                    "${'$'}ref" : "#/components/schemas/KotlinxTestSubClass1"
+                  }, {
+                    "${'$'}ref" : "#/components/schemas/test_2"
+                  } ],
+                  "discriminator" : {
+                    "propertyName" : "_myType",
+                    "mapping" : {
+                      "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.KotlinxTestSubClass1" : "#/components/schemas/KotlinxTestSubClass1",
+                      "test_2" : "#/components/schemas/test_2"
+                    }
+                  }
+                },
+                "KotlinxTestSubClass1" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_myType" : {
+                      "${'$'}ref" : "#/components/schemas/KotlinxTestSubClass1_discriminator"
+                    }
+                  },
+                  "required" : [ "_myType" ]
+                },
+                "KotlinxTestSubClass1_discriminator" : {
+                  "type" : "string",
+                  "enum" : [ "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.KotlinxTestSubClass1" ]
+                },
+                "test_2" : {
+                  "type" : "object",
+                  "properties" : {
+                    "_myType" : {
+                      "${'$'}ref" : "#/components/schemas/test_2_discriminator"
+                    }
+                  },
+                  "required" : [ "_myType" ]
+                },
+                "test_2_discriminator" : {
+                  "type" : "string",
+                  "enum" : [ "test_2" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonInline = """
+            {
+               "anyOf": [
+                  {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "enum": [
+                              "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.KotlinxTestSubClass1"
+                           ]
+                        }
+                     }
+                  },
+                  {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "enum": [
+                              "test_2"
+                           ]
+                        }
+                     }
+                  }
+               ]
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonReference = """
+            {
+               "anyOf": [
+                  {
+                     "${'$'}ref": "#/${'$'}defs/KotlinxTestSubClass1"
+                  },
+                  {
+                     "${'$'}ref": "#/${'$'}defs/test_2"
+                  }
+               ],
+               "${'$'}defs": {
+                  "KotlinxTestSubClass1": {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "${'$'}ref": "#/${'$'}defs/KotlinxTestSubClass1_discriminator"
+                        }
+                     }
+                  },
+                  "KotlinxTestSubClass1_discriminator": {
+                     "enum": [
+                        "io.github.smiley4.schemakenerator.test.cases.InheritanceTestCases.KotlinxTestSubClass1"
+                     ]
+                  },
+                  "test_2": {
+                     "type": "object",
+                     "required": [
+                        "_myType"
+                     ],
+                     "properties": {
+                        "_myType": {
+                           "${'$'}ref": "#/${'$'}defs/test_2_discriminator"
+                        }
+                     }
+                  },
+                  "test_2_discriminator": {
+                     "enum": [
+                        "test_2"
+                     ]
+                  }
+               }
+            }
+            """.trimIndent()
     }
 
     val collectSubtypesCore = case("inheritance", "collect sub types using core @SubType annotation") {

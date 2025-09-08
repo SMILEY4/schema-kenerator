@@ -2,7 +2,7 @@ package io.github.smiley4.schemakenerator.swagger.generator
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.github.smiley4.schemakenerator.core.AbstractAddDiscriminatorStep
+import io.github.smiley4.schemakenerator.core.AddStringDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.data.MemberData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
@@ -162,7 +162,7 @@ class DefaultSwaggerSchemaGenerationModule(
 
     private fun getDiscriminatorName(typeData: TypeData): String? {
         val property = typeData.members.find { member ->
-            member.annotations.any { it.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }
+            member.annotations.any { it.name == AddStringDiscriminatorStep.MARKER_ANNOTATION_NAME }
         }
         return property?.name
     }
@@ -183,7 +183,7 @@ class DefaultSwaggerSchemaGenerationModule(
                     it.nullable = member.nullable
                 }
                 if (strictDiscriminatorProperty) {
-                    if (member.annotations.any { annotation -> annotation.name == AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME }) {
+                    if (member.annotations.any { annotation -> annotation.name == AddStringDiscriminatorStep.MARKER_ANNOTATION_NAME }) {
                         @Suppress("UNCHECKED_CAST")
                         (it as Schema<Any>).enum = listOf(context.typeData.descriptiveName.full)
                     }
