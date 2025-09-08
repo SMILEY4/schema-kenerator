@@ -55,7 +55,6 @@ class _ManualTests : StringSpec({
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .addMissingSupertypeSubtypeRelations()
-            .let { it }
             .generateJsonSchema()
             .withTitle(TitleType.FULL)
             .compileInlining()
