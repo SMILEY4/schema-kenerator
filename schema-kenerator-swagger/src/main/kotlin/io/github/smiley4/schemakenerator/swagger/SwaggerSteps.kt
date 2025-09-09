@@ -103,6 +103,7 @@ object SwaggerSteps {
      *           - allowableValues
      *           - defaultValue
      *           - accessMode
+     *           - requiredMode
      *           - minLength
      *           - maxLength,
      *           - format

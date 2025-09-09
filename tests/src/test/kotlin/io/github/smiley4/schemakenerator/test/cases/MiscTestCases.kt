@@ -18,9 +18,11 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.renameMembers
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.customizeProperties
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.ValidationSwaggerSteps.handleJavaxValidationAnnotations
+import io.swagger.v3.oas.annotations.media.Schema
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -1548,6 +1550,90 @@ object MiscTestCases {
     @Description("description on class")
     class TestClassWithDescription(
         val value: Int
+    )
+
+    val propertyNullableSwaggerSchemaRequired = case(
+        "misc",
+        "nullable property marked required by (swagger) schema annotation"
+    ) {
+        type = typeOf<TestClassNullablePropWithSchemaRequired>()
+        postGenerateSwaggerSchema = {
+            this.handleSchemaAnnotations()
+        }
+        // language=json
+        expectedSwagger = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someText" : {
+                      "type" : [ "null", "string" ]
+                    }
+                  },
+                  "required" : [ "someText" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // swagger @Schema not supported by kotlinx-serialization
+        // language=json
+        expectedSwaggerKotlinxSerialization = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someText" : {
+                      "type" : [ "null", "string" ]
+                    }
+                  }
+                }
+              }
+            }
+            """.trimIndent()
+        expectedJsonInline = null
+        expectedJsonReference = null
+    }
+
+    val propertyNullableCoreRequired = case(
+        "misc",
+        "nullable property marked required by (core) required annotation"
+    ) {
+        type = typeOf<TestClassNullablePropWithCoreRequired>()
+        postGenerateSwaggerSchema = {
+            this.handleCoreAnnotations()
+        }
+        // language=json
+        expectedSwagger = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someText" : {
+                      "type" : [ "null", "string" ]
+                    }
+                  },
+                  "required" : [ "someText" ]
+                }
+              }
+            }
+            """.trimIndent()
+        expectedJsonInline = null
+        expectedJsonReference = null
+    }
+
+    @Serializable
+    data class TestClassNullablePropWithSchemaRequired(
+        @field:Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        val someText: String?,
+    )
+
+    @Serializable
+    data class TestClassNullablePropWithCoreRequired(
+        @Required
+        val someText: String?,
     )
 
     object MyInstantSerializer : KSerializer<Instant> {
