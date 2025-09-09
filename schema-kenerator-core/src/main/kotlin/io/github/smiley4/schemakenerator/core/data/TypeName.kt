@@ -12,4 +12,16 @@ data class TypeName(
      * shorter version of the name
      */
     var short: String,
-)
+    /**
+     * Name of the package, without the class-name
+     */
+    var packageName: String = "",
+) {
+
+    companion object {
+
+        fun wildcard() = TypeName("*", "*", "")
+
+    }
+
+}

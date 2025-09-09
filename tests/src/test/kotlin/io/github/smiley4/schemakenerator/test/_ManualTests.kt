@@ -37,7 +37,6 @@ import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 
 
 /**
@@ -45,21 +44,23 @@ import kotlinx.serialization.Serializable
  */
 class _ManualTests : StringSpec({
 
-    "test #61" {
-        val schema = initial<TestSchema>()
-            .analyzeTypeUsingReflection {
-                enumConstType = EnumConstType.TO_STRING
-            }
-            .generateSwaggerSchema {
-                nullables = SwaggerSteps.RequiredHandling.REQUIRED
-            }
+    "test" {
+        val schema = initial<OuterTestClass.InnerTestClass>()
+            .collectSubTypes()
+            .analyzeTypeUsingReflection()
+            .addMissingSupertypeSubtypeRelations()
+            .handleNameAnnotation()
+            .generateSwaggerSchema()
+            .handleCoreAnnotations()
             .handleSchemaAnnotations()
-            .compileInlining()
+            .mergePropertyAttributesIntoType()
+            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+
         println(schema.asOpenApiJson())
     }
 
     "reflection" {
-        val schema = initial<ParentClass<ChildClass>>()
+        val schema = initial<Any>()
             .collectSubTypes()
             .analyzeTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
@@ -74,7 +75,7 @@ class _ManualTests : StringSpec({
     }
 
     "kotlinx" {
-        val schema = initial<RootClass>()
+        val schema = initial<Any>()
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
@@ -90,50 +91,13 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        data class TestSchema(
-            @field:Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            val someText: String?,
-            @field:Schema(requiredMode = Schema.RequiredMode.REQUIRED, name = "myEnum")
-            val someEnum: MyEnum?,
-        )
+        class OuterTestClass {
 
-        enum class MyEnum {
-            RED, GREEN, BLUE
+            class InnerTestClass(
+                val someValue: String
+            )
+
         }
-
-
-        @Serializable
-        class TestClass(
-
-            @MinLength(3)
-            @MaxLength(10)
-            val myText: String,
-
-            @Min(2)
-            @ExclusiveMax(5)
-            val myNumber: Int,
-
-            @MinLength(1)
-            @MaxLength(9)
-            val myList: List<Boolean>
-        )
-
-
-        @Serializable
-        class RootClass(
-            val parent1: ParentClass<String>,
-            val parent2: ParentClass<Int>
-        )
-
-
-        @Serializable
-        class ParentClass<T>(
-            val child: T
-        )
-
-
-        @Serializable
-        class ChildClass(val value: String)
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

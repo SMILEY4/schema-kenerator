@@ -100,8 +100,8 @@ object CustomTypeProcessingTestCases {
             custom<LocalDateTime> {
                 TypeData(
                     id = TypeId.create(),
-                    identifyingName = TypeName("kotlin.String", "String"),
-                    descriptiveName = TypeName(LocalDateTime::class.qualifiedName!!, LocalDateTime::class.simpleName!!),
+                    identifyingName = TypeName("kotlin.String", "String", "kotlin"),
+                    descriptiveName = TypeName(LocalDateTime::class.qualifiedName!!, LocalDateTime::class.simpleName!!, LocalDateTime::class.java.packageName),
                     typeParameters = mutableListOf(),
                     annotations = mutableListOf(),
                     subtypes = mutableListOf(),
@@ -118,8 +118,8 @@ object CustomTypeProcessingTestCases {
             custom<LocalDateTime> {
                 TypeData(
                     id = TypeId.create(),
-                    identifyingName = TypeName("kotlin.String", "String"),
-                    descriptiveName = TypeName(LocalDateTime::class.qualifiedName!!, LocalDateTime::class.simpleName!!),
+                    identifyingName = TypeName("kotlin.String", "String", "kotlin"),
+                    descriptiveName = TypeName(LocalDateTime::class.qualifiedName!!, LocalDateTime::class.simpleName!!, LocalDateTime::class.java.packageName),
                     typeParameters = mutableListOf(),
                     annotations = mutableListOf(),
                     subtypes = mutableListOf(),

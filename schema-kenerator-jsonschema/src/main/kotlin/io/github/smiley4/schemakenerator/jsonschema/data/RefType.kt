@@ -5,11 +5,19 @@ package io.github.smiley4.schemakenerator.jsonschema.data
  */
 enum class RefType {
     /**
-     * use the full name of a type as the reference path
+     * Use the full name of a type as the reference path.
      */
     FULL,
+
     /**
-     * use a simple version of the name of a type as the reference path
+     * Use a simple version of the name of a type as the reference path.
+     * For nested classes, the name includes the names of the outer classes.
      */
-    SIMPLE
+    SIMPLE,
+
+    /**
+     * Use a simple version of the name of a type as the reference path.
+     * For nested classes, the name does NOT include the names of the outer classes.
+     */
+    MINIMAL
 }

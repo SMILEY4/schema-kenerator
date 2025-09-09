@@ -34,6 +34,7 @@ object JsonSchemaSteps {
             when (type) {
                 TitleType.FULL -> TitleBuilder.BUILDER_FULL
                 TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                TitleType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
             }
         )
     }
@@ -119,6 +120,7 @@ object JsonSchemaSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
             },
             definitionsPath
         )
@@ -156,6 +158,7 @@ object JsonSchemaSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
             },
             definitionsPath
         )

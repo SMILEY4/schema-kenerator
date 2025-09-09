@@ -727,8 +727,8 @@ object MiscTestCases {
                 contextual(Instant::class, MyInstantSerializer)
             }
         }
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -793,8 +793,8 @@ object MiscTestCases {
     ) {
         type = typeOf<TestClassContextualFromAnnotationWith>()
         withReflection = false
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -863,8 +863,8 @@ object MiscTestCases {
                 contextual(MyInstantSerializer)
             }
         }
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -925,8 +925,8 @@ object MiscTestCases {
         "overwriting inherited type with more specific type - https://github.com/SMILEY4/schema-kenerator/issues/43"
     ) {
         type = typeOf<Issue43IntHolder>()
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -983,8 +983,8 @@ object MiscTestCases {
         "collect correct subtypes with type parameters involved - https://github.com/SMILEY4/schema-kenerator/issues/43"
     ) {
         type = typeOf<Issue43Root>()
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwaggerInline = """
             {
