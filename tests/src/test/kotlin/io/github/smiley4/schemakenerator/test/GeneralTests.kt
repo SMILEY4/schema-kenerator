@@ -142,7 +142,9 @@ class GeneralTests : FunSpec({
             MiscTestCases.specialFloatingPointValuesAllow,
             MiscTestCases.mapsWithComplexKeysAsArraysDisabled,
             MiscTestCases.mapsWithComplexKeysAsArraysEnabled,
-            MiscTestCases.descriptionOnPropertyAndType
+            MiscTestCases.descriptionOnPropertyAndType,
+            MiscTestCases.propertyNullableSwaggerSchemaRequired,
+            MiscTestCases.propertyNullableCoreRequired,
         )
     )
 

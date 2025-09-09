@@ -13,19 +13,14 @@ import io.github.smiley4.schemakenerator.core.annotations.ExclusiveMax
 import io.github.smiley4.schemakenerator.core.annotations.MaxLength
 import io.github.smiley4.schemakenerator.core.annotations.Min
 import io.github.smiley4.schemakenerator.core.annotations.MinLength
-import io.github.smiley4.schemakenerator.core.data.AnnotationData
-import io.github.smiley4.schemakenerator.core.data.TypeData
-import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
-import io.github.smiley4.schemakenerator.core.data.TypeId
-import io.github.smiley4.schemakenerator.core.data.TypeName
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.withTitle
-import io.github.smiley4.schemakenerator.jsonschema.data.TitleType
+import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
+import io.github.smiley4.schemakenerator.reflection.data.EnumConstType
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
@@ -35,15 +30,14 @@ import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.core.util.Json31
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Paths
+import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
-import kotlin.reflect.full.starProjectedType
 
 
 /**
@@ -51,80 +45,17 @@ import kotlin.reflect.full.starProjectedType
  */
 class _ManualTests : StringSpec({
 
-    "test case" {
-        /*
-            A
-            ├── B (d)
-            └── C
-                ├── D
-                └── E
-        */
-        val idA = TypeId.create()
-        val idB = TypeId.create()
-        val idC = TypeId.create()
-        val idD = TypeId.create()
-        val idE = TypeId.create()
-
-        fun buildTypeData(id: TypeId, name: String, subtypes: List<TypeId>) = TypeData(
-            id = id,
-            identifyingName = TypeName(
-                full = name,
-                short = name
-            ),
-            descriptiveName = TypeName(
-                full = name,
-                short = name
-            ),
-            subtypes = subtypes.toMutableList(),
-            typeParameters = mutableListOf(),
-            annotations = mutableListOf(
-                AnnotationData(
-                    name = JsonClassDiscriminator::class.qualifiedName!!,
-                    values = mutableMapOf("discriminator" to "type")
-                )
-            ),
-            supertypes = mutableListOf(),
-            members = mutableListOf(),
-            isInlineValue = false,
-            enumData = null,
-            collectionData = null,
-            mapData = null,
-        )
-
-        val data = TypeDataGroup(
-            rootId = idA,
-            data = mapOf(
-                idA to buildTypeData(idA, "A", listOf(idB, idC)),
-                idB to buildTypeData(idB, "B", listOf()),
-                idC to buildTypeData(idC, "C", listOf(idD, idE)),
-                idD to buildTypeData(idD, "D", listOf()),
-                idE to buildTypeData(idE, "E", listOf()),
-            )
-        )
-            .addMissingSupertypeSubtypeRelations()
-            .addJsonClassDiscriminatorProperty(asEnum = true)
-            .generateSwaggerSchema()
-            .handleCoreAnnotations()
+    "test #61" {
+        val schema = initial<TestSchema>()
+            .analyzeTypeUsingReflection {
+                enumConstType = EnumConstType.TO_STRING
+            }
+            .generateSwaggerSchema {
+                nullables = SwaggerSteps.RequiredHandling.REQUIRED
+            }
             .handleSchemaAnnotations()
-            .mergePropertyAttributesIntoType()
-            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
-
-        println(data.asOpenApiJson())
-//            .generateJsonSchema()
-//            .withTitle(TitleType.FULL)
-//            .compileInlining()
-//        println(data.json.prettyPrint())
-    }
-
-    "test #60" {
-        val data = initial(TestSchema::class.starProjectedType)
-            .analyzeTypeUsingKotlinxSerialization()
-            .addJsonClassDiscriminatorProperty()
-            .addMissingSupertypeSubtypeRelations()
-            .generateJsonSchema()
-            .withTitle(TitleType.FULL)
             .compileInlining()
-        println(data.json.prettyPrint())
+        println(schema.asOpenApiJson())
     }
 
     "reflection" {
@@ -159,17 +90,15 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        @Serializable
-        @JsonClassDiscriminator("type")
-        sealed class TestSchema {
-            @Serializable
-            @SerialName("a")
-            object A : TestSchema()
+        data class TestSchema(
+            @field:Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+            val someText: String?,
+            @field:Schema(requiredMode = Schema.RequiredMode.REQUIRED, name = "myEnum")
+            val someEnum: MyEnum?,
+        )
 
-
-            @Serializable
-            @SerialName("b")
-            object B : TestSchema()
+        enum class MyEnum {
+            RED, GREEN, BLUE
         }
 
 
@@ -221,6 +150,8 @@ class _ManualTests : StringSpec({
 
         fun CompiledSwaggerSchemaData.asOpenApiJson(): String {
             val openApi = OpenAPI().also { openAPI ->
+                openAPI.specVersion = SpecVersion.V31
+                openAPI.openapi = "3.1.0"
                 openAPI.info = Info().also { info ->
                     info.title = "Test"
                     info.version = "0.0"
