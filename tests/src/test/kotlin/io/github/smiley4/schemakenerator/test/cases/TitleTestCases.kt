@@ -11,15 +11,15 @@ import io.github.smiley4.schemakenerator.swagger.data.TitleType as SwaggerTitleT
 
 object TitleTestCases {
 
-    val simple = case("title", "simple") {
+    val minimal = case("title", "minimal") {
         type = typeOf<TestClass>()
-        swaggerRefType = SwaggerRefType.SIMPLE
-        jsonRefType = JsonRefType.SIMPLE
+        swaggerRefType = SwaggerRefType.MINIMAL
+        jsonRefType = JsonRefType.MINIMAL
         postGenerateSwaggerSchema = {
-            this.withTitle(SwaggerTitleType.SIMPLE)
+            this.withTitle(SwaggerTitleType.MINIMAL)
         }
         postGenerateJsonSchema = {
-            this.withTitle(JsonTitleType.SIMPLE)
+            this.withTitle(JsonTitleType.MINIMAL)
         }
         // language=json
         expectedSwaggerInline = """
@@ -187,6 +187,188 @@ object TitleTestCases {
                         }
                      },
                      "title": "NestedClass1<String,Int>"
+                  }
+               }
+            }
+            """.trimIndent()
+    }
+
+    val simple = case("title", "simple") {
+        type = typeOf<TestClass>()
+        swaggerRefType = SwaggerRefType.SIMPLE
+        jsonRefType = JsonRefType.SIMPLE
+        postGenerateSwaggerSchema = {
+            this.withTitle(SwaggerTitleType.SIMPLE)
+        }
+        postGenerateJsonSchema = {
+            this.withTitle(JsonTitleType.SIMPLE)
+        }
+        // language=json
+        expectedSwaggerInline = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "nested" : {
+                      "type" : "object",
+                      "properties" : {
+                        "someValue" : {
+                          "type" : "object",
+                          "properties" : {
+                            "value1" : {
+                              "type" : "string",
+                              "title" : "String"
+                            },
+                            "value2" : {
+                              "type" : "integer",
+                              "format" : "int32",
+                              "title" : "Int"
+                            }
+                          },
+                          "required" : [ "value1", "value2" ],
+                          "title" : "TitleTestCases.NestedClass1<String,Int>"
+                        }
+                      },
+                      "required" : [ "someValue" ],
+                      "title" : "TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>"
+                    }
+                  },
+                  "required" : [ "nested" ],
+                  "title" : "TitleTestCases.TestClass"
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "nested" : {
+                      "${'$'}ref" : "#/components/schemas/TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>"
+                    }
+                  },
+                  "required" : [ "nested" ],
+                  "title" : "TitleTestCases.TestClass"
+                },
+                "TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someValue" : {
+                      "${'$'}ref" : "#/components/schemas/TitleTestCases.NestedClass1<String,Int>"
+                    }
+                  },
+                  "required" : [ "someValue" ],
+                  "title" : "TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>"
+                },
+                "TitleTestCases.NestedClass1<String,Int>" : {
+                  "type" : "object",
+                  "properties" : {
+                    "value1" : {
+                      "type" : "string",
+                      "title" : "String"
+                    },
+                    "value2" : {
+                      "type" : "integer",
+                      "format" : "int32",
+                      "title" : "Int"
+                    }
+                  },
+                  "required" : [ "value1", "value2" ],
+                  "title" : "TitleTestCases.NestedClass1<String,Int>"
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonInline = """
+            {
+               "type": "object",
+               "required": [
+                  "nested"
+               ],
+               "properties": {
+                  "nested": {
+                     "type": "object",
+                     "required": [
+                        "someValue"
+                     ],
+                     "properties": {
+                        "someValue": {
+                           "type": "object",
+                           "required": [
+                              "value1",
+                              "value2"
+                           ],
+                           "properties": {
+                              "value1": {
+                                 "type": "string",
+                                 "title": "String"
+                              },
+                              "value2": {
+                                 "type": "integer",
+                                 "minimum": -2147483648,
+                                 "maximum": 2147483647,
+                                 "title": "Int"
+                              }
+                           },
+                           "title": "TitleTestCases.NestedClass1<String,Int>"
+                        }
+                     },
+                     "title": "TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>"
+                  }
+               },
+               "title": "TitleTestCases.TestClass"
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonReference = """
+            {
+               "type": "object",
+               "required": [
+                  "nested"
+               ],
+               "properties": {
+                  "nested": {
+                     "${'$'}ref": "#/${'$'}defs/TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>"
+                  }
+               },
+               "title": "TitleTestCases.TestClass",
+               "${'$'}defs": {
+                  "TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>": {
+                     "type": "object",
+                     "required": [
+                        "someValue"
+                     ],
+                     "properties": {
+                        "someValue": {
+                           "${'$'}ref": "#/${'$'}defs/TitleTestCases.NestedClass1<String,Int>"
+                        }
+                     },
+                     "title": "TitleTestCases.NestedClass2<TitleTestCases.NestedClass1<String,Int>>"
+                  },
+                  "TitleTestCases.NestedClass1<String,Int>": {
+                     "type": "object",
+                     "required": [
+                        "value1",
+                        "value2"
+                     ],
+                     "properties": {
+                        "value1": {
+                           "type": "string",
+                           "title": "String"
+                        },
+                        "value2": {
+                           "type": "integer",
+                           "minimum": -2147483648,
+                           "maximum": 2147483647,
+                           "title": "Int"
+                        }
+                     },
+                     "title": "TitleTestCases.NestedClass1<String,Int>"
                   }
                }
             }
@@ -380,6 +562,96 @@ object TitleTestCases {
         swaggerRefType = SwaggerRefType.OPENAPI_SIMPLE
         postGenerateSwaggerSchema = {
             this.withTitle(SwaggerTitleType.OPENAPI_SIMPLE)
+        }
+        // language=json
+        expectedSwaggerInline = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "nested" : {
+                      "type" : "object",
+                      "properties" : {
+                        "someValue" : {
+                          "type" : "object",
+                          "properties" : {
+                            "value1" : {
+                              "type" : "string",
+                              "title" : "String"
+                            },
+                            "value2" : {
+                              "type" : "integer",
+                              "format" : "int32",
+                              "title" : "Int"
+                            }
+                          },
+                          "required" : [ "value1", "value2" ],
+                          "title" : "TitleTestCases.NestedClass1_String-Int"
+                        }
+                      },
+                      "required" : [ "someValue" ],
+                      "title" : "TitleTestCases.NestedClass2_TitleTestCases.NestedClass1_String-Int"
+                    }
+                  },
+                  "required" : [ "nested" ],
+                  "title" : "TitleTestCases.TestClass"
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "nested" : {
+                      "${'$'}ref": "#/components/schemas/TitleTestCases.NestedClass2_TitleTestCases.NestedClass1_String-Int"
+                    }
+                  },
+                  "required" : [ "nested" ],
+                  "title" : "TitleTestCases.TestClass"
+                },
+                "TitleTestCases.NestedClass2_TitleTestCases.NestedClass1_String-Int": {
+                  "type" : "object",
+                  "properties" : {
+                    "someValue" : {
+                      "${'$'}ref" : "#/components/schemas/TitleTestCases.NestedClass1_String-Int"
+                    }
+                  },
+                  "required" : [ "someValue" ],
+                  "title" : "TitleTestCases.NestedClass2_TitleTestCases.NestedClass1_String-Int"
+                },
+                "TitleTestCases.NestedClass1_String-Int": {
+                  "type" : "object",
+                  "properties" : {
+                    "value1" : {
+                      "type" : "string",
+                      "title" : "String"
+                    },
+                    "value2" : {
+                      "type" : "integer",
+                      "format" : "int32",
+                      "title" : "Int"
+                    }
+                  },
+                  "required" : [ "value1", "value2" ],
+                  "title" : "TitleTestCases.NestedClass1_String-Int"
+                }
+              }
+            }
+            """.trimIndent()
+
+        expectedJson = null
+    }
+
+    val openApiMinimal = case("title", "openapi minimal") {
+        type = typeOf<TestClass>()
+        swaggerRefType = SwaggerRefType.OPENAPI_MINIMAL
+        postGenerateSwaggerSchema = {
+            this.withTitle(SwaggerTitleType.OPENAPI_MINIMAL)
         }
         // language=json
         expectedSwaggerInline = """

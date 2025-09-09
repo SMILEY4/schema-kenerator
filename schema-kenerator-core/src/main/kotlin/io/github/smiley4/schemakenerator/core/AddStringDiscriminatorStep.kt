@@ -35,10 +35,12 @@ class AddStringDiscriminatorStep(private val discriminatorNameProvider: Discrimi
             identifyingName = TypeName(
                 full = String::class.qualifiedName!!,
                 short = String::class.simpleName!!,
+                packageName = String::class.java.packageName
             ),
             descriptiveName = TypeName(
                 full = String::class.qualifiedName!!,
                 short = String::class.simpleName!!,
+                packageName = String::class.java.packageName
             ),
             typeParameters = mutableListOf(),
             annotations = mutableListOf(),

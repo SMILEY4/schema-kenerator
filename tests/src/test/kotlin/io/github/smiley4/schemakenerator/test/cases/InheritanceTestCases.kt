@@ -1274,10 +1274,10 @@ object InheritanceTestCases {
             this.addMissingSupertypeSubtypeRelations()
         }
         postGenerateSwaggerSchema = {
-            this.withTitle(io.github.smiley4.schemakenerator.swagger.data.TitleType.OPENAPI_SIMPLE)
+            this.withTitle(io.github.smiley4.schemakenerator.swagger.data.TitleType.OPENAPI_MINIMAL)
         }
         postGenerateJsonSchema = {
-            this.withTitle(TitleType.SIMPLE)
+            this.withTitle(TitleType.MINIMAL)
         }
         // language=json
         expectedSwaggerInline = """
@@ -1501,10 +1501,10 @@ object InheritanceTestCases {
             this.addMissingSupertypeSubtypeRelations()
         }
         postGenerateSwaggerSchema = {
-            this.withTitle(io.github.smiley4.schemakenerator.swagger.data.TitleType.OPENAPI_SIMPLE)
+            this.withTitle(io.github.smiley4.schemakenerator.swagger.data.TitleType.OPENAPI_MINIMAL)
         }
         postGenerateJsonSchema = {
-            this.withTitle(TitleType.SIMPLE)
+            this.withTitle(TitleType.MINIMAL)
         }
         // language=json
         expectedSwaggerInline = """

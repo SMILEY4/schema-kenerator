@@ -73,8 +73,10 @@ class GeneralTests : FunSpec({
             BasicTestCases.nestedClass,
             BasicTestCases.nullableSelfReference,
 
+            TitleTestCases.minimal,
             TitleTestCases.simple,
             TitleTestCases.full,
+            TitleTestCases.openApiMinimal,
             TitleTestCases.openApiSimple,
             TitleTestCases.openApiFull,
 

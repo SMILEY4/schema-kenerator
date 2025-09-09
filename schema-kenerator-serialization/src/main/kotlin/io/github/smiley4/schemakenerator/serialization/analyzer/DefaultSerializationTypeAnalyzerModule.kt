@@ -479,7 +479,8 @@ class DefaultSerializationTypeAnalyzerModule(
      */
     private fun KClass<*>.toTypeName() = TypeName(
         full = this.qualifiedName ?: this.java.name,
-        short = this.simpleName ?: this.java.name
+        short = this.simpleName ?: this.java.name,
+        packageName = this.java.packageName,
     )
 
 
@@ -488,7 +489,8 @@ class DefaultSerializationTypeAnalyzerModule(
      */
     private fun SerialDescriptor.toTypeName() = TypeName(
         full = this.fullName(),
-        short = this.serialName.split(".").last().replace("?", "")
+        short = this.serialName.split(".").last().replace("?", ""),
+        packageName = ""
     )
 
 }

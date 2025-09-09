@@ -76,10 +76,12 @@ class AddEnumDiscriminatorStep(private val discriminatorNameProvider: Discrimina
             identifyingName = TypeName(
                 full = type.identifyingName.full + "_discriminator",
                 short = type.identifyingName.short + "_discriminator",
+                packageName = type.identifyingName.packageName,
             ),
             descriptiveName = TypeName(
                 full = type.descriptiveName.full + "_discriminator",
                 short = type.descriptiveName.short + "_discriminator",
+                packageName = type.descriptiveName.packageName,
             ),
             typeParameters = mutableListOf(),
             annotations = mutableListOf(),

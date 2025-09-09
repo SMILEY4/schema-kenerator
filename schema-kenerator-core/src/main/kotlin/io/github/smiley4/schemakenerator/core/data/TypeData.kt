@@ -71,8 +71,8 @@ data class TypeData(
          */
         fun createWildcard() = TypeData(
             id = TypeId.createWildcard(),
-            identifyingName = TypeName("*", "*"),
-            descriptiveName = TypeName("*", "*"),
+            identifyingName = TypeName.wildcard(),
+            descriptiveName = TypeName.wildcard(),
             typeParameters = mutableListOf(),
             annotations = mutableListOf(),
             subtypes = mutableListOf(),
@@ -88,7 +88,7 @@ data class TypeData(
         /**
          * Create a new placeholder [TypeData]. This data is usually just temporary and will get replaced by the actual data.
          */
-        fun createPlaceholder(id: TypeId) = createPlaceholder(id, TypeName("*", "*"), TypeName("*", "*"), emptyList())
+        fun createPlaceholder(id: TypeId) = createPlaceholder(id, TypeName.wildcard(), TypeName.wildcard(), emptyList())
 
 
         /**

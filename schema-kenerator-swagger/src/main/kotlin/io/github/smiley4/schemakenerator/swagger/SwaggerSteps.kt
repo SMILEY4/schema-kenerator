@@ -34,8 +34,10 @@ object SwaggerSteps {
             when (type) {
                 TitleType.FULL -> TitleBuilder.BUILDER_FULL
                 TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                TitleType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
                 TitleType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
                 TitleType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
+                TitleType.OPENAPI_MINIMAL -> TitleBuilder.BUILDER_OPENAPI_MINIMAL
             }
         )
     }
@@ -155,8 +157,10 @@ object SwaggerSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
                 RefType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
                 RefType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
+                RefType.OPENAPI_MINIMAL -> TitleBuilder.BUILDER_OPENAPI_MINIMAL
             }
         )
     }
@@ -189,8 +193,11 @@ object SwaggerSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
                 RefType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
                 RefType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
+                RefType.OPENAPI_MINIMAL -> TitleBuilder.BUILDER_OPENAPI_MINIMAL
+
             }
         )
     }
