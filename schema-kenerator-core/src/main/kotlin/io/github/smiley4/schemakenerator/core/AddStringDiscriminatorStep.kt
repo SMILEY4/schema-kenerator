@@ -12,13 +12,15 @@ import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.Visibility
 
+
+
 /**
- * Adds properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.
- * The created property is annotated with a marker annotation with the name [AbstractAddDiscriminatorStep.MARKER_ANNOTATION_NAME].
+ * Adds string properties to types with subtypes used to differentiate between the possible subtypes when (de-)serializing.
+ * The created property is annotated with a marker annotation with the name [AddStringDiscriminatorStep.MARKER_ANNOTATION_NAME].
  * If a property with the name already exists, the marker annotation will be added to this existing property.
  * If a type already contains a property annotated with the marker annotation, no new property will be added.
  */
-abstract class AbstractAddDiscriminatorStep {
+class AddStringDiscriminatorStep(private val discriminatorNameProvider: DiscriminatorNameProvider) {
 
     companion object {
 
@@ -33,10 +35,12 @@ abstract class AbstractAddDiscriminatorStep {
             identifyingName = TypeName(
                 full = String::class.qualifiedName!!,
                 short = String::class.simpleName!!,
+                packageName = String::class.java.packageName
             ),
             descriptiveName = TypeName(
                 full = String::class.qualifiedName!!,
                 short = String::class.simpleName!!,
+                packageName = String::class.java.packageName
             ),
             typeParameters = mutableListOf(),
             annotations = mutableListOf(),
@@ -138,6 +142,8 @@ abstract class AbstractAddDiscriminatorStep {
     /**
      * Provides the name of the discriminator property. Return null to NOT add a discriminator property
      */
-    abstract fun getDiscriminatorPropertyName(typeData: TypeData): String?
+    fun getDiscriminatorPropertyName(typeData: TypeData): String? {
+        return discriminatorNameProvider.getDiscriminatorPropertyName(typeData)
+    }
 
 }

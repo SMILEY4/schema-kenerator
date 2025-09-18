@@ -11,6 +11,9 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
+/**
+ * Handles the core [Example] annotation
+ */
 internal class JsonSchemaCoreAnnotationExamplesStep {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {

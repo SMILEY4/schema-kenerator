@@ -10,6 +10,9 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
+/**
+ * Handles the core [Type] annotation
+ */
 internal class JsonSchemaCoreAnnotationTypeStep {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {
@@ -18,7 +21,7 @@ internal class JsonSchemaCoreAnnotationTypeStep {
     }
 
     private fun process(schema: JsonSchemaData, typeDataMap: Map<TypeId, TypeData>) {
-        if (schema.json is JsonObject && schema.json.properties["type"] == null) {
+        if (schema.json is JsonObject) {
             determineType(schema.typeData.annotations)?.also { type ->
                 schema.json.properties["type"] = JsonTextValue(type)
             }

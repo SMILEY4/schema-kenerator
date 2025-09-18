@@ -145,6 +145,10 @@ internal class JsonSchemaCompileReferenceStep(
                     this.putAll(refObj.properties)
                     this.remove("\$ref")
                 })
+                // cleanup min/exclusiveMin, max/exclusiveMax
+                if (it.properties.contains("exclusiveMinimum")) { it.properties.remove("minimum") }
+                if (it.properties.contains("exclusiveMaximum")) { it.properties.remove("maximum") }
+                // cleanup nullable
                 if (it.properties.contains("_nullable") && it.getBool("_nullable") && explicitNullTypes) {
                     setNullable(it)
                     it.properties.remove("_nullable")

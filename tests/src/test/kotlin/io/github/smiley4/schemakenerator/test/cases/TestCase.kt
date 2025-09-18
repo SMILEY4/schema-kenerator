@@ -71,8 +71,8 @@ class TestCaseBuilder {
     var postGenerateSwaggerSchema: IntermediateSwaggerSchemaData.() -> IntermediateSwaggerSchemaData = { this }
     var postGenerateJsonSchema: IntermediateJsonSchemaData.() -> IntermediateJsonSchemaData = { this }
 
-    var swaggerRefType: SwaggerRefType = SwaggerRefType.OPENAPI_SIMPLE
-    var jsonRefType: JsonRefType = JsonRefType.SIMPLE
+    var swaggerRefType: SwaggerRefType = SwaggerRefType.OPENAPI_MINIMAL
+    var jsonRefType: JsonRefType = JsonRefType.MINIMAL
 
     var expectedSwagger: String? = null
     var expectedSwaggerInline: String? = null

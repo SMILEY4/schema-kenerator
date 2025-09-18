@@ -3,7 +3,6 @@
 package io.github.smiley4.schemakenerator.test.cases
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.Format
@@ -19,9 +18,11 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.renameMembers
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.customizeProperties
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.validation.swagger.ValidationSwaggerSteps.handleJavaxValidationAnnotations
+import io.swagger.v3.oas.annotations.media.Schema
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -726,8 +727,8 @@ object MiscTestCases {
                 contextual(Instant::class, MyInstantSerializer)
             }
         }
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -792,8 +793,8 @@ object MiscTestCases {
     ) {
         type = typeOf<TestClassContextualFromAnnotationWith>()
         withReflection = false
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -862,8 +863,8 @@ object MiscTestCases {
                 contextual(MyInstantSerializer)
             }
         }
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -924,8 +925,8 @@ object MiscTestCases {
         "overwriting inherited type with more specific type - https://github.com/SMILEY4/schema-kenerator/issues/43"
     ) {
         type = typeOf<Issue43IntHolder>()
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwagger = """
             {
@@ -982,8 +983,8 @@ object MiscTestCases {
         "collect correct subtypes with type parameters involved - https://github.com/SMILEY4/schema-kenerator/issues/43"
     ) {
         type = typeOf<Issue43Root>()
-        postGenerateJsonSchema = { this.withTitle(JsonTitleType.SIMPLE) }
-        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.SIMPLE) }
+        postGenerateJsonSchema = { this.withTitle(JsonTitleType.MINIMAL) }
+        postGenerateSwaggerSchema = { this.withTitle(SwaggerTitleType.MINIMAL) }
         // language=json
         expectedSwaggerInline = """
             {
@@ -1549,6 +1550,90 @@ object MiscTestCases {
     @Description("description on class")
     class TestClassWithDescription(
         val value: Int
+    )
+
+    val propertyNullableSwaggerSchemaRequired = case(
+        "misc",
+        "nullable property marked required by (swagger) schema annotation"
+    ) {
+        type = typeOf<TestClassNullablePropWithSchemaRequired>()
+        postGenerateSwaggerSchema = {
+            this.handleSchemaAnnotations()
+        }
+        // language=json
+        expectedSwagger = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someText" : {
+                      "type" : [ "null", "string" ]
+                    }
+                  },
+                  "required" : [ "someText" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // swagger @Schema not supported by kotlinx-serialization
+        // language=json
+        expectedSwaggerKotlinxSerialization = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someText" : {
+                      "type" : [ "null", "string" ]
+                    }
+                  }
+                }
+              }
+            }
+            """.trimIndent()
+        expectedJsonInline = null
+        expectedJsonReference = null
+    }
+
+    val propertyNullableCoreRequired = case(
+        "misc",
+        "nullable property marked required by (core) required annotation"
+    ) {
+        type = typeOf<TestClassNullablePropWithCoreRequired>()
+        postGenerateSwaggerSchema = {
+            this.handleCoreAnnotations()
+        }
+        // language=json
+        expectedSwagger = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someText" : {
+                      "type" : [ "null", "string" ]
+                    }
+                  },
+                  "required" : [ "someText" ]
+                }
+              }
+            }
+            """.trimIndent()
+        expectedJsonInline = null
+        expectedJsonReference = null
+    }
+
+    @Serializable
+    data class TestClassNullablePropWithSchemaRequired(
+        @field:Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        val someText: String?,
+    )
+
+    @Serializable
+    data class TestClassNullablePropWithCoreRequired(
+        @Required
+        val someText: String?,
     )
 
     object MyInstantSerializer : KSerializer<Instant> {

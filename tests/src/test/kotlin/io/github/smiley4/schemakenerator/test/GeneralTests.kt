@@ -44,7 +44,7 @@ import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.models.Components
 import kotlin.reflect.KType
 
-class GeneralTestCases : FunSpec({
+class GeneralTests : FunSpec({
 
     runSuite(
         listOf(
@@ -73,18 +73,23 @@ class GeneralTestCases : FunSpec({
             BasicTestCases.nestedClass,
             BasicTestCases.nullableSelfReference,
 
+            TitleTestCases.minimal,
             TitleTestCases.simple,
             TitleTestCases.full,
+            TitleTestCases.openApiMinimal,
             TitleTestCases.openApiSimple,
             TitleTestCases.openApiFull,
 
             InheritanceTestCases.subtypeWithSupertype,
             InheritanceTestCases.supertypeWithSubtypes,
             InheritanceTestCases.basicDiscriminator,
+            InheritanceTestCases.basicDiscriminatorAsEnum,
             InheritanceTestCases.jacksonUseClassDiscriminator,
+            InheritanceTestCases.jacksonUseClassDiscriminatorAsEnum,
             InheritanceTestCases.jacksonUseNameDiscriminator,
             InheritanceTestCases.jacksonUseSimpleNameDiscriminator,
             InheritanceTestCases.kotlinxSerializationDiscriminator,
+            InheritanceTestCases.kotlinxSerializationDiscriminatorAsEnum,
             InheritanceTestCases.collectSubtypesCore,
             InheritanceTestCases.collectSubtypesJackson,
 
@@ -139,7 +144,9 @@ class GeneralTestCases : FunSpec({
             MiscTestCases.specialFloatingPointValuesAllow,
             MiscTestCases.mapsWithComplexKeysAsArraysDisabled,
             MiscTestCases.mapsWithComplexKeysAsArraysEnabled,
-            MiscTestCases.descriptionOnPropertyAndType
+            MiscTestCases.descriptionOnPropertyAndType,
+            MiscTestCases.propertyNullableSwaggerSchemaRequired,
+            MiscTestCases.propertyNullableCoreRequired,
         )
     )
 

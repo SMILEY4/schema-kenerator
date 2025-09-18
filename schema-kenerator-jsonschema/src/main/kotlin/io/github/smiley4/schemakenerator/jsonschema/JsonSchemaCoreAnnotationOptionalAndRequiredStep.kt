@@ -13,6 +13,9 @@ import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
+/**
+ * Handles the core [Optional] and [Required] annotation
+ */
 internal class JsonSchemaCoreAnnotationOptionalAndRequiredStep {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {

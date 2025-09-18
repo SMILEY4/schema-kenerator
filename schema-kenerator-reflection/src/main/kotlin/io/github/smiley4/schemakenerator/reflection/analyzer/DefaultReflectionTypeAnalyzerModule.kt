@@ -221,7 +221,8 @@ class DefaultReflectionTypeAnalyzerModule(
      */
     private fun KClass<*>.toTypeName() = TypeName(
         full = this.qualifiedName ?: this.java.name,
-        short = this.simpleName ?: this.java.name
+        short = this.simpleName ?: this.java.name,
+        packageName = this.java.packageName
     )
 
 

@@ -5,6 +5,12 @@ search:
 
 # Changelog
 
+## 2.3.0
+
+- type parameters are more often correctly detected when using kotlinx-serialization for analysis
+  - behavior can be disabled with `findTypeParametersUsingReflection = false` in the analysis step config
+- deprecate `markNotParameterized` for kotlinx-serialization type analysis - property is no longer used
+
 ## 2.2.0
 
 **Improvements to JSON schema generation:**

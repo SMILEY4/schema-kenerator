@@ -34,8 +34,10 @@ object SwaggerSteps {
             when (type) {
                 TitleType.FULL -> TitleBuilder.BUILDER_FULL
                 TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                TitleType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
                 TitleType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
                 TitleType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
+                TitleType.OPENAPI_MINIMAL -> TitleBuilder.BUILDER_OPENAPI_MINIMAL
             }
         )
     }
@@ -63,6 +65,13 @@ object SwaggerSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.Title]
      * - [io.github.smiley4.schemakenerator.core.annotations.Format]
      * - [io.github.smiley4.schemakenerator.core.annotations.Type]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Min]
+     * - [io.github.smiley4.schemakenerator.core.annotations.ExclusiveMin]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Max]
+     * - [io.github.smiley4.schemakenerator.core.annotations.ExclusiveMax]
+     * - [io.github.smiley4.schemakenerator.core.annotations.MinLength]
+     * - [io.github.smiley4.schemakenerator.core.annotations.MaxLength]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Pattern]
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateSwaggerSchemaData.handleCoreAnnotations(): IntermediateSwaggerSchemaData {
@@ -75,6 +84,9 @@ object SwaggerSteps {
             .let { SwaggerSchemaCoreAnnotationTitleStep().process(this) }
             .let { SwaggerSchemaCoreAnnotationFormatStep().process(this) }
             .let { SwaggerSchemaCoreAnnotationTypeStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationMinMaxStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationMinMaxLengthStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationPatternStep().process(this) }
     }
 
 
@@ -93,6 +105,7 @@ object SwaggerSteps {
      *           - allowableValues
      *           - defaultValue
      *           - accessMode
+     *           - requiredMode
      *           - minLength
      *           - maxLength,
      *           - format
@@ -144,8 +157,10 @@ object SwaggerSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
                 RefType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
                 RefType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
+                RefType.OPENAPI_MINIMAL -> TitleBuilder.BUILDER_OPENAPI_MINIMAL
             }
         )
     }
@@ -178,8 +193,11 @@ object SwaggerSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
                 RefType.OPENAPI_FULL -> TitleBuilder.BUILDER_OPENAPI_FULL
                 RefType.OPENAPI_SIMPLE -> TitleBuilder.BUILDER_OPENAPI_SIMPLE
+                RefType.OPENAPI_MINIMAL -> TitleBuilder.BUILDER_OPENAPI_MINIMAL
+
             }
         )
     }

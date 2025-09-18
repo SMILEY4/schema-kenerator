@@ -34,6 +34,7 @@ object JsonSchemaSteps {
             when (type) {
                 TitleType.FULL -> TitleBuilder.BUILDER_FULL
                 TitleType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                TitleType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
             }
         )
     }
@@ -61,6 +62,13 @@ object JsonSchemaSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.Title]
      * - [io.github.smiley4.schemakenerator.core.annotations.Format]
      * - [io.github.smiley4.schemakenerator.core.annotations.Type]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Min]
+     * - [io.github.smiley4.schemakenerator.core.annotations.ExclusiveMin]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Max]
+     * - [io.github.smiley4.schemakenerator.core.annotations.ExclusiveMax]
+     * - [io.github.smiley4.schemakenerator.core.annotations.MinLength]
+     * - [io.github.smiley4.schemakenerator.core.annotations.MaxLength]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Pattern]
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateJsonSchemaData.handleCoreAnnotations(): IntermediateJsonSchemaData {
@@ -73,6 +81,9 @@ object JsonSchemaSteps {
             .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
             .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
             .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
+            .let { JsonSchemaCoreAnnotationMinMaxStep().process(this) }
+            .let { JsonSchemaCoreAnnotationMinMaxLengthStep().process(this) }
+            .let { JsonSchemaCoreAnnotationPatternStep().process(this) }
     }
 
 
@@ -109,6 +120,7 @@ object JsonSchemaSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
             },
             definitionsPath
         )
@@ -146,6 +158,7 @@ object JsonSchemaSteps {
             when (pathType) {
                 RefType.FULL -> TitleBuilder.BUILDER_FULL
                 RefType.SIMPLE -> TitleBuilder.BUILDER_SIMPLE
+                RefType.MINIMAL -> TitleBuilder.BUILDER_MINIMAL
             },
             definitionsPath
         )

@@ -7,6 +7,9 @@ import io.github.smiley4.schemakenerator.jsonschema.data.JsonSchemaData
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 
+/**
+ * Handles the core [Title] annotation
+ */
 internal class JsonSchemaCoreAnnotationTitleStep {
 
     fun process(input: IntermediateJsonSchemaData): IntermediateJsonSchemaData {
