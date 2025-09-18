@@ -739,6 +739,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#240" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#230" class="md-nav__link">
     <span class="md-ellipsis">
       2.3.0
@@ -1053,6 +1062,18 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="240">2.4.0</h2>
+<ul>
+<li>added more (core) annotations for swagger and json schemas <a href="https://github.com/SMILEY4/schema-kenerator/issues/59">#59</a></li>
+<li>@Min, @Max, @ExclusiveMin, @ExclusiveMax</li>
+<li>@MinLength, @MaxLength for strings and arrays</li>
+<li>@Pattern for strings</li>
+<li>steps <code>addDiscriminatorProperty</code>, <code>addJsonClassDiscriminatorProperty</code> and <code>addJacksonTypeInfoDiscriminatorProperty</code> have new optional parameter <code>asEnum: Boolean</code>. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. <a href="https://github.com/SMILEY4/schema-kenerator/issues/60">60</a></li>
+<li>fixed a null pointer exception when using swagger @Schema annotation "required" property <a href="https://github.com/SMILEY4/schema-kenerator/issues/61">#61</a></li>
+<li>expanded RefType and SimpleType for swagger and json schema</li>
+<li><code>SIMPLE</code>, <code>OPENAPI_SIMPLE</code>: now contain the names of outer classes for nested classes.</li>
+<li><code>MINIMAL</code>, <code>OPENAPI_MINIMAL</code>: new; same behavior as previous SIMPLE &amp; OPENAPI_SIMPLE. Contains only the name of the class without any outer classes.</li>
+</ul>
 <h2 id="230">2.3.0</h2>
 <ul>
 <li>type parameters are more often correctly detected when using kotlinx-serialization for analysis</li>
