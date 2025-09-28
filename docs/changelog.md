@@ -8,14 +8,14 @@ search:
 ## 2.4.0
 
 - added more (core) annotations for swagger and json schemas [#59](https://github.com/SMILEY4/schema-kenerator/issues/59)
-  - @Min, @Max, @ExclusiveMin, @ExclusiveMax
-  - @MinLength, @MaxLength for strings and arrays
-  - @Pattern for strings
-- steps `addDiscriminatorProperty`, `addJsonClassDiscriminatorProperty` and `addJacksonTypeInfoDiscriminatorProperty` have new optional parameter `asEnum: Boolean`. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. [60](https://github.com/SMILEY4/schema-kenerator/issues/60)
-- fixed a null pointer exception when using swagger @Schema annotation "required" property [#61](https://github.com/SMILEY4/schema-kenerator/issues/61)
+  - `@Min`, `@Max`, `@ExclusiveMin`, `@ExclusiveMax`
+  - `@MinLength`, `@MaxLength` for strings and arrays
+  - `@Pattern` for strings
+- steps `addDiscriminatorProperty`, `addJsonClassDiscriminatorProperty` and `addJacksonTypeInfoDiscriminatorProperty` have new optional parameter `asEnum: Boolean`. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. [#60](https://github.com/SMILEY4/schema-kenerator/issues/60)
 - expanded RefType and SimpleType for swagger and json schema
   - `SIMPLE`, `OPENAPI_SIMPLE`: now contain the names of outer classes for nested classes.
   - `MINIMAL`, `OPENAPI_MINIMAL`: new; same behavior as previous SIMPLE & OPENAPI_SIMPLE. Contains only the name of the class without any outer classes.
+- fixed a null pointer exception when using swagger `@Schema` annotation "required" property [#61](https://github.com/SMILEY4/schema-kenerator/issues/61)
 
 ## 2.3.0
 
