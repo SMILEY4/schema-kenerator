@@ -200,10 +200,16 @@ class DefaultSwaggerSchemaGenerationModule(
     }
 
     private fun buildInlineObjectSchema(context: SwaggerSchemaGenerationModule.Context): Schema<*> {
-        val inlineType = context.typeData.members.first { it.kind == MemberKind.PROPERTY }
+        val inlineType = collectInlineValueClassMember(context.typeData)
+            ?: return schema.anyObjectSchema()
         val inlineTypeData = context.knownTypeData.find { it.id == inlineType.type }
             ?: throw NoSuchElementException("Could not find type-data for inline type ${inlineType.type}")
         return context.generate(inlineTypeData)
+    }
+
+    private fun collectInlineValueClassMember(typeData: TypeData): MemberData? {
+        val properties = typeData.members.filter { it.kind == MemberKind.PROPERTY }
+        return properties.firstOrNull { it.hasConstructorParameter } ?: properties.firstOrNull()
     }
 
     private fun collectMembers(typeData: TypeData, typeDataList: Collection<TypeData>): List<MemberData> {

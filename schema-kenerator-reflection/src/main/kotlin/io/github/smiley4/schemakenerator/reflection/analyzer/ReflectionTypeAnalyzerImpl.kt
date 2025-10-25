@@ -65,8 +65,6 @@ internal class ReflectionTypeAnalyzerImpl(
      * @param knownTypeData the already known type data. Adds new results to this collection.
      */
     private fun analyze(type: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
-//        return if (typeRedirects.containsKey(type)) {
-//            analyze(typeRedirects[type]!!, knownTypeData)
         return if (type.classifier is KClass<*>) {
             analyzeClass(type, type.classifier as KClass<*>, emptyList(), knownTypeData)
         } else {
