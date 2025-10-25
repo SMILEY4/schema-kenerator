@@ -52,6 +52,7 @@ class GeneralTests : FunSpec({
             BasicTestCases.uByte,
             BasicTestCases.int,
             BasicTestCases.float,
+            BasicTestCases.double,
             BasicTestCases.boolean,
             BasicTestCases.string,
             BasicTestCases.enum,

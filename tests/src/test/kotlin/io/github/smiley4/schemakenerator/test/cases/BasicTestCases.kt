@@ -91,8 +91,31 @@ object BasicTestCases {
         expectedJson = """
             {
               "type": "number",
-              "minimum": 1.4E-45,
+              "minimum": -3.4028235E38,
               "maximum": 3.4028235E38
+            }
+            """.trimIndent()
+    }
+
+    val double = case("basics", "Double") {
+        type = typeOf<Double>()
+        // language=json
+        expectedSwagger = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type": "number",
+                  "format": "double"
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJson = """
+            {
+              "type": "number",
+              "minimum": -1.7976931348623157E308,
+              "maximum": 1.7976931348623157E308
             }
             """.trimIndent()
     }

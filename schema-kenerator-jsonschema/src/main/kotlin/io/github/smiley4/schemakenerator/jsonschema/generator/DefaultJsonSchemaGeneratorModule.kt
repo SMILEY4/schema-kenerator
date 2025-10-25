@@ -89,12 +89,12 @@ class DefaultJsonSchemaGeneratorModule(
             )
             Float::class.qualifiedName -> schemaUtils.numericSchema(
                 integer = false,
-                min = Float.MIN_VALUE,
+                min = -Float.MAX_VALUE,
                 max = Float.MAX_VALUE,
             )
             Double::class.qualifiedName -> schemaUtils.numericSchema(
                 integer = false,
-                min = Double.MIN_VALUE,
+                min = -Double.MAX_VALUE,
                 max = Double.MAX_VALUE,
             )
             Boolean::class.qualifiedName -> schemaUtils.booleanSchema()
