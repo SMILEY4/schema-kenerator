@@ -102,15 +102,18 @@ class DefaultReflectionTypeAnalyzerModule(
         // check if collection is a set of unique items
         val uniqueCollection = collectionAnalyzer.areCollectionItemsUnique(context.type)
 
+        // check if class is an inline value class
+        val isInlineValueClass = typeCategory == TypeCategory.OBJECT && context.clazz.isValue;
+
         // collect member information
         val members = if (typeCategory == TypeCategory.OBJECT) {
             memberAnalyzer.analyzeMembers(
                 context,
-                includeGetters,
-                includeWeakGetters,
-                includeFunctions,
-                includeHidden,
-                includeStatic,
+                if(isInlineValueClass) false else includeGetters,
+                if(isInlineValueClass) false else includeWeakGetters,
+                if(isInlineValueClass) false else includeFunctions,
+                if(isInlineValueClass) true else includeHidden,
+                if(isInlineValueClass) false else includeStatic,
                 this::analyzeMemberAnnotations
             )
         } else {
@@ -144,7 +147,7 @@ class DefaultReflectionTypeAnalyzerModule(
                 subtypes = subtypes.toMutableList(),
                 supertypes = supertypes.toMutableList(),
                 members = members.toMutableList(),
-                isInlineValue = context.clazz.isValue,
+                isInlineValue = isInlineValueClass,
                 enumData = null,
                 collectionData = null,
                 mapData = null

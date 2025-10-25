@@ -29,6 +29,10 @@ data class MemberData(
      */
     var kind: MemberKind,
     /**
+     * Whether a parameter in a constructor matches this member.
+     */
+    var hasConstructorParameter: Boolean = false,
+    /**
      * the list of annotations of this property
      */
     val annotations: MutableList<AnnotationData>
