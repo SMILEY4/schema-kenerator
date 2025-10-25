@@ -37,6 +37,8 @@ import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 
 
 /**
@@ -44,8 +46,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
  */
 class _ManualTests : StringSpec({
 
-    "test" {
-        val schema = initial<OuterTestClass.InnerTestClass>()
+    "reflection referencing" {
+        val schema = initial<MembershipTypeCredits>()
             .collectSubTypes()
             .analyzeTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
@@ -59,8 +61,8 @@ class _ManualTests : StringSpec({
         println(schema.asOpenApiJson())
     }
 
-    "reflection" {
-        val schema = initial<Any>()
+    "reflection inlining" {
+        val schema = initial<MembershipTypeCredits>()
             .collectSubTypes()
             .analyzeTypeUsingReflection()
             .addMissingSupertypeSubtypeRelations()
@@ -69,13 +71,13 @@ class _ManualTests : StringSpec({
             .handleCoreAnnotations()
             .handleSchemaAnnotations()
             .mergePropertyAttributesIntoType()
-            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+            .compileInlining()
 
         println(schema.asOpenApiJson())
     }
 
     "kotlinx" {
-        val schema = initial<Any>()
+        val schema = initial<MembershipTypeCredits>()
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
@@ -91,13 +93,11 @@ class _ManualTests : StringSpec({
 }) {
     companion object {
 
-        class OuterTestClass {
-
-            class InnerTestClass(
-                val someValue: String
-            )
-
-        }
+        @Serializable
+        data class MembershipTypeCredits(
+            val amount: Long,
+            val duration: Duration,
+        )
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

@@ -157,13 +157,16 @@ class MemberAnalyzer {
         annotationAnalyzer: (member: KCallable<*>, ctx: ReflectionTypeAnalyzerModule.Context) -> List<AnnotationData>
     ): MemberData {
 
-        val isOptional = context.clazz.constructors.any { constructor ->
-            val ctorParameter = constructor.parameters.find { parameter ->
+        val matchingConstructorParameters = context.clazz.constructors.mapNotNull { constructor ->
+            constructor.parameters.find { parameter ->
                 parameter.name == member.name && parameter.type == member.returnType
             }
-            ctorParameter?.isOptional ?: false
         }
+
+        val isOptional = matchingConstructorParameters.any { it.isOptional }
+
         val type = resolveMemberType(member.returnType, context)
+
         return MemberData(
             name = member.name,
             type = type.id,
@@ -171,7 +174,8 @@ class MemberAnalyzer {
             optional = isOptional,
             annotations = annotationAnalyzer(member, context).toMutableList(),
             kind = MemberKind.PROPERTY,
-            visibility = determinePropertyVisibility(member)
+            visibility = determinePropertyVisibility(member),
+            hasConstructorParameter = matchingConstructorParameters.isNotEmpty(),
         )
     }
 
