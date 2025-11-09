@@ -275,10 +275,50 @@ object CoreAnnotationTestCases {
             """.trimIndent()
         // language=json
         expectedJsonInline = """
-        """.trimIndent()
+            {
+               "type": "object",
+               "required": [
+                  "someNormalValue",
+                  "valueRefOnProperty",
+                  "valueRefOnType"
+               ],
+               "properties": {
+                  "someNormalValue": {
+                     "type": "string"
+                  },
+                  "valueRefOnProperty": {
+                     "${'$'}ref" : "example.com/schema-property.json",
+                     "description": "Some description for the external property"
+                  },
+                  "valueRefOnType": {
+                     "${'$'}ref": "example.com/schema-class.json"
+                  }
+               }
+            }
+            """.trimIndent()
         // language=json
         expectedJsonReference = """
-        """.trimIndent()
+            {
+               "type": "object",
+               "required": [
+                  "someNormalValue",
+                  "valueRefOnProperty",
+                  "valueRefOnType"
+               ],
+               "properties": {
+                  "someNormalValue": {
+                     "type": "string"
+                  },
+                  "valueRefOnProperty": {
+                     "${'$'}ref" : "example.com/schema-property.json",
+                     "description": "Some description for the external property"
+                  },
+                  "valueRefOnType": {
+                     "${'$'}ref": "example.com/schema-class.json"
+                  }
+               }
+            }
+            """.trimIndent()
     }
 
 

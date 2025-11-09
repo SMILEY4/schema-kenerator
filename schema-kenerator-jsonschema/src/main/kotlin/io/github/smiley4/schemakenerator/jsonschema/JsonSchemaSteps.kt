@@ -69,10 +69,12 @@ object JsonSchemaSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.MinLength]
      * - [io.github.smiley4.schemakenerator.core.annotations.MaxLength]
      * - [io.github.smiley4.schemakenerator.core.annotations.Pattern]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Ref]
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateJsonSchemaData.handleCoreAnnotations(): IntermediateJsonSchemaData {
         return this
+            .let { JsonSchemaCoreAnnotationRefStep().process(it) }
             .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(it) }
             .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
             .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
