@@ -9,10 +9,12 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
+import io.github.smiley4.schemakenerator.core.annotations.Description
 import io.github.smiley4.schemakenerator.core.annotations.ExclusiveMax
 import io.github.smiley4.schemakenerator.core.annotations.MaxLength
 import io.github.smiley4.schemakenerator.core.annotations.Min
 import io.github.smiley4.schemakenerator.core.annotations.MinLength
+import io.github.smiley4.schemakenerator.core.annotations.Ref
 import io.github.smiley4.schemakenerator.core.annotations.Required
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
@@ -26,9 +28,12 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSch
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.RefType
+import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.kotest.core.spec.style.StringSpec
+import io.swagger.models.Swagger
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.models.Components
@@ -54,6 +59,7 @@ class _ManualTests : StringSpec({
             .handleNameAnnotation()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
+            .withTitle(TitleType.SIMPLE)
             .handleSchemaAnnotations()
             .mergePropertyAttributesIntoType()
             .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
@@ -69,6 +75,7 @@ class _ManualTests : StringSpec({
             .handleNameAnnotation()
             .generateSwaggerSchema()
             .handleCoreAnnotations()
+            .withTitle(TitleType.SIMPLE)
             .handleSchemaAnnotations()
             .mergePropertyAttributesIntoType()
             .compileInlining()
@@ -76,28 +83,38 @@ class _ManualTests : StringSpec({
         println(schema.asOpenApiJson())
     }
 
-    "kotlinx" {
-        val schema = initial<MembershipTypeCredits>()
-            .analyzeTypeUsingKotlinxSerialization()
-            .addJsonClassDiscriminatorProperty()
-            .handleNameAnnotation()
-            .generateSwaggerSchema()
-            .handleCoreAnnotations()
-            .handleSchemaAnnotations()
-            .mergePropertyAttributesIntoType()
-            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
-            .asPrintable()
-        println(json.writeValueAsString(schema))
-    }
+//    "kotlinx" {
+//        val schema = initial<MembershipTypeCredits>()
+//            .analyzeTypeUsingKotlinxSerialization()
+//            .addJsonClassDiscriminatorProperty()
+//            .handleNameAnnotation()
+//            .generateSwaggerSchema()
+//            .handleCoreAnnotations()
+//            .handleSchemaAnnotations()
+//            .mergePropertyAttributesIntoType()
+//            .compileReferencingRoot(pathType = RefType.OPENAPI_SIMPLE)
+//            .asPrintable()
+//        println(json.writeValueAsString(schema))
+//    }
 
 }) {
     companion object {
 
-        @Serializable
         data class MembershipTypeCredits(
             val amount: Long,
             val duration: Duration,
+            val user: User
         )
+
+        @Ref("https://example.com/user.schema.json")
+        @Description("A user in the system")
+        data class User(
+            val name: String,
+            val joinedTimestamp: Long,
+        )
+
+
+
 
         class SwaggerResult(
             val root: io.swagger.v3.oas.models.media.Schema<*>,

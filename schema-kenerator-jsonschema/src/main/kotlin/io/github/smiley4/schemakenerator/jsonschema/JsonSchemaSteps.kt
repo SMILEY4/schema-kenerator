@@ -73,17 +73,17 @@ object JsonSchemaSteps {
      */
     fun IntermediateJsonSchemaData.handleCoreAnnotations(): IntermediateJsonSchemaData {
         return this
-            .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
-            .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
-            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(this) }
-            .let { JsonSchemaCoreAnnotationDescriptionStep().process(this) }
-            .let { JsonSchemaCoreAnnotationExamplesStep().process(this) }
-            .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
-            .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
-            .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
-            .let { JsonSchemaCoreAnnotationMinMaxStep().process(this) }
-            .let { JsonSchemaCoreAnnotationMinMaxLengthStep().process(this) }
-            .let { JsonSchemaCoreAnnotationPatternStep().process(this) }
+            .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(it) }
+            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
+            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
+            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
+            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
+            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+            .let { JsonSchemaCoreAnnotationTypeStep().process(it) }
+            .let { JsonSchemaCoreAnnotationMinMaxStep().process(it) }
+            .let { JsonSchemaCoreAnnotationMinMaxLengthStep().process(it) }
+            .let { JsonSchemaCoreAnnotationPatternStep().process(it) }
     }
 
 

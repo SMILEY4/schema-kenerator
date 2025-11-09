@@ -76,17 +76,18 @@ object SwaggerSteps {
      */
     fun IntermediateSwaggerSchemaData.handleCoreAnnotations(): IntermediateSwaggerSchemaData {
         return this
-            .let { SwaggerSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationTitleStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationFormatStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationTypeStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationMinMaxStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationMinMaxLengthStep().process(this) }
-            .let { SwaggerSchemaCoreAnnotationPatternStep().process(this) }
+            .let { SwaggerSchemaCoreAnnotationRefStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationOptionalAndRequiredStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationDefaultStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationDeprecatedStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationDescriptionStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationExamplesStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationTitleStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationFormatStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationTypeStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationMinMaxStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationMinMaxLengthStep().process(it) }
+            .let { SwaggerSchemaCoreAnnotationPatternStep().process(it) }
     }
 
 
