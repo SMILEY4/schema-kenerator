@@ -72,6 +72,7 @@ object SwaggerSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.MinLength]
      * - [io.github.smiley4.schemakenerator.core.annotations.MaxLength]
      * - [io.github.smiley4.schemakenerator.core.annotations.Pattern]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Ref]
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateSwaggerSchemaData.handleCoreAnnotations(): IntermediateSwaggerSchemaData {

@@ -102,6 +102,7 @@ class _ManualTests : StringSpec({
 
         data class MembershipTypeCredits(
             val amount: Long,
+            @Ref("https://example.com/duration.schema.json")
             val duration: Duration,
             val user: User
         )
