@@ -10,8 +10,11 @@ import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubty
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.merge
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
 import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
@@ -23,6 +26,7 @@ import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeU
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
+import io.github.smiley4.schemakenerator.serialization.SerializationSteps.convertToKotlinxSerializationTypes
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
@@ -91,40 +95,13 @@ class _ManualTests : StringSpec({
             .handleNameAnnotation()
             .generateJsonSchema()
             .handleCoreAnnotations()
-            .compileInlining()
-            .json.convert()
+            .compileReferencing(definitionsPath = "definitions")
+            .convertToKotlinxSerializationTypes()
         println(schema)
     }
 
 }) {
     companion object {
-
-        fun JsonNode.convert(): JsonElement {
-            return when (this) {
-                is JsonArray -> this.convert()
-                is JsonObject -> this.convert()
-                is JsonBooleanValue -> this.convert()
-                is JsonNumericValue -> this.convert()
-                is JsonTextValue -> this.convert()
-                is JsonNullValue -> kotlinx.serialization.json.JsonNull
-            }
-        }
-
-        fun JsonArray.convert(): JsonElement {
-            return kotlinx.serialization.json.JsonArray(
-                this.items.map { it.convert() }
-            )
-        }
-
-        fun JsonObject.convert(): JsonElement {
-            return kotlinx.serialization.json.JsonObject(
-                this.properties.mapValues { (_, value) -> value.convert() }
-            )
-        }
-
-        fun JsonBooleanValue.convert() = JsonPrimitive(this.value)
-        fun JsonNumericValue.convert() = JsonPrimitive(this.value)
-        fun JsonTextValue.convert() = JsonPrimitive(this.value)
 
 
         @Serializable
