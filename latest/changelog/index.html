@@ -739,6 +739,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#250" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.5.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#240" class="md-nav__link">
     <span class="md-ellipsis">
       2.4.0
@@ -1062,17 +1071,26 @@
 
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="250">2.5.0</h2>
+<ul>
+<li>added annotation <code>@Ref</code> for classes and properties: reference external schema instead of generating schema from type. Handled in the <code>handleCoreAnnotation</code>-step for Swagger and JSON-Schemas. <a href="https://github.com/SMILEY4/schema-kenerator/issues/66">#66</a></li>
+<li><code>schema-kenerator-serialization</code>: added step <code>convertToKotlinxSerializationTypes</code> to convert compiled schema to kotlinx-serialization types. <a href="https://github.com/SMILEY4/schema-kenerator/issues/64">#64</a></li>
+<li><code>schema-kenerator-jsonschema</code>: removed deprecated option <code>OptionalHandling</code> (was previously replaced by <code>RequiredHandling</code>)</li>
+<li>stricter handling of value classes to prevent infinite loops for specific types <a href="https://github.com/SMILEY4/ktor-openapi-tools/issues/220">ktor-openapi-tools#220</a></li>
+<li>fixed bug: double and float schemas had incorrect min and max values. <a href="https://github.com/SMILEY4/schema-kenerator/issues/65">#65</a></li>
+<li>fixed bug: null pointer exception in swagger schemas for specific types. <a href="https://github.com/SMILEY4/schema-kenerator/issues/61">#61</a></li>
+</ul>
 <h2 id="240">2.4.0</h2>
 <ul>
 <li>added more (core) annotations for swagger and json schemas <a href="https://github.com/SMILEY4/schema-kenerator/issues/59">#59</a></li>
-<li>@Min, @Max, @ExclusiveMin, @ExclusiveMax</li>
-<li>@MinLength, @MaxLength for strings and arrays</li>
-<li>@Pattern for strings</li>
-<li>steps <code>addDiscriminatorProperty</code>, <code>addJsonClassDiscriminatorProperty</code> and <code>addJacksonTypeInfoDiscriminatorProperty</code> have new optional parameter <code>asEnum: Boolean</code>. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. <a href="https://github.com/SMILEY4/schema-kenerator/issues/60">60</a></li>
-<li>fixed a null pointer exception when using swagger @Schema annotation "required" property <a href="https://github.com/SMILEY4/schema-kenerator/issues/61">#61</a></li>
+<li><code>@Min</code>, <code>@Max</code>, <code>@ExclusiveMin</code>, <code>@ExclusiveMax</code></li>
+<li><code>@MinLength</code>, <code>@MaxLength</code> for strings and arrays</li>
+<li><code>@Pattern</code> for strings</li>
+<li>steps <code>addDiscriminatorProperty</code>, <code>addJsonClassDiscriminatorProperty</code> and <code>addJacksonTypeInfoDiscriminatorProperty</code> have new optional parameter <code>asEnum: Boolean</code>. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. <a href="https://github.com/SMILEY4/schema-kenerator/issues/60">#60</a></li>
 <li>expanded RefType and SimpleType for swagger and json schema</li>
 <li><code>SIMPLE</code>, <code>OPENAPI_SIMPLE</code>: now contain the names of outer classes for nested classes.</li>
 <li><code>MINIMAL</code>, <code>OPENAPI_MINIMAL</code>: new; same behavior as previous SIMPLE &amp; OPENAPI_SIMPLE. Contains only the name of the class without any outer classes.</li>
+<li>fixed a null pointer exception when using swagger <code>@Schema</code> annotation "required" property <a href="https://github.com/SMILEY4/schema-kenerator/issues/61">#61</a></li>
 </ul>
 <h2 id="230">2.3.0</h2>
 <ul>
