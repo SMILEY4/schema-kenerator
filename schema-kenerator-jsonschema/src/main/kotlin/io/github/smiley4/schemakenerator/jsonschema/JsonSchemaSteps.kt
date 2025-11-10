@@ -209,21 +209,6 @@ object JsonSchemaSteps {
         return JsonSchemaCustomizeStep().customizeProperties(this, action)
     }
 
-
-    @Deprecated("Use 'RequiredHandling' instead")
-    enum class OptionalHandling {
-        /**
-         * Handle optional parameters as "required" in the schema
-         */
-        REQUIRED,
-
-
-        /**
-         * Handle optional parameters as not required in the schema
-         */
-        NON_REQUIRED
-    }
-
     enum class RequiredHandling {
         /**
          * Handle optional parameters as "required" in the schema
@@ -237,39 +222,7 @@ object JsonSchemaSteps {
         NON_REQUIRED
     }
 
-    fun RequiredHandling.toOptionalHandling(): OptionalHandling {
-        return when (this) {
-            RequiredHandling.REQUIRED -> OptionalHandling.REQUIRED
-            RequiredHandling.NON_REQUIRED -> OptionalHandling.NON_REQUIRED
-        }
-    }
-
-    fun OptionalHandling.toRequiredHandling(): RequiredHandling {
-        return when (this) {
-            OptionalHandling.REQUIRED -> RequiredHandling.REQUIRED
-            OptionalHandling.NON_REQUIRED -> RequiredHandling.NON_REQUIRED
-        }
-    }
-
     class JsonSchemaGenerationStepConfig {
-
-        /**
-         * How to handle optional properties
-         *
-         * Example:
-         * ```
-         * class MyExample(val someValue: String = "hello")
-         * ```
-         * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
-         * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
-         */
-        @Deprecated("use 'optionals' instead")
-        var optionalHandling: OptionalHandling
-            get() = optionals.toOptionalHandling()
-            set(value) {
-                optionals = value.toRequiredHandling()
-            }
-
 
         /**
          * How to handle optional properties

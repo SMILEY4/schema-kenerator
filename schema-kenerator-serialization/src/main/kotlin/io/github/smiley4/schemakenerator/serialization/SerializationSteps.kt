@@ -5,6 +5,8 @@ import io.github.smiley4.schemakenerator.core.AddStringDiscriminatorStep
 import io.github.smiley4.schemakenerator.core.CoreSteps.renameMembers
 import io.github.smiley4.schemakenerator.core.data.InitialTypeData
 import io.github.smiley4.schemakenerator.core.data.TypeDataGroup
+import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.merge
+import io.github.smiley4.schemakenerator.jsonschema.data.CompiledJsonSchemaData
 import io.github.smiley4.schemakenerator.serialization.analyzer.DefaultSerializationTypeAnalyzerModule
 import io.github.smiley4.schemakenerator.serialization.analyzer.KotlinxSerializationCustomProvider
 import io.github.smiley4.schemakenerator.serialization.analyzer.KotlinxSerializationTypeMatcher
@@ -19,6 +21,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KClass
@@ -42,7 +45,7 @@ object SerializationSteps {
      * @param asEnum whether the property should be a simple string or an enum with the (full identifying) name of the type as only option.
      */
     fun TypeDataGroup.addJsonClassDiscriminatorProperty(asEnum: Boolean = false): TypeDataGroup {
-        return when(asEnum) {
+        return when (asEnum) {
             true -> AddEnumDiscriminatorStep(KotlinxJsonDiscriminatorNameProvider()).process(this)
             false -> AddStringDiscriminatorStep(KotlinxJsonDiscriminatorNameProvider()).process(this)
         }
@@ -83,13 +86,16 @@ object SerializationSteps {
          */
         var findTypeParametersUsingReflection: Boolean = true
 
+
         /**
          * kotlinx serializers module from `Json { }.serializersModule` for support of contextual serializers
          */
         var serializersModule: SerializersModule? = null
 
+
         @Deprecated("unused")
         var knownNotParameterized = mutableSetOf<String>()
+
 
         /**
          * Mark the type with the given full/qualified name as "not parameterized", i.e. as not having any generic type parameters.
@@ -246,6 +252,7 @@ object SerializationSteps {
                 fromNullability = nullability
             }
 
+
             /**
              * Specify the target type.
              * @param T the type to replace with
@@ -254,6 +261,7 @@ object SerializationSteps {
             inline fun <reified T> to(nullability: TypeRedirect.ToNullability = TypeRedirect.ToNullability.KEEP) {
                 to(typeOf<T>(), nullability)
             }
+
 
             /**
              * Specify the target type.
@@ -292,6 +300,12 @@ object SerializationSteps {
 
         }
 
+    }
+
+    fun CompiledJsonSchemaData.convertToKotlinxSerializationTypes(): JsonElement {
+        return this
+            .merge()
+            .let { KotlinxJsonConvertJsonTypes().process(it) }
     }
 
 }

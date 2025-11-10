@@ -21,7 +21,6 @@ repositories {
 }
 
 dependencies {
-    val versionJackson: String by project
     implementation(project(":schema-kenerator-core"))
     implementation(project(":schema-kenerator-jackson"))
     implementation(project(":schema-kenerator-jsonschema"))
