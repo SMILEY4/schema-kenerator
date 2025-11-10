@@ -69,21 +69,23 @@ object JsonSchemaSteps {
      * - [io.github.smiley4.schemakenerator.core.annotations.MinLength]
      * - [io.github.smiley4.schemakenerator.core.annotations.MaxLength]
      * - [io.github.smiley4.schemakenerator.core.annotations.Pattern]
+     * - [io.github.smiley4.schemakenerator.core.annotations.Ref]
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateJsonSchemaData.handleCoreAnnotations(): IntermediateJsonSchemaData {
         return this
-            .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(this) }
-            .let { JsonSchemaCoreAnnotationDefaultStep().process(this) }
-            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(this) }
-            .let { JsonSchemaCoreAnnotationDescriptionStep().process(this) }
-            .let { JsonSchemaCoreAnnotationExamplesStep().process(this) }
-            .let { JsonSchemaCoreAnnotationTitleStep().process(this) }
-            .let { JsonSchemaCoreAnnotationFormatStep().process(this) }
-            .let { JsonSchemaCoreAnnotationTypeStep().process(this) }
-            .let { JsonSchemaCoreAnnotationMinMaxStep().process(this) }
-            .let { JsonSchemaCoreAnnotationMinMaxLengthStep().process(this) }
-            .let { JsonSchemaCoreAnnotationPatternStep().process(this) }
+            .let { JsonSchemaCoreAnnotationRefStep().process(it) }
+            .let { JsonSchemaCoreAnnotationOptionalAndRequiredStep().process(it) }
+            .let { JsonSchemaCoreAnnotationDefaultStep().process(it) }
+            .let { JsonSchemaCoreAnnotationDeprecatedStep().process(it) }
+            .let { JsonSchemaCoreAnnotationDescriptionStep().process(it) }
+            .let { JsonSchemaCoreAnnotationExamplesStep().process(it) }
+            .let { JsonSchemaCoreAnnotationTitleStep().process(it) }
+            .let { JsonSchemaCoreAnnotationFormatStep().process(it) }
+            .let { JsonSchemaCoreAnnotationTypeStep().process(it) }
+            .let { JsonSchemaCoreAnnotationMinMaxStep().process(it) }
+            .let { JsonSchemaCoreAnnotationMinMaxLengthStep().process(it) }
+            .let { JsonSchemaCoreAnnotationPatternStep().process(it) }
     }
 
 
@@ -207,21 +209,6 @@ object JsonSchemaSteps {
         return JsonSchemaCustomizeStep().customizeProperties(this, action)
     }
 
-
-    @Deprecated("Use 'RequiredHandling' instead")
-    enum class OptionalHandling {
-        /**
-         * Handle optional parameters as "required" in the schema
-         */
-        REQUIRED,
-
-
-        /**
-         * Handle optional parameters as not required in the schema
-         */
-        NON_REQUIRED
-    }
-
     enum class RequiredHandling {
         /**
          * Handle optional parameters as "required" in the schema
@@ -235,39 +222,7 @@ object JsonSchemaSteps {
         NON_REQUIRED
     }
 
-    fun RequiredHandling.toOptionalHandling(): OptionalHandling {
-        return when (this) {
-            RequiredHandling.REQUIRED -> OptionalHandling.REQUIRED
-            RequiredHandling.NON_REQUIRED -> OptionalHandling.NON_REQUIRED
-        }
-    }
-
-    fun OptionalHandling.toRequiredHandling(): RequiredHandling {
-        return when (this) {
-            OptionalHandling.REQUIRED -> RequiredHandling.REQUIRED
-            OptionalHandling.NON_REQUIRED -> RequiredHandling.NON_REQUIRED
-        }
-    }
-
     class JsonSchemaGenerationStepConfig {
-
-        /**
-         * How to handle optional properties
-         *
-         * Example:
-         * ```
-         * class MyExample(val someValue: String = "hello")
-         * ```
-         * - with `optionalHandling = REQUIRED` => "someValue" is required (because is not nullable)
-         * - with `optionalHandling = NON_REQUIRED` => "someValue" is not required (because a default value is provided)
-         */
-        @Deprecated("use 'optionals' instead")
-        var optionalHandling: OptionalHandling
-            get() = optionals.toOptionalHandling()
-            set(value) {
-                optionals = value.toRequiredHandling()
-            }
-
 
         /**
          * How to handle optional properties

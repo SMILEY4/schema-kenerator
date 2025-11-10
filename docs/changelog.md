@@ -5,17 +5,26 @@ search:
 
 # Changelog
 
+## 2.5.0
+
+- added annotation `@Ref` for classes and properties: reference external schema instead of generating schema from type. Handled in the `handleCoreAnnotation`-step for Swagger and JSON-Schemas. [#66](https://github.com/SMILEY4/schema-kenerator/issues/66)
+- `schema-kenerator-serialization`: added step `convertToKotlinxSerializationTypes` to convert compiled schema to kotlinx-serialization types. [#64](https://github.com/SMILEY4/schema-kenerator/issues/64)
+- `schema-kenerator-jsonschema`: removed deprecated option `OptionalHandling` (was previously replaced by `RequiredHandling`)
+- stricter handling of value classes to prevent infinite loops for specific types [ktor-openapi-tools#220](https://github.com/SMILEY4/ktor-openapi-tools/issues/220)
+- fixed bug: double and float schemas had incorrect min and max values. [#65](https://github.com/SMILEY4/schema-kenerator/issues/65)
+- fixed bug: null pointer exception in swagger schemas for specific types. [#61](https://github.com/SMILEY4/schema-kenerator/issues/61)
+
 ## 2.4.0
 
 - added more (core) annotations for swagger and json schemas [#59](https://github.com/SMILEY4/schema-kenerator/issues/59)
-  - @Min, @Max, @ExclusiveMin, @ExclusiveMax
-  - @MinLength, @MaxLength for strings and arrays
-  - @Pattern for strings
-- steps `addDiscriminatorProperty`, `addJsonClassDiscriminatorProperty` and `addJacksonTypeInfoDiscriminatorProperty` have new optional parameter `asEnum: Boolean`. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. [60](https://github.com/SMILEY4/schema-kenerator/issues/60)
-- fixed a null pointer exception when using swagger @Schema annotation "required" property [#61](https://github.com/SMILEY4/schema-kenerator/issues/61)
+  - `@Min`, `@Max`, `@ExclusiveMin`, `@ExclusiveMax`
+  - `@MinLength`, `@MaxLength` for strings and arrays
+  - `@Pattern` for strings
+- steps `addDiscriminatorProperty`, `addJsonClassDiscriminatorProperty` and `addJacksonTypeInfoDiscriminatorProperty` have new optional parameter `asEnum: Boolean`. Specifies whether the discriminator properties should be generated as simple strings or enums with only the possible types as options. [#60](https://github.com/SMILEY4/schema-kenerator/issues/60)
 - expanded RefType and SimpleType for swagger and json schema
   - `SIMPLE`, `OPENAPI_SIMPLE`: now contain the names of outer classes for nested classes.
   - `MINIMAL`, `OPENAPI_MINIMAL`: new; same behavior as previous SIMPLE & OPENAPI_SIMPLE. Contains only the name of the class without any outer classes.
+- fixed a null pointer exception when using swagger `@Schema` annotation "required" property [#61](https://github.com/SMILEY4/schema-kenerator/issues/61)
 
 ## 2.3.0
 

@@ -49,10 +49,10 @@ object JacksonSteps {
      */
     fun TypeDataGroup.handleJacksonAnnotations(): TypeDataGroup {
         return this
-            .let { JacksonIgnoreStep().process(this) }
-            .let { JacksonIgnoreTypeStep().process(this) }
-            .let { JacksonIgnorePropertiesStep().process(this) }
-            .let { JacksonPropertyStep().process(this) }
+            .let { JacksonIgnoreStep().process(it) }
+            .let { JacksonIgnoreTypeStep().process(it) }
+            .let { JacksonIgnorePropertiesStep().process(it) }
+            .let { JacksonPropertyStep().process(it) }
     }
 
 
