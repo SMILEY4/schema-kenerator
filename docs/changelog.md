@@ -5,6 +5,15 @@ search:
 
 # Changelog
 
+## 2.5.0
+
+- added annotation `@Ref` for classes and properties: reference external schema instead of generating schema from type. Handled in the `handleCoreAnnotation`-step for Swagger and JSON-Schemas. [#66](https://github.com/SMILEY4/schema-kenerator/issues/66)
+- `schema-kenerator-serialization`: added step `convertToKotlinxSerializationTypes` to convert compiled schema to kotlinx-serialization types. [#64](https://github.com/SMILEY4/schema-kenerator/issues/64)
+- `schema-kenerator-jsonschema`: removed deprecated option `OptionalHandling` (was previously replaced by `RequiredHandling`)
+- stricter handling of value classes to prevent infinite loops for specific types [ktor-openapi-tools#220](https://github.com/SMILEY4/ktor-openapi-tools/issues/220)
+- fixed bug: double and float schemas had incorrect min and max values. [#65](https://github.com/SMILEY4/schema-kenerator/issues/65)
+- fixed bug: null pointer exception in swagger schemas for specific types. [#61](https://github.com/SMILEY4/schema-kenerator/issues/61)
+
 ## 2.4.0
 
 - added more (core) annotations for swagger and json schemas [#59](https://github.com/SMILEY4/schema-kenerator/issues/59)
