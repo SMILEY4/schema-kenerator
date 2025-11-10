@@ -96,6 +96,7 @@ class GeneralTests : FunSpec({
 
             CoreAnnotationTestCases.basics,
             CoreAnnotationTestCases.annotatedValueClass,
+            CoreAnnotationTestCases.externalReferences,
 
             JacksonAnnotationTestCases.jsonIgnore,
             JacksonAnnotationTestCases.jsonIgnoreType,

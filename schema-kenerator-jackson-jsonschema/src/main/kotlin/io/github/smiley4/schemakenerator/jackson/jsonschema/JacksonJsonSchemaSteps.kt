@@ -10,7 +10,7 @@ object JacksonJsonSchemaSteps {
      * Add this step after schema generation and before schema compilation.
      */
     fun IntermediateJsonSchemaData.handleJacksonJsonSchemaAnnotations(): IntermediateJsonSchemaData {
-        return this.let { JacksonJsonSchemaPropertyDescriptionStep().process(this) }
+        return this.let { JacksonJsonSchemaPropertyDescriptionStep().process(it) }
     }
 
 }

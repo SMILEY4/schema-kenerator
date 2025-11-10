@@ -12,9 +12,11 @@ import io.github.smiley4.schemakenerator.core.annotations.MaxLength
 import io.github.smiley4.schemakenerator.core.annotations.Min
 import io.github.smiley4.schemakenerator.core.annotations.MinLength
 import io.github.smiley4.schemakenerator.core.annotations.Pattern
+import io.github.smiley4.schemakenerator.core.annotations.Ref
 import io.github.smiley4.schemakenerator.core.annotations.Title
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.mergePropertyAttributesIntoType
 import kotlinx.serialization.Serializable
 import org.checkerframework.common.value.qual.MinLen
 import kotlin.reflect.typeOf
@@ -217,6 +219,109 @@ object CoreAnnotationTestCases {
         """.trimIndent()
     }
 
+    val externalReferences = case("core annotations", "external reference annotation") {
+        type = typeOf<ClassWithExternalReferences>()
+        postGenerateSwaggerSchema = {
+            this.handleCoreAnnotations()
+        }
+        postGenerateJsonSchema = {
+            this.handleCoreAnnotations()
+        }
+        // language=json
+        expectedSwaggerInline = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someNormalValue" : {
+                      "type" : "string"
+                    },
+                    "valueRefOnProperty" : {
+                      "description" : "Some description for the external property",
+                      "${'$'}ref" : "example.com/schema-property.json"
+                    },
+                    "valueRefOnType" : {
+                      "${'$'}ref" : "example.com/schema-class.json"
+                    }
+                  },
+                  "required" : [ "someNormalValue", "valueRefOnProperty", "valueRefOnType" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedSwaggerReference = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : {
+                    "someNormalValue" : {
+                      "type" : "string"
+                    },
+                    "valueRefOnProperty" : {
+                      "description" : "Some description for the external property",
+                      "${'$'}ref" : "example.com/schema-property.json"
+                    },
+                    "valueRefOnType" : {
+                      "${'$'}ref" : "example.com/schema-class.json"
+                    }
+                  },
+                  "required" : [ "someNormalValue", "valueRefOnProperty", "valueRefOnType" ]
+                }
+              }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonInline = """
+            {
+               "type": "object",
+               "required": [
+                  "someNormalValue",
+                  "valueRefOnProperty",
+                  "valueRefOnType"
+               ],
+               "properties": {
+                  "someNormalValue": {
+                     "type": "string"
+                  },
+                  "valueRefOnProperty": {
+                     "${'$'}ref" : "example.com/schema-property.json",
+                     "description": "Some description for the external property"
+                  },
+                  "valueRefOnType": {
+                     "${'$'}ref": "example.com/schema-class.json"
+                  }
+               }
+            }
+            """.trimIndent()
+        // language=json
+        expectedJsonReference = """
+            {
+               "type": "object",
+               "required": [
+                  "someNormalValue",
+                  "valueRefOnProperty",
+                  "valueRefOnType"
+               ],
+               "properties": {
+                  "someNormalValue": {
+                     "type": "string"
+                  },
+                  "valueRefOnProperty": {
+                     "${'$'}ref" : "example.com/schema-property.json",
+                     "description": "Some description for the external property"
+                  },
+                  "valueRefOnType": {
+                     "${'$'}ref": "example.com/schema-class.json"
+                  }
+               }
+            }
+            """.trimIndent()
+    }
+
+
 
     @Title("Annotated Class")
     @Description("some description")
@@ -273,6 +378,23 @@ object CoreAnnotationTestCases {
         @Format("text")
         val myValueAnnotated: AnnotatedValueClass,
         val myValue: AnnotatedValueClass,
+    )
+
+    @Serializable
+    private data class ClassWithExternalReferences(
+        val someNormalValue: String,
+        val valueRefOnType: ClassAsExternalReference,
+        @Ref("example.com/schema-property.json")
+        @Description("Some description for the external property")
+        val valueRefOnProperty: String
+
+    )
+
+    @Serializable
+    @Ref("example.com/schema-class.json")
+    @Description("Some description for the external object")
+    private data class ClassAsExternalReference(
+        val someValue: String
     )
 
 }

@@ -211,6 +211,7 @@ object SwaggerSchemaCompileUtils {
             copy.uniqueItems = source.uniqueItems
             copy.writeOnly = source.writeOnly
             copy.xml = source.xml
+            copy.`raw$ref`(source.`$ref`)
         }
     }
 
