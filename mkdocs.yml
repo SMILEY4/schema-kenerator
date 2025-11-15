@@ -13,21 +13,11 @@ repo_url: https://github.com/SMILEY4/schema-kenerator
 # https://www.mkdocs.org/user-guide/configuration/#documentation-layout
 nav:
   - Project: index.md
-  - User Guide:
-    - Concept: user_guide/concept.md
-    - Analyzing Types:
-      - Reflection: user_guide/analyzing_types_reflection.md
-      - Kotlinx.Serialization: user_guide/analyzing_types_kotlinx_serialization.md
-    - Generating Schemas:
-      - JSON Schema: user_guide/generating_json_schema.md
-      - Swagger Schema: user_guide/generating_swagger_schema.md
-    - Customization: user_guide/customization.md
-  - Modules: modules.md
   - Changelog: changelog.md
 
 
 # Validation
-# # https://www.mkdocs.org/user-guide/configuration/#validation
+# https://www.mkdocs.org/user-guide/configuration/#validation
 validation:
   nav:
     omitted_files: warn

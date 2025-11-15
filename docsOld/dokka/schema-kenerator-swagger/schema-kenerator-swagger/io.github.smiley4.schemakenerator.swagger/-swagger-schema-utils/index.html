@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SwaggerSchemaUtils</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            schema-kenerator-swagger
+                    </a>
+            </div>
+            <div class="library-version">
+2.4.0            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":schema-kenerator-swagger:dokkaHtml/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="schema-kenerator-swagger::io.github.smiley4.schemakenerator.swagger/SwaggerSchemaUtils///PointingToDeclaration//-1155578353">
+  <div class="breadcrumbs"><a href="../../../index.html">schema-kenerator-swagger</a><span class="delimiter">/</span><a href="../index.html">io.github.smiley4.schemakenerator.swagger</a><span class="delimiter">/</span><span class="current">SwaggerSchemaUtils</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Swagger</span><wbr></wbr><span>Schema</span><wbr></wbr><span><span>Utils</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">SwaggerSchemaUtils</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="587276473%2FConstructors%2F-1155578353" anchor-label="SwaggerSchemaUtils" id="587276473%2FConstructors%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-swagger-schema-utils.html"><span>Swagger</span><wbr></wbr><span>Schema</span><wbr></wbr><span><span>Utils</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="587276473%2FConstructors%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="2045198511%2FFunctions%2F-1155578353" anchor-label="anyObjectSchema" id="2045198511%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="any-object-schema.html"><span>any</span><wbr></wbr><span>Object</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2045198511%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="any-object-schema.html"><span class="token function">anyObjectSchema</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema for any json object</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1824922356%2FFunctions%2F-1155578353" anchor-label="arraySchema" id="1824922356%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="array-schema.html"><span>array</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1824922356%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="array-schema.html"><span class="token function">arraySchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">items<span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">uniqueItems<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="963492018%2FFunctions%2F-1155578353" anchor-label="booleanSchema" id="963492018%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="boolean-schema.html"><span>boolean</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="963492018%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="boolean-schema.html"><span class="token function">booleanSchema</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a boolean</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1336153587%2FFunctions%2F-1155578353" anchor-label="componentReference" id="1336153587%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="component-reference.html"><span>component</span><wbr></wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1336153587%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="component-reference.html"><span class="token function">componentReference</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2132074290%2FFunctions%2F-1155578353" anchor-label="doubleSchema" id="2132074290%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="double-schema.html"><span>double</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2132074290%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="double-schema.html"><span class="token function">doubleSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">allowSpecialValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a floating-point number with double precision</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="259129991%2FFunctions%2F-1155578353" anchor-label="enumSchema" id="259129991%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enum-schema.html"><span>enum</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="259129991%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="enum-schema.html"><span class="token function">enumSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">values<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-collection/index.html">Collection</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1030207933%2FFunctions%2F-1155578353" anchor-label="floatSchema" id="-1030207933%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="float-schema.html"><span>float</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1030207933%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="float-schema.html"><span class="token function">floatSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">allowSpecialValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a floating-point number</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1465192716%2FFunctions%2F-1155578353" anchor-label="int32Schema" id="1465192716%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="int32-schema.html"><span><span>int32Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1465192716%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="int32-schema.html"><span class="token function">int32Schema</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a signed 32-bit integer</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-516111155%2FFunctions%2F-1155578353" anchor-label="int64Schema" id="-516111155%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="int64-schema.html"><span><span>int64Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-516111155%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="int64-schema.html"><span class="token function">int64Schema</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a signed 64-bit integer</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1211529234%2FFunctions%2F-1155578353" anchor-label="mapObjectSchema" id="-1211529234%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="map-object-schema.html"><span>map</span><wbr></wbr><span>Object</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1211529234%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="map-object-schema.html"><span class="token function">mapObjectSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">valueSchema<span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema for a key-value-map object with the given schema for the values</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1181655735%2FFunctions%2F-1155578353" anchor-label="nullSchema" id="1181655735%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="null-schema.html"><span>null</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1181655735%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="null-schema.html"><span class="token function">nullSchema</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema for 'null'</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="82592442%2FFunctions%2F-1155578353" anchor-label="numberSchema" id="82592442%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="number-schema.html"><span>number</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="82592442%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="number-schema.html"><span class="token function">numberSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">integer<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of any number</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-355368014%2FFunctions%2F-1155578353" anchor-label="numericSchema" id="-355368014%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="numeric-schema.html"><span>numeric</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-355368014%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="numeric-schema.html"><span class="token function">numericSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">integer<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">min<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html">BigDecimal</a><span class="token punctuation">, </span></span><span class="parameter ">max<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigDecimal.html">BigDecimal</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a number</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1429309821%2FFunctions%2F-1155578353" anchor-label="objectSchema" id="-1429309821%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="object-schema.html"><span>object</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1429309821%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="object-schema.html"><span class="token function">objectSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">properties<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">required<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-collection/index.html">Collection</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema for a json object with the given properties</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1469162122%2FFunctions%2F-1155578353" anchor-label="referenceSchema" id="-1469162122%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reference-schema.html"><span>reference</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1469162122%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="reference-schema.html"><span class="token function">referenceSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><span data-unresolved-link="io.github.smiley4.schemakenerator.core.data/TypeId///PointingToDeclaration/">TypeId</span><span class="token punctuation">, </span></span><span class="parameter ">prefixComponents<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="reference-schema.html"><span class="token function">referenceSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">refId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">prefixComponents<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="613912654%2FFunctions%2F-1155578353" anchor-label="referenceSchemaNullable" id="613912654%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reference-schema-nullable.html"><span>reference</span><wbr></wbr><span>Schema</span><wbr></wbr><span><span>Nullable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="613912654%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="reference-schema-nullable.html"><span class="token function">referenceSchemaNullable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">refId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">prefixComponents<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1915000612%2FFunctions%2F-1155578353" anchor-label="referenceSelf" id="1915000612%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reference-self.html"><span>reference</span><wbr></wbr><span><span>Self</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1915000612%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="reference-self.html"><span class="token function">referenceSelf</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-740627042%2FFunctions%2F-1155578353" anchor-label="stringSchema" id="-740627042%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="string-schema.html"><span>string</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-740627042%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="string-schema.html"><span class="token function">stringSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">min<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">max<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Schema of a text</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-443323725%2FFunctions%2F-1155578353" anchor-label="subtypesSchema" id="-443323725%2FFunctions%2F-1155578353" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main"></a>
+          <div class="table-row" data-filterable-current=":schema-kenerator-swagger:dokkaHtml/main" data-filterable-set=":schema-kenerator-swagger:dokkaHtml/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="subtypes-schema.html"><span>subtypes</span><wbr></wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-443323725%2FFunctions%2F-1155578353"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":schema-kenerator-swagger:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="subtypes-schema.html"><span class="token function">subtypesSchema</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">subtypes<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">discriminator<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">discriminatorMapping<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span data-unresolved-link="io.github.smiley4.schemakenerator.core.data/TypeId///PointingToDeclaration/">TypeId</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.swagger.v3.oas.models.media/Schema///PointingToDeclaration/">Schema</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

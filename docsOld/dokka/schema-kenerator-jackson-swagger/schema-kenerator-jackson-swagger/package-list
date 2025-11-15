@@ -1,0 +1,7 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:io.github.smiley4.schemakenerator.jackson.swagger////PointingToDeclaration/schema-kenerator-jackson-swagger/io.github.smiley4.schemakenerator.jackson.swagger/index.html
+$dokka.location:io.github.smiley4.schemakenerator.jackson.swagger/JacksonSwaggerSteps///PointingToDeclaration/schema-kenerator-jackson-swagger/io.github.smiley4.schemakenerator.jackson.swagger/-jackson-swagger-steps/index.html
+$dokka.location:io.github.smiley4.schemakenerator.jackson.swagger/JacksonSwaggerSteps/handleJacksonSwaggerAnnotations/io.github.smiley4.schemakenerator.swagger.data.IntermediateSwaggerSchemaData#/PointingToDeclaration/schema-kenerator-jackson-swagger/io.github.smiley4.schemakenerator.jackson.swagger/-jackson-swagger-steps/handle-jackson-swagger-annotations.html
+io.github.smiley4.schemakenerator.jackson.swagger
+
