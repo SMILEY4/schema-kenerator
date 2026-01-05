@@ -20,7 +20,7 @@ interface SerializationTypeAnalyzerModule {
         fun analyze(descriptor: SerialDescriptor): WrappedTypeData {
             return this.analyzer.analyze(
                 descriptor = descriptor,
-                type = type,
+                type = null,
                 knownTypeData = knownTypeData,
                 cache = cache,
             )
