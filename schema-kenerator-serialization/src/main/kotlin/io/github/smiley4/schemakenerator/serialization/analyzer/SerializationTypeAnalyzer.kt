@@ -3,6 +3,7 @@ package io.github.smiley4.schemakenerator.serialization.analyzer
 import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlin.reflect.KType
 
 /**
  * Analyzes the given type and returns the resulting [TypeData] (with additional nullability information)
@@ -12,11 +13,13 @@ interface SerializationTypeAnalyzer {
     /**
      * Analyzes the given descriptor and adds the results to the given collection
      * @param descriptor the input descriptor to parse
+     * @param type the original ktype reference the descriptor came from
      * @param knownTypeData the already known type data. Adds new results to this collection.
      * @param cache already processed descriptors with their type data. Adds new results to this map.
      */
     fun analyze(
         descriptor: SerialDescriptor,
+        type: KType?,
         knownTypeData: MutableList<TypeData>,
         cache: TypeDataCache
     ): WrappedTypeData

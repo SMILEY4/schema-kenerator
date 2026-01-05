@@ -4,6 +4,7 @@ import io.github.smiley4.schemakenerator.core.data.TypeData
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.WrappedTypeData
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlin.reflect.KType
 
 interface SerializationTypeAnalyzerModule {
 
@@ -11,6 +12,7 @@ interface SerializationTypeAnalyzerModule {
         private val analyzer: SerializationTypeAnalyzer,
         val id: TypeId,
         val descriptor: SerialDescriptor,
+        val type: KType?,
         val knownTypeData: MutableList<TypeData>,
         val cache: TypeDataCache
     ) {
@@ -18,6 +20,7 @@ interface SerializationTypeAnalyzerModule {
         fun analyze(descriptor: SerialDescriptor): WrappedTypeData {
             return this.analyzer.analyze(
                 descriptor = descriptor,
+                type = type,
                 knownTypeData = knownTypeData,
                 cache = cache,
             )
