@@ -58,7 +58,7 @@ internal class SerializationTypeAnalyzerImpl(
 
     private fun analyze(input: KType, knownTypeData: MutableList<TypeData>): WrappedTypeData {
         return getSerializerFor(input)
-            ?.let { serializer -> analyze(serializer.descriptor, knownTypeData, TypeDataCache()) }
+            ?.let { serializer -> analyze(serializer.descriptor, input, knownTypeData, TypeDataCache()) }
             ?: WrappedTypeData(
                 typeData = knownTypeData.find(TypeId.createWildcard()) ?: TypeData.createWildcard().also { knownTypeData.add(it) },
                 nullable = false
@@ -66,11 +66,12 @@ internal class SerializationTypeAnalyzerImpl(
     }
 
     private fun analyze(input: SerialDescriptor, knownTypeData: MutableList<TypeData>): WrappedTypeData {
-        return analyze(input, knownTypeData, TypeDataCache())
+        return analyze(input, null, knownTypeData, TypeDataCache())
     }
 
     override fun analyze(
         descriptor: SerialDescriptor,
+        type: KType?,
         knownTypeData: MutableList<TypeData>,
         cache: TypeDataCache
     ): WrappedTypeData {
@@ -89,7 +90,7 @@ internal class SerializationTypeAnalyzerImpl(
         // check contextual descriptors
         val contextualByKClass = descriptor.capturedKClass?.let { serializersModule?.getContextual(it)?.descriptor }
         if (contextualByKClass != null) {
-            return analyze(contextualByKClass, knownTypeData, cache)
+            return analyze(contextualByKClass, null, knownTypeData, cache)
         }
 
         // input serial descriptor has already been parsed before (or is currently being parsed) -> break out of infinite loops
@@ -115,6 +116,7 @@ internal class SerializationTypeAnalyzerImpl(
                 analyzer = this,
                 id = reservedTypeId,
                 descriptor = descriptor,
+                type = type,
                 knownTypeData = knownTypeData,
                 cache = cache
             )

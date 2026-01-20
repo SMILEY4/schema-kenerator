@@ -22,8 +22,10 @@ import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
+import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.KType
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
@@ -33,6 +35,12 @@ class DefaultSerializationTypeAnalyzerModule(
      */
     private val findTypeParametersUsingReflection: Boolean
 ) : SerializationTypeAnalyzerModule {
+    companion object {
+        private val DEFAULT_SERIAL_DESCRIPTOR_CLASSES = setOf(
+            "kotlinx.serialization.internal.PluginGeneratedSerialDescriptor",
+            "kotlinx.serialization.internal.InlineClassDescriptor",
+        )
+    }
 
     private val annotationAnalyzer = AnnotationAnalyzer()
 
@@ -263,7 +271,7 @@ class DefaultSerializationTypeAnalyzerModule(
 
         // extract type parameters using reflection (if enabled)
         val typeParameters = if (findTypeParametersUsingReflection) {
-            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
+            extractTypeParameters(context.descriptor, context.type).mapIndexed { index, descriptor ->
                 val type = context.analyze(descriptor)
                 TypeParameterData(
                     name = "T$index",
@@ -337,7 +345,7 @@ class DefaultSerializationTypeAnalyzerModule(
 
         // extract type parameters using reflection (if enabled)
         val typeParameters = if (findTypeParametersUsingReflection) {
-            extractTypeParameters(context.descriptor).mapIndexed { index, descriptor ->
+            extractTypeParameters(context.descriptor, context.type).mapIndexed { index, descriptor ->
                 val type = context.analyze(descriptor)
                 TypeParameterData(
                     name = "T$index",
@@ -368,7 +376,7 @@ class DefaultSerializationTypeAnalyzerModule(
             id = context.id,
             identifyingName = identifyingName,
             descriptiveName = descriptiveName,
-            typeParameters = mutableListOf(),
+            typeParameters = typeParameters.toMutableList(),
             annotations = annotations,
             subtypes = subtypes.toMutableList(),
             supertypes = mutableListOf(),
@@ -463,12 +471,16 @@ class DefaultSerializationTypeAnalyzerModule(
     /**
      * Try to determine the type parameters of the given serial descriptor (if possible).
      */
-    private fun extractTypeParameters(serialDescriptor: SerialDescriptor): List<SerialDescriptor> {
-        if (serialDescriptor::class.qualifiedName == "kotlinx.serialization.internal.PluginGeneratedSerialDescriptor") {
+    private fun extractTypeParameters(serialDescriptor: SerialDescriptor, type: KType?): List<SerialDescriptor> {
+        if (serialDescriptor::class.qualifiedName in DEFAULT_SERIAL_DESCRIPTOR_CLASSES) {
             val property = serialDescriptor::class.memberProperties.find { it.name == "typeParameterDescriptors" }!!
             @Suppress("UNCHECKED_CAST") val typedProperty = property as KProperty1<SerialDescriptor, Array<SerialDescriptor>>
             typedProperty.isAccessible = true
             return typedProperty.get(serialDescriptor).toList()
+        }
+        if (type != null) {
+            val parameters = type.arguments.map { it.type ?: error("") }
+            return parameters.map { serializer(it).descriptor }
         }
         return emptyList()
     }
