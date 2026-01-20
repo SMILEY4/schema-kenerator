@@ -179,9 +179,25 @@ class SwaggerSchemaUtils {
 
     //=====  OBJECTS ================================
 
-    fun subtypesSchema(subtypes: List<Schema<*>>, discriminator: String?, discriminatorMapping: Map<TypeId, String>): Schema<*> {
+    fun anyOfSchema(subtypes: List<Schema<*>>, discriminator: String?, discriminatorMapping: Map<TypeId, String>): Schema<*> {
         return Schema<Any>().also { schema ->
             schema.anyOf = subtypes
+            if (discriminator != null) {
+                schema.discriminator = Discriminator().also {
+                    it.propertyName = discriminator
+                    it.mapping = buildMap {
+                        discriminatorMapping.forEach { (typeId, name) ->
+                            this[name] = typeId.id
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun oneOfSchema(subtypes: List<Schema<*>>, discriminator: String?, discriminatorMapping: Map<TypeId, String>): Schema<*> {
+        return Schema<Any>().also { schema ->
+            schema.oneOf = subtypes
             if (discriminator != null) {
                 schema.discriminator = Discriminator().also {
                     it.propertyName = discriminator

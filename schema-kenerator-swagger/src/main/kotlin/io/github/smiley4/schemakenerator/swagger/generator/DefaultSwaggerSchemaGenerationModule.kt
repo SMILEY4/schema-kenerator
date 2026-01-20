@@ -25,10 +25,9 @@ class DefaultSwaggerSchemaGenerationModule(
     override fun applies(typeData: TypeData) = true
 
     override fun generate(context: SwaggerSchemaGenerationModule.Context): Schema<*> {
-        if (context.typeData.subtypes.isNotEmpty()) {
-            return buildWithSubtypes(context.typeData, context.knownTypeData)
-        }
         return when {
+            // TODO add oneOf support
+            context.typeData.subtypes.isNotEmpty() -> buildAnyOfSchema(context.typeData, context.knownTypeData)
             context.typeData.enumData != null -> buildEnumSchema(context.typeData)
             context.typeData.collectionData != null -> buildCollectionSchema(context.typeData)
             context.typeData.mapData != null -> buildMapSchema(context.typeData, context.knownTypeData)
@@ -123,8 +122,16 @@ class DefaultSwaggerSchemaGenerationModule(
         )
     }
 
-    private fun buildWithSubtypes(typeData: TypeData, typeDataList: Collection<TypeData>): Schema<*> {
-        return schema.subtypesSchema(
+    private fun buildAnyOfSchema(typeData: TypeData, typeDataList: Collection<TypeData>): Schema<*> {
+        return schema.anyOfSchema(
+            subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
+            discriminator = getDiscriminatorName(typeData),
+            discriminatorMapping = discriminatorMapping(typeData, typeDataList)
+        )
+    }
+
+    private fun buildOneOfSchema(typeData: TypeData, typeDataList: Collection<TypeData>): Schema<*> {
+        return schema.oneOfSchema(
             subtypes = typeData.subtypes.map { schema.referenceSchema(it) },
             discriminator = getDiscriminatorName(typeData),
             discriminatorMapping = discriminatorMapping(typeData, typeDataList)
