@@ -35,6 +35,12 @@ class DefaultSerializationTypeAnalyzerModule(
      */
     private val findTypeParametersUsingReflection: Boolean
 ) : SerializationTypeAnalyzerModule {
+    companion object {
+        private val DEFAULT_SERIAL_DESCRIPTOR_CLASSES = setOf(
+            "kotlinx.serialization.internal.PluginGeneratedSerialDescriptor",
+            "kotlinx.serialization.internal.InlineClassDescriptor",
+        )
+    }
 
     private val annotationAnalyzer = AnnotationAnalyzer()
 
@@ -466,7 +472,7 @@ class DefaultSerializationTypeAnalyzerModule(
      * Try to determine the type parameters of the given serial descriptor (if possible).
      */
     private fun extractTypeParameters(serialDescriptor: SerialDescriptor, type: KType?): List<SerialDescriptor> {
-        if (serialDescriptor::class.qualifiedName in setOf("kotlinx.serialization.internal.PluginGeneratedSerialDescriptor", "kotlinx.serialization.internal.InlineClassDescriptor")) {
+        if (serialDescriptor::class.qualifiedName in DEFAULT_SERIAL_DESCRIPTOR_CLASSES) {
             val property = serialDescriptor::class.memberProperties.find { it.name == "typeParameterDescriptors" }!!
             @Suppress("UNCHECKED_CAST") val typedProperty = property as KProperty1<SerialDescriptor, Array<SerialDescriptor>>
             typedProperty.isAccessible = true
