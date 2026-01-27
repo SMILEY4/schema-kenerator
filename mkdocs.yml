@@ -13,6 +13,10 @@ repo_url: https://github.com/SMILEY4/schema-kenerator
 # https://www.mkdocs.org/user-guide/configuration/#documentation-layout
 nav:
   - Project: index.md
+  - Documentation:
+      - Getting Started: getting_started.md
+      - Core Concepts:
+          - Pipeline and Steps: core_concepts/pipeline_and_steps.md
   - Changelog: changelog.md
 
 
@@ -55,10 +59,7 @@ theme:
     - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
-    - navigation.expand
     - navigation.indexes
-    - navigation.footer
-    - toc.integrate
     - search.suggest
     - search.share
     - content.code.copy

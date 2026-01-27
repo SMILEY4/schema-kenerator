@@ -9,10 +9,27 @@ details code {
         border-bottom: 1px solid var(--md-default-fg-color--lightest);
     }
 }
+
 @media not screen and (max-width: 44.9844em) {
     .tabbed-set {
         border: 1px solid var(--md-default-fg-color--lightest);
         border-radius: .2rem !important;
         padding: 0 .3rem .3rem .3rem !important;
     }
+}
+
+.md-typeset h2 {
+    margin: 2.5em 0 .64em;
+}
+
+.md-typeset h2 {
+    margin: 2.6em 0 .64em;
+}
+
+.md-typeset h3 {
+    margin-top: 2.2em;
+}
+
+.md-content {
+    padding-bottom: 7em;
 }
