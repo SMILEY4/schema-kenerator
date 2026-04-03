@@ -1,1 +1,1 @@
-sourceset_dependencies='{":schema-kenerator-validation-swagger:dokkaHtml/main":[]}'
+sourceset_dependencies='{":schema-kenerator-validation-swagger/main":[]}'

@@ -1,1 +1,1 @@
-sourceset_dependencies='{":schema-kenerator-jackson:dokkaHtml/main":[]}'
+sourceset_dependencies='{":schema-kenerator-jackson/main":[]}'

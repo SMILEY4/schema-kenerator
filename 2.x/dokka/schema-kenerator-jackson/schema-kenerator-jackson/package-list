@@ -6,4 +6,3 @@ $dokka.location:io.github.smiley4.schemakenerator.jackson/JacksonSteps/addJackso
 $dokka.location:io.github.smiley4.schemakenerator.jackson/JacksonSteps/collectJacksonSubTypes/io.github.smiley4.schemakenerator.core.data.InitialTypeData#kotlin.Function1[io.github.smiley4.schemakenerator.core.data.InitialKTypeData,io.github.smiley4.schemakenerator.core.data.TypeDataGroup]#kotlin.Int/PointingToDeclaration/schema-kenerator-jackson/io.github.smiley4.schemakenerator.jackson/-jackson-steps/collect-jackson-sub-types.html
 $dokka.location:io.github.smiley4.schemakenerator.jackson/JacksonSteps/handleJacksonAnnotations/io.github.smiley4.schemakenerator.core.data.TypeDataGroup#/PointingToDeclaration/schema-kenerator-jackson/io.github.smiley4.schemakenerator.jackson/-jackson-steps/handle-jackson-annotations.html
 io.github.smiley4.schemakenerator.jackson
-
