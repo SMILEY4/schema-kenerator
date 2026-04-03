@@ -1,0 +1,68 @@
+[versions]
+
+# Language & Build
+kotlin = "2.2.21"
+jvm-target = "11"
+
+# Plugins
+dokka = "1.9.20"
+detekt = "1.23.0"
+dependencycheck = "8.2.1"
+maven-publish = "0.33.0"
+versions-plugin = "0.53.0"
+mkdocs = "4.0.1"
+
+# Libraries
+kotlinx-serialization = "1.9.0"
+kotest = "5.9.1"
+jackson = "2.19.1"
+swagger-parser = "2.1.30"
+javax-validation = "2.0.1.Final"
+jakarta-validation = "3.1.1"
+
+
+[libraries]
+
+# Kotlin & Kotlinx
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
+
+
+# Testing
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-assertions-json = { module = "io.kotest:kotest-assertions-json", version.ref = "kotest" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+# Jackson
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+
+# Swagger
+swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swagger-parser" }
+
+# Validation
+javax-validation-api = { module = "javax.validation:validation-api", version.ref = "javax-validation" }
+jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation" }
+
+
+[plugins]
+
+# Kotlin
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Code Quality & Documentation
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+dependencycheck = { id = "org.owasp.dependencycheck", version.ref = "dependencycheck" }
+
+# Publishing
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+
+# Utilities
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions-plugin" }
+mkdocs = { id = "ru.vyarus.mkdocs", version.ref = "mkdocs" }
