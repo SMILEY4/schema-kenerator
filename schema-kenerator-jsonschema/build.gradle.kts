@@ -18,10 +18,6 @@ dependencies {
     implementation(project(":schema-kenerator-core"))
 }
 
-kotlin {
-    jvmToolchain(libs.versions.jvm.target.get().toInt())
-}
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }

@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false
@@ -10,9 +13,38 @@ plugins {
 }
 
 subprojects {
+
     repositories {
         mavenCentral()
     }
+
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+
+        val versionJvmCompile = libs.versions.jvm.compile.get().toInt()
+        val versionJvmTarget = libs.versions.jvm.target.get()
+
+        // Kotlin Toolchain
+        extensions.configure<KotlinJvmProjectExtension> {
+            jvmToolchain(versionJvmCompile)
+            compilerOptions {
+                jvmTarget.set(JvmTarget.fromTarget(versionJvmTarget))
+            }
+        }
+
+        // Java Toolchain
+        extensions.configure<JavaPluginExtension> {
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(versionJvmCompile))
+            }
+        }
+
+        // JVM Compatibility
+        tasks.withType<JavaCompile>().configureEach {
+            sourceCompatibility = versionJvmTarget
+            targetCompatibility = versionJvmTarget
+        }
+    }
+
 }
 
 mkdocs {

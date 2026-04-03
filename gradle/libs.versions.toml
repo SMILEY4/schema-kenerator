@@ -2,6 +2,7 @@
 
 # Language & Build
 kotlin = "2.2.21"
+jvm-compile = "21"
 jvm-target = "11"
 
 # Plugins

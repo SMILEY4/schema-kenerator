@@ -1,4 +1,5 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -21,10 +22,6 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotlin.test)
-}
-
-kotlin {
-    jvmToolchain(libs.versions.jvm.target.get().toInt())
 }
 
 tasks.withType<Test>().configureEach {

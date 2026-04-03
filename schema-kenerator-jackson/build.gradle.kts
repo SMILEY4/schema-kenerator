@@ -19,10 +19,6 @@ dependencies {
     api(libs.jackson.module.kotlin)
 }
 
-kotlin {
-    jvmToolchain(libs.versions.jvm.target.get().toInt())
-}
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }

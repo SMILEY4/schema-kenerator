@@ -22,10 +22,6 @@ dependencies {
     implementation(project(":schema-kenerator-jsonschema"))
 }
 
-kotlin {
-    jvmToolchain(libs.versions.jvm.target.get().toInt())
-}
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }

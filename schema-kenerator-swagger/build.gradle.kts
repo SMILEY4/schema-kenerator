@@ -26,10 +26,6 @@ dependencies {
     }
 }
 
-kotlin {
-    jvmToolchain(libs.versions.jvm.target.get().toInt())
-}
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
