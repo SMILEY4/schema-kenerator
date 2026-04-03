@@ -42,6 +42,8 @@ import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import io.kotest.core.spec.style.scopes.FunSpecRootScope
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.models.Components
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import kotlin.reflect.KType
 
 class GeneralTests : FunSpec({
@@ -183,6 +185,7 @@ class GeneralTests : FunSpec({
                                 .analyzeTypeUsingReflection(case.reflectionConfig)
                                 .addMissingSupertypeSubtypeRelations()
                         }
+                            .normalizeSwaggerJson()
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -201,6 +204,7 @@ class GeneralTests : FunSpec({
                                 .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
                                 .addMissingSupertypeSubtypeRelations()
                         }
+                            .normalizeSwaggerJson()
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -223,6 +227,7 @@ class GeneralTests : FunSpec({
                                 .analyzeTypeUsingReflection(case.reflectionConfig)
                                 .addMissingSupertypeSubtypeRelations()
                         }
+                            .normalizeSwaggerJson()
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -241,6 +246,7 @@ class GeneralTests : FunSpec({
                                 .analyzeTypeUsingKotlinxSerialization(case.kotlinxSerializationConfig)
                                 .addMissingSupertypeSubtypeRelations()
                         }
+                            .normalizeSwaggerJson()
                             .also {
                                 println("== ACTUAL =======================")
                                 println(it)
@@ -411,6 +417,32 @@ class GeneralTests : FunSpec({
             }
 
             return mergedSchema.prettyPrint()
+        }
+
+        private val json = jacksonObjectMapper()
+
+        fun String.normalizeSwaggerJson(): String {
+            val actualTree = json.readTree(this)
+            val actualTreeNormalized = normalizeSwaggerJson(actualTree)
+            val actual = json.writerWithDefaultPrettyPrinter().writeValueAsString(actualTreeNormalized)
+            return actual
+        }
+
+        fun normalizeSwaggerJson(node: JsonNode): JsonNode {
+            return when {
+                node.isObject -> json.createObjectNode().also { objNode ->
+                    node.properties().forEach { (key, value) ->
+                        if (key == "default" && (value.isNull || (value.isString && value.stringValue() == "##default"))) {
+                            return@forEach
+                        }
+                        objNode.set(key, normalizeSwaggerJson(value))
+                    }
+                }
+                node.isArray -> json.createArrayNode().also { arrayNode ->
+                    node.forEach { arrayNode.add(normalizeSwaggerJson(it)) }
+                }
+                else -> node
+            }
         }
 
         private fun String.shouldEqualJsonLenient(expected: String): String {

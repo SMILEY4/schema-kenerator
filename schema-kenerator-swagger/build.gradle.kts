@@ -1,7 +1,6 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.dokka.gradle.DokkaTask
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -9,31 +8,22 @@ group = projectGroupId
 version = projectVersion
 
 plugins {
-    kotlin("jvm")
-    id("org.owasp.dependencycheck")
-    id("com.github.ben-manes.versions")
-    id("io.gitlab.arturbosch.detekt")
-    id("com.vanniktech.maven.publish")
-    id("org.jetbrains.dokka")
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.dependencycheck)
+    alias(libs.plugins.versions)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {
-    val versionSwaggerParser: String by project
     implementation(project(":schema-kenerator-core"))
-    api("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
+    api(libs.swagger.parser)
     constraints {
         api("commons-codec:commons-codec:1.13") {
             because("Version 1.11 has a known vulnerability (pulled in via 'io.swagger.parser.v3:swagger-parser').")
         }
     }
-}
-
-kotlin {
-    jvmToolchain(11)
 }
 
 tasks.withType<Test>().configureEach {
@@ -44,7 +34,7 @@ detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true
     allRules = false
-    config.setFrom("$projectDir/../detekt/detekt.yml")
+    config.setFrom("$rootDir/detekt/detekt.yml")
 }
 tasks.withType<Detekt>().configureEach {
     reports {
@@ -56,8 +46,10 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-swagger"))
+dokka {
+    dokkaPublications.html {
+        outputDirectory = file("$rootDir/docs/dokka/schema-kenerator-swagger")
+    }
 }
 
 mavenPublishing {

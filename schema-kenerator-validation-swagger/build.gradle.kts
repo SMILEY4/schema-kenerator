@@ -1,7 +1,6 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.dokka.gradle.DokkaTask
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -9,30 +8,19 @@ group = projectGroupId
 version = projectVersion
 
 plugins {
-    kotlin("jvm")
-    id("org.owasp.dependencycheck")
-    id("com.github.ben-manes.versions")
-    id("io.gitlab.arturbosch.detekt")
-    id("com.vanniktech.maven.publish")
-    id("org.jetbrains.dokka")
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.dependencycheck)
+    alias(libs.plugins.versions)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {
-    val versionSwaggerParser: String by project
-    val versionJavaxValidation: String by project
-    val versionJakartaValidation: String by project
     implementation(project(":schema-kenerator-core"))
     implementation(project(":schema-kenerator-swagger"))
-    api("javax.validation:validation-api:$versionJavaxValidation")
-    api("jakarta.validation:jakarta.validation-api:$versionJakartaValidation")
-}
-
-kotlin {
-    jvmToolchain(11)
+    api(libs.javax.validation.api)
+    api(libs.jakarta.validation.api)
 }
 
 tasks.withType<Test>().configureEach {
@@ -43,7 +31,7 @@ detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true
     allRules = false
-    config.setFrom("$projectDir/../detekt/detekt.yml")
+    config.setFrom("$rootDir/detekt/detekt.yml")
 }
 tasks.withType<Detekt>().configureEach {
     reports {
@@ -55,8 +43,10 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-validation-swagger"))
+dokka {
+    dokkaPublications.html {
+        outputDirectory = file("$rootDir/docs/dokka/schema-kenerator-validation-swagger")
+    }
 }
 
 mavenPublishing {

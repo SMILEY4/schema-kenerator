@@ -1,34 +1,29 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 dependencies {
-    val versionKotest: String by project
-    val versionJackson: String by project
-    val versionKotlinxSerializationJson: String by project
-    val versionSwaggerParser: String by project
-    val versionJavaxValidation: String by project
-    val versionJakartaValidation: String by project
-    testImplementation("io.kotest:kotest-runner-junit5:$versionKotest")
-    testImplementation("io.kotest:kotest-framework-datatest:$versionKotest")
-    testImplementation("io.kotest:kotest-assertions-core:$versionKotest")
-    testImplementation("io.kotest:kotest-assertions-json:$versionKotest")
-    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:$versionJackson")
-    testImplementation("com.fasterxml.jackson.core:jackson-annotations:$versionJackson")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$versionKotlinxSerializationJson")
-    testImplementation("io.swagger.parser.v3:swagger-parser:$versionSwaggerParser")
+
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.assertions.json)
+
+    testImplementation(libs.jackson.module.kotlin)
+    testImplementation(libs.jackson.annotations)
+
+    testImplementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.swagger.parser)
     constraints {
         testImplementation("commons-codec:commons-codec:1.13") {
             because("Version 1.11 has a known vulnerability (pulled in via 'io.swagger.parser.v3:swagger-parser').")
         }
     }
-    testImplementation("javax.validation:validation-api:$versionJavaxValidation")
-    testImplementation("jakarta.validation:jakarta.validation-api:$versionJakartaValidation")
+
+    testImplementation(libs.javax.validation.api)
+    testImplementation(libs.jakarta.validation.api)
+
     testImplementation(project(":schema-kenerator-core"))
     testImplementation(project(":schema-kenerator-reflection"))
     testImplementation(project(":schema-kenerator-serialization"))

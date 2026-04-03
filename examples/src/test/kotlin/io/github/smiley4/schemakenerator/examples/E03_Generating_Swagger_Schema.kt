@@ -4,7 +4,6 @@ package io.github.smiley4.schemakenerator.examples
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
 import io.github.smiley4.schemakenerator.core.annotations.Default
 import io.github.smiley4.schemakenerator.core.annotations.Deprecated
@@ -31,6 +30,9 @@ import io.kotest.core.spec.style.FreeSpec
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.module.kotlin.jsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
@@ -447,8 +449,10 @@ class E03_Generating_Swagger_Schema : FreeSpec({
 }) {
     companion object {
 
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
-
+        private val json = jsonMapper {
+            changeDefaultPropertyInclusion { it.withValueInclusion(JsonInclude.Include.NON_NULL) }
+            addModule(kotlinModule())
+        }
 
         private class NestedClass(
             val flag: Boolean

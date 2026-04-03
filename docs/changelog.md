@@ -5,6 +5,20 @@ search:
 
 # Changelog
 
+## 2.7.0
+
+- upgrade dependencies
+  - kotlinx-serialization: `1.9.20` -> `1.10.0`
+  - jackson: `2.19.1` -> `3.1.1`
+  - swagger-parser: `2.1.30` -> `2.1.39`
+  - ... and some more test dependencies and gradle plugins
+
+## 2.6.0
+
+- upgrade kotlin from 2.0.21 to 2.2.21
+- upgrade kotlinx-serialization from 1.8.1 to 1.9.0
+- fix issue with type parameters for sealed interfaces ([#67](https://github.com/SMILEY4/schema-kenerator/issues/67))
+
 ## 2.5.0
 
 - added annotation `@Ref` for classes and properties: reference external schema instead of generating schema from type. Handled in the `handleCoreAnnotation`-step for Swagger and JSON-Schemas. [#66](https://github.com/SMILEY4/schema-kenerator/issues/66)
