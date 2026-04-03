@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinJvm
 import io.gitlab.arturbosch.detekt.Detekt
 
 val projectGroupId: String by project
@@ -65,7 +63,12 @@ mavenPublishing {
     val projectDeveloperName: String by project
     val projectDeveloperUrl: String by project
 
-    configure(KotlinJvm(JavadocJar.Dokka("dokkaHtml"), true))
+    configure(
+        com.vanniktech.maven.publish.KotlinJvm(
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka("dokkaGenerateHtml")
+        )
+    )
+
     publishToMavenCentral(automaticRelease = true)
     signAllPublications()
     coordinates(projectGroupId, "$projectArtifactIdBase-swagger", projectVersion)

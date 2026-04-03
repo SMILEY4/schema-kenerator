@@ -30,7 +30,7 @@ jobs:
           key: 'python'
 
       - name: Dokka
-        run: ./gradlew dokkaHtml -Dorg.gradle.jvmargs=-XX:MaxMetaspaceSize=512m
+        run: ./gradlew dokkaGenerateHtml -Dorg.gradle.jvmargs=-XX:MaxMetaspaceSize=512m
 
       - name: Publish
         run: ./gradlew mkdocsPublish -Porg.ajoberstar.grgit.auth.username=${{ secrets.GRGIT_USER }}
