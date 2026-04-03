@@ -1,5 +1,5 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -7,32 +7,21 @@ group = projectGroupId
 version = projectVersion
 
 plugins {
-    kotlin("jvm")
-    id("org.owasp.dependencycheck")
-    id("com.github.ben-manes.versions")
-    id("io.gitlab.arturbosch.detekt")
-    id("com.vanniktech.maven.publish")
-    id("org.jetbrains.dokka")
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.dependencycheck)
+    alias(libs.plugins.versions)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {
-    val versionKotlinxSerializationJson: String by project
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:$versionKotlinxSerializationJson")
 
-    val versionKotest: String by project
-    val versionKotlinTest: String by project
-    testImplementation("io.kotest:kotest-runner-junit5:$versionKotest")
-    testImplementation("io.kotest:kotest-assertions-core:$versionKotest")
-    testImplementation("io.kotest:kotest-framework-datatest:$versionKotest")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:$versionKotlinTest")
-}
+    implementation(libs.kotlinx.serialization.core)
 
-kotlin {
-    jvmToolchain(11)
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotlin.test)
 }
 
 tasks.withType<Test>().configureEach {
@@ -43,7 +32,7 @@ detekt {
     ignoreFailures = false
     buildUponDefaultConfig = true
     allRules = false
-    config.setFrom("$projectDir/../detekt/detekt.yml")
+    config.setFrom("$rootDir/detekt/detekt.yml")
 }
 tasks.withType<Detekt>().configureEach {
     reports {
@@ -55,8 +44,10 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-core"))
+dokka {
+    dokkaPublications.html {
+        outputDirectory = file("$rootDir/docs/dokka/schema-kenerator-core")
+    }
 }
 
 mavenPublishing {

@@ -4,24 +4,12 @@
 
 package io.github.smiley4.schemakenerator.test
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.smiley4.schemakenerator.core.CoreSteps.addMissingSupertypeSubtypeRelations
 import io.github.smiley4.schemakenerator.core.CoreSteps.handleNameAnnotation
 import io.github.smiley4.schemakenerator.core.CoreSteps.initial
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileInlining
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencing
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.generateJsonSchema
 import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.jsonschema.JsonSchemaSteps.merge
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonArray
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonBooleanValue
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNode
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNullValue
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonNumericValue
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonObject
-import io.github.smiley4.schemakenerator.jsonschema.jsonDsl.JsonTextValue
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.analyzeTypeUsingReflection
 import io.github.smiley4.schemakenerator.reflection.ReflectionSteps.collectSubTypes
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJsonClassDiscriminatorProperty
@@ -46,8 +34,6 @@ import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Duration
 
 
@@ -153,8 +139,6 @@ class _ManualTests : StringSpec({
 
             return Json31.pretty(openApi)
         }
-
-        private val json = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writerWithDefaultPrettyPrinter()!!
 
     }
 }
