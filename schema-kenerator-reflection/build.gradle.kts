@@ -1,5 +1,4 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.dokka.gradle.DokkaTask
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -44,8 +43,10 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-reflection"))
+dokka {
+    dokkaPublications.html {
+        outputDirectory = file("$rootDir/docs/dokka/schema-kenerator-reflection")
+    }
 }
 
 mavenPublishing {

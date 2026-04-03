@@ -15,7 +15,7 @@ import kotlin.reflect.typeOf
 class PropertyFilterTests : FunSpec({
 
     context("filter properties") {
-        withData(TEST_DATA) { data ->
+        this.withData(TEST_DATA) { data ->
 
             val schema = initial(data.type)
                 .analyzeTypeUsingReflection {

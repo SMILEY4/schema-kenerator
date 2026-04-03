@@ -5,18 +5,19 @@ kotlin = "2.2.21"
 jvm-target = "11"
 
 # Plugins
-dokka = "1.9.20"
-detekt = "1.23.0"
-dependencycheck = "8.2.1"
-maven-publish = "0.33.0"
+dokka = "2.2.0"
+detekt = "1.23.8"
+dependencycheck = "12.2.0"
+maven-publish = "0.36.0"
 versions-plugin = "0.53.0"
 mkdocs = "4.0.1"
 
 # Libraries
-kotlinx-serialization = "1.9.0"
-kotest = "5.9.1"
-jackson = "2.19.1"
-swagger-parser = "2.1.30"
+kotlinx-serialization = "1.10.0"
+kotest = "6.1.10"
+jackson = "3.1.1"
+jackson-annotations = "2.21"
+swagger-parser = "2.1.39"
 javax-validation = "2.0.1.Final"
 jakarta-validation = "3.1.1"
 
@@ -31,15 +32,13 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 
 # Testing
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-assertions-json = { module = "io.kotest:kotest-assertions-json", version.ref = "kotest" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 # Jackson
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson-annotations" }
 
 # Swagger
 swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swagger-parser" }

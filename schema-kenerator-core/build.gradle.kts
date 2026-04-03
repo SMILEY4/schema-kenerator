@@ -1,5 +1,4 @@
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.dokka.gradle.DokkaTask
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -21,7 +20,6 @@ dependencies {
 
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
-    testImplementation(libs.kotest.framework.datatest)
     testImplementation(libs.kotlin.test)
 }
 
@@ -49,8 +47,10 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/schema-kenerator-core"))
+dokka {
+    dokkaPublications.html {
+        outputDirectory = file("$rootDir/docs/dokka/schema-kenerator-core")
+    }
 }
 
 mavenPublishing {
