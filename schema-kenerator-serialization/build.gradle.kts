@@ -61,6 +61,12 @@ mavenPublishing {
     val projectDeveloperName: String by project
     val projectDeveloperUrl: String by project
 
+    configure(
+        com.vanniktech.maven.publish.KotlinJvm(
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Dokka("dokkaGenerateHtml")
+        )
+    )
+
     publishToMavenCentral(automaticRelease = true)
     signAllPublications()
     coordinates(projectGroupId, "$projectArtifactIdBase-serialization", projectVersion)
