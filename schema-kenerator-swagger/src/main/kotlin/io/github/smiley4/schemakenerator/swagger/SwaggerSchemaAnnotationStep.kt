@@ -126,7 +126,7 @@ internal class SwaggerSchemaAnnotationStep {
         return annotations
             .filter { it.name == Schema::class.qualifiedName }
             .map { it.values["defaultValue"] as String }
-            .firstOrNull { it.isNotBlank() }
+            .firstOrNull { it.isNotBlank() && it != Schema.DEFAULT_SENTINEL }
     }
 
     private fun getAccessMode(annotations: Collection<AnnotationData>): Schema.AccessMode? {

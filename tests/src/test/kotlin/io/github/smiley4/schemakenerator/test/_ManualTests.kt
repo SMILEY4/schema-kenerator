@@ -16,6 +16,7 @@ import io.github.smiley4.schemakenerator.serialization.SerializationSteps.addJso
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
 import io.github.smiley4.schemakenerator.serialization.SerializationSteps.convertToKotlinxSerializationTypes
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileInlining
+import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencing
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
@@ -84,6 +85,14 @@ class _ManualTests : StringSpec({
             .compileReferencing(definitionsPath = "definitions")
             .convertToKotlinxSerializationTypes()
         println(schema)
+    }
+
+    "test" {
+        val schema = initial<MembershipTypeCredits>()
+            .analyzeTypeUsingKotlinxSerialization()
+            .generateSwaggerSchema()
+            .compileInlining()
+        println(Json31.pretty(schema))
     }
 
 }) {

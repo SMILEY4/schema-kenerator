@@ -173,8 +173,7 @@ object SwaggerSchemaCompileUtils {
             copy.description = source.description
             copy.discriminator = source.discriminator
             copy.enum = source.enum
-            copy.example = source.example
-            copy.exampleSetFlag = source.exampleSetFlag
+            if(source.exampleSetFlag) copy.example = source.example
             copy.examples = source.examples
             copy.exclusiveMaximum = source.exclusiveMaximum
             copy.exclusiveMaximumValue = source.exclusiveMaximumValue
@@ -203,7 +202,7 @@ object SwaggerSchemaCompileUtils {
             copy.readOnly = source.readOnly
             copy.required = source.required
             copy.setConst(source.const)
-            copy.setDefault(source.default)
+            if(source.defaultSetFlag) copy.default = source.default
             copy.specVersion = source.specVersion
             copy.title = source.title
             copy.type = source.type
