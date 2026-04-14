@@ -6,6 +6,7 @@ import io.github.smiley4.schemakenerator.core.data.EnumData
 import io.github.smiley4.schemakenerator.core.data.MapData
 import io.github.smiley4.schemakenerator.core.data.MemberKind
 import io.github.smiley4.schemakenerator.core.data.TypeData
+import io.github.smiley4.schemakenerator.core.data.TypeDataUtils.findOrThrow
 import io.github.smiley4.schemakenerator.core.data.TypeId
 import io.github.smiley4.schemakenerator.core.data.TypeName
 import io.github.smiley4.schemakenerator.core.data.TypeParameterData
@@ -79,7 +80,8 @@ class DefaultReflectionTypeAnalyzerModule(
         val typeCategory = typeCategoryAnalyzer.determineTypeCategory(context.type, primitiveTypes)
 
         // collect supertypes
-        val supertypes = if (typeCategory == TypeCategory.OBJECT) {
+        val categoriesWithSupertypes = setOf(TypeCategory.OBJECT, TypeCategory.COLLECTION, TypeCategory.MAP)
+        val supertypes = if (categoriesWithSupertypes.contains(typeCategory)) {
             supertypeAnalyzer.analyzeSupertypes(context).map { it.id }
         } else {
             emptyList()
@@ -180,7 +182,10 @@ class DefaultReflectionTypeAnalyzerModule(
                 isInlineValue = false,
                 enumData = null,
                 collectionData = CollectionData(
-                    itemType = collectionAnalyzer.getCollectionItemType(minimalTypeData.typeParameters, this::unknownTypeParameter),
+                    itemType = collectionAnalyzer.getCollectionItemType(
+                        minimalTypeData.typeParameters + supertypes.flatMap { st -> context.knownTypeData.findOrThrow(st).typeParameters },
+                        this::unknownTypeParameter
+                    ),
                     unique = uniqueCollection,
                 ),
                 mapData = null
@@ -198,8 +203,14 @@ class DefaultReflectionTypeAnalyzerModule(
                 enumData = null,
                 collectionData = null,
                 mapData = MapData(
-                    keyType = collectionAnalyzer.getMapKeyType(minimalTypeData.typeParameters, this::unknownTypeParameter),
-                    valueType = collectionAnalyzer.getMapValueType(minimalTypeData.typeParameters, this::unknownTypeParameter),
+                    keyType = collectionAnalyzer.getMapKeyType(
+                        minimalTypeData.typeParameters + supertypes.flatMap { st -> context.knownTypeData.findOrThrow(st).typeParameters },
+                        this::unknownTypeParameter
+                    ),
+                    valueType = collectionAnalyzer.getMapValueType(
+                        minimalTypeData.typeParameters + supertypes.flatMap { st -> context.knownTypeData.findOrThrow(st).typeParameters },
+                        this::unknownTypeParameter
+                    ),
                 )
             )
         }.let {

@@ -26,6 +26,7 @@ import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
 import io.github.smiley4.schemakenerator.swagger.data.CompiledSwaggerSchemaData
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
+import io.github.smiley4.schemakenerator.test.cases.MiscTestCases.Issue43Enum
 import io.kotest.core.spec.style.StringSpec
 import io.swagger.v3.core.util.Json31
 import io.swagger.v3.oas.models.Components
@@ -35,6 +36,7 @@ import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import kotlin.time.Duration
 
 
@@ -76,7 +78,7 @@ class _ManualTests : StringSpec({
     }
 
     "kotlinx" {
-        val schema = initial<MembershipTypeCredits>()
+        val schema = initial<TestClass>()
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
@@ -88,16 +90,22 @@ class _ManualTests : StringSpec({
     }
 
     "test" {
-        val schema = initial<MembershipTypeCredits>()
-            .analyzeTypeUsingKotlinxSerialization()
+        val schema = initial<TestClass>()
+            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
-            .compileInlining()
-        println(Json31.pretty(schema))
+            .withTitle(TitleType.SIMPLE)
+            .compileReferencing()
+            .asOpenApiJson()
+        println(schema)
     }
 
 }) {
     companion object {
 
+        @Serializable
+        data class TestClass(
+            val someData: JsonElement,
+        )
 
         @Serializable
         data class MembershipTypeCredits(
