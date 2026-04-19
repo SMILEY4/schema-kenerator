@@ -1175,6 +1175,51 @@ object BasicTestCases {
         """.trimIndent()
     }
 
+    val genericTypeSuperclass = case("basics", "generic type property in superclass (list)") {
+        type = typeOf<ClassWithGenericListSuperclass>()
+        // language=json
+        expectedSwagger = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+        """.trimIndent()
+        // note: kotlinx-serialization analyzer can't properly deal with this yet
+        expectedSwaggerKotlinxSerialization = """
+            {
+              "schemas" : {
+                "_root" : {
+                  "type" : "object",
+                  "properties" : { }
+                }
+              }
+            }
+        """.trimIndent()
+        // language=json
+        expectedJson = """
+            {
+               "type": "array",
+               "items": {
+                  "type": "string"
+               }
+            }
+        """.trimIndent()
+        // note: kotlinx-serialization analyzer can't properly deal with this yet
+        expectedJsonKotlinxSerialization = """
+            {
+               "type": "object",
+               "required": [],
+               "properties": {}
+            }
+        """.trimIndent()
+    }
+
     val differentGenericsForSameWrapper = case("basics", "different generics for same wrapper") {
         type = typeOf<ClassWithDifferentGenerics>()
         // language=json
@@ -1603,10 +1648,12 @@ object BasicTestCases {
 
 
     @Serializable
-    class ClassWithGenericField<T>(
+    open class ClassWithGenericField<T>(
         val value: T
     )
 
+    @Serializable
+    abstract class ClassWithGenericListSuperclass: List<String>
 
     @Serializable
     class ClassWithDifferentGenerics(

@@ -73,6 +73,7 @@ class GeneralTests : FunSpec({
             BasicTestCases.genericWildcardField,
             BasicTestCases.genericDeepField,
             BasicTestCases.differentGenericsForSameWrapper,
+            BasicTestCases.genericTypeSuperclass,
             BasicTestCases.nestedClass,
             BasicTestCases.nullableSelfReference,
 
