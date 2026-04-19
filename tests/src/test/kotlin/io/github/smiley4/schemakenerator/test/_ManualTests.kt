@@ -35,6 +35,8 @@ import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.info.Info
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlin.time.Duration
 
 
@@ -76,7 +78,7 @@ class _ManualTests : StringSpec({
     }
 
     "kotlinx" {
-        val schema = initial<MembershipTypeCredits>()
+        val schema = initial<TestClass>()
             .analyzeTypeUsingKotlinxSerialization()
             .addJsonClassDiscriminatorProperty()
             .handleNameAnnotation()
@@ -88,16 +90,26 @@ class _ManualTests : StringSpec({
     }
 
     "test" {
-        val schema = initial<MembershipTypeCredits>()
+        val schema = initial<JsonArray>()
             .analyzeTypeUsingKotlinxSerialization()
+//            .analyzeTypeUsingReflection()
             .generateSwaggerSchema()
-            .compileInlining()
-        println(Json31.pretty(schema))
+            .compileReferencing()
+            .asOpenApiJson()
+        println(schema)
     }
 
 }) {
     companion object {
 
+        @Serializable
+        abstract class ClassWithGenericListSuperclass: List<String>
+
+
+        @Serializable
+        data class TestClass(
+            val someData: JsonElement,
+        )
 
         @Serializable
         data class MembershipTypeCredits(

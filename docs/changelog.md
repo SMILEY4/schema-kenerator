@@ -5,6 +5,10 @@ search:
 
 # Changelog
 
+## 2.7.1
+
+- fix: `"default": null` or `"default":"##default"` incorrectly added to swagger schemas
+
 ## 2.7.0
 
 - upgrade dependencies
