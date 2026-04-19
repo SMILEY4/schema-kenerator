@@ -5,6 +5,10 @@ search:
 
 # Changelog
 
+## 2.7.2
+
+- fix type analysis for some non-generic classes with generic superclasses
+
 ## 2.7.1
 
 - fix: `"default": null` or `"default":"##default"` incorrectly added to swagger schemas
